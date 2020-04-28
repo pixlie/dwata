@@ -11,6 +11,7 @@ starlette = "*"
 uvicorn = "*"
 python-decouple = "*"
 python-rapidjson = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"
