@@ -1,0 +1,2 @@
+export const INITIATE_FETCH_DATA = "INITIATE_FETCH_DATA";
+export const FETCH_DATA = "FETCH_DATA";

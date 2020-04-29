@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&display=swap');
+
+// Update Bulma's global variables
+$family-sans-serif: "Titillium Web", sans-serif;
+
+// Reduce the size of the default shadow
+$scheme-invert: hsl(0, 0%, 4%);
+$card-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+$panel-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+$box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+
+@import '../../node_modules/bulma';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/solid.css';
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  min-width: 480px;
+  box-shadow: $box-shadow;
+
+  background-color: white;
+
+  .head {
+    text-align: right;
+
+    .button {
+      border: none;
+    }
+  }
+
+  .title {
+    color: wheat;
+  }
+
+  z-index: 100;
+
+  .panel {
+    .panel-block {
+      cursor: pointer;
+    }
+  }
+}
+
+.navbar {
+  font-weight: bold;
+
+  button {
+    font-weight: bold;
+  }
+}
