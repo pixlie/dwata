@@ -58,4 +58,7 @@ async def schema_get(request):
             ) for name, schema in meta.tables.items()
         ], key=lambda x: x[0])
         conn.close()
-        return RapidJSONResponse(tables)
+        return RapidJSONResponse({
+            "columns": ["table_name", "columns"],
+            "rows": tables
+        })

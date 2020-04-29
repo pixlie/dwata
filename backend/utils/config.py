@@ -21,7 +21,7 @@ class Settings(object):
         self.ALLOWED_ORIGINS = config(
             "ALLOWED_ORIGINS",
             cast=lambda v: [s.strip() for s in v.split(',')],
-            default="http://localhost:3000,"
+            default="http://localhost:12122,"
         )
 
 

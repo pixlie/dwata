@@ -7,13 +7,14 @@ from starlette.routing import Route
 from utils.config import settings
 from endpoints.source import source_get
 from endpoints.schema import schema_get
+from endpoints.data import data_post
 
 
 handlers = [
-    Route(r"/api/source/", source_get),
-    Route(r"/api/schema/{source_index:int}/{table_name:str}", schema_get),
-    Route(r"/api/schema/{source_index:int}", schema_get),
-    # Route(r"/api/data/", CategorySolutionEndpoint),
+    Route(r"/api/source/", source_get, methods=["GET"]),
+    Route(r"/api/schema/{source_index:int}/{table_name:str}", schema_get, methods=["GET"]),
+    Route(r"/api/schema/{source_index:int}", schema_get, methods=["GET"]),
+    Route(r"/api/data/{source_index:int}/{table_name:str}", data_post, methods=["POST"]),
 ]
 
 
@@ -21,7 +22,7 @@ middleware = [
     Middleware(
         CORSMiddleware,
         allow_origins=settings.ALLOWED_ORIGINS,
-        allow_methods=["OPTIONS", "GET"],
+        allow_methods=["OPTIONS", "GET", "POST"],
         allow_headers="Authorization,Access-Control-Allow-Headers,Origin,Accept,X-Requested-With"
                       ",Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers"
     )
