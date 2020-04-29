@@ -8,6 +8,7 @@ $scheme-invert: hsl(0, 0%, 4%);
 $card-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
 $panel-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
 $box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+$table-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 
 @import '../../node_modules/bulma';
 @import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
@@ -49,5 +50,33 @@ $box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
 
   button {
     font-weight: bold;
+  }
+
+  .navbar-brand {
+    .navbar-item {
+      font-size: x-large;
+      padding: 0 3rem;
+    }
+  }
+}
+
+table {
+  &.is-data-table {
+    border-top: $table-cell-border;
+    border-bottom: $table-cell-border;
+    box-shadow: $table-shadow;
+    margin-bottom: 8rem;
+  }
+
+  thead {
+    tr {
+      th {
+        cursor: n-resize;
+
+        &:hover {
+          background-color: #efefef;
+        }
+      }
+    }
   }
 }

@@ -20,8 +20,8 @@ class QueryEditor extends PureComponent {
   }
 
   componentDidMount() {
-    const { source_id, table_name, table_columns } = this.props;
-    var cache_state = window.localStorage.getItem(`queryEditorCache/${source_id}/${table_name}`);
+    const { sourceId, table_name, table_columns } = this.props;
+    var cache_state = window.localStorage.getItem(`queryEditorCache/${sourceId}/${table_name}`);
     if (cache_state) {
       cache_state = JSON.parse(cache_state);
       cache_state["limit"] = cache_state["limit"] ? parseInt(cache_state["limit"]) : null;
@@ -56,11 +56,11 @@ class QueryEditor extends PureComponent {
 
   applyChanges(event) {
     event.preventDefault();
-    const { onchange, source_id, table_name, order_by } = this.props;
+    const { onchange, sourceId, table_name, order_by } = this.props;
     const { columns_selected, filter_by, limit } = this.state;
     // We save the query specification to local storage so when we reopen the editor or refresh we can refill the form
     window.localStorage.setItem(
-      `queryEditorCache/${source_id}/${table_name}`,
+      `queryEditorCache/${sourceId}/${table_name}`,
       JSON.stringify({ columns_selected, order_by, filter_by, limit })
     );
     onchange({ columns_selected, order_by, filter_by, limit });

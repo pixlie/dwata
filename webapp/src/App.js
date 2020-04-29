@@ -20,7 +20,7 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
-          <Route path="/browse/:dbId/:tableName">
+          <Route path="/browse/:sourceId/:tableName">
             <Browser />
           </Route>
         </Switch>

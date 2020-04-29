@@ -1,10 +1,11 @@
-import React, { Fragment, PureComponent } from "react";
+import React, { PureComponent } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fetchData } from "services/browser/actions";
 import { fetchSchema } from "services/schema/actions";
 import { toggleOrderBy } from "services/queryEditor/actions";
+import { Section } from "components/BulmaHelpers";
 import QueryEditor from "./QueryEditor";
 
 
@@ -29,10 +30,10 @@ const RowRenderer = (schema, queriedColumns) => {
       }
     }
   });
-  console.log(schema);
 
   for (let i = 0; i < queriedColumns.length; i++) {
     const head = schema.columns.find(x => x.name === queriedColumns[i]);
+    console.log(head, queriedColumns[i], schema.columns, queriedColumns);
     if (head.type === "BOOLEAN") {
       row_list.push(BooleanCell);
     } else if (head.type === "JSONB" || head.type === "JSON") {
@@ -68,12 +69,12 @@ class Browser extends PureComponent {
     tableData: [],
     count: 0,
     query: undefined,
-    options_open: false,
+    optionsOpen: false,
   }
 
 	componentDidMount() {
     const { orderBy, schema, match } = this.props;
-    const { dbId, tableName } = match.params;
+    const { sourceId, tableName } = match.params;
     const columnsSelected = schema.isReady ? schema.columns.reduce((acc, ele) => ({
       ...acc,
       [ele.name]: true
@@ -87,23 +88,28 @@ class Browser extends PureComponent {
       // limit,
     };
 
-    this.props.fetchSchema(dbId);
-    this.props.fetchData(dbId, tableName, querySpecification);
-	}
+    this.props.fetchSchema(sourceId);
+    this.props.fetchData(sourceId, tableName, querySpecification);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { sourceId, table_name, tableData, schema, toggleOrderBy } = this.props;
+
+  }
 
   toggleOptions = () => {
     this.setState(state => ({
       ...state,
-      options_open: !state.options_open
+      optionsOpen: !state.optionsOpen
     }));
   }
 
 	render() {
-    const { source_id, table_name, tableData, schema, toggleOrderBy } = this.props;
-    const { options_open } = this.state;
+    const { sourceId, table_name, tableData, schema, toggleOrderBy } = this.props;
+    const { optionsOpen } = this.state;
     const { toggleOptions, fetchData } = this;
 
-    if (!tableData.isReady || !schema.isReady) {
+    if (!tableData.isReady || !schema.isReady || tableData.columns.length !== schema.columns.length) {
       return (
         <div>Loading...</div>
       );
@@ -112,25 +118,12 @@ class Browser extends PureComponent {
     const row_renderer_list = RowRenderer(schema, tableData.columns);
 
     return (
-      <Fragment>
-        <div className="pure-g main-head">
-          <div className="pure-u-1-4">
-            <h1>Data browser</h1>
-          </div>
-
-          <div className="pure-u-1-4">travlyng / {table_name}</div>
-
-          <div className="pure-u-1-2 right-menu">
-            <button className="pure-button pure-button-primary small" onClick={toggleOptions}>Edit query</button>
-          </div>
-        </div>
-
-        { options_open ? <QueryEditor source_id={source_id} table_name={table_name}
-          tableColumns={schema} onchange={fetchData} /> : null }
+      <Section>
+        { optionsOpen ? <QueryEditor onchange={fetchData} /> : null }
 
         <div className="pure-g">
           <div className="pure-u">
-            <table className="pure-table pure-table-horizontal data-table">
+            <table className="table is-narrow is-fullwidth is-data-table">
               <thead>
                 <tr>
                   { tableData.columns.map(head => <HeadItem toggleOrderBy={toggleOrderBy} key={`th-${head}`} head={head} />) }
@@ -143,7 +136,6 @@ class Browser extends PureComponent {
                     { row.map((cell, j) => {
                       const Cell = row_renderer_list[j];
                       return <Cell key={`td-${i}-${j}`} data={cell} />;
-                      // return <Fragment />;
                     }) }
                   </tr>
                 )) : null }
@@ -151,7 +143,7 @@ class Browser extends PureComponent {
             </table>
           </div>
         </div>
-      </Fragment>
+      </Section>
     );
 	}
 }
