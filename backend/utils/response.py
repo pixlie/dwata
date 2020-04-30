@@ -2,6 +2,7 @@ import json
 import typing
 from starlette.responses import JSONResponse
 import rapidjson
+from loguru import logger
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -20,3 +21,11 @@ class RapidJSONResponse(JSONResponse):
 
     def render(self, content: typing.Any) -> bytes:
         return CustomJSONEncoder().encode(content).encode("utf-8")
+
+
+def web_error(error_code, message, level="error"):
+    logger.error("({}) {}".format(error_code, message))
+    return RapidJSONResponse({
+        "error_code": error_code,
+        "message": message,
+    })
