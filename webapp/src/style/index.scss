@@ -8,7 +8,7 @@ $scheme-invert: hsl(0, 0%, 4%);
 $card-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
 $panel-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
 $box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
-$table-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+$table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 
 @import '../../node_modules/bulma';
 @import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
@@ -20,15 +20,17 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
   left: 0;
   bottom: 0;
   min-width: 480px;
-  box-shadow: $box-shadow;
 
-  background-color: white;
+  background-color: rgba(109, 109, 109, 0.404);
+  border-right: 4px solid #5c5c5c;
 
   .head {
     text-align: right;
 
     .button {
       border: none;
+      background-color: #5c5c5c;
+      margin: 0.5rem -3rem 0 0;
     }
   }
 
@@ -39,6 +41,8 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
   z-index: 100;
 
   .panel {
+    background-color: white;
+
     .panel-block {
       cursor: pointer;
     }
@@ -62,8 +66,8 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
 
 table {
   &.is-data-table {
-    border-top: $table-cell-border;
-    border-bottom: $table-cell-border;
+    border-top: 4px solid #48c774;
+    border-bottom: 4px solid #48c774;
     box-shadow: $table-shadow;
     margin-bottom: 8rem;
   }

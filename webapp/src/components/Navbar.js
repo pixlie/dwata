@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { toggleSidebar } from "services/global/actions";
 
 
-const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
+const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSidebar }) => {
   return (
     <nav className="navbar is-light" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -24,7 +24,7 @@ const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
         <div className="navbar-start">
           <div className="navbar-item">
             <div className="buttons">
-              <button className="button is-grey" onClick={toggleSidebar}>
+              <button className="button is-grey" onClick={toggleSidebar} disabled={isSourceFetching}>
                 Sources
               </button>
             </div>
@@ -72,6 +72,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     schema: state.schema,
+    isSourceFetching: state.source.isFetching,
     db: state.source.isReady ? state.source.rows[sourceId] : {},
     sourceId,
     tableName,

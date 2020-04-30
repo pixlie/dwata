@@ -3,10 +3,13 @@ import { transformData } from "utils";
 
 
 const initialState = {
+  sourceId: null,
+  id: null,
   columns: [],
   rows: [],
   isFetching: false,
   isReady: false,
+  _cachedData: {},
 };
 
 
@@ -16,14 +19,26 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isFetching: true,
+        sourceId: parseInt(action.sourceId),
+        id: parseInt(action.sourceId),
       };
 
     case FETCH_SCHEMA:
-      return {
+      const temp = {
         columns: action.payload.columns,
         rows: action.payload.rows.map(row => transformData(action.payload.columns, row)),
+        sourceId: parseInt(action.sourceId),
+        id: parseInt(action.sourceId),
         isFetching: false,
         isReady: true,
+      };
+      return {
+        ...state,
+        ...temp,
+        _cachedData: {
+          ...state.cachedData,
+          [action.sourceId]: temp,
+        }
       };
     default:
       return state;

@@ -6,6 +6,7 @@ import store from "services/store";
 import Navbar from "components/Navbar";
 import Source from "components/Source";
 import Sidebar from "components/Sidebar";
+import Home from "components/Home";
 import Browser from "components/Browser";
 
 
@@ -20,8 +21,12 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
-          <Route path="/browse/:sourceId/:tableName">
+          <Route path="/browse/:sourceId/:tableName" exact>
             <Browser />
+          </Route>
+
+          <Route path="/" exact>
+            <Home />
           </Route>
         </Switch>
       </BrowserRouter>

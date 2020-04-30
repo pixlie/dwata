@@ -7,6 +7,8 @@ import { dataURL } from "services/urls";
 export const fetchData = (sourceId, tableName, payload, callback) => dispatch => {
   dispatch({
     type: INITIATE_FETCH_DATA,
+    sourceId,
+    tableName,
   });
 
   return axios
@@ -19,6 +21,8 @@ export const fetchData = (sourceId, tableName, payload, callback) => dispatch =>
       return dispatch({
         type: FETCH_DATA,
         payload: res.data,
+        sourceId,
+        tableName,
       });
     })
     .catch(err => {

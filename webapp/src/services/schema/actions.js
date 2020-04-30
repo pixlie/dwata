@@ -4,13 +4,14 @@ import { schemanURL } from '../urls';
 import { INITIATE_FETCH_SCHEMA, FETCH_SCHEMA } from './actionTypes';
 
 
-export const fetchSchema = (sourceIndex, callback) => dispatch => {
+export const fetchSchema = (sourceId, callback) => dispatch => {
   dispatch({
     type: INITIATE_FETCH_SCHEMA,
+    sourceId,
   });
 
   return axios
-    .get(`${schemanURL}/${sourceIndex}`)
+    .get(`${schemanURL}/${sourceId}`)
     .then(res => {
       if (!!callback) {
         callback();
@@ -18,6 +19,7 @@ export const fetchSchema = (sourceIndex, callback) => dispatch => {
 
       return dispatch({
         type: FETCH_SCHEMA,
+        sourceId,
         payload: res.data,
       });
     })

@@ -55,8 +55,8 @@ async def schema_get(request):
                         "name": col,
                         "type": type(col_def.type).__name__,
                         "length": col_def.type.length if type(col_def.type).__name__ in types_with_length else None,
-                        "primary_key": col_def.primary_key,
-                        "nullable": col_def.nullable,
+                        "is_primary_key": col_def.primary_key,
+                        "is_nullable": col_def.nullable,
                         "has_foreign_keys": len(col_def.foreign_keys) > 0,
                     } for col, col_def in schema.columns.items()
                 ]
