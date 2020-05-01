@@ -1,10 +1,20 @@
 import axios from 'axios';
 
 import { schemanURL } from '../urls';
-import { INITIATE_FETCH_SCHEMA, FETCH_SCHEMA } from './actionTypes';
+import { INITIATE_FETCH_SCHEMA, FETCH_SCHEMA, LOAD_SCHEMA_FROM_CACHE } from './actionTypes';
 
 
-export const fetchSchema = (sourceId, callback) => dispatch => {
+export const fetchSchema = (sourceId, callback) => (dispatch, getState) => {
+  const container = getState().schema;
+  const _cacheKey = sourceId;
+  if (container._cachedData && container._cachedData[_cacheKey]) {
+    // We have needed data in cache. Swap that into the state
+    return dispatch({
+      type: LOAD_SCHEMA_FROM_CACHE,
+      sourceId,
+    });
+  }
+
   dispatch({
     type: INITIATE_FETCH_SCHEMA,
     sourceId,

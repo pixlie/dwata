@@ -9,8 +9,8 @@ class QueryEditor extends PureComponent {
 	constructor() {
 		super();
 		this.state = {
-      columns_selected: {},
-      filter_by: {},
+      columnsSelected: {},
+      filterBy: {},
       order_by: {},  // Only used to load from localStorage
       limit: 100,
     }
@@ -33,7 +33,7 @@ class QueryEditor extends PureComponent {
     }
     this.setState(state => ({
       ...state,
-      columns_selected: table_columns.reduce((acc, ele) => ({
+      columnsSelected: table_columns.reduce((acc, ele) => ({
         ...acc,
         [ele.name]: true
       }), {}),
@@ -46,7 +46,7 @@ class QueryEditor extends PureComponent {
     if (table_columns !== prevProps.table_columns) {
       this.setState(state => ({
         ...state,
-        columns_selected: table_columns.reduce((acc, ele) => ({
+        columnsSelected: table_columns.reduce((acc, ele) => ({
           ...acc,
           [ele.name]: true
         }), {})
@@ -57,13 +57,13 @@ class QueryEditor extends PureComponent {
   applyChanges(event) {
     event.preventDefault();
     const { onchange, sourceId, table_name, order_by } = this.props;
-    const { columns_selected, filter_by, limit } = this.state;
+    const { columnsSelected, filterBy, limit } = this.state;
     // We save the query specification to local storage so when we reopen the editor or refresh we can refill the form
     window.localStorage.setItem(
       `queryEditorCache/${sourceId}/${table_name}`,
-      JSON.stringify({ columns_selected, order_by, filter_by, limit })
+      JSON.stringify({ columnsSelected, order_by, filterBy, limit })
     );
-    onchange({ columns_selected, order_by, filter_by, limit });
+    onchange({ columnsSelected, order_by, filterBy, limit });
   }
 
   toggleColumn(event) {
@@ -71,9 +71,9 @@ class QueryEditor extends PureComponent {
     const { name } = event.target;
     this.setState(state => ({
       ...state,
-      columns_selected: {
-        ...state.columns_selected,
-        [name]: !state.columns_selected[name],
+      columnsSelected: {
+        ...state.columnsSelected,
+        [name]: !state.columnsSelected[name],
       },
     }))
   }
@@ -90,7 +90,7 @@ class QueryEditor extends PureComponent {
   setFilters = (filterData) => {
     this.setState(state => ({
       ...state,
-      filter_by: {
+      filterBy: {
         ...filterData
       }
     }));
@@ -99,7 +99,7 @@ class QueryEditor extends PureComponent {
   render() {
     const { applyChanges, toggleColumn, changeInput, setFilters } = this;
     const { table_columns } = this.props;
-    const { columns_selected, limit, filter_by, order_by } = this.state;
+    const { columnsSelected, limit, filterBy, order_by } = this.state;
 
     return (
       <div className="pure-g options-panel">
@@ -110,7 +110,7 @@ class QueryEditor extends PureComponent {
               { table_columns.map(head => (
                 <div className="checkbox">
                   <label for={`sl-${head.name}`}>{head.name}</label>
-                  <input type="checkbox" name={head.name} id={`sl-${head.name}`} key={`sl-${head.name}`} checked={columns_selected[head.name]} onChange={toggleColumn} />
+                  <input type="checkbox" name={head.name} id={`sl-${head.name}`} key={`sl-${head.name}`} checked={columnsSelected[head.name]} onChange={toggleColumn} />
                 </div>
               )) }
             </div>
@@ -118,7 +118,7 @@ class QueryEditor extends PureComponent {
         </div>
 
         <div className="pure-u-1-3">
-          <FilterByEditor table_columns={table_columns} filter_by={filter_by} setFilters={setFilters} />
+          <FilterByEditor table_columns={table_columns} filterBy={filterBy} setFilters={setFilters} />
         </div>
 
         <div className="pure-u-1-3">
@@ -144,7 +144,7 @@ class QueryEditor extends PureComponent {
 
 
 const mapStateToProps = state => ({
-  order_by: state.queryEditor.order_by,
+  queryEditor: state.queryEditor,
 });
 
 

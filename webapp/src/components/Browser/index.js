@@ -6,21 +6,8 @@ import { fetchData } from "services/browser/actions";
 import { fetchSchema } from "services/schema/actions";
 import { toggleOrderBy } from "services/queryEditor/actions";
 import { Section } from "components/BulmaHelpers";
-import QueryEditor from "./QueryEditor";
 import rowRenderer from "./rowRenderer";
 import headRenderer from "./headRenderer";
-
-
-const HeadItem = ({ toggleOrderBy, head }) => {
-  const handleClick = event => {
-    event.preventDefault();
-    toggleOrderBy(head);
-  }
-
-  return (
-    <th onClick={handleClick}>{head}</th>
-  );
-}
 
 
 class Browser extends PureComponent {
@@ -35,42 +22,25 @@ class Browser extends PureComponent {
   }
 
 	componentDidMount() {
-    const { orderBy, schema, match } = this.props;
-    const { sourceId, tableName } = match.params;
-    const columnsSelected = schema.isReady ? schema.columns.reduce((acc, ele) => ({
-      ...acc,
-      [ele.name]: true
-    }), {}) : {};
-    const querySpecification = {
-      columns: Object.keys(columnsSelected).
-        map(col => columnsSelected[col] === true ? col : undefined).
-        filter(col => col !== undefined),
-      orderBy,
-      // filterBy,
-      // limit,
-    };
-
+    const {match: {params: {sourceId, tableName}}} = this.props;
     this.props.fetchSchema(sourceId);
-    this.props.fetchData(sourceId, tableName, querySpecification);
+    this.props.fetchData(sourceId, tableName);
   }
 
   componentDidUpdate(prevProps) {
-    const { sourceId, tableName, tableData, schema, toggleOrderBy } = this.props;
-
-  }
-
-  toggleOptions = () => {
-    this.setState(state => ({
-      ...state,
-      optionsOpen: !state.optionsOpen
-    }));
+    const {match: {params: {sourceId, tableName}}} = this.props;
+    const {match: {params: {sourceId: prevSourceId, tableName: prevTableName}}} = prevProps;
+    if (sourceId && tableName && prevSourceId && prevTableName &&
+      (sourceId != prevSourceId || tableName != prevTableName)) {
+        console.log(sourceId, tableName, prevSourceId, prevTableName);
+        // Call the fetch actions when URL has changed but this Component was already loaded
+        this.props.fetchSchema(sourceId);
+        this.props.fetchData(sourceId, tableName);
+    }
   }
 
 	render() {
-    const { sourceId, tableName, tableData, schema, toggleOrderBy } = this.props;
-    const { optionsOpen } = this.state;
-    const { toggleOptions, fetchData } = this;
-
+    const { tableData, schema } = this.props;
     if (!tableData.isReady || !schema.isReady || tableData.columns.length !== schema.columns.length) {
       return (
         <div>Loading...</div>
@@ -82,8 +52,6 @@ class Browser extends PureComponent {
 
     return (
       <Section>
-        { optionsOpen ? <QueryEditor onchange={fetchData} /> : null }
-
         <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
           <thead>
             <tr>
@@ -112,39 +80,23 @@ class Browser extends PureComponent {
 }
 
 
-const currentOrCache = (container, id) => {
-  if (container.id === id && container.isReady) {
-    // We seem to have current data and it is ready
-    return {
-      ...container,
-      _cachedData: undefined, // Cache data not to be sent out
-    };
-  }
-  if (container._cachedData && container._cachedData[id]) {
-    // Do we have needed data in cache? If so, return that
-    return container._cachedData[id];
-  }
-  // console.log(container);
-  return {
-    isReady: false,
-  }
-}
-
-
 const mapStateToProps = (state, props) => {
   let { sourceId, tableName } = props.match.params;
   sourceId = parseInt(sourceId);
-  const _id = `${sourceId}/${tableName}`;
-  const schema = currentOrCache(state.schema, sourceId);
+  const _browserCacheKey = `${sourceId}/${tableName}`;
 
   return {
     sourceId,
     tableName,
-    schema: schema.isReady ? {
-      ...schema.rows.find(x => x.table_name === tableName),
+    schema: state.schema.isReady && state.schema.sourceId === parseInt(sourceId) ? {
+      ...state.schema.rows.find(x => x.table_name === tableName),
       isReady: true,
-    } : schema,
-    tableData: currentOrCache(state.browser, _id),
+    } : {
+      isReady: false,
+    },
+    tableData: state.browser.isReady && state.browser._cacheKey === _browserCacheKey ? state.browser : {
+      isReady: false,
+    },
     orderBy: state.queryEditor.orderBy,
   }
 }

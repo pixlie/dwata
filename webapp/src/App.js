@@ -8,6 +8,7 @@ import Source from "components/Source";
 import Sidebar from "components/Sidebar";
 import Home from "components/Home";
 import Browser from "components/Browser";
+import QueryEditor from "components/Browser/QueryEditor";
 
 
 export default ({ initialState }) => {
