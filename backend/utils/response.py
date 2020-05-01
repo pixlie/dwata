@@ -28,4 +28,4 @@ def web_error(error_code, message, level="error"):
     return RapidJSONResponse({
         "error_code": error_code,
         "message": message,
-    })
+    }, status_code=500)

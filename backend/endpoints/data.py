@@ -1,8 +1,9 @@
 from starlette.responses import Response
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData, select, column, table, text
+from json.decoder import JSONDecodeError
 
-from utils.response import RapidJSONResponse
+from utils.response import RapidJSONResponse, web_error
 from utils.config import settings
 
 
@@ -22,7 +23,13 @@ async def data_post(request):
     """
     source_index = request.path_params["source_index"]
     table_name = request.path_params["table_name"]
-    request_data = await request.json()
+    try:
+        request_data = await request.json()
+    except JSONDecodeError:
+        return web_error(
+            error_code="request.json_decode_error",
+            message="We could not handle that request, perhaps something is wrong with the server."
+        )
 
     engine = create_engine(settings.DATABASES[source_index])
     conn = engine.connect()
