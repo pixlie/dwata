@@ -13,6 +13,7 @@ python-decouple = "*"
 python-rapidjson = "*"
 psycopg2 = "*"
 loguru = "*"
+aiohttp = "*"
 
 [requires]
 python_version = "3.8"

@@ -8,6 +8,7 @@ import Source from "components/Source";
 import Sidebar from "components/Sidebar";
 import Home from "components/Home";
 import Browser from "components/Browser";
+import APIBrowser from "components/APIBrowser";
 import QueryEditor from "components/Browser/QueryEditor";
 
 
@@ -24,6 +25,10 @@ export default ({ initialState }) => {
         <Switch>
           <Route path="/browse/:sourceId/:tableName" exact>
             <Browser />
+          </Route>
+
+          <Route path="/integration/:sourceId/:resourceName" exact>
+            <APIBrowser />
           </Route>
 
           <Route path="/" exact>

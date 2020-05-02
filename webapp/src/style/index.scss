@@ -14,6 +14,10 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 @import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '../../node_modules/@fortawesome/fontawesome-free/css/solid.css';
 
+body {
+  background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
+}
+
 #sidebar {
   position: fixed;
   top: 0;
@@ -51,6 +55,7 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 
 .navbar {
   font-weight: bold;
+  background-color: transparent;
 
   button {
     font-weight: bold;
@@ -60,6 +65,11 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
     .navbar-item {
       font-size: x-large;
       padding: 0 3rem;
+
+      img {
+        visibility: hidden;
+        max-height: 3.4rem;
+      }
     }
   }
 }

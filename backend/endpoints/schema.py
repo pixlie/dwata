@@ -1,16 +1,15 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.exc import OperationalError
 
-from utils.response import RapidJSONResponse, web_error
 from utils.config import settings
+from utils.response import RapidJSONResponse, web_error
+from utils.source import get_all_sources
+from integrations import all_integrations
 
 
-async def schema_get(request):
-    source_index = request.path_params["source_index"]
-    table_name = request.path_params.get("table_name", None)
-
+async def get_source_database(db_url, table_name):
     try:
-        engine = create_engine(settings.DATABASES[source_index])
+        engine = create_engine(db_url)
     except ModuleNotFoundError as e:
         if hasattr(e, "name") and e.name == "psycopg2":
             return web_error(
@@ -66,4 +65,21 @@ async def schema_get(request):
         return RapidJSONResponse({
             "columns": ["table_name", "columns"],
             "rows": tables
+        })
+
+
+async def schema_get(request):
+    source_index = request.path_params["source_index"]
+    all_sources = get_all_sources()
+    requested_source = all_sources[source_index]
+
+    if requested_source[2] == "database":
+        table_name = request.path_params.get("table_name", None)
+        response = await get_source_database(db_url=settings.DATABASES[source_index], table_name=table_name)
+        return response
+    elif requested_source[2] == "integration":
+        integration = all_integrations[requested_source[1]]()
+        return RapidJSONResponse({
+            "columns": ["table_name", "columns"],
+            "rows": [[x, []] for x in integration.resources.keys()]
         })

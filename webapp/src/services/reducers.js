@@ -6,6 +6,7 @@ import source from "./source/reducer";
 import schema from "./schema/reducer";
 import browser from "./browser/reducer";
 import queryEditor from "./queryEditor/reducer";
+import apiBrowser from "./apiBrowser/reducer";
 
 
 export default combineReducers({
@@ -14,4 +15,5 @@ export default combineReducers({
   schema,
   browser,
   queryEditor,
+  apiBrowser,
 });

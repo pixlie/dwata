@@ -2,15 +2,16 @@ import React from "react";
 import { Link, withRouter, matchPath } from "react-router-dom";
 import { connect } from "react-redux";
 
+import Logo from "asset/Supernova_logo_medium-removebg-preview.png";
 import { toggleSidebar } from "services/global/actions";
 
 
 const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSidebar }) => {
   return (
-    <nav className="navbar is-light" role="navigation" aria-label="main navigation">
+    <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          Supernova
+          <img src={Logo} alt="Logo: Tycho's Supernova Remnant" />&nbsp;Supernova
         </Link>
 
         <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" href="/">
@@ -52,7 +53,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSideb
         <div className="navbar-end">
           <div className="navbar-item">
             <div className="buttons">
-              <button className="button is-info">Filter/Order</button>
+              <button className="button is-info" disabled>Filter/Order</button>
             </div>
           </div>
         </div>
