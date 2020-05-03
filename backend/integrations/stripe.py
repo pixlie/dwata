@@ -6,6 +6,10 @@ class ResourceCharges(object):
     needs_auth = True
     base_url = None
     request_method = "get"
+    api_reference_url = "https://stripe.com/docs/api/charges"
+    help = "Returns a list of charges you’ve previously created. The charges are returned in sorted order, with the" \
+           " most recent charges appearing first."
+    response_data_type = "json"
 
     def __init__(self, base_url):
         self.base_url = base_url
@@ -18,7 +22,6 @@ class ResourceCharges(object):
 class Stripe(object):
     auth_method = api_constants.AUTH_METHOD_HTTP_BASIC
     base_url = "https://api.stripe.com"
-    response_data_type = "json"
     # base_path = ""
     resources = {
         "charges": ResourceCharges,
@@ -40,7 +43,6 @@ class Stripe(object):
         return aiohttp.ClientSession(**params)
 
     def get_resource(self, resource_name):
-        if resource_name in self.resource_names:
-            return self.resources[resource_name](
-
-            )
+        return self.resources[resource_name](
+            base_url=self.base_url
+        )

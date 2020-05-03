@@ -8,7 +8,7 @@ from utils.config import settings
 from endpoints.source import source_get
 from endpoints.schema import schema_get
 from endpoints.data import data_post
-from endpoints.api import api_fetch
+from endpoints.integration import integration_fetch
 
 
 handlers = [
@@ -16,7 +16,7 @@ handlers = [
     Route(r"/api/schema/{source_index:int}/{table_name:str}", schema_get, methods=["GET"]),
     Route(r"/api/schema/{source_index:int}", schema_get, methods=["GET"]),
     Route(r"/api/data/{source_index:int}/{table_name:str}", data_post, methods=["POST"]),
-    Route(r"/api/integration/{source_index:int}/{resource_name:str}", api_fetch, methods=["GET", "POST"])
+    Route(r"/api/integration/{source_index:int}/{resource_name:str}", integration_fetch, methods=["GET", "POST"])
 ]
 
 

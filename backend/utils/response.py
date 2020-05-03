@@ -5,7 +5,7 @@ import rapidjson
 from loguru import logger
 
 
-class CustomJSONEncoder(json.JSONEncoder):
+class RapidJSONEncoder(json.JSONEncoder):
     encode = rapidjson.Encoder(
         skip_invalid_keys=False,
         ensure_ascii=False,
@@ -20,7 +20,7 @@ class RapidJSONResponse(JSONResponse):
     media_type = "application/json"
 
     def render(self, content: typing.Any) -> bytes:
-        return CustomJSONEncoder().encode(content).encode("utf-8")
+        return RapidJSONEncoder().encode(content).encode("utf-8")
 
 
 def web_error(error_code, message, level="error"):

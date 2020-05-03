@@ -4,7 +4,6 @@ import { withRouter } from "react-router-dom";
 
 import { fetchAPIData } from "services/apiBrowser/actions";
 import { toggleOrderBy } from "services/queryEditor/actions";
-import { Section } from "components/BulmaHelpers";
 import rowRenderer from "./rowRenderer";
 import headRenderer from "./headRenderer";
 
@@ -48,7 +47,7 @@ class APIBrowser extends PureComponent {
     const headRendererList = headRenderer(tableData.columns);
 
     return (
-      <Section>
+      <div className="table-container">
         <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
           <thead>
             <tr>
@@ -71,7 +70,7 @@ class APIBrowser extends PureComponent {
             )) : null }
           </tbody>
         </table>
-      </Section>
+      </div>
     );
 	}
 }

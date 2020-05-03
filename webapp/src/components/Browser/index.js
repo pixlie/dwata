@@ -5,7 +5,6 @@ import { withRouter } from "react-router-dom";
 import { fetchData } from "services/browser/actions";
 import { fetchSchema } from "services/schema/actions";
 import { toggleOrderBy } from "services/queryEditor/actions";
-import { Section } from "components/BulmaHelpers";
 import rowRenderer from "./rowRenderer";
 import headRenderer from "./headRenderer";
 
@@ -51,30 +50,28 @@ class Browser extends PureComponent {
     const headRendererList = headRenderer(schema, tableData.columns);
 
     return (
-      <Section>
-        <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
-          <thead>
-            <tr>
-              { tableData.columns.map((cell, j) => {
-                const Cell = headRendererList[j];
-                return Cell !== null ? <Cell key={`th-${j}`} data={cell} /> : null;
-              }) }
-              {/* { tableData.columns.map(head => <HeadItem toggleOrderBy={toggleOrderBy} key={`th-${head}`} head={head} />) } */}
-            </tr>
-          </thead>
+      <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
+        <thead>
+          <tr>
+            { tableData.columns.map((cell, j) => {
+              const Cell = headRendererList[j];
+              return Cell !== null ? <Cell key={`th-${j}`} data={cell} /> : null;
+            }) }
+            {/* { tableData.columns.map(head => <HeadItem toggleOrderBy={toggleOrderBy} key={`th-${head}`} head={head} />) } */}
+          </tr>
+        </thead>
 
-          <tbody>
-            { tableData.isReady ? tableData.rows.map((row, i) => (
-              <tr key={`tr-${i}`}>
-                { row.map((cell, j) => {
-                  const Cell = rowRendererList[j];
-                  return Cell !== null ? <Cell key={`td-${i}-${j}`} data={cell} /> : null;
-                }) }
-              </tr>
-            )) : null }
-          </tbody>
-        </table>
-      </Section>
+        <tbody>
+          { tableData.isReady ? tableData.rows.map((row, i) => (
+            <tr key={`tr-${i}`}>
+              { row.map((cell, j) => {
+                const Cell = rowRendererList[j];
+                return Cell !== null ? <Cell key={`td-${i}-${j}`} data={cell} /> : null;
+              }) }
+            </tr>
+          )) : null }
+        </tbody>
+      </table>
     );
 	}
 }

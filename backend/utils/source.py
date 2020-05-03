@@ -7,6 +7,6 @@ def get_all_sources():
     sources = [urlparse(db) for db in settings.DATABASES]
     integrations = [
         ["Stripe Primary", "stripe", "integration"],
-        ["MailChimp @tshirts.de", "mailchimp", "integration"],
+        ["MailChimp @tshirts.de", "coming-soon", "integration"],
     ]
     return [[db.path[1:], db.scheme, "database"] for db in sources] + integrations
