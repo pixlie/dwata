@@ -24,6 +24,7 @@ export default ({ initialState }) => {
 
         <Switch>
           <Route path="/browse/:sourceId/:tableName" exact>
+            <QueryEditor />
             <Browser />
           </Route>
 

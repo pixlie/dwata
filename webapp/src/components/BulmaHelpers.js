@@ -1,10 +1,10 @@
 import React from 'react';
 
 
-export const Hero = ({ size = "", children }) => (
+export const Hero = ({ size = "", textCentered = false, children }) => (
   <section className={`hero ${size}`}>
     <div className="hero-body">
-      <div className="container">
+      <div className={`container${textCentered ? " has-text-centered" : null}`}>
         {children}
       </div>
     </div>
