@@ -2,16 +2,16 @@ import React from "react";
 import { Link, withRouter, matchPath } from "react-router-dom";
 import { connect } from "react-redux";
 
-import Logo from "asset/Supernova_logo_medium-removebg-preview.png";
 import { toggleSidebar } from "services/global/actions";
+import { toggleQueryEditor } from "services/queryEditor/actions";
 
 
-const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSidebar }) => {
+const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetching, toggleSidebar, toggleQueryEditor }) => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          <img src={Logo} alt="Logo: Tycho's Supernova Remnant" />&nbsp;Supernova
+          [dwata]
         </Link>
 
         <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" href="/">
@@ -34,7 +34,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSideb
           { tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
               <a className="navbar-link">
-                {db.label}
+                {db.label}/{tableName}
               </a>
 
               { schema.isReady ? (
@@ -53,7 +53,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isSourceFetching, toggleSideb
         <div className="navbar-end">
           <div className="navbar-item">
             <div className="buttons">
-              <button className="button is-info" disabled>Filter/Order</button>
+              <button className="button is-info" disabled={!isFilterEnabled} onClick={toggleQueryEditor}>Filter/Order</button>
             </div>
           </div>
         </div>
@@ -77,11 +77,15 @@ const mapStateToProps = (state, props) => {
     db: state.source.isReady ? state.source.rows[sourceId] : {},
     sourceId,
     tableName,
+    isFilterEnabled: sourceId && tableName,
   }
 }
 
 
 export default withRouter(connect(
   mapStateToProps,
-  { toggleSidebar }
+  {
+    toggleSidebar,
+    toggleQueryEditor
+  }
 )(Navbar));

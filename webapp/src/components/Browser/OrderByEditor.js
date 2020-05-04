@@ -1,47 +1,52 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { connect } from "react-redux";
 
 import { addOrderBy, changeOrderBy } from "services/queryEditor/actions";
+import { Hx } from "components/BulmaHelpers";
 
 
-const orderByEditor = ({ table_columns, cached_order_by, order_by, addOrderBy, changeOrderBy }) => {
-  const order_by_options = [<option value="">Order by</option>];
-  for (const head of table_columns) {
-    order_by_options.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
+const orderByEditor = ({ schema, cachedOrderBy, orderBy, addOrderBy, changeOrderBy }) => {
+  const order_by_options = [<option value="" key="ord-hd">Order by</option>];
+  for (const head of schema.columns) {
+    order_by_options.push(<option value={head.name} key={`ord-${head.name}`}>{head.name}</option>);
   }
 
-  const ignoreSubmit = (event) => { event.preventDefault(); }
-  if (Object.keys(order_by).length === 0 && Object.keys(cached_order_by).length > 0) {
+  if (Object.keys(orderBy).length === 0 && Object.keys(cachedOrderBy).length > 0) {
     // We have data from cache, we need to apply this to our own data
-    order_by = cached_order_by;
+    orderBy = cachedOrderBy;
   }
 
   return (
-    <form className="pure-form pure-form-stacked" onsubmit={ignoreSubmit}>
-      <select name="filter_column" onchange={addOrderBy}>
-        { order_by_options }
-      </select>
+    <Fragment>
+      <Hx x="4">Ordering</Hx>
+      <div className="control">
+        <div className="select">
+          <select name="filter_column" onChange={addOrderBy}>
+            { order_by_options }
+          </select>
+        </div>
+      </div>
 
-      { Object.keys(order_by).map(col => (
+      { Object.keys(orderBy).map(col => (
         <div className="multiple-input" key={`or-ch-${col}`}>
           {col}
           <div className="checkbox">
             <label for="order_type_asc">asc</label>
-            <input type="checkbox" name={`order-${col}`} id="order_type_asc" value="asc" checked={order_by[col] === "asc"} onChange={changeOrderBy} />
+            <input type="checkbox" name={`order-${col}`} id="order_type_asc" value="asc" checked={orderBy[col] === "asc"} onChange={changeOrderBy} />
           </div>
           <div className="checkbox">
             <label for="order_type_desc">desc</label>
-            <input type="checkbox" name={`order-${col}`} id="order_type_desc" value="desc" checked={order_by[col] === "desc"} onChange={changeOrderBy} />
+            <input type="checkbox" name={`order-${col}`} id="order_type_desc" value="desc" checked={orderBy[col] === "desc"} onChange={changeOrderBy} />
           </div>
         </div>
       )) }
-    </form>
+    </Fragment>
   );
 }
 
 
 const mapStateToProps = state => ({
-  order_by: state.queryEditor.order_by,
+  orderBy: state.queryEditor.orderBy,
 });
 
 

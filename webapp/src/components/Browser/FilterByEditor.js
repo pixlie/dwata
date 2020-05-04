@@ -1,24 +1,26 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+
+import { Hx } from "components/BulmaHelpers";
 
 
-export default ({ table_columns, filter_by, setFilters }) => {
+export default ({ schema, filterBy, setFilters }) => {
   const addFilter = event => {
     event.preventDefault();
     const { value } = event.target;
     if (value === "") {
       return;
     }
-    const data_type = table_columns.find(x => x.name === value);
+    const data_type = schema.find(x => x.name === value);
     if (["INTEGER", "VARCHAR", "TIMESTAMP"].includes(data_type.type)) {
       setFilters({
-        ...filter_by,
+        ...filterBy,
         [value]: {
           display: ""
         },
       });
     } else if (data_type.type === "BOOLEAN") {
       setFilters({
-        ...filter_by,
+        ...filterBy,
         [value]: {
           display: "true",
           value: true,
@@ -32,7 +34,7 @@ export default ({ table_columns, filter_by, setFilters }) => {
     const { name, value, dataset } = event.target;
 
     const temp = {};
-    const data_type = table_columns.find(x => x.name === name);
+    const data_type = schema.find(x => x.name === name);
     if (data_type.type === "INTEGER") {
       if (value.indexOf(",") !== -1) {
         // This is a range provided
@@ -67,7 +69,7 @@ export default ({ table_columns, filter_by, setFilters }) => {
     }
   
     setFilters({
-      ...filter_by,
+      ...filterBy,
       [name]: temp,
     });
   }
@@ -75,44 +77,44 @@ export default ({ table_columns, filter_by, setFilters }) => {
   const removeFilter = event => {
     event.preventDefault();
     const { name } = event.target.dataset;
-    if (name, name in filter_by) {
-      const temp = {...filter_by};
+    if (name, name in filterBy) {
+      const temp = {...filterBy};
       delete temp[name];
       setFilters(temp);
     }
   }
 
-  const filters = [<p className="tip">Double click column name to remove filter</p>];
-  for (const [col, filter_spec] of Object.entries(filter_by)) {
-    const data_type = table_columns.find(x => x.name === col);
+  const filters = [<p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>];
+  for (const [col, filter_spec] of Object.entries(filterBy)) {
+    const data_type = schema.find(x => x.name === col);
     if (data_type.type === "INTEGER") {
       filters.push(
         <div className="multiple-input" key={`fl-int-${col}`}>
           <div className="label" ondblclick={removeFilter} data-name={col}>{col}</div>
-          <input name={col} onchange={changeFilter} placeholder="range 12,88 or exact 66" value={filter_by[col].display} />
+          <input name={col} onchange={changeFilter} placeholder="range 12,88 or exact 66" value={filterBy[col].display} />
         </div>
       );
     } else if (data_type.type === "VARCHAR") {
       filters.push(
         <div className="multiple-input" key={`fl-ch-${col}`}>
           <div className="label" ondblclick={removeFilter} data-name={col}>{col} (LIKE)</div>
-          <input name={col} onchange={changeFilter} placeholder="text to search" value={filter_by[col].display} />
+          <input name={col} onchange={changeFilter} placeholder="text to search" value={filterBy[col].display} />
         </div>
       );
     } else if (data_type.type === "DATE") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
           <div className="label" ondblclick={removeFilter} data-name={col}>{col} (from, to)</div>
-          <input name={col} data-meta="from" type="date" onchange={changeFilter} value={filter_by[col].display} />
-          <input name={col} data-meta="to" type="date" onchange={changeFilter} value={filter_by[col].display} />
+          <input name={col} data-meta="from" type="date" onchange={changeFilter} value={filterBy[col].display} />
+          <input name={col} data-meta="to" type="date" onchange={changeFilter} value={filterBy[col].display} />
         </div>
       )
     } else if (data_type.type === "TIMESTAMP") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
           <div className="label" ondblclick={removeFilter} data-name={col}>{col} (from, to)</div>
-          <input name={col} data-meta="from" type="datetime-local" onchange={changeFilter} value={filter_by[col].from} />
-          <input name={col} data-meta="to" type="datetime-local" onchange={changeFilter} value={filter_by[col].to} />
+          <input name={col} data-meta="from" type="datetime-local" onchange={changeFilter} value={filterBy[col].from} />
+          <input name={col} data-meta="to" type="datetime-local" onchange={changeFilter} value={filterBy[col].to} />
         </div>
       )
     } else if (data_type.type === "BOOLEAN") {
@@ -121,31 +123,34 @@ export default ({ table_columns, filter_by, setFilters }) => {
           <div className="label" ondblclick={removeFilter} data-name={col}>{col}</div>
           <div className="checkbox">
             <label for={`fl_${col}_true`}>true</label>
-            <input type="checkbox" name={col} id={`fl_${col}_true`} value="true" checked={filter_by[col].value === true} onChange={changeFilter} />
+            <input type="checkbox" name={col} id={`fl_${col}_true`} value="true" checked={filterBy[col].value === true} onChange={changeFilter} />
           </div>
           <div className="checkbox">
             <label for={`fl_${col}_false`}>false</label>
-            <input type="checkbox" name={col} id={`fl_${col}_false`} value="false" checked={filter_by[col].value === false} onChange={changeFilter} />
+            <input type="checkbox" name={col} id={`fl_${col}_false`} value="false" checked={filterBy[col].value === false} onChange={changeFilter} />
           </div>
         </div>
       )
     }
   }
 
-  const filter_by_options = [<option value="">Filter by</option>];
-  for (const head of table_columns) {
-    filter_by_options.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
+  const filterByOptions = [<option value="" key="fl-hd">Filter by</option>];
+  for (const head of schema.columns) {
+    filterByOptions.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
   }
 
-  const ignoreSubmit = event => { event.preventDefault(); }
-
   return (
-    <form className="pure-form pure-form-stacked" onsubmit={ignoreSubmit}>
-      <select name="filter_column" onchange={addFilter} value="">
-        { filter_by_options }
-      </select>
+    <Fragment>
+      <Hx x="4">Filters</Hx>
+      <div className="control">
+        <div className="select">
+          <select name="filter_column" onChange={addFilter}>
+            { filterByOptions }
+          </select>
+        </div>
 
-      {filters}
-    </form>
+        {filters}
+      </div>
+    </Fragment>
   );
 }

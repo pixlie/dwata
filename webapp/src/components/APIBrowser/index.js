@@ -29,7 +29,6 @@ class APIBrowser extends PureComponent {
     const {match: {params: {sourceId: prevSourceId, resourceName: prevTableName}}} = prevProps;
     if (sourceId && resourceName && prevSourceId && prevTableName &&
       (sourceId != prevSourceId || resourceName != prevTableName)) {
-        console.log(sourceId, resourceName, prevSourceId, prevTableName);
         // Call the fetch actions when URL has changed but this Component was already loaded
         this.props.fetchAPIData(sourceId, resourceName);
     }

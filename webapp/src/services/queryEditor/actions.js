@@ -1,6 +1,4 @@
-import axios from "axios";
-
-import { ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER } from "./actionTypes";
+import { ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER, TOGGLE_QUERY_EDITOR } from "./actionTypes";
 
 
 export const addOrderBy = (columnName) => ({
@@ -19,4 +17,9 @@ export const changeOrderBy = (columnName, orderType) => ({
 export const toggleOrderBy = columnName => ({
   type: TOGGLE_ORDER,
   columnName,
+});
+
+
+export const toggleQueryEditor = () => dispatch => dispatch({
+  type: TOGGLE_QUERY_EDITOR,
 });

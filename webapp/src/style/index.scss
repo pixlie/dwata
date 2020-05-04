@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&family=Alegreya:wght@900&display=swap');
 
 // Update Bulma's global variables
 $family-sans-serif: "Titillium Web", sans-serif;
+$family-serif: "Alegreya";
 
 // Reduce the size of the default shadow
 $scheme-invert: hsl(0, 0%, 4%);
@@ -23,6 +24,17 @@ body {
   background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
   min-height: 100%;
   min-width: 100%;
+}
+
+h1, h2, h3 {
+  &.title {
+    font-family: $family-serif;
+    font-weight: 900;
+  }
+}
+
+.has-box-shadow {
+  box-shadow: $box-shadow;
 }
 
 #sidebar {
@@ -62,7 +74,12 @@ body {
 
 .navbar {
   font-weight: bold;
-  background-color: transparent;
+  background-color: #efefef;
+  opacity: 0.3;
+
+  &:hover {
+    opacity: 1;
+  }
 
   button {
     font-weight: bold;
@@ -72,11 +89,6 @@ body {
     .navbar-item {
       font-size: x-large;
       padding: 0 3rem;
-
-      img {
-        visibility: hidden;
-        max-height: 3.4rem;
-      }
     }
   }
 }
