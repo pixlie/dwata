@@ -26,19 +26,19 @@ class Mailchimp(object):
         "lists": ResourceList,
     }
     resource_names = []
-    _settings = {}
+    _api_key = None
 
-    def __init__(self, settings):
+    def __init__(self, api_key):
         self.resource_names = self.resources.keys()
-        self._settings = settings
-        api_key_parts = self._settings["api_key"].split("-")
+        self._api_key = api_key
+        api_key_parts = self._api_key.split("-")
         self.base_url = self.base_url.format(data_center=api_key_parts[1])
 
     @property
     def auth(self):
         return aiohttp.BasicAuth(
                 login="dwata",
-                password=self._settings["api_key"]
+                password=self._api_key
             )
 
     def client_factory(self):

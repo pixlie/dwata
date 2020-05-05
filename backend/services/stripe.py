@@ -27,16 +27,16 @@ class Stripe(object):
         "charges": ResourceCharges,
     }
     resource_names = []
-    _settings = {}
+    _api_key = None
 
-    def __init__(self, settings):
+    def __init__(self, api_key):
         self.resource_names = self.resources.keys()
-        self._settings = settings
+        self._api_key = api_key
 
     @property
     def auth(self):
         return aiohttp.BasicAuth(
-            login=self._settings["api_key"]
+            login=self._api_key
         )
 
     def client_factory(self):

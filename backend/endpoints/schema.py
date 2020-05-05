@@ -3,8 +3,8 @@ from sqlalchemy.exc import OperationalError
 
 from utils.config import settings
 from utils.response import RapidJSONResponse, web_error
-from utils.source import get_all_sources
-from services import all_integrations
+from utils.source import get_all_sources, get_source_settings
+from services import all_services
 
 
 async def get_source_database(db_url, table_name):
@@ -70,15 +70,18 @@ async def get_source_database(db_url, table_name):
 
 async def schema_get(request):
     source_index = request.path_params["source_index"]
-    all_sources = get_all_sources()
-    requested_source = all_sources[source_index]
+    requested_source = get_all_sources()[source_index]
+    source_settings = get_source_settings(source_index=source_index)
 
-    if requested_source[2] == "database":
+    if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)
-        response = await get_source_database(db_url=settings.DATABASES[source_index], table_name=table_name)
+        response = await get_source_database(
+            **source_settings,
+            table_name=table_name
+        )
         return response
-    elif requested_source[2] == "integration":
-        integration = all_integrations[requested_source[1]]()
+    elif requested_source[1] == "service":
+        integration = all_services[requested_source[2]](**source_settings)
         return RapidJSONResponse({
             "columns": ["table_name", "columns"],
             "rows": [[x, []] for x in integration.resources.keys()]

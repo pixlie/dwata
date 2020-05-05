@@ -1,0 +1,31 @@
+# Uncomment any setting that you want to use and modify it
+# A label is just an easy way for you to spot this configuration in the dwata UI
+
+# If you have multiple databases/mailchimp/stripe/etc, then use a different label for each of them.
+# So you can use multiple databases/services.
+
+# Note: Please DO NOT use spaces in the label names. We recommend lower_case_words_separated_by_underscore
+
+[dwata]
+server_host = "localhost"
+server_port = 12121
+
+
+[database.database_one_label]
+# db_url = "postgresql://db_user:db_password@db_host/db_name"
+
+
+[mailchimp.some_label]
+# api_key = "api_key"
+
+[stripe.some_label]
+# api_key = "api_key"
+
+
+[database.another_database_label]
+# This is a MySQL connection example
+# db_url = "mysql://db_user:db_password@db_host/db_name"
+
+
+[mailchimp.another_mailchimp_account_label]
+# api_key = "api_key"

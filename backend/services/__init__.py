@@ -2,7 +2,7 @@ from .stripe import Stripe
 from .mailchimp import Mailchimp
 
 
-all_integrations = {
+all_services = {
     "stripe": Stripe,
     "mailchimp": Mailchimp,
 }

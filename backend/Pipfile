@@ -16,6 +16,7 @@ loguru = "*"
 aiohttp = "*"
 aioredis = "*"
 rapidjson = "*"
+toml = "*"
 
 [requires]
 python_version = "3.8"
