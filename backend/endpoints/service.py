@@ -6,7 +6,7 @@ import rapidjson
 
 from utils.response import RapidJSONResponse, RapidJSONEncoder
 from utils.source import get_all_sources
-from integrations import all_integrations
+from services import all_integrations
 
 
 async def cache_to_redis(cache_key, cache_value):
@@ -35,7 +35,9 @@ async def integration_fetch(request):
     source_index = request.path_params["source_index"]
     resource_name = request.path_params["resource_name"]
     requested_source = all_sources[source_index]
-    integration = all_integrations[requested_source[1]]()
+    integration = all_integrations[requested_source[1]]({
+        "api_key": "e3f2702263e153deaa883f443e435bc1-us8"
+    })
 
     async with integration.client_factory() as session:
         resource = integration.get_resource(resource_name=resource_name)
@@ -47,8 +49,8 @@ async def integration_fetch(request):
         async with session.get(resource.url) as resp:
             if resource.response_data_type == "json":
                 payload = await resp.json()
-                columns = list(payload["data"][0].keys())
-                rows = [list(row.values()) for row in payload["data"]]
+                columns = list(payload["lists"][0].keys())
+                rows = [list(row.values()) for row in payload["lists"]]
                 task = BackgroundTask(
                     cache_to_redis,
                     cache_key=cache_key,

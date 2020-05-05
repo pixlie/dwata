@@ -4,7 +4,7 @@ from sqlalchemy.exc import OperationalError
 from utils.config import settings
 from utils.response import RapidJSONResponse, web_error
 from utils.source import get_all_sources
-from integrations import all_integrations
+from services import all_integrations
 
 
 async def get_source_database(db_url, table_name):

@@ -1,5 +1,5 @@
 import aiohttp
-from integrations.constants import api_constants
+from services.constants import api_constants
 
 
 class ResourceCharges(object):
@@ -27,19 +27,22 @@ class Stripe(object):
         "charges": ResourceCharges,
     }
     resource_names = []
+    _settings = {}
 
-    def __init__(self):
+    def __init__(self, settings):
         self.resource_names = self.resources.keys()
+        self._settings = settings
 
-    def get_http_login(self):
-        return "sk_test_4eC39HqLyjWDarjtT1zdp7dc"
+    @property
+    def auth(self):
+        return aiohttp.BasicAuth(
+            login=self._settings["api_key"]
+        )
 
     def client_factory(self):
         params = {}
         if self.auth_method == api_constants.AUTH_METHOD_HTTP_BASIC:
-            params["auth"] = aiohttp.BasicAuth(
-                login=self.get_http_login()
-            )
+            params["auth"] = self.auth
         return aiohttp.ClientSession(**params)
 
     def get_resource(self, resource_name):
