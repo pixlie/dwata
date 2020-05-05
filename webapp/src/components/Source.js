@@ -44,7 +44,7 @@ const Source = ({ source, fetchSource }) => {
         )) : null }
       </Panel>
 
-      <Panel title="Integrations">
+      <Panel title="Services">
         { source.isReady ? source.rows.filter(x => x.type === "integration").map((s, i) => (
           <SourceItem s={s} i={count_database + i} sourceType="integration" key={`sr-${count_database + i}`} />
         )) : null }

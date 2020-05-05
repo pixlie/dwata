@@ -112,3 +112,9 @@ table {
     }
   }
 }
+
+.box {
+  &.has-no-shadow {
+    box-shadow: none;
+  }
+}
