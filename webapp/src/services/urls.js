@@ -6,4 +6,4 @@ export const apiRoot = `${host}/api`;
 export const sourceURL = `${apiRoot}/source`;
 export const schemanURL = `${apiRoot}/schema`;
 export const dataURL = `${apiRoot}/data`;
-export const apiDataURL = `${apiRoot}/integration`
+export const apiDataURL = `${apiRoot}/service`

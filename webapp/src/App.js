@@ -10,6 +10,7 @@ import Home from "components/Home";
 import Browser from "components/Browser";
 import APIBrowser from "components/APIBrowser";
 import QueryEditor from "components/Browser/QueryEditor";
+import DetailView from "components/Browser/Detail";
 
 
 export default ({ initialState }) => {
@@ -23,12 +24,18 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
+          <Route path="/browse/:sourceId/:tableName/:pk" exact>
+            <QueryEditor />
+            <Browser />
+            <DetailView />
+          </Route>
+
           <Route path="/browse/:sourceId/:tableName" exact>
             <QueryEditor />
             <Browser />
           </Route>
 
-          <Route path="/integration/:sourceId/:resourceName" exact>
+          <Route path="/service/:sourceId/:resourceName" exact>
             <APIBrowser />
           </Route>
 

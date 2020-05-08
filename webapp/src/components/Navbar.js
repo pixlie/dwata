@@ -52,6 +52,16 @@ const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetc
 
         <div className="navbar-end">
           <div className="navbar-item">
+            <div className="field">
+              <p className="control has-icons-left">
+                <input className="input" type="text" placeholder="Search" />
+                <span className="icon is-small is-left">
+                  <i className="fas fa-search"></i>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="navbar-item">
             <div className="buttons">
               <button className="button is-info" disabled={!isFilterEnabled} onClick={toggleQueryEditor}>Filter/Order</button>
             </div>

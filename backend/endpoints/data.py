@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, MetaData, select, column, table, text
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
-from utils.config import settings
+from utils.source import get_source_settings
 
 
 # Example query specification:
@@ -23,15 +23,19 @@ async def data_post(request):
     """
     source_index = request.path_params["source_index"]
     table_name = request.path_params["table_name"]
-    try:
-        request_data = await request.json()
-    except JSONDecodeError:
-        return web_error(
-            error_code="request.json_decode_error",
-            message="We could not handle that request, perhaps something is wrong with the server."
-        )
+    settings = get_source_settings(source_index=source_index)
+    query_specification = {}
 
-    engine = create_engine(settings.DATABASES[source_index])
+    if request.method == "POST":
+        try:
+            query_specification = await request.json()
+        except JSONDecodeError:
+            return web_error(
+                error_code="request.json_decode_error",
+                message="We could not handle that request, perhaps something is wrong with the server."
+            )
+
+    engine = create_engine(settings["db_url"])
     conn = engine.connect()
     meta = MetaData(bind=engine)
     meta.reflect()
@@ -42,15 +46,15 @@ async def data_post(request):
 
     tt = meta.tables[table_name]
     sel = {
-        "limit": request_data.get("limit", 100)
+        "limit": query_specification.get("limit", 100)
     }
-    if len(request_data.get("columns", [])) > 0:
-        sel["columns"] = [column(col) for col in request_data["columns"]]
+    if len(query_specification.get("columns", [])) > 0:
+        sel["columns"] = [column(col) for col in query_specification["columns"]]
     else:
         sel["columns"] = [text("*")]
 
-    if request_data.get("order_by", None):
-        order_by = request_data["order_by"]
+    if query_specification.get("order_by", None):
+        order_by = query_specification["order_by"]
         valid_order_by = [
             (col, ord_type if ord_type in ("asc", "desc") else "asc")
             for col, ord_type in order_by.items() if col in tt.columns.keys()
@@ -60,8 +64,8 @@ async def data_post(request):
     sel_obj = select(**sel)
     sel_obj = sel_obj.select_from(table(table_name))
 
-    if request_data.get("filter_by", None):
-        filter_by = request_data["filter_by"]
+    if query_specification.get("filter_by", None):
+        filter_by = query_specification["filter_by"]
         for col, filter_spec in filter_by.items():
             if col in tt.columns:
                 column_def = tt.columns[col]

@@ -9,7 +9,7 @@ const TableList = ({ sourceIndex, schema, fetchSchema, sourceType }) => {
   useEffect(() => {
     fetchSchema(sourceIndex);
   }, []);
-  const urlBase = sourceType === "database" ? "/browse" : "/integration";
+  const urlBase = sourceType === "database" ? "/browse" : "/service";
 
   return (
     <Fragment>

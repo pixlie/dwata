@@ -39,7 +39,7 @@ class Browser extends PureComponent {
   }
 
 	render() {
-    const { tableData, schema } = this.props;
+    const { sourceId, tableName, tableData, schema, history } = this.props;
     if (!tableData.isReady || !schema.isReady || tableData.columns.length !== schema.columns.length) {
       return (
         <div>Loading...</div>
@@ -63,7 +63,7 @@ class Browser extends PureComponent {
 
         <tbody>
           { tableData.isReady ? tableData.rows.map((row, i) => (
-            <tr key={`tr-${i}`}>
+            <tr key={`tr-${i}`} onClick={() => {history.push(`/browse/${sourceId}/${tableName}/${row[0]}`)}}>
               { row.map((cell, j) => {
                 const Cell = rowRendererList[j];
                 return Cell !== null ? <Cell key={`td-${i}-${j}`} data={cell} /> : null;

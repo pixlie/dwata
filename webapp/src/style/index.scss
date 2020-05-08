@@ -111,10 +111,48 @@ table {
       }
     }
   }
+
+  tbody {
+    tr {
+      cursor: pointer;
+    }
+  }
 }
 
 .box {
   &.has-no-shadow {
     box-shadow: none;
+  }
+}
+
+#detail-modal {
+  z-index: 100;
+  background-color: white;
+  box-shadow: $box-shadow;
+  position: absolute;
+  top: 2rem;
+  left: 12rem;
+  width: 60%;
+
+  section {
+    padding: 1rem;
+
+    .container {
+      .columns {
+        .column {
+          &.is-3 {
+            min-height: 21rem;
+            background-color: #fdf7e3;
+
+            .input {
+              &:disabled {
+                border-color: #f1e5bc;
+                background-color: #fbf2d4;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

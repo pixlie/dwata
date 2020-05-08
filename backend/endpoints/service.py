@@ -5,7 +5,7 @@ import aioredis
 import rapidjson
 
 from utils.response import RapidJSONResponse, RapidJSONEncoder
-from utils.source import get_all_sources
+from utils.source import get_all_sources, get_source_settings
 from services import all_services
 
 
@@ -31,14 +31,14 @@ async def read_from_redis(cache_key, fresh_within=600, raw_value=False):
 
 
 async def service_fetch(request):
-    all_sources = get_all_sources()
     source_index = request.path_params["source_index"]
     resource_name = request.path_params["resource_name"]
-    requested_source = all_sources[source_index]
-    integration = all_services[requested_source[1]]()
+    requested_source = get_all_sources()[source_index]
+    source_settings = get_source_settings(source_index=source_index)
+    service = all_services[requested_source[2]](**source_settings)
 
-    async with integration.client_factory() as session:
-        resource = integration.get_resource(resource_name=resource_name)
+    async with service.client_factory() as session:
+        resource = service.get_resource(resource_name=resource_name)
         cache_key = "{}.{}.{}".format(source_index, resource_name, resource.url)
         cache_value = await read_from_redis(cache_key=cache_key)
         if cache_value:

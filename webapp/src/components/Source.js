@@ -1,5 +1,4 @@
 import React, { useEffect, Fragment, useState } from "react";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { Section, Panel, Hx } from "components/BulmaHelpers";
@@ -27,7 +26,7 @@ const Source = ({ source, fetchSource }) => {
     return (
       <Fragment>
         <div className="panel-block" onClick={handleClickSource}>
-          {s.label}&nbsp;<span className="tag is-info is-light">{s.engine}</span>
+          {s.label}&nbsp;<span className="tag is-info is-light">{s.provider}</span>
         </div>
 
         { sourceIndex === i ? <TableList sourceIndex={sourceIndex} sourceType={sourceType} /> : null }
@@ -45,8 +44,8 @@ const Source = ({ source, fetchSource }) => {
       </Panel>
 
       <Panel title="Services">
-        { source.isReady ? source.rows.filter(x => x.type === "integration").map((s, i) => (
-          <SourceItem s={s} i={count_database + i} sourceType="integration" key={`sr-${count_database + i}`} />
+        { source.isReady ? source.rows.filter(x => x.type === "service").map((s, i) => (
+          <SourceItem s={s} i={count_database + i} sourceType="service" key={`sr-${count_database + i}`} />
         )) : null }
       </Panel>
     </Section>
