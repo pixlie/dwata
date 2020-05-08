@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
-const cellRenderer = (column) => {
+const cellRenderer = (column, sourceId) => {
   const date_time_options = {
     year: "numeric", month: "numeric", day: "numeric",
     hour: "numeric", minute: "numeric", second: "numeric",
@@ -20,6 +20,7 @@ const cellRenderer = (column) => {
       </div>
     </div>
   );
+
   const TitleCell = ({ data, column }) => (
     <div className="field">
       <label className="label">{column.name}</label>
@@ -28,14 +29,16 @@ const cellRenderer = (column) => {
       </div>
     </div>
   );
+
   const TextareaCell = ({ data, column }) => (
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        <textarea className="textarea is-fullwidth" disabled>{data}</textarea>
+        <textarea className="textarea is-fullwidth" disabled defaultValue={data} />
       </div>
     </div>
   );
+
   const PrimaryKeyCell = ({ data, column }) => (
     <div className="field">
       <label className="label">{column.name}</label>
@@ -44,13 +47,16 @@ const cellRenderer = (column) => {
       </div>
     </div>
   );
+
   const RelatedCell = ({ data, column }) => (
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
         <input className="input" type="text" value={data} disabled />
       </div>
-      {data ? <p class="help">Linked to <Link to={`/browse/0/category/${data}`}>category/{data}</Link></p> : null}
+      {data ? <p className="help">Linked to {column.foreign_keys.map(link => (
+        <Link key={`fk-${column.name}-${link.table}-${link.column}`} to={`/browse/${sourceId}/${link.table}/${data}`}>{link.table}/{data}</Link>
+      ))}</p> : null}
     </div>
   )
 
@@ -64,7 +70,16 @@ const cellRenderer = (column) => {
       </div>
     </div>
   );
-  const JSONCell = ({ data }) => <div>{"{}"}</div>;
+
+  const JSONCell = ({ data }) => (
+    <div className="field">
+      <label className="label">{column.name}</label>
+      <div className="control">
+        {data !== null ? <div onClick={() => { alert(JSON.stringify(data)); }}>{"{ click to expand }"}</div> : "-"}
+      </div>
+    </div>
+  );
+
   const TimeStampCell = (({ data }) => {
     try {
       return <div>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</div>;
@@ -103,9 +118,7 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData }) => {
     );
   }
 
-  if (tableData.isReady) {
-    currentRow = tableData.rows.find(x => x[0] == pk);
-  }
+  currentRow = tableData.rows.find(x => x[0] == pk);
 
   return (
     <div id="detail-modal">
@@ -114,7 +127,7 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData }) => {
           <div className="column is-9">
             { currentRow.map((cell, i) => {
               if (schema.columns[i].ui_hints.includes("is_meta")) { return null; }
-              const Cell = cellRenderer(schema.columns[i]);
+              const Cell = cellRenderer(schema.columns[i], sourceId);
               return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schema.columns[i]} /> : null;
             }) }
           </div>
@@ -122,7 +135,7 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData }) => {
           <div className="column is-3">
             { currentRow.map((cell, i) => {
               if (!schema.columns[i].ui_hints.includes("is_meta")) { return null; }
-              const Cell = cellRenderer(schema.columns[i]);
+              const Cell = cellRenderer(schema.columns[i], sourceId);
               return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schema.columns[i]} /> : null;
             }) }
           </div>

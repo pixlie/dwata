@@ -14,7 +14,7 @@ def column_definition(col, col_def):
         hints = []
         if (col_def.primary_key or
                 len(col_def.foreign_keys) > 0 or
-                _type in ["BOOLEAN", "INET"] or
+                _type in ["BOOLEAN", "INET", "TIMESTAMP"] or
                 len(col_def.foreign_keys) > 0):
             hints.append("is_meta")
         elif "_url" in col.lower() or col.lower() == "url":
@@ -37,6 +37,12 @@ def column_definition(col, col_def):
         "is_primary_key": col_def.primary_key,
         "is_nullable": col_def.nullable,
         "has_foreign_keys": len(col_def.foreign_keys) > 0,
+        "foreign_keys": [
+            {
+                "table": str(x.column.table),
+                "column": str(x.column.name)
+            } for x in col_def.foreign_keys
+        ] if len(col_def.foreign_keys) > 0 else None,
         "ui_hints": ui_hints()
     }
 
@@ -72,10 +78,7 @@ async def get_source_database(db_url, table_name):
 
     if table_name and table_name in meta.tables.keys():
         columns = [
-            {
-                "name": col,
-                "type": type(col_def.type).__name__
-            } for col, col_def in meta.tables[table_name].columns.items()
+            column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
         ]
         conn.close()
         return RapidJSONResponse(columns)

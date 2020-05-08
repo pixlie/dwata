@@ -12,7 +12,7 @@ export default (schema, queriedColumns) => {
   const DefaultCell = ({ data }) => <td>{data}</td>;
   const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
   const BooleanCell = ({ data }) => <td>{(data === true || data === false) ?
-    (data === true ? <i className="far fa-check-square dark-text" /> : <i className="far fa-window-close light-text" />) : <i />}</td>;
+    (data === true ? <i className="fas fa-check-circle" /> : <i className="fas fa-times-circle" />) : <i />}</td>;
   const JSONCell = ({ data }) => <td>{"{}"}</td>;
   const TimeStampCell = (({ data }) => {
     try {
@@ -30,10 +30,12 @@ export default (schema, queriedColumns) => {
       rowList.push(PrimaryKeyCell);
     } else if (head.has_foreign_keys) {
       rowList.push(null);
+    } else if (head.ui_hints.includes("is_meta")) {
+      rowList.push(null);
     } else if (head.type === "BOOLEAN") {
       rowList.push(BooleanCell);
     } else if (head.type === "JSONB" || head.type === "JSON") {
-      rowList.push(JSONCell);
+      rowList.push(null);
     } else if (head.type === "TIMESTAMP") {
       rowList.push(TimeStampCell);
     } else {
