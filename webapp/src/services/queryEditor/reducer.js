@@ -1,5 +1,7 @@
-import { ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER, TOGGLE_QUERY_EDITOR } from "./actionTypes";
-import { transformData } from "utils";
+import {
+  ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER, TOGGLE_QUERY_EDITOR,
+  NEXT_PAGE, PREVIOUS_PAGE, CHANGE_PER_PAGE
+} from "./actionTypes";
 
 
 const initialState = {
@@ -9,7 +11,9 @@ const initialState = {
   columnsSelected: {},
   filterBy: {},
   orderBy: {},  // Only used to load from localStorage
-  limit: 100,
+  currentPage: 0,
+  perPage: 100,
+  offset: 0,
   isVisible: false,
   _cachedData: {},
 };
@@ -23,7 +27,19 @@ export default (state = initialState, action) => {
         isVisible: !state.isVisible,
       }
 
-      default:
+    case CHANGE_PER_PAGE:
+      return {
+        ...state,
+        perPage: action.payload,
+      }
+
+    case NEXT_PAGE:
+      return {
+        ...state,
+        currentPage: action.payload,
+      }
+
+    default:
       return state;
   }
 }

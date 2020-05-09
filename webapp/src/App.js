@@ -11,6 +11,7 @@ import Browser from "components/Browser";
 import APIBrowser from "components/APIBrowser";
 import QueryEditor from "components/Browser/QueryEditor";
 import DetailView from "components/Browser/Detail";
+import Paginator from "components/Browser/Paginator";
 
 
 export default ({ initialState }) => {
@@ -28,11 +29,13 @@ export default ({ initialState }) => {
             <QueryEditor />
             <Browser />
             <DetailView />
+            <Paginator />
           </Route>
 
           <Route path="/browse/:sourceId/:tableName" exact>
             <QueryEditor />
             <Browser />
+            <Paginator />
           </Route>
 
           <Route path="/service/:sourceId/:resourceName" exact>

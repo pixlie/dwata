@@ -72,6 +72,7 @@ async def data_post(request):
     table_name = request.path_params["table_name"]
     settings = get_source_settings(source_index=source_index)
     query_specification = {}
+    default_per_page = 20
 
     if request.method == "POST":
         try:
@@ -103,7 +104,7 @@ async def data_post(request):
         sel_obj = apply_ordering(query_specification, sel_obj, current_table)
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table)
-    sel_obj = sel_obj.limit(query_specification.get("limit", 100))
+    sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
     exc = conn.execute(sel_obj)
 
@@ -119,6 +120,8 @@ async def data_post(request):
             columns=exc.keys(),
             rows=exc.cursor.fetchall(),
             count=count,
+            limit=query_specification.get("limit", default_per_page),
+            offset=query_specification.get("offset", 0),
             query_sql=str(sel_obj),
         )
     )

@@ -124,6 +124,17 @@ table {
   }
 }
 
+#paginator {
+  z-index: 80;
+  background-color: #fdf7e3;
+  padding: 0.4rem 0.6rem;
+  box-shadow: $box-shadow;
+  border-radius: $radius-small;
+  position: fixed;
+  bottom: 4rem;
+  right: 12rem;
+}
+
 #detail-modal {
   z-index: 100;
   background-color: white;
