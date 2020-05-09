@@ -19,7 +19,9 @@ export default (schema, queriedColumns) => {
 
   for (let i = 0; i < queriedColumns.length; i++) {
     const head = schema.columns.find(x => x.name === queriedColumns[i]);
-    if (head.has_foreign_keys) {
+    if (head.is_primary_key) {
+      headList.push(DefaultCell);
+    } else if (head.has_foreign_keys) {
       headList.push(null);
     } else if (head.ui_hints.includes("is_meta")) {
       headList.push(null);

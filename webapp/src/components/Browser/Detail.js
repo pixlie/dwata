@@ -16,7 +16,7 @@ const cellRenderer = (column, sourceId) => {
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        <input className="input" type="text" value={data} disabled />
+        <input className="input" type="text" value={data === null ? "" : data} disabled />
       </div>
     </div>
   );
@@ -25,7 +25,7 @@ const cellRenderer = (column, sourceId) => {
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        <input className="input is-medium is-fullwidth" type="text" value={data} disabled />
+        <input className="input is-medium is-fullwidth" type="text" value={data === null ? "" : data} disabled />
       </div>
     </div>
   );
@@ -43,7 +43,7 @@ const cellRenderer = (column, sourceId) => {
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        <input className="input" type="text" value={data} disabled />
+        <input className="input" type="text" value={data === null ? "" : data} disabled />
       </div>
     </div>
   );
@@ -52,7 +52,7 @@ const cellRenderer = (column, sourceId) => {
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        <input className="input" type="text" value={data} disabled />
+        <input className="input" type="text" value={data === null ? "" : data} disabled />
       </div>
       {data ? <p className="help">Linked to {column.foreign_keys.map(link => (
         <Link key={`fk-${column.name}-${link.table}-${link.column}`} to={`/browse/${sourceId}/${link.table}/${data}`}>{link.table}/{data}</Link>
@@ -81,13 +81,22 @@ const cellRenderer = (column, sourceId) => {
   );
 
   const TimeStampCell = (({ data }) => {
-    try {
-      return <div>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</div>;
-    } catch (error) {
-      if (error instanceof RangeError) {
-        return <div>{data}</div>
+    let parsedDate = null;
+    if (data !== null) {
+      try {
+        parsedDate = new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000));
+      } catch (error) {
+        // Perhaps log this for admin
       }
     }
+    return (
+      <div className="field">
+        <label className="label">{column.name}</label>
+        <div className="control">
+          <input className="input" type="text" value={parsedDate === null ? "" : data} disabled />
+        </div>
+      </div>
+    )
   });
 
   if (column.is_primary_key) {

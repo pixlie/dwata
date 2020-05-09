@@ -32,10 +32,10 @@ export default (schema, queriedColumns) => {
       rowList.push(null);
     } else if (head.ui_hints.includes("is_meta")) {
       rowList.push(null);
-    } else if (head.type === "BOOLEAN") {
-      rowList.push(BooleanCell);
     } else if (head.type === "JSONB" || head.type === "JSON") {
       rowList.push(null);
+    } else if (head.type === "BOOLEAN") {
+      rowList.push(BooleanCell);
     } else if (head.type === "TIMESTAMP") {
       rowList.push(TimeStampCell);
     } else {
