@@ -52,7 +52,6 @@ h1, h2, h3 {
 
     .button {
       border: none;
-      background-color: #5c5c5c;
       margin: 0.5rem -3rem 0 0;
     }
   }
@@ -130,12 +129,20 @@ table {
   background-color: white;
   box-shadow: $box-shadow;
   position: fixed;
-  top: 2rem;
+  top: 4rem;
   left: 12rem;
   width: 60%;
 
   section {
     padding: 1rem;
+
+    .button {
+      &.close {
+        position: absolute;
+        top: -1.6rem;
+        right: -2rem;
+      }
+    }
 
     .container {
       .columns {

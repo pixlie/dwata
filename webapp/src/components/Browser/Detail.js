@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useCallback } from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -119,19 +119,34 @@ const cellRenderer = (column, sourceId) => {
 }
 
 
-const Detail = ({ sourceId, tableName, pk, schema, tableData }) => {
+const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
+  const handleKey = useCallback(event => {
+    if (event.keyCode === 27) {
+      history.push(`/browse/${sourceId}/${tableName}`);
+    }
+  }, []);
+  useEffect(() => {
+    document.addEventListener("keydown", handleKey, false);
+
+    return () => {
+      document.removeEventListener("keydown", handleKey, false);
+    }
+  }, []);
   let currentRow = {};
   if (!schema.isReady || !tableData.isReady) {
     return (
       <div>Loading...</div>
     );
   }
-
   currentRow = tableData.rows.find(x => x[0] == pk);
 
   return (
     <div id="detail-modal">
       <Section>
+        <button className="button is-rounded is-dark close" onClick={() => history.push(`/browse/${sourceId}/${tableName}`)}>
+          Close&nbsp;<i className="fas fa-times"></i>
+        </button>
+
         <div className="columns">
           <div className="column is-9">
             { currentRow.map((cell, i) => {

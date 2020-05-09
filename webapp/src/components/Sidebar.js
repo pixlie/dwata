@@ -9,7 +9,7 @@ const Sidebar = ({ global, toggleSidebar, children }) => {
     return (
       <div id="sidebar">
         <div className="head">
-          <button className="button is-rounded is-black" onClick={toggleSidebar}>
+          <button className="button is-rounded is-dark" onClick={toggleSidebar}>
             Close&nbsp;<i className="fas fa-times"></i>
           </button>
         </div>

@@ -14,7 +14,7 @@ def column_definition(col, col_def):
         hints = []
         if (col_def.primary_key or
                 len(col_def.foreign_keys) > 0 or
-                _type in ["BOOLEAN", "INET", "TIMESTAMP"] or
+                _type in ["BOOLEAN", "INET", "TIMESTAMP", "DATE"] or
                 len(col_def.foreign_keys) > 0):
             hints.append("is_meta")
         elif "_url" in col.lower() or col.lower() == "url":
