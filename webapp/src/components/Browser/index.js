@@ -23,7 +23,7 @@ class Browser extends PureComponent {
 	componentDidMount() {
     const {match: {params: {sourceId, tableName}}} = this.props;
     this.props.fetchSchema(sourceId);
-    this.props.fetchData(sourceId, tableName);
+    this.props.fetchData();
   }
 
   componentDidUpdate(prevProps) {
@@ -34,7 +34,7 @@ class Browser extends PureComponent {
         console.log(sourceId, tableName, prevSourceId, prevTableName);
         // Call the fetch actions when URL has changed but this Component was already loaded
         this.props.fetchSchema(sourceId);
-        this.props.fetchData(sourceId, tableName);
+        this.props.fetchData();
     }
   }
 

@@ -1,11 +1,13 @@
 import axios from "axios";
 
-import { INITIATE_FETCH_DATA, FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
 import { dataURL } from "services/urls";
+import { matchBrowserPath } from "utils";
+import { INITIATE_FETCH_DATA, FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
 
 
-export const fetchData = (sourceId, tableName, callback) => (dispatch, getState) => {
+export const fetchData = callback => (dispatch, getState) => {
   const state = getState();
+  const {params: {sourceId, tableName}} = matchBrowserPath(state.router.location.pathname);
   const _cacheKey = `${sourceId}/${tableName}`;
   if (state.browser._cachedData && state.browser._cachedData[_cacheKey]) {
     // We have needed data in cache. Swap that into the state
@@ -57,6 +59,7 @@ export const fetchData = (sourceId, tableName, callback) => (dispatch, getState)
       });
     })
     .catch(err => {
-      console.log('Could not fetch sources. Try again later.');
+      console.log("Could not fetch sources. Try again later.");
+      console.log(err);
     });
 };

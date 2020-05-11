@@ -2,18 +2,19 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
+import { nextPage } from "services/queryEditor/actions";
+
 
 const PageItem = ({ number, currentPage }) => (
   <li><a className={`pagination-link${number === currentPage ? " is-current" : ""}`} aria-label={`Goto page ${number}`}>{number}</a></li>
 );
 
 
-const Paginator = ({ meta: {isReady, count, limit, offset} }) => {
+const Paginator = ({ meta: {isReady, count, limit, offset}, nextPage }) => {
   if (!isReady) {
     return null;
   }
   const currentPage = ((limit + offset) % limit) + 1;
-  console.log(currentPage);
 
   return (
     <div id="paginator">
@@ -59,5 +60,10 @@ const mapStateToProps = (state, props) => {
 
 export default withRouter(connect(
   mapStateToProps,
-  {}
+  {
+    nextPage: event => {
+      event.preventDefault();
+      nextPage();
+    }
+  }
 )(Paginator));

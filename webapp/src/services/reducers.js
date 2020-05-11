@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { connectRouter } from "connected-react-router";
 
 
 import global from "./global/reducer";
@@ -9,7 +10,8 @@ import queryEditor from "./queryEditor/reducer";
 import apiBrowser from "./apiBrowser/reducer";
 
 
-export default combineReducers({
+export default (history) => combineReducers({
+  router: connectRouter(history),
   global,
   source,
   schema,

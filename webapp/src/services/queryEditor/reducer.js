@@ -36,7 +36,7 @@ export default (state = initialState, action) => {
     case NEXT_PAGE:
       return {
         ...state,
-        currentPage: action.payload,
+        currentPage: state.currentPage + 1,
       }
 
     default:

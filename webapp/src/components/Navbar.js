@@ -1,9 +1,10 @@
 import React from "react";
-import { Link, withRouter, matchPath } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
 import { toggleQueryEditor } from "services/queryEditor/actions";
+import { matchBrowserPath } from "utils";
 
 
 const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetching, toggleSidebar, toggleQueryEditor }) => {
@@ -74,11 +75,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetc
 
 
 const mapStateToProps = (state, props) => {
-  const match = matchPath(props.location.pathname, {
-    path: "/browse/:sourceId/:tableName",
-    exact: true,
-    strict: false,
-  });
+  const match = matchBrowserPath(props.location.pathname);
   const { sourceId, tableName } = match != null ? match.params : { sourceId: null, tableName: null };
 
   return {
