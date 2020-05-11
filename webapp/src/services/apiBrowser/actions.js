@@ -28,7 +28,7 @@ export const fetchAPIData = (sourceId, tableName, callback) => (dispatch, getSta
   } : {
     isReady: false,
   }
-  const orderBy = state.queryEditor.orderBy;
+  const orderBy = state.querySpecification.orderBy;
   const columnsSelected = schema.isReady ? schema.columns.reduce((acc, ele) => ({
     ...acc,
     [ele.name]: true

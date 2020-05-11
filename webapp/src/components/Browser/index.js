@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import { fetchData } from "services/browser/actions";
 import { fetchSchema } from "services/schema/actions";
-import { toggleOrderBy } from "services/queryEditor/actions";
+import { toggleOrderBy } from "services/querySpecification/actions";
 import rowRenderer from "./rowRenderer";
 import headRenderer from "./headRenderer";
 
@@ -21,7 +21,7 @@ class Browser extends PureComponent {
   }
 
 	componentDidMount() {
-    const {match: {params: {sourceId, tableName}}} = this.props;
+    const {match: {params: {sourceId}}} = this.props;
     this.props.fetchSchema(sourceId);
     this.props.fetchData();
   }
@@ -94,7 +94,7 @@ const mapStateToProps = (state, props) => {
     tableData: state.browser.isReady && state.browser._cacheKey === _browserCacheKey ? state.browser : {
       isReady: false,
     },
-    orderBy: state.queryEditor.orderBy,
+    orderBy: state.querySpecification.orderBy,
   }
 }
 

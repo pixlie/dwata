@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fetchAPIData } from "services/apiBrowser/actions";
-import { toggleOrderBy } from "services/queryEditor/actions";
+import { toggleOrderBy } from "services/querySpecification/actions";
 import rowRenderer from "./rowRenderer";
 import headRenderer from "./headRenderer";
 
@@ -86,7 +86,7 @@ const mapStateToProps = (state, props) => {
     tableData: state.apiBrowser.isReady && state.apiBrowser._cacheKey === _browserCacheKey ? state.apiBrowser : {
       isReady: false,
     },
-    orderBy: state.queryEditor.orderBy,
+    orderBy: state.querySpecification.orderBy,
   }
 }
 

@@ -143,15 +143,10 @@ class QueryEditor extends PureComponent {
 }
 
 
-const mapStateToProps = state => ({
-  queryEditor: state.queryEditor,
-});
-
-
-const mapDispatchToProps = () => ({});
+const mapStateToProps = state => ({});
 
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  {}
 )(QueryEditor);

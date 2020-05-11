@@ -10,19 +10,19 @@ export default (columns) => {
   };
 
   const DefaultCell = ({ data }) => <td>{data}</td>;
-  const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
-  const BooleanCell = ({ data }) => <td>{(data === true || data === false) ?
-    (data === true ? <i className="far fa-check-square dark-text" /> : <i className="far fa-window-close light-text" />) : <i />}</td>;
-  const JSONCell = ({ data }) => <td>{"{}"}</td>;
-  const TimeStampCell = (({ data }) => {
-    try {
-      return <td>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</td>;
-    } catch (error) {
-      if (error instanceof RangeError) {
-        return <td>{data}</td>
-      }
-    }
-  });
+  // const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
+  // const BooleanCell = ({ data }) => <td>{(data === true || data === false) ?
+    // (data === true ? <i className="far fa-check-square dark-text" /> : <i className="far fa-window-close light-text" />) : <i />}</td>;
+  // const JSONCell = ({ data }) => <td>{"{}"}</td>;
+  // const TimeStampCell = (({ data }) => {
+  //   try {
+  //     return <td>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</td>;
+  //   } catch (error) {
+  //     if (error instanceof RangeError) {
+  //       return <td>{data}</td>
+  //     }
+  //   }
+  // });
 
   for (let i = 0; i < columns.length; i++) {
     /* 

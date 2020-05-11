@@ -2,7 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { nextPage } from "services/queryEditor/actions";
+import { nextPage, previousPage } from "services/querySpecification/actions";
 
 
 const PageItem = ({ number, currentPage }) => (
@@ -10,28 +10,56 @@ const PageItem = ({ number, currentPage }) => (
 );
 
 
-const Paginator = ({ meta: {isReady, count, limit, offset}, nextPage }) => {
+const PageSlots = ({count, limit, offset}) => {
+  const slots = 9;  // Includes all page numbers to be shown and ellipses
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil(count / limit);
+  const slotComponents = [];
+  if (totalPages < slots) {
+    return (
+      <ul className="pagination-list">
+        <li><span className="pagination-ellipsis">{limit}/page</span></li>
+        {[...Array(totalPages).keys()].map(x => (
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} />
+        ))}
+      </ul>
+    );
+  } else {
+    return (
+      <ul className="pagination-list">
+        <li><span className="pagination-ellipsis">{limit}/page</span></li>
+        {[...Array(4).keys()].map(x => (
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} />
+        ))}
+        <li><span className="pagination-ellipsis">&hellip;</span></li>
+        {[...Array(4).keys()].reverse().map(x => (
+          <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} currentPage={currentPage} />
+        ))}
+      </ul>
+    );
+  }
+}
+
+
+const Paginator = ({meta: {isReady, count, limit, offset}, handleNext, handlePrevious}) => {
   if (!isReady) {
     return null;
   }
-  const currentPage = ((limit + offset) % limit) + 1;
 
   return (
     <div id="paginator">
       <nav className="pagination" role="navigation" aria-label="pagination">
-        <a className="pagination-previous">Previous</a>
-        <a className="pagination-next">Next page</a>
-        <ul className="pagination-list">
-          <li><span className="pagination-ellipsis">{limit}/page</span></li>
-          <PageItem number={1} currentPage={currentPage} />
-          <li><span className="pagination-ellipsis">&hellip;</span></li>
-          {/* <li><a className="pagination-link" aria-label="Goto page 45">45</a></li> */}
-          {/* <li><a className="pagination-link is-current" aria-label="Page 46" aria-current="page">46</a></li> */}
-          <li><a className="pagination-link" aria-label={`Goto page ${Math.floor(count/limit)/2}`}>{Math.floor(count/limit)/2}</a></li>
-          {/* <li><a className="pagination-link" aria-label="Goto page 47">47</a></li> */}
-          <li><span className="pagination-ellipsis">&hellip;</span></li>
-          <li><a className="pagination-link" aria-label={`Goto page ${Math.floor(count/limit)}`}>{Math.floor(count/limit)}</a></li>
-        </ul>
+        {offset < limit ? (
+          <a className="pagination-previous" disabled>Previous</a>
+        ) : (
+          <a className="pagination-previous" onClick={handlePrevious}>Previous</a>
+        )}
+        {offset + limit >= count ? (
+          <a className="pagination-next" disabled>Next page</a>
+        ) : (
+          <a className="pagination-next" onClick={handleNext}>Next page</a>
+        )}
+        <PageSlots count={count} limit={limit} offset={offset} />
       </nav>
     </div>
   );
@@ -41,12 +69,11 @@ const Paginator = ({ meta: {isReady, count, limit, offset}, nextPage }) => {
 const mapStateToProps = (state, props) => {
   let { sourceId, tableName } = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
 
   return {
     sourceId,
     tableName,
-    meta: state.browser.isReady && state.browser._cacheKey === _browserCacheKey ? {
+    meta: state.browser.isReady && state.browser.sourceId === sourceId && state.browser.tableName === tableName ? {
       count: state.browser.count,
       limit: state.browser.limit,
       offset: state.browser.offset,
@@ -61,9 +88,14 @@ const mapStateToProps = (state, props) => {
 export default withRouter(connect(
   mapStateToProps,
   {
-    nextPage: event => {
+    handleNext: event => {
       event.preventDefault();
-      nextPage();
+      return nextPage();
+    },
+
+    handlePrevious: event => {
+      event.preventDefault();
+      return previousPage();
     }
   }
 )(Paginator));

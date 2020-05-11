@@ -1,7 +1,7 @@
 import { fetchData } from "services/browser/actions";
 import {
   ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER, TOGGLE_QUERY_EDITOR,
-  NEXT_PAGE,
+  NEXT_PAGE, PREVIOUS_PAGE,
 } from "./actionTypes";
 
 
@@ -32,6 +32,15 @@ export const toggleQueryEditor = () => dispatch => dispatch({
 export const nextPage = () => dispatch => {
   dispatch({
     type: NEXT_PAGE,
+  });
+
+  dispatch(fetchData());
+}
+
+
+export const previousPage = () => dispatch => {
+  dispatch({
+    type: PREVIOUS_PAGE,
   });
 
   dispatch(fetchData());

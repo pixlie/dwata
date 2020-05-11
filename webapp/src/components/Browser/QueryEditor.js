@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from "react";
+import React, { PureComponent } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
@@ -162,7 +162,7 @@ const mapStateToProps = (state, props) => {
     tableData: state.browser.isReady && state.browser._cacheKey === _browserCacheKey ? state.browser : {
       isReady: false,
     },
-    qe: state.queryEditor,
+    qe: state.querySpecification,
   }
 }
 

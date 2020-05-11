@@ -3,7 +3,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
-import { toggleQueryEditor } from "services/queryEditor/actions";
+import { toggleQueryEditor } from "services/querySpecification/actions";
 import { matchBrowserPath } from "utils";
 
 

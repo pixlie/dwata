@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import { addOrderBy, changeOrderBy } from "services/queryEditor/actions";
+import { addOrderBy, changeOrderBy } from "services/querySpecification/actions";
 
 
 const orderByEditor = ({ table_columns, cached_order_by, order_by, addOrderBy, changeOrderBy }) => {
@@ -41,7 +41,7 @@ const orderByEditor = ({ table_columns, cached_order_by, order_by, addOrderBy, c
 
 
 const mapStateToProps = state => ({
-  order_by: state.queryEditor.order_by,
+  order_by: state.querySpecification.order_by,
 });
 
 

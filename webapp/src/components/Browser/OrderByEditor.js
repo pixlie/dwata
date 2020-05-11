@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 
-import { addOrderBy, changeOrderBy } from "services/queryEditor/actions";
+import { addOrderBy, changeOrderBy } from "services/querySpecification/actions";
 import { Hx } from "components/BulmaHelpers";
 
 
@@ -46,7 +46,7 @@ const orderByEditor = ({ schema, cachedOrderBy, orderBy, addOrderBy, changeOrder
 
 
 const mapStateToProps = state => ({
-  orderBy: state.queryEditor.orderBy,
+  orderBy: state.querySpecification.orderBy,
 });
 
 

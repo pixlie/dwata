@@ -59,10 +59,14 @@ export default (state = initialState, action) => {
     }
 
     case LOAD_DATA_FROM_CACHE: {
-      const temp = state._cachedData[_cacheKey];
+      const temp = {
+        ...state._cachedData[_cacheKey]
+      };
       return {
         ...temp,
-        _cachedData: state._cachedData,
+        _cachedData: {
+          ...state._cachedData
+        },
       };
     }
 

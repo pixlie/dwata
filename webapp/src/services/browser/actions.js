@@ -3,23 +3,34 @@ import axios from "axios";
 import { dataURL } from "services/urls";
 import { matchBrowserPath } from "utils";
 import { INITIATE_FETCH_DATA, FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
+import { INITIATE_QUERY_SPECIFICATION, UPDATE_QUERY_SPECIFICATION } from "services/querySpecification/actionTypes";
 
 
 export const fetchData = callback => (dispatch, getState) => {
   const state = getState();
   const {params: {sourceId, tableName}} = matchBrowserPath(state.router.location.pathname);
   const _cacheKey = `${sourceId}/${tableName}`;
-  if (state.browser._cachedData && state.browser._cachedData[_cacheKey]) {
-    // We have needed data in cache. Swap that into the state
-    return dispatch({
-      type: LOAD_DATA_FROM_CACHE,
-      sourceId,
-      tableName,
-    });
+
+  if (state.browser.sourceId !== parseInt(sourceId) && state.browser.tableName !== tableName) {
+    // The browser reducer is currently not holding data for the page we are at.
+    // Check if cache has our needed data.
+    if (state.browser._cachedData && state.browser._cachedData[_cacheKey]) {
+      // We have needed data in cache. Swap that into the state
+      return dispatch({
+        type: LOAD_DATA_FROM_CACHE,
+        sourceId,
+        tableName,
+      });
+    }
   }
 
   dispatch({
     type: INITIATE_FETCH_DATA,
+    sourceId,
+    tableName,
+  });
+  dispatch({
+    type: INITIATE_QUERY_SPECIFICATION,
     sourceId,
     tableName,
   });
@@ -30,7 +41,7 @@ export const fetchData = callback => (dispatch, getState) => {
   } : {
     isReady: false,
   }
-  const orderBy = state.queryEditor.orderBy;
+  const { orderBy, limit, offset } = state.querySpecification;
   const columnsSelected = schema.isReady ? schema.columns.reduce((acc, ele) => ({
     ...acc,
     [ele.name]: true
@@ -41,7 +52,8 @@ export const fetchData = callback => (dispatch, getState) => {
       filter(col => col !== undefined),
     orderBy,
     // filterBy,
-    // limit,
+    limit,
+    offset,
   };
 
   return axios
@@ -51,8 +63,14 @@ export const fetchData = callback => (dispatch, getState) => {
         callback();
       }
 
-      return dispatch({
+      dispatch({
         type: FETCH_DATA,
+        payload: res.data,
+        sourceId,
+        tableName,
+      });
+      dispatch({
+        type: UPDATE_QUERY_SPECIFICATION,
         payload: res.data,
         sourceId,
         tableName,
