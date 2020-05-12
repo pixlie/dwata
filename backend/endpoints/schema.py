@@ -1,7 +1,7 @@
 from sqlalchemy import MetaData
 
 from utils.response import RapidJSONResponse
-from utils.database import connect_database
+from utils.database import connect_database, get_unavailable_columns
 from utils.source import get_all_sources, get_source_settings
 from services import all_services
 
@@ -47,14 +47,16 @@ def column_definition(col, col_def):
     }
 
 
-async def get_source_database(db_url, table_name):
-    engine, conn = await connect_database(db_url=db_url)
+async def get_source_database(source_settings, table_name):
+    engine, conn = await connect_database(db_url=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
+    unavailable_columns = get_unavailable_columns(source_settings=source_settings, meta=meta)
 
     if table_name and table_name in meta.tables.keys():
         columns = [
             column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
+            if col not in unavailable_columns.get(table_name, [])
         ]
         conn.close()
         return RapidJSONResponse(columns)
@@ -63,6 +65,7 @@ async def get_source_database(db_url, table_name):
             (
                 name, [
                     column_definition(col, col_def) for col, col_def in schema.columns.items()
+                    if col not in unavailable_columns.get(name, [])
                 ]
             ) for name, schema in meta.tables.items()
         ], key=lambda x: x[0])
@@ -81,7 +84,7 @@ async def schema_get(request):
     if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)
         response = await get_source_database(
-            source_settings["db_url"],
+            source_settings=source_settings,
             table_name=table_name
         )
         return response

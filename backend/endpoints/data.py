@@ -1,9 +1,10 @@
 from starlette.responses import Response
 import sqlalchemy
-from sqlalchemy import create_engine, MetaData, select, column, table, text, func
+from sqlalchemy import MetaData, select, column, table, text, func
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
+from utils.database import connect_database, get_unavailable_columns
 from utils.source import get_source_settings
 
 
@@ -83,20 +84,23 @@ async def data_post(request):
                 message="We could not handle that request, perhaps something is wrong with the server."
             )
 
-    engine = create_engine(settings["db_url"])
-    conn = engine.connect()
+    engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
+    unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta)
 
     if not table_name or (table_name and table_name not in meta.tables):
         conn.close()
         return Response("", status_code=404)
+    table_column_names = meta.tables[table_name].columns.keys()
 
     current_table = meta.tables[table_name]
     if len(query_specification.get("columns", [])) > 0:
-        columns = [column(col) for col in query_specification["columns"]]
+        columns = [column(col) for col in query_specification["columns"]
+                   if col in table_column_names and col not in unavailable_columns.get(table_name, [])]
     else:
-        columns = [text("*")]
+        columns = [column(col) for col in table_column_names
+                   if col not in unavailable_columns.get(table_name, [])]
 
     sel_obj = select(columns)
     sel_obj = sel_obj.select_from(table(table_name))
