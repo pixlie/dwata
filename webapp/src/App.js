@@ -1,8 +1,10 @@
 import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
+import { ConnectedRouter } from "connected-react-router";
 import { Provider } from "react-redux";
 
-import store from "services/store";
+import configureStore from "services/store";
+import history from "services/history";
 import Navbar from "components/Navbar";
 import Source from "components/Source";
 import Sidebar from "components/Sidebar";
@@ -16,8 +18,8 @@ import Paginator from "components/Browser/Paginator";
 
 export default ({ initialState }) => {
   return (
-    <Provider store={store(initialState)}>
-      <BrowserRouter>
+    <Provider store={configureStore(initialState)}>
+      <ConnectedRouter history={history}>
         <Navbar />
 
         <Sidebar>
@@ -46,7 +48,7 @@ export default ({ initialState }) => {
             <Home />
           </Route>
         </Switch>
-      </BrowserRouter>
+      </ConnectedRouter>
     </Provider>
   );
 }

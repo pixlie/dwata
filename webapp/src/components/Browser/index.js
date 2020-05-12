@@ -31,7 +31,6 @@ class Browser extends PureComponent {
     const {match: {params: {sourceId: prevSourceId, tableName: prevTableName}}} = prevProps;
     if (sourceId && tableName && prevSourceId && prevTableName &&
       (sourceId != prevSourceId || tableName != prevTableName)) {
-        console.log(sourceId, tableName, prevSourceId, prevTableName);
         // Call the fetch actions when URL has changed but this Component was already loaded
         this.props.fetchSchema(sourceId);
         this.props.fetchData();
