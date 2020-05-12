@@ -1,0 +1,2 @@
+class DwataException(Exception):
+    pass

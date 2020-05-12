@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
 from utils.config import settings
+from utils.exceptions import web_exception_handlers
 from endpoints.source import source_get
 from endpoints.schema import schema_get
 from endpoints.data import data_post
@@ -32,7 +33,7 @@ middleware = [
 
 
 # app = Starlette(debug=True, routes=handlers, exception_handlers=exception_handlers)
-app = Starlette(debug=True, routes=handlers, middleware=middleware)
+app = Starlette(debug=True, routes=handlers, middleware=middleware, exception_handlers=web_exception_handlers)
 
 
 if __name__ == "__main__":

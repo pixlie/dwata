@@ -26,3 +26,13 @@ def get_source_settings(source_index):
         return settings.DATABASES[requested_source[0]]
     elif requested_source[1] == "service":
         return getattr(settings, requested_source[2].upper())[requested_source[0]]
+
+
+def get_all_unavailable_columns(source_index):
+    """
+    For any given source_index (currently SQL source only), we create a dict with keys being table names
+    and for each key we have a list of unavailable columns.
+    """
+    requested_source = get_all_sources()[source_index]
+    for name, configuration in requested_source.items():
+        pass

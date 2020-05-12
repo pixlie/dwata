@@ -1,7 +1,7 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.exc import OperationalError
+from sqlalchemy import MetaData
 
-from utils.response import RapidJSONResponse, web_error
+from utils.response import RapidJSONResponse
+from utils.database import connect_database
 from utils.source import get_all_sources, get_source_settings
 from services import all_services
 
@@ -48,31 +48,7 @@ def column_definition(col, col_def):
 
 
 async def get_source_database(db_url, table_name):
-    try:
-        engine = create_engine(db_url)
-    except ModuleNotFoundError as e:
-        if hasattr(e, "name") and e.name == "psycopg2":
-            return web_error(
-                error_code="db.psycopg2",
-                message="Please install psycopg2 in the backend folder `pipenv install psycopg2`"
-            )
-        return web_error(
-            error_code="unknown",
-            message="We encountered an unknown error"
-        )
-
-    try:
-        conn = engine.connect()
-    except OperationalError as e:
-        if e.code == "e3q8":
-            return web_error(
-                error_code="db.not_running",
-                message="It seems that we can not connect to the PostgreSQL DB, can you please double check?",
-            )
-        return RapidJSONResponse({
-            "error_code": "unknown",
-            "error": "We encountered an unknown error",
-        })
+    engine, conn = await connect_database(db_url=db_url)
     meta = MetaData(bind=engine)
     meta.reflect()
 
@@ -105,7 +81,7 @@ async def schema_get(request):
     if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)
         response = await get_source_database(
-            **source_settings,
+            source_settings["db_url"],
             table_name=table_name
         )
         return response
