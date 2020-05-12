@@ -16,19 +16,20 @@ example_spec = {
 }
 
 
-def apply_ordering(query_specification, sel_obj, current_table):
+def apply_ordering(query_specification, sel_obj, current_table, unavailable_columns):
     order_by = query_specification["order_by"]
     valid_order_by = [
         (col, ord_type if ord_type in ("asc", "desc") else "asc")
-        for col, ord_type in order_by.items() if col in current_table.columns.keys()
+        for col, ord_type in order_by.items() if col in current_table.columns.keys() and col not in unavailable_columns
     ]
-    sel_obj.order_by(*[getattr(sqlalchemy, x[1])(getattr(current_table.c, x[0])) for x in valid_order_by])
-    return sel_obj
+    return sel_obj.order_by(*[getattr(sqlalchemy, x[1])(getattr(current_table.c, x[0])) for x in valid_order_by])
 
 
-def apply_filters(query_specification, sel_obj, current_table):
+def apply_filters(query_specification, sel_obj, current_table, unavailable_columns):
     filter_by = query_specification["filter_by"]
     for col, filter_spec in filter_by.items():
+        if col in unavailable_columns:
+            continue
         if col in current_table.columns:
             column_def = current_table.columns[col]
             if str(column_def.type) == "INTEGER":
@@ -105,9 +106,9 @@ async def data_post(request):
     sel_obj = select(columns)
     sel_obj = sel_obj.select_from(table(table_name))
     if query_specification.get("order_by", None):
-        sel_obj = apply_ordering(query_specification, sel_obj, current_table)
+        sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
     if query_specification.get("filter_by", None):
-        sel_obj = apply_filters(query_specification, sel_obj, current_table)
+        sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
     sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
     exc = conn.execute(sel_obj)
