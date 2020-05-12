@@ -1,21 +1,55 @@
-import React from "react";
+import React, { Fragment } from "react";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+
+import { toggleOrderBy } from "services/querySpecification/actions";
 
 
-const HeadItem = ({ toggleOrderBy, head }) => {
+const HeadItem = ({ toggleOrderBy, head, ordering }) => {
   const handleClick = event => {
     event.preventDefault();
     toggleOrderBy(head);
   }
-
-  return (
-    <th onClick={handleClick}>{head}</th>
-  );
+  if (ordering === "asc") {
+    return (
+      <th onClick={handleClick}>
+        <i className="fas fa-sort-up" />&nbsp;{head}
+      </th>
+    );
+  } else if (ordering === "desc") {
+    return (
+      <th onClick={handleClick}>
+        <i className="fas fa-sort-down" />{head}
+      </th>
+    );
+  } else {
+    return (
+      <th onClick={handleClick}>{head}</th>
+    );
+  }
 }
+
+
+const mapStateToProps = (state, {head}) => {
+  const qs = state.querySpecification;
+
+  return {
+    ordering: qs.orderBy[head],
+  };
+}
+
+
+const HeadItemConnected = connect(
+  mapStateToProps,
+  {
+    toggleOrderBy, 
+  }
+)(HeadItem);
 
 
 export default (schema, queriedColumns) => {
   const headList = [];
-  const DefaultCell = ({ data }) => <th>{data}</th>;
+  const DefaultCell = ({ data }) => <HeadItemConnected head={data} />;
 
   for (let i = 0; i < queriedColumns.length; i++) {
     const head = schema.columns.find(x => x.name === queriedColumns[i]);

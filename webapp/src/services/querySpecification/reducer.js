@@ -1,6 +1,6 @@
 import {
   INITIATE_QUERY_SPECIFICATION, TOGGLE_QUERY_EDITOR, UPDATE_QUERY_SPECIFICATION,
-  NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE
+  TOGGLE_ORDER, NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE
 } from "./actionTypes";
 
 
@@ -13,7 +13,7 @@ const initialState = {
   cacheKey: null,
   columnsSelected: {},
   filterBy: {},
-  orderBy: {},  // Only used to load from localStorage
+  orderBy: {},
   limit: 20,
   offset: 0,
   isVisible: false,
@@ -24,6 +24,11 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case INITIATE_QUERY_SPECIFICATION:
+      if (state.sourceId === action.sourceId && state.tableName === action.tableName) {
+        return {
+          ...state
+        };
+      }
       return {
         ...initialState,
         sourceId: action.sourceId,
@@ -62,9 +67,28 @@ export default (state = initialState, action) => {
         ...state,
         limit: action.payload.limit,
         offset: action.payload.offset,
+      };
+
+    case TOGGLE_ORDER:
+      const currentOrder = state.orderBy[action.columnName];
+      let newOrder = undefined;
+      if (currentOrder === undefined) {
+        newOrder = "asc";
+      } else if (currentOrder === "asc") {
+        newOrder = "desc";
       }
 
+      return {
+        ...state,
+        orderBy: {
+          ...state.orderBy,
+          [action.columnName]: newOrder,
+        }
+      };
+
     default:
-      return state;
+      return {
+        ...state
+      };
   }
 }

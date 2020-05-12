@@ -18,10 +18,15 @@ export const changeOrderBy = (columnName, orderType) => ({
 });
 
 
-export const toggleOrderBy = columnName => ({
-  type: TOGGLE_ORDER,
-  columnName,
-});
+export const toggleOrderBy = columnName => dispatch => {
+  // This method is triggerd from table head and it instantly loads new data
+  dispatch({
+    type: TOGGLE_ORDER,
+    columnName,
+  });
+
+  dispatch(fetchData());
+}
 
 
 export const toggleQueryEditor = () => dispatch => dispatch({

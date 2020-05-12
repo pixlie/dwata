@@ -50,7 +50,7 @@ export const fetchData = callback => (dispatch, getState) => {
     columns: Object.keys(columnsSelected).
       map(col => columnsSelected[col] === true ? col : undefined).
       filter(col => col !== undefined),
-    orderBy,
+    order_by: orderBy,
     // filterBy,
     limit,
     offset,
