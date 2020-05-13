@@ -1,6 +1,8 @@
 import {
-  INITIATE_QUERY_SPECIFICATION, TOGGLE_QUERY_EDITOR, UPDATE_QUERY_SPECIFICATION,
-  TOGGLE_ORDER, NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE
+  INITIATE_QUERY_SPECIFICATION, UPDATE_QUERY_SPECIFICATION,
+  TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
+  TOGGLE_ORDER, NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE,
+  TOGGLE_COLUMN_SELECTION
 } from "./actionTypes";
 
 
@@ -11,12 +13,14 @@ const initialState = {
   sourceId: null,
   tableName: null,
   cacheKey: null,
-  columnsSelected: {},
+  columnsSelected: [],
   filterBy: {},
   orderBy: {},
   limit: 20,
   offset: 0,
-  isVisible: false,
+  isQEVisible: false,
+  isCSVisible: false,
+  isSEVisible: false,
   _cachedData: {},
 };
 
@@ -41,8 +45,20 @@ export default (state = initialState, action) => {
     case TOGGLE_QUERY_EDITOR:
       return {
         ...state,
-        isVisible: !state.isVisible,
-      }
+        isQEVisible: !state.isQEVisible,
+      };
+
+    case TOGGLE_COLUMN_SELECTOR_UI:
+      return {
+        ...state,
+        isCSVisible: !state.isCSVisible,
+      };
+
+    case TOGGLE_SORT_EDITOR:
+      return {
+        ...state,
+        isSEVisible: !state.isSEVisible,
+      };
 
     case CHANGE_PER_PAGE:
       return {
@@ -67,6 +83,7 @@ export default (state = initialState, action) => {
         ...state,
         limit: action.payload.limit,
         offset: action.payload.offset,
+        columnsSelected: action.payload.columns,
       };
 
     case TOGGLE_ORDER:
@@ -86,9 +103,27 @@ export default (state = initialState, action) => {
         }
       };
 
-    default:
-      return {
-        ...state
-      };
+    case TOGGLE_COLUMN_SELECTION:
+      if (state.columnsSelected.includes(action.columnName)) {
+        // This column is currently selected, let's get it removed
+        return {
+          ...state,
+          columnsSelected: [...state.columnsSelected].filter(x => x !== action.columnName),
+        };
+      } else {
+        // This column is not selected, let's add it
+        return {
+          ...state,
+          columnsSelected: [
+            ...state.columnsSelected,
+            action.columnName,
+          ]
+        };
+      }
+
+      default:
+        return {
+          ...state
+        };
   }
 }

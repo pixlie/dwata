@@ -141,7 +141,7 @@ export default ({ schema, filterBy, setFilters }) => {
 
   return (
     <Fragment>
-      <Hx x="4">Filters</Hx>
+      <Hx x="6">Filters</Hx>
       <div className="control">
         <div className="select">
           <select name="filter_column" onChange={addFilter}>

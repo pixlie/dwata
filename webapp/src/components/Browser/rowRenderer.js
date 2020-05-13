@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 
 export default (schema, queriedColumns) => {
@@ -11,8 +11,19 @@ export default (schema, queriedColumns) => {
 
   const DefaultCell = ({ data }) => <td>{data}</td>;
   const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
-  const BooleanCell = ({ data }) => <td>{(data === true || data === false) ?
-    (data === true ? <i className="fas fa-check-circle" /> : <i className="fas fa-times-circle" />) : <i />}</td>;
+  const BooleanCell = ({ data }) => <td>{(data === true || data === false) ? (
+    <Fragment>
+      {data === true ? (
+        <div className="tag is-light is-success">
+          <i className="fas fa-check-circle" />&nbsp;Yes
+        </div>
+       ) : (
+        <div className="tag is-light is-danger">
+          <i className="fas fa-times-circle" />&nbsp;No
+        </div>
+       )}
+    </Fragment>
+  ) : <i />}</td>;
   // const JSONCell = ({ data }) => <td>{"{}"}</td>;
   const TimeStampCell = (({ data }) => {
     try {

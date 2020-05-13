@@ -41,15 +41,9 @@ export const fetchData = callback => (dispatch, getState) => {
   } : {
     isReady: false,
   }
-  const { orderBy, limit, offset } = state.querySpecification;
-  const columnsSelected = schema.isReady ? schema.columns.reduce((acc, ele) => ({
-    ...acc,
-    [ele.name]: true
-  }), {}) : {};
+  const {columnsSelected, orderBy, limit, offset} = state.querySpecification;
   const querySpecification = {
-    columns: Object.keys(columnsSelected).
-      map(col => columnsSelected[col] === true ? col : undefined).
-      filter(col => col !== undefined),
+    columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
     // filterBy,
     limit,

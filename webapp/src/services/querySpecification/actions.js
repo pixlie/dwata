@@ -1,7 +1,8 @@
 import { fetchData } from "services/browser/actions";
 import {
-  ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER, TOGGLE_QUERY_EDITOR,
-  NEXT_PAGE, PREVIOUS_PAGE,
+  ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER,
+  TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
+  NEXT_PAGE, PREVIOUS_PAGE, TOGGLE_COLUMN_SELECTION,
 } from "./actionTypes";
 
 
@@ -34,6 +35,16 @@ export const toggleQueryEditor = () => dispatch => dispatch({
 });
 
 
+export const toggleColumnSelector = () => dispatch => dispatch({
+  type: TOGGLE_COLUMN_SELECTOR_UI,
+});
+
+
+export const toggleSortEditor = () => dispatch => dispatch({
+  type: TOGGLE_SORT_EDITOR,
+});
+
+
 export const nextPage = () => dispatch => {
   dispatch({
     type: NEXT_PAGE,
@@ -50,3 +61,9 @@ export const previousPage = () => dispatch => {
 
   dispatch(fetchData());
 }
+
+
+export const toggleColumnSelection = columnName => dispatch => dispatch({
+  type: TOGGLE_COLUMN_SELECTION,
+  columnName,
+});

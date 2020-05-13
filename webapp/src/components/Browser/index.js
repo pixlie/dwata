@@ -39,7 +39,7 @@ class Browser extends PureComponent {
 
 	render() {
     const { sourceId, tableName, tableData, schema, history } = this.props;
-    if (!tableData.isReady || !schema.isReady || tableData.columns.length !== schema.columns.length) {
+    if (!tableData.isReady || !schema.isReady) {
       return (
         <div>Loading...</div>
       );

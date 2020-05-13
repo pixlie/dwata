@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import OrderByEditor from "./OrderByEditor";
 import FilterByEditor from "./FilterByEditor";
-import { Hx } from "components/BulmaHelpers";
+import { Section, Hx } from "components/BulmaHelpers";
 
 
 class QueryEditor extends PureComponent {
@@ -100,39 +100,45 @@ class QueryEditor extends PureComponent {
     const { sourceId, tableName, schema, qe } = this.props;
     const { columnsSelected, limit, filterBy, orderBy } = this.state;
 
-    if (sourceId === null || tableName === null || !qe.isVisible) {
+    if (sourceId === null || tableName === null || !qe.isQEVisible) {
       return null;
     }
 
     return (
-      <div className="modal is-active">
-        <div className="modal-background"></div>
+      <div id="query-editor">
+        <Section>
+          <button className="button is-rounded is-dark close" onClick={() => {}}>
+            Close&nbsp;<i className="fas fa-times"></i>
+          </button>
 
-        <div className="modal-content">
-          <div className="box">
-            <form className="" onSubmit={applyChanges}>
-              <Hx x="4">I want to get</Hx>
+          <div className="columns">
+            <div className="column is-8">
+              <Hx x="6">Visible columns</Hx>
               <div className="field is-grouped is-grouped-multiline">
-                { schema.columns.map((head, i) => (
+                { schema.columns.filter(x => !x.ui_hints.includes("is_meta")).map((head, i) => (
                   <div className="control" key={`col-get-${i}`}>
                     <input type="checkbox" name={head.name} id={`sl-${head.name}`} checked={columnsSelected[head.name]} onChange={toggleColumn} />
                     &nbsp;<label className="checkbox" htmlFor={`sl-${head.name}`}>{head.name}</label>
                   </div>
                 )) }
               </div>
-            </form>
-            <FilterByEditor schema={schema} filterBy={filterBy} setFilters={setFilters} />
-            <OrderByEditor schema={schema} cachedOrderBy={orderBy} />
+            </div>
 
-            Limited to
-            <form className="pure-form pure-form-stacked" onSubmit={applyChanges}>
-              <input type="number" name="limit" onChange={changeInput} value={limit} />
-
-              <button type="submit" className="pure-button small pure-button-success">Apply</button>
-            </form>
+            <div className="column is-4 has-meta-data">
+              <div className="field is-grouped is-grouped-multiline">
+                { schema.columns.filter(x => x.ui_hints.includes("is_meta")).map((head, i) => (
+                  <div className="control" key={`col-get-${i}`}>
+                    <input type="checkbox" name={head.name} id={`sl-${head.name}`} checked={columnsSelected[head.name]} onChange={toggleColumn} />
+                    &nbsp;<label className="checkbox" htmlFor={`sl-${head.name}`}>{head.name}</label>
+                  </div>
+                )) }
+              </div>
+            </div>
           </div>
-        </div>
-        <button className="modal-close is-large" aria-label="close"></button>
+        </Section>
+          {/* <FilterByEditor schema={schema} filterBy={filterBy} setFilters={setFilters} /> */}
+          {/* <OrderByEditor schema={schema} cachedOrderBy={orderBy} /> */}
+
         { /* <div className="pure-u-1-2">
           <form className="pure-form pure-form-stacked" onSubmit={applyChanges}>
             <textarea name="raw_sql" style="width:100%;max-width:100%;height:120px;">{query}</textarea>

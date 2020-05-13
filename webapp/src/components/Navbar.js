@@ -3,11 +3,14 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
-import { toggleQueryEditor } from "services/querySpecification/actions";
+import { toggleQueryEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
 import { matchBrowserPath } from "utils";
 
 
-const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetching, toggleSidebar, toggleQueryEditor }) => {
+const Navbar = ({
+  sourceId, tableName, db, schema, isFilterEnabled, isSourceFetching,
+  toggleSidebar, toggleQueryEditor, toggleColumnSelector, toggleSortEditor
+}) => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -27,7 +30,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetc
           <div className="navbar-item">
             <div className="buttons">
               <button className="button is-grey" onClick={toggleSidebar} disabled={isSourceFetching}>
-                Sources
+                <i className="fas fa-database" />&nbsp;Sources
               </button>
             </div>
           </div>
@@ -35,7 +38,7 @@ const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetc
           { tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
               <a className="navbar-link">
-                {db.label}/{tableName}
+                <i className="fas fa-table" />&nbsp;Tables
               </a>
 
               { schema.isReady ? (
@@ -63,8 +66,16 @@ const Navbar = ({ sourceId, tableName, db, schema, isFilterEnabled, isSourceFetc
             </div>
           </div>
           <div className="navbar-item">
-            <div className="buttons">
-              <button className="button is-info" disabled={!isFilterEnabled} onClick={toggleQueryEditor}>Filter/Order</button>
+            <div className="buttons has-addons">
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
+                <i className="fas fa-columns" />&nbsp;Columns
+              </button>
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleQueryEditor}>
+                <i className="fas fa-filter" />&nbsp;Filter
+              </button>
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
+                <i className="fas fa-sort" />&nbsp;Sort
+              </button>
             </div>
           </div>
         </div>
@@ -93,6 +104,8 @@ export default withRouter(connect(
   mapStateToProps,
   {
     toggleSidebar,
-    toggleQueryEditor
+    toggleQueryEditor,
+    toggleColumnSelector,
+    toggleSortEditor
   }
 )(Navbar));

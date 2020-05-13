@@ -156,7 +156,7 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
             }) }
           </div>
 
-          <div className="column is-3">
+          <div className="column is-3 has-meta-data">
             { currentRow.map((cell, i) => {
               if (!schema.columns[i].ui_hints.includes("is_meta")) { return null; }
               const Cell = cellRenderer(schema.columns[i], sourceId);
