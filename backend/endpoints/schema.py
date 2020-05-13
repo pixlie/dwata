@@ -14,10 +14,9 @@ def column_definition(col, col_def):
         hints = []
         if (col_def.primary_key or
                 len(col_def.foreign_keys) > 0 or
-                _type in ["BOOLEAN", "INET", "TIMESTAMP", "DATE"] or
-                len(col_def.foreign_keys) > 0):
+                _type in ["INET", "TIMESTAMP", "DATE"]):
             hints.append("is_meta")
-        elif "_url" in col.lower() or col.lower() == "url":
+        elif "_by_id" in col.lower():
             hints.append("is_meta")
         else:
             if _type == "VARCHAR" and not col_def.nullable:

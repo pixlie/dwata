@@ -70,6 +70,7 @@ async def data_post(request):
     etc. This method is a POST method because the query specification can become large.
     We use JSON (in the POST payload) to specify the query.
     """
+    from .schema import column_definition
     source_index = request.path_params["source_index"]
     table_name = request.path_params["table_name"]
     settings = get_source_settings(source_index=source_index)
@@ -88,7 +89,7 @@ async def data_post(request):
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
-    unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta)
+    unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
 
     if not table_name or (table_name and table_name not in meta.tables):
         conn.close()
@@ -98,14 +99,20 @@ async def data_post(request):
     current_table = meta.tables[table_name]
     if len(query_specification.get("columns", [])) > 0:
         columns = [column(col) for col in query_specification["columns"]
-                   if col in table_column_names and col not in unavailable_columns.get(table_name, [])]
+                   if col in table_column_names and col not in unavailable_columns]
     else:
+        # If we have not been asked to show specific columns then we do not send columns which are
+        # detected to be meta data
+        meta_data_column_names = [col["name"] for col in [
+            column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
+            if col not in unavailable_columns
+        ] if "is_meta" in col["ui_hints"]]
         columns = [column(col) for col in table_column_names
-                   if col not in unavailable_columns.get(table_name, [])]
+                   if col not in unavailable_columns and col not in meta_data_column_names]
 
     sel_obj = select(columns)
     sel_obj = sel_obj.select_from(table(table_name))
-    if query_specification.get("order_by", None):
+    if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
