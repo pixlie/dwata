@@ -2,8 +2,7 @@ import axios from "axios";
 
 import { dataURL } from "services/urls";
 import { matchBrowserPath } from "utils";
-import { INITIATE_FETCH_DATA, FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
-import { INITIATE_QUERY_SPECIFICATION, UPDATE_QUERY_SPECIFICATION } from "services/querySpecification/actionTypes";
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
 
 
 export const fetchData = callback => (dispatch, getState) => {
@@ -29,19 +28,7 @@ export const fetchData = callback => (dispatch, getState) => {
     sourceId,
     tableName,
   });
-  dispatch({
-    type: INITIATE_QUERY_SPECIFICATION,
-    sourceId,
-    tableName,
-  });
-  // This tells the API which DB/table and what filters/ordering to apply
-  const schema = state.schema.isReady && state.schema.sourceId === parseInt(sourceId) ? {
-    ...state.schema.rows.find(x => x.table_name === tableName),
-    isReady: true,
-  } : {
-    isReady: false,
-  }
-  const {columnsSelected, orderBy, limit, offset} = state.querySpecification;
+  const {columnsSelected, orderBy, limit, offset} = getState().querySpecification;
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
@@ -58,13 +45,7 @@ export const fetchData = callback => (dispatch, getState) => {
       }
 
       dispatch({
-        type: FETCH_DATA,
-        payload: res.data,
-        sourceId,
-        tableName,
-      });
-      dispatch({
-        type: UPDATE_QUERY_SPECIFICATION,
+        type: COMPLETE_FETCH_DATA,
         payload: res.data,
         sourceId,
         tableName,

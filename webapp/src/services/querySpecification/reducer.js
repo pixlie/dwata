@@ -1,44 +1,54 @@
 import {
-  INITIATE_QUERY_SPECIFICATION, UPDATE_QUERY_SPECIFICATION,
   TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   TOGGLE_ORDER, NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE,
   TOGGLE_COLUMN_SELECTION
 } from "./actionTypes";
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
 
 
 /**
- * This reducer specifies what we *want* to fetch, not necessarily what the backend has given us.
+ * This reducer specifies what we *want*, not necessarily what the backend has given us.
  **/
 const initialState = {
   sourceId: null,
   tableName: null,
-  cacheKey: null,
   columnsSelected: [],
   filterBy: {},
   orderBy: {},
-  limit: 20,
-  offset: 0,
+
+  count: undefined,
+  limit: undefined,
+  offset: undefined,
+
   isQEVisible: false,
   isCSVisible: false,
   isSEVisible: false,
+
+  isColumnsSelectedDirty: false,
+  isReady: false,
+  _cacheKey: null,
   _cachedData: {},
 };
 
 
 export default (state = initialState, action) => {
+  const _cacheKey = `${action.sourceId}/${action.tableName}`;
+
   switch (action.type) {
-    case INITIATE_QUERY_SPECIFICATION:
-      if (state.sourceId === action.sourceId && state.tableName === action.tableName) {
+    case INITIATE_FETCH_DATA:
+      if (state._cacheKey === _cacheKey) {
         return {
           ...state
         };
       }
       return {
         ...initialState,
-        sourceId: action.sourceId,
+        sourceId: parseInt(action.sourceId),
         tableName: action.tableName,
+        _cacheKey,
         _cachedData: {
           ...state._cachedData,
+          [_cacheKey]: undefined,
         }
       };
 
@@ -78,12 +88,26 @@ export default (state = initialState, action) => {
         offset: state.offset - state.limit,
       };
 
-    case UPDATE_QUERY_SPECIFICATION:
-      return {
-        ...state,
+    case COMPLETE_FETCH_DATA:
+      const temp = {
+        count: action.payload.count,
         limit: action.payload.limit,
         offset: action.payload.offset,
         columnsSelected: action.payload.columns,
+        sourceId: parseInt(action.sourceId),
+        tableName: action.tableName,
+        _cacheKey,
+      };
+      return {
+        ...initialState,
+        ...temp,
+        isReady: true,
+        _cachedData: {
+          ...state._cachedData,
+          [_cacheKey]: {
+            ...temp,
+          },
+        },
       };
 
     case TOGGLE_ORDER:
@@ -117,13 +141,14 @@ export default (state = initialState, action) => {
           columnsSelected: [
             ...state.columnsSelected,
             action.columnName,
-          ]
+          ],
+          isColumnsSelectedDirty: true,
         };
       }
 
-      default:
-        return {
-          ...state
-        };
+    default:
+      return {
+        ...state
+      };
   }
 }

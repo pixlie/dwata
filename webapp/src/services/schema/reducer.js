@@ -4,11 +4,12 @@ import { transformData } from "utils";
 
 const initialState = {
   sourceId: null,
-  _cacheKey: null,
   columns: [],
   rows: [],
+
   isFetching: false,
   isReady: false,
+  _cacheKey: null,
   _cachedData: {},
 };
 

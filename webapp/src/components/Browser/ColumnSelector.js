@@ -11,8 +11,7 @@ const ColumnSelector = ({sourceId, tableName, schema, isVisible, columns, origin
   if (sourceId === null || tableName === null || !isVisible) {
     return null;
   }
-  const areEqual = columns.length === originalColumns.length &&
-    columns.sort().every(function(value, index) { return value === originalColumns.sort()[index]});
+  const colsAreAvailable = columns.every((col, i) => originalColumns.includes(col));
 
   const BoundInput = ({head}) => {
     const handleClick = event => {
@@ -45,7 +44,8 @@ const ColumnSelector = ({sourceId, tableName, schema, isVisible, columns, origin
             </div>
           ))}
         </div>
-        <button className="button is-fullwidth is-success" disabled={areEqual} onClick={handleSubmit}>Apply</button>
+        {!colsAreAvailable? <div className="help">New column data needs to be fetched</div> : null}
+        <button className="button is-fullwidth is-success" disabled={colsAreAvailable} onClick={handleSubmit}>Apply</button>
       </Section>
     </div>
   );

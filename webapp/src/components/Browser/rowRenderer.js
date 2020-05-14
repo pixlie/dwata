@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 
 
-export default (schema, queriedColumns) => {
+export default (schemaColumns, tableColumns, querySpecificationColumns) => {
   const rowList = [];
   const date_time_options = {
     year: "numeric", month: "numeric", day: "numeric",
@@ -24,7 +24,7 @@ export default (schema, queriedColumns) => {
        )}
     </Fragment>
   ) : <i />}</td>;
-  // const JSONCell = ({ data }) => <td>{"{}"}</td>;
+  const JSONCell = ({ data }) => <td>{"{}"}</td>;
   const TimeStampCell = (({ data }) => {
     try {
       return <td>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</td>;
@@ -35,16 +35,20 @@ export default (schema, queriedColumns) => {
     }
   });
 
-  for (let i = 0; i < queriedColumns.length; i++) {
-    const head = schema.columns.find(x => x.name === queriedColumns[i]);
+  for (const col of tableColumns) {
+    if (!querySpecificationColumns.includes(col)) {
+      rowList.push(null);
+      continue;
+    }
+    const head = schemaColumns.find(x => x.name === col);
     if (head.is_primary_key) {
       rowList.push(PrimaryKeyCell);
     } else if (head.has_foreign_keys) {
-      rowList.push(null);
+      rowList.push(DefaultCell);
     } else if (head.ui_hints.includes("is_meta")) {
-      rowList.push(null);
+      rowList.push(DefaultCell);
     } else if (head.type === "JSONB" || head.type === "JSON") {
-      rowList.push(null);
+      rowList.push(JSONCell);
     } else if (head.type === "BOOLEAN") {
       rowList.push(BooleanCell);
     } else if (head.type === "TIMESTAMP") {
