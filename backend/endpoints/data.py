@@ -98,8 +98,8 @@ async def data_post(request):
 
     current_table = meta.tables[table_name]
     if len(query_specification.get("columns", [])) > 0:
-        columns = [column(col) for col in query_specification["columns"]
-                   if col in table_column_names and col not in unavailable_columns]
+        columns = [column(col) for col in table_column_names
+                   if col in query_specification["columns"] and col not in unavailable_columns]
     else:
         # If we have not been asked to show specific columns then we do not send columns which are
         # detected to be meta data
