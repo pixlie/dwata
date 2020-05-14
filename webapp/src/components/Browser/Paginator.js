@@ -41,7 +41,7 @@ const PageSlots = ({count, limit, offset}) => {
 }
 
 
-const Paginator = ({meta: {isReady, count, limit, offset}, handleNext, handlePrevious}) => {
+const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious}) => {
   if (!isReady) {
     return null;
   }
@@ -67,20 +67,27 @@ const Paginator = ({meta: {isReady, count, limit, offset}, handleNext, handlePre
 
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName } = props.match.params;
+  let {sourceId, tableName} = props.match.params;
   sourceId = parseInt(sourceId);
+  const _browserCacheKey = `${sourceId}/${tableName}`;
+  let isReady = false;
+  if (state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+    isReady = true;
+  }
 
-  return {
-    sourceId,
-    tableName,
-    meta: state.browser.isReady && state.browser.sourceId === sourceId && state.browser.tableName === tableName ? {
-      count: state.browser.count,
-      limit: state.browser.limit,
-      offset: state.browser.offset,
-      isReady: true,
-    } : {
-      isReady: false,
-    },
+  if (isReady) {
+    return {
+      isReady,
+      sourceId,
+      tableName,
+      count: state.querySpecification.count,
+      limit: state.querySpecification.limit,
+      offset: state.querySpecification.offset,
+    };
+  } else {
+    return {
+      isReady,
+    };
   }
 }
 

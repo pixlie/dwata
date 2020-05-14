@@ -98,8 +98,10 @@ async def data_post(request):
 
     current_table = meta.tables[table_name]
     if len(query_specification.get("columns", [])) > 0:
-        columns = [column(col) for col in table_column_names
-                   if col in query_specification["columns"] and col not in unavailable_columns]
+        # If there is an "id" column then it is always included, the UI hides it as needed
+        columns = [column("id")] if "id" not in query_specification["columns"] and "id" in table_column_names else []
+        columns = columns + [column(col) for col in table_column_names
+                             if col in query_specification["columns"] and col not in unavailable_columns]
     else:
         # If we have not been asked to show specific columns then we do not send columns which are
         # detected to be meta data
@@ -107,15 +109,15 @@ async def data_post(request):
             column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
             if col not in unavailable_columns
         ] if "is_meta" in col["ui_hints"]]
-        columns = [column(col) for col in table_column_names
-                   if col not in unavailable_columns and col not in meta_data_column_names]
+        columns = [column("id")] + [column(col) for col in table_column_names
+                                    if col not in unavailable_columns and col not in meta_data_column_names]
 
     sel_obj = select(columns)
     sel_obj = sel_obj.select_from(table(table_name))
     if query_specification.get("order_by", {}) != {}:
-        sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
+        sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     if query_specification.get("filter_by", None):
-        sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns.get(table_name, []))
+        sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
     exc = conn.execute(sel_obj)
@@ -123,7 +125,8 @@ async def data_post(request):
     # We use a separate query to count the total number of rows in the given query
     count_sel_obj = select([func.count(text("*"))]).select_from(table(table_name))
     if query_specification.get("filter_by", None):
-        count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table)
+        count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
+                                      unavailable_columns=unavailable_columns)
     count = conn.execute(count_sel_obj).scalar()
     conn.close()
 
