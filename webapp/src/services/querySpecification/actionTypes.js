@@ -8,6 +8,7 @@ export const TOGGLE_SORT_EDITOR = "TOGGLE_SORT_EDITOR";
 
 export const NEXT_PAGE = "NEXT_PAGE";
 export const PREVIOUS_PAGE = "PREVIOUS_PAGE";
-export const CHANGE_PER_PAGE = "CHANGE_PER_PAGE";
+export const GOTO_PAGE = "GOTO_PAGE";
+export const CHANGE_LIMIT = "CHANGE_LIMIT";
 
 export const TOGGLE_COLUMN_SELECTION = "TOGGLE_COLUMN_SELECTION";

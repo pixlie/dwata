@@ -2,7 +2,7 @@ import { fetchData } from "services/browser/actions";
 import {
   ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER,
   TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
-  NEXT_PAGE, PREVIOUS_PAGE, TOGGLE_COLUMN_SELECTION,
+  NEXT_PAGE, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
 } from "./actionTypes";
 
 
@@ -57,6 +57,16 @@ export const nextPage = () => dispatch => {
 export const previousPage = () => dispatch => {
   dispatch({
     type: PREVIOUS_PAGE,
+  });
+
+  dispatch(fetchData());
+}
+
+
+export const gotoPage = pageNum => dispatch => {
+  dispatch({
+    type: GOTO_PAGE,
+    pageNum,
   });
 
   dispatch(fetchData());

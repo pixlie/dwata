@@ -2,15 +2,22 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { nextPage, previousPage } from "services/querySpecification/actions";
+import { nextPage, previousPage, gotoPage } from "services/querySpecification/actions";
 
 
-const PageItem = ({ number, currentPage }) => (
-  <li><a className={`pagination-link${number === currentPage ? " is-current" : ""}`} aria-label={`Goto page ${number}`}>{number}</a></li>
-);
+const PageItem = ({number, currentPage, gotoPage}) => {
+  const handleGotoPage = event => {
+    event.preventDefault();
+    gotoPage(number);
+  }
+  
+  return (
+    <li><a className={`pagination-link${number === currentPage ? " is-current" : ""}`} aria-label={`Goto page ${number}`} onClick={handleGotoPage}>{number}</a></li>
+  );
+}
 
 
-const PageSlots = ({count, limit, offset}) => {
+const PageSlots = ({count, limit, offset, gotoPage}) => {
   const slots = 9;  // Includes all page numbers to be shown and ellipses
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(count / limit);
@@ -20,7 +27,7 @@ const PageSlots = ({count, limit, offset}) => {
       <ul className="pagination-list">
         <li><span className="pagination-ellipsis">{limit}/page</span></li>
         {[...Array(totalPages).keys()].map(x => (
-          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} />
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} gotoPage={gotoPage} />
         ))}
       </ul>
     );
@@ -29,11 +36,11 @@ const PageSlots = ({count, limit, offset}) => {
       <ul className="pagination-list">
         <li><span className="pagination-ellipsis">{limit}/page</span></li>
         {[...Array(4).keys()].map(x => (
-          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} />
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} currentPage={currentPage} gotoPage={gotoPage} />
         ))}
         <li><span className="pagination-ellipsis">&hellip;</span></li>
         {[...Array(4).keys()].reverse().map(x => (
-          <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} currentPage={currentPage} />
+          <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} currentPage={currentPage} gotoPage={gotoPage} />
         ))}
       </ul>
     );
@@ -41,7 +48,7 @@ const PageSlots = ({count, limit, offset}) => {
 }
 
 
-const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious}) => {
+const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious, gotoPage}) => {
   if (!isReady) {
     return null;
   }
@@ -59,7 +66,7 @@ const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious}) 
         ) : (
           <a className="pagination-next" onClick={handleNext}>Next page</a>
         )}
-        <PageSlots count={count} limit={limit} offset={offset} />
+        <PageSlots count={count} limit={limit} offset={offset} gotoPage={gotoPage} />
       </nav>
     </div>
   );
@@ -103,6 +110,8 @@ export default withRouter(connect(
     handlePrevious: event => {
       event.preventDefault();
       return previousPage();
-    }
+    },
+
+    gotoPage,
   }
 )(Paginator));

@@ -1,9 +1,11 @@
 import {
   TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
-  TOGGLE_ORDER, NEXT_PAGE, CHANGE_PER_PAGE, PREVIOUS_PAGE,
+  TOGGLE_ORDER,
+  NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
   TOGGLE_COLUMN_SELECTION
 } from "./actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
+import { act } from "react-dom/test-utils";
 
 
 /**
@@ -70,10 +72,10 @@ export default (state = initialState, action) => {
         isSEVisible: !state.isSEVisible,
       };
 
-    case CHANGE_PER_PAGE:
+    case CHANGE_LIMIT:
       return {
         ...state,
-        perPage: action.payload,
+        limit: action.limit,
       }
 
     case NEXT_PAGE:
@@ -88,7 +90,13 @@ export default (state = initialState, action) => {
         offset: state.offset - state.limit,
       };
 
-    case COMPLETE_FETCH_DATA:
+    case GOTO_PAGE:
+      return {
+        ...state,
+        offset: (action.pageNum - 1) * state.limit,  // Since pageNum comes from UI, it counts from 1, but API counts from 0
+      };
+
+      case COMPLETE_FETCH_DATA:
       const temp = {
         count: action.payload.count,
         limit: action.payload.limit,
