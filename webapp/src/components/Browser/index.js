@@ -23,7 +23,6 @@ const Browser = ({
   }
 
   const rowRendererList = rowRenderer(schemaColumns, tableColumns, querySpecificationColumns);
-  console.log(rowRendererList);
 
   return (
     <table className="table is-narrow is-fullwidth is-hoverable is-data-table">

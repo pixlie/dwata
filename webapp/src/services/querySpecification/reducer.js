@@ -4,8 +4,7 @@ import {
   NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
   TOGGLE_COLUMN_SELECTION
 } from "./actionTypes";
-import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
-import { act } from "react-dom/test-utils";
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
 
 /**
@@ -26,15 +25,23 @@ const initialState = {
   isCSVisible: false,
   isSEVisible: false,
 
-  isColumnsSelectedDirty: false,
   isReady: false,
   _cacheKey: null,
   _cachedData: {},
 };
 
 
+const keysToCache = ["sourceId", "tableName", "columnsSelected", "filterBy", "orderBy", "count", "limit", "offset"];
+const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
+  if (keysToCache.includes(key)) {
+    acc[key] = state[key];
+  }
+  return acc;
+}, {});
+
+
 export default (state = initialState, action) => {
-  const _cacheKey = `${action.sourceId}/${action.tableName}`;
+  const _cacheKey = (action.sourceId && action.tableName) ?  `${action.sourceId}/${action.tableName}` : `${state.sourceId}/${state.tableName}`;
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
@@ -72,23 +79,47 @@ export default (state = initialState, action) => {
         isSEVisible: !state.isSEVisible,
       };
 
-    case CHANGE_LIMIT:
-      return {
+    case CHANGE_LIMIT: {
+      const temp = {
         ...state,
         limit: action.limit,
-      }
-
-    case NEXT_PAGE:
+      };
       return {
+        ...temp,
+        _cachedData: {
+          ...state._cachedData,
+          [_cacheKey]: extractObjectToCache(temp),
+        },
+      };
+    }
+
+    case NEXT_PAGE: {
+      const temp = {
         ...state,
         offset: state.offset + state.limit,
       };
-
-    case PREVIOUS_PAGE:
       return {
+        ...temp,
+        _cachedData: {
+          ...state._cachedData,
+          [_cacheKey]: extractObjectToCache(temp),
+        },
+      };
+    }
+
+    case PREVIOUS_PAGE: {
+      const temp = {
         ...state,
         offset: state.offset - state.limit,
       };
+      return {
+        ...temp,
+        _cachedData: {
+          ...state._cachedData,
+          [_cacheKey]: extractObjectToCache(temp),
+        },
+      };
+    }
 
     case GOTO_PAGE:
       return {
@@ -96,7 +127,7 @@ export default (state = initialState, action) => {
         offset: (action.pageNum - 1) * state.limit,  // Since pageNum comes from UI, it counts from 1, but API counts from 0
       };
 
-      case COMPLETE_FETCH_DATA:
+    case COMPLETE_FETCH_DATA:
       const temp = {
         count: action.payload.count,
         limit: action.payload.limit,
@@ -116,6 +147,29 @@ export default (state = initialState, action) => {
             ...temp,
           },
         },
+      };
+
+    case LOAD_DATA_FROM_CACHE:
+      if (_cacheKey in state._cachedData) {
+        return {
+          ...initialState,
+          ...state._cachedData[_cacheKey],
+          isReady: true,
+          _cachedData: {
+            ...state._cachedData
+          },
+        };
+      }
+      // Request cacheKey is not in cacheData, we simply initiate
+      return {
+        ...initialState,
+        sourceId: parseInt(action.sourceId),
+        tableName: action.tableName,
+        _cacheKey,
+        _cachedData: {
+          ...state._cachedData,
+          [_cacheKey]: undefined,
+        }
       };
 
     case TOGGLE_ORDER:
@@ -150,7 +204,6 @@ export default (state = initialState, action) => {
             ...state.columnsSelected,
             action.columnName,
           ],
-          isColumnsSelectedDirty: true,
         };
       }
 

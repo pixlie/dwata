@@ -10,10 +10,10 @@ export const fetchData = callback => (dispatch, getState) => {
   const {params: {sourceId, tableName}} = matchBrowserPath(state.router.location.pathname);
   const _cacheKey = `${sourceId}/${tableName}`;
 
-  if (state.browser.sourceId !== parseInt(sourceId) && state.browser.tableName !== tableName) {
+  if (state.browser._cacheKey !== _cacheKey) {
     // The browser reducer is currently not holding data for the page we are at.
     // Check if cache has our needed data.
-    if (state.browser._cachedData && state.browser._cachedData[_cacheKey]) {
+    if (state.browser._cachedData && _cacheKey in state.browser._cachedData) {
       // We have needed data in cache. Swap that into the state
       return dispatch({
         type: LOAD_DATA_FROM_CACHE,

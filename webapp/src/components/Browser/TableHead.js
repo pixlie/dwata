@@ -52,7 +52,6 @@ const mapStateToProps = (state, props) => {
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       tableColumns: state.browser.columns,
       querySpecificationColumns: state.querySpecification.columnsSelected,
-      isQSColumnsDirty: state.querySpecification.isColumnsSelectedDirty,
     };
   } else {
     return {
