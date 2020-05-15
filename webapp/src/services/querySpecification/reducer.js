@@ -43,6 +43,18 @@ const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
 export default (state = initialState, action) => {
   const _cacheKey = (action.sourceId && action.tableName) ?  `${action.sourceId}/${action.tableName}` : `${state.sourceId}/${state.tableName}`;
 
+  const setDataAndCache = delta => ({
+    ...state,
+    ...delta,
+    _cachedData: {
+      ...state._cachedData,
+      [_cacheKey]: extractObjectToCache({
+        ...state,
+        ...delta,
+      }),
+    },
+  });
+
   switch (action.type) {
     case INITIATE_FETCH_DATA:
       if (state._cacheKey === _cacheKey) {
@@ -79,53 +91,25 @@ export default (state = initialState, action) => {
         isSEVisible: !state.isSEVisible,
       };
 
-    case CHANGE_LIMIT: {
-      const temp = {
-        ...state,
+    case CHANGE_LIMIT:
+      return setDataAndCache({
         limit: action.limit,
-      };
-      return {
-        ...temp,
-        _cachedData: {
-          ...state._cachedData,
-          [_cacheKey]: extractObjectToCache(temp),
-        },
-      };
-    }
+      });
 
-    case NEXT_PAGE: {
-      const temp = {
-        ...state,
+    case NEXT_PAGE:
+      return setDataAndCache({
         offset: state.offset + state.limit,
-      };
-      return {
-        ...temp,
-        _cachedData: {
-          ...state._cachedData,
-          [_cacheKey]: extractObjectToCache(temp),
-        },
-      };
-    }
+      });
 
-    case PREVIOUS_PAGE: {
-      const temp = {
-        ...state,
+    case PREVIOUS_PAGE:
+      return setDataAndCache({
         offset: state.offset - state.limit,
-      };
-      return {
-        ...temp,
-        _cachedData: {
-          ...state._cachedData,
-          [_cacheKey]: extractObjectToCache(temp),
-        },
-      };
-    }
+      });
 
     case GOTO_PAGE:
-      return {
-        ...state,
+      return setDataAndCache({
         offset: (action.pageNum - 1) * state.limit,  // Since pageNum comes from UI, it counts from 1, but API counts from 0
-      };
+      });
 
     case COMPLETE_FETCH_DATA:
       const temp = {
@@ -181,30 +165,27 @@ export default (state = initialState, action) => {
         newOrder = "desc";
       }
 
-      return {
-        ...state,
+      return setDataAndCache({
         orderBy: {
           ...state.orderBy,
           [action.columnName]: newOrder,
         }
-      };
+      });
 
     case TOGGLE_COLUMN_SELECTION:
       if (state.columnsSelected.includes(action.columnName)) {
         // This column is currently selected, let's get it removed
-        return {
-          ...state,
+        return setDataAndCache({
           columnsSelected: [...state.columnsSelected].filter(x => x !== action.columnName),
-        };
+        });
       } else {
         // This column is not selected, let's add it
-        return {
-          ...state,
+        return setDataAndCache({
           columnsSelected: [
             ...state.columnsSelected,
             action.columnName,
           ],
-        };
+        });
       }
 
     default:
