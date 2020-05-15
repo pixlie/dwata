@@ -11,8 +11,6 @@ import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "
  * This reducer specifies what we *want*, not necessarily what the backend has given us.
  **/
 const initialState = {
-  sourceId: null,
-  tableName: null,
   columnsSelected: [],
   filterBy: {},
   orderBy: {},
@@ -31,7 +29,7 @@ const initialState = {
 };
 
 
-const keysToCache = ["sourceId", "tableName", "columnsSelected", "filterBy", "orderBy", "count", "limit", "offset"];
+const keysToCache = ["columnsSelected", "filterBy", "orderBy", "count", "limit", "offset", "_cacheKey"];
 const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
   if (keysToCache.includes(key)) {
     acc[key] = state[key];
@@ -41,14 +39,12 @@ const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
 
 
 export default (state = initialState, action) => {
-  const _cacheKey = (action.sourceId && action.tableName) ?  `${action.sourceId}/${action.tableName}` : `${state.sourceId}/${state.tableName}`;
-
-  const setDataAndCache = delta => ({
+  const setDeltaAndCache = delta => ({
     ...state,
     ...delta,
     _cachedData: {
       ...state._cachedData,
-      [_cacheKey]: extractObjectToCache({
+      [state._cacheKey]: extractObjectToCache({
         ...state,
         ...delta,
       }),
@@ -57,19 +53,18 @@ export default (state = initialState, action) => {
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
-      if (state._cacheKey === _cacheKey) {
+      if (`${action.sourceId}/${action.tableName}` === state._cacheKey) {
+        // No need to initiate multiple times
         return {
           ...state
         };
       }
       return {
         ...initialState,
-        sourceId: parseInt(action.sourceId),
-        tableName: action.tableName,
-        _cacheKey,
+        _cacheKey: `${action.sourceId}/${action.tableName}`,
         _cachedData: {
           ...state._cachedData,
-          [_cacheKey]: undefined,
+          [`${action.sourceId}/${action.tableName}`]: undefined,
         }
       };
 
@@ -92,67 +87,61 @@ export default (state = initialState, action) => {
       };
 
     case CHANGE_LIMIT:
-      return setDataAndCache({
+      return setDeltaAndCache({
         limit: action.limit,
       });
 
     case NEXT_PAGE:
-      return setDataAndCache({
+      return setDeltaAndCache({
         offset: state.offset + state.limit,
       });
 
     case PREVIOUS_PAGE:
-      return setDataAndCache({
+      return setDeltaAndCache({
         offset: state.offset - state.limit,
       });
 
     case GOTO_PAGE:
-      return setDataAndCache({
+      return setDeltaAndCache({
         offset: (action.pageNum - 1) * state.limit,  // Since pageNum comes from UI, it counts from 1, but API counts from 0
       });
 
     case COMPLETE_FETCH_DATA:
-      const temp = {
+      if (`${action.sourceId}/${action.tableName}` != state._cacheKey) {
+        // We have a problem, some data race perhaps
+        // Todo: tackle this issue if it happens
+        console.log("This is a huge problem, please check");
+        return {
+          ...state,
+        };
+      }
+      return setDeltaAndCache({
         count: action.payload.count,
         limit: action.payload.limit,
         offset: action.payload.offset,
         columnsSelected: action.payload.columns,
-        sourceId: parseInt(action.sourceId),
-        tableName: action.tableName,
-        _cacheKey,
-      };
-      return {
-        ...initialState,
-        ...temp,
         isReady: true,
-        _cachedData: {
-          ...state._cachedData,
-          [_cacheKey]: {
-            ...temp,
-          },
-        },
-      };
+      });
 
     case LOAD_DATA_FROM_CACHE:
-      if (_cacheKey in state._cachedData) {
+      if (`${action.sourceId}/${action.tableName}` in state._cachedData) {
+        // Data found in cache, let us set that cached data to the main state of this reducer
         return {
           ...initialState,
-          ...state._cachedData[_cacheKey],
+          ...state._cachedData[`${action.sourceId}/${action.tableName}`],
           isReady: true,
           _cachedData: {
             ...state._cachedData
           },
         };
       }
-      // Request cacheKey is not in cacheData, we simply initiate
+      // Requested cacheKey is not in cacheData, we simply initiate fresh data in the state of this reducer
       return {
         ...initialState,
-        sourceId: parseInt(action.sourceId),
-        tableName: action.tableName,
-        _cacheKey,
+        _cacheKey: `${action.sourceId}/${action.tableName}`,
         _cachedData: {
           ...state._cachedData,
-          [_cacheKey]: undefined,
+          [`${action.sourceId}/${action.tableName}`]: undefined,
         }
       };
 
@@ -165,7 +154,7 @@ export default (state = initialState, action) => {
         newOrder = "desc";
       }
 
-      return setDataAndCache({
+      return setDeltaAndCache({
         orderBy: {
           ...state.orderBy,
           [action.columnName]: newOrder,
@@ -175,12 +164,12 @@ export default (state = initialState, action) => {
     case TOGGLE_COLUMN_SELECTION:
       if (state.columnsSelected.includes(action.columnName)) {
         // This column is currently selected, let's get it removed
-        return setDataAndCache({
+        return setDeltaAndCache({
           columnsSelected: [...state.columnsSelected].filter(x => x !== action.columnName),
         });
       } else {
         // This column is not selected, let's add it
-        return setDataAndCache({
+        return setDeltaAndCache({
           columnsSelected: [
             ...state.columnsSelected,
             action.columnName,
