@@ -51,11 +51,7 @@ const mapStateToProps = (state, props) => {
   const _browserCacheKey = `${sourceId}/${tableName}`;
   let isReady = false;
 
-  console.log(state.schema.isReady, state.schema.sourceId === parseInt(sourceId),
-  state.browser.isReady, state.browser._cacheKey === _browserCacheKey,
-  state.querySpecification.isReady, state.querySpecification._cacheKey === _browserCacheKey,
-  state.querySpecification._cacheKey, _browserCacheKey);
-
+  // We are ready only when all the needed data is there
   if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
     state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
     state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {

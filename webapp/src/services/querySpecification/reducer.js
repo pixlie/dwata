@@ -1,5 +1,5 @@
 import {
-  TOGGLE_QUERY_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
+  TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   TOGGLE_ORDER,
   NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
   TOGGLE_COLUMN_SELECTION
@@ -19,7 +19,7 @@ const initialState = {
   limit: undefined,
   offset: undefined,
 
-  isQEVisible: false,
+  isFEVisible: false,
   isCSVisible: false,
   isSEVisible: false,
 
@@ -68,10 +68,10 @@ export default (state = initialState, action) => {
         }
       };
 
-    case TOGGLE_QUERY_EDITOR:
+    case TOGGLE_FILTER_EDITOR:
       return {
         ...state,
-        isQEVisible: !state.isQEVisible,
+        isFEVisible: !state.isFEVisible,
       };
 
     case TOGGLE_COLUMN_SELECTOR_UI:

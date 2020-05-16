@@ -1,16 +1,23 @@
-import React, { Fragment } from 'react';
+import React from 'react';
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 
+import { fetchData } from "services/browser/actions";
 import { Hx } from "components/BulmaHelpers";
 
 
-export default ({ schema, filterBy, setFilters }) => {
+const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
+  if (!isReady) {
+    return null;
+  }
+
   const addFilter = event => {
     event.preventDefault();
     const { value } = event.target;
     if (value === "") {
       return;
     }
-    const data_type = schema.find(x => x.name === value);
+    const data_type = schemaColumns.find(x => x.name === value);
     if (["INTEGER", "VARCHAR", "TIMESTAMP"].includes(data_type.type)) {
       setFilters({
         ...filterBy,
@@ -34,7 +41,7 @@ export default ({ schema, filterBy, setFilters }) => {
     const { name, value, dataset } = event.target;
 
     const temp = {};
-    const data_type = schema.find(x => x.name === name);
+    const data_type = schemaColumns.find(x => x.name === name);
     if (data_type.type === "INTEGER") {
       if (value.indexOf(",") !== -1) {
         // This is a range provided
@@ -86,7 +93,7 @@ export default ({ schema, filterBy, setFilters }) => {
 
   const filters = [<p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>];
   for (const [col, filter_spec] of Object.entries(filterBy)) {
-    const data_type = schema.find(x => x.name === col);
+    const data_type = schemaColumns.find(x => x.name === col);
     if (data_type.type === "INTEGER") {
       filters.push(
         <div className="multiple-input" key={`fl-int-${col}`}>
@@ -135,12 +142,12 @@ export default ({ schema, filterBy, setFilters }) => {
   }
 
   const filterByOptions = [<option value="" key="fl-hd">Filter by</option>];
-  for (const head of schema.columns) {
+  for (const head of schemaColumns) {
     filterByOptions.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
   }
 
   return (
-    <Fragment>
+    <div id="filter-editor">
       <Hx x="6">Filters</Hx>
       <div className="control">
         <div className="select">
@@ -151,6 +158,45 @@ export default ({ schema, filterBy, setFilters }) => {
 
         {filters}
       </div>
-    </Fragment>
+    </div>
   );
 }
+
+
+const mapStateToProps = (state, props) => {
+  let { sourceId, tableName } = props.match.params;
+  sourceId = parseInt(sourceId);
+  const _browserCacheKey = `${sourceId}/${tableName}`;
+  let isReady = false;
+  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
+    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+    isReady = true;
+  }
+
+  if (isReady) {
+    return {
+      isReady,
+      sourceId,
+      tableName,
+      schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
+      dataColumns: state.browser.columns,
+      qsColumns: state.querySpecification.columnsSelected,
+      filterBy: state.querySpecification.filterBy,
+      isVisible: state.querySpecification.isFEVisible,
+    };
+  } else {
+    return {
+      isReady,
+    };
+  }
+}
+
+
+export default withRouter(connect(
+  mapStateToProps,
+  {
+    // toggleColumnSelection,
+    fetchData,
+  }
+)(FilterEditor));

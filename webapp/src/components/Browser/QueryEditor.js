@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import OrderByEditor from "./OrderByEditor";
-import FilterByEditor from "./FilterByEditor";
+import FilterByEditor from "./FilterEditor";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
@@ -100,7 +100,7 @@ class QueryEditor extends PureComponent {
     const { sourceId, tableName, schema, qe } = this.props;
     const { columnsSelected, limit, filterBy, orderBy } = this.state;
 
-    if (sourceId === null || tableName === null || !qe.isQEVisible) {
+    if (sourceId === null || tableName === null || !qe.isFEVisible) {
       return null;
     }
 

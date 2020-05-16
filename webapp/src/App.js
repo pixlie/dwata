@@ -11,8 +11,9 @@ import Sidebar from "components/Sidebar";
 import Home from "components/Home";
 import Browser from "components/Browser";
 import APIBrowser from "components/APIBrowser";
-import QueryEditor from "components/Browser/QueryEditor";
+// import QueryEditor from "components/Browser/QueryEditor";
 import ColumnSelector from "components/Browser/ColumnSelector";
+import FilterEditor from "components/Browser/FilterEditor";
 import DetailView from "components/Browser/Detail";
 import Paginator from "components/Browser/Paginator";
 
@@ -29,7 +30,7 @@ export default ({ initialState }) => {
 
         <Switch>
           <Route path="/browse/:sourceId/:tableName/:pk" exact>
-            <QueryEditor />
+            {/* <QueryEditor /> */}
             <Browser />
             <DetailView />
             <Paginator />
@@ -37,7 +38,8 @@ export default ({ initialState }) => {
 
           <Route path="/browse/:sourceId/:tableName" exact>
             <ColumnSelector />
-            <QueryEditor />
+            <FilterEditor />
+            {/* <QueryEditor /> */}
             <Browser />
             <Paginator />
           </Route>

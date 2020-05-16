@@ -3,13 +3,13 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
-import { toggleQueryEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
+import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
 import { matchBrowserPath } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, db, schema, isFilterEnabled, isSourceFetching,
-  toggleSidebar, toggleQueryEditor, toggleColumnSelector, toggleSortEditor
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching,
+  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor
 }) => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -70,7 +70,7 @@ const Navbar = ({
               <button className="button" disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
                 <i className="fas fa-columns" />&nbsp;Columns
               </button>
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleQueryEditor}>
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
                 <i className="fas fa-filter" />&nbsp;Filter
               </button>
               <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
@@ -104,7 +104,7 @@ export default withRouter(connect(
   mapStateToProps,
   {
     toggleSidebar,
-    toggleQueryEditor,
+    toggleFilterEditor,
     toggleColumnSelector,
     toggleSortEditor
   }

@@ -1,4 +1,4 @@
-import { TOGGLE_SIDEBAR, TOGGLE_QUERY_EDITOR } from './actionTypes';
+import { TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR } from './actionTypes';
 
 
 export const toggleSidebar = () => dispatch => dispatch({
@@ -6,6 +6,6 @@ export const toggleSidebar = () => dispatch => dispatch({
 });
 
 
-export const toggleQueryEditor = () => dispatch => dispatch({
-  type: TOGGLE_QUERY_EDITOR,
+export const toggleFilterEditor = () => dispatch => dispatch({
+  type: TOGGLE_FILTER_EDITOR,
 });

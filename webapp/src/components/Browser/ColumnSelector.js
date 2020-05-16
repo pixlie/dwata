@@ -7,11 +7,11 @@ import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
-const ColumnSelector = ({sourceId, tableName, schema, isVisible, columns, originalColumns, toggleColumnSelection, fetchData}) => {
+const ColumnSelector = ({sourceId, tableName, schemaColumns, isVisible, qsColumns, dataColumns, toggleColumnSelection, fetchData}) => {
   if (sourceId === null || tableName === null || !isVisible) {
     return null;
   }
-  const colsAreAvailable = columns.every((col, i) => originalColumns.includes(col));
+  const colsAreAvailable = qsColumns.every((col, i) => dataColumns.includes(col));
 
   const BoundInput = ({head}) => {
     const handleClick = event => {
@@ -21,7 +21,7 @@ const ColumnSelector = ({sourceId, tableName, schema, isVisible, columns, origin
 
     return (
       <Fragment>
-        <input type="checkbox" name={head.name} checked={columns.includes(head.name)} onChange={handleClick} />&nbsp;{head.name}
+        <input type="checkbox" name={head.name} checked={qsColumns.includes(head.name)} onChange={handleClick} />&nbsp;{head.name}
       </Fragment>
     )
   }
@@ -32,11 +32,11 @@ const ColumnSelector = ({sourceId, tableName, schema, isVisible, columns, origin
   };
 
   return (
-    <div id="query-editor">
+    <div id="column-selector">
       <Section>
         <Hx x="6">Visible columns</Hx>
         <div className="field">
-          {schema.columns.map((head, i) => (
+          {schemaColumns.columns.map((head, i) => (
             <div key={`col-get-${i}`} className="control">
               <label className="checkbox">
                 <BoundInput head={head} />
@@ -56,19 +56,27 @@ const mapStateToProps = (state, props) => {
   let { sourceId, tableName } = props.match.params;
   sourceId = parseInt(sourceId);
   const _browserCacheKey = `${sourceId}/${tableName}`;
+  let isReady = false;
+  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
+    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+    isReady = true;
+  }
 
-  return {
-    sourceId,
-    tableName,
-    schema: state.schema.isReady && state.schema.sourceId === parseInt(sourceId) ? {
-      ...state.schema.rows.find(x => x.table_name === tableName),
-      isReady: true,
-    } : {
-      isReady: false,
-    },
-    columns: [...state.querySpecification.columnsSelected],  // Need to do shallow copy else sorting in component will sort in Redux state
-    originalColumns: [...state.browser.columns],
-    isVisible: state.querySpecification.isCSVisible,
+  if (isReady) {
+    return {
+      isReady,
+      sourceId,
+      tableName,
+      schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
+      dataColumns: state.browser.columns,
+      qsColumns: state.querySpecification.columnsSelected,
+      isVisible: state.querySpecification.isCSVisible,
+    };
+  } else {
+    return {
+      isReady,
+    };
   }
 }
 
