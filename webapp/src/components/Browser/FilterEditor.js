@@ -3,11 +3,12 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fetchData } from "services/browser/actions";
-import { Hx } from "components/BulmaHelpers";
+import { setFilter } from "services/querySpecification/actions";
+import { Section, Hx } from "components/BulmaHelpers";
 
 
-const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
-  if (!isReady) {
+const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, fetchData}) => {
+  if (!isReady || !isVisible) {
     return null;
   }
 
@@ -19,20 +20,18 @@ const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
     }
     const data_type = schemaColumns.find(x => x.name === value);
     if (["INTEGER", "VARCHAR", "TIMESTAMP"].includes(data_type.type)) {
-      setFilters({
-        ...filterBy,
-        [value]: {
+      setFilter(
+        value, {
           display: ""
-        },
-      });
+        }
+      );
     } else if (data_type.type === "BOOLEAN") {
-      setFilters({
-        ...filterBy,
-        [value]: {
+      setFilter(
+        value, {
           display: "true",
           value: true,
         }
-      });
+      );
     }
   }
 
@@ -75,10 +74,7 @@ const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
       temp["value"] = value === "true" ? true : false;
     }
   
-    setFilters({
-      ...filterBy,
-      [name]: temp,
-    });
+    setFilter(name, temp);
   }
 
   const removeFilter = event => {
@@ -87,7 +83,7 @@ const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
     if (name, name in filterBy) {
       const temp = {...filterBy};
       delete temp[name];
-      setFilters(temp);
+      // setFilter(temp);
     }
   }
 
@@ -97,37 +93,39 @@ const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
     if (data_type.type === "INTEGER") {
       filters.push(
         <div className="multiple-input" key={`fl-int-${col}`}>
-          <div className="label" ondblclick={removeFilter} data-name={col}>{col}</div>
-          <input name={col} onchange={changeFilter} placeholder="range 12,88 or exact 66" value={filterBy[col].display} />
+          <label className="label" onDoubleClick={removeFilter}>
+            {col}
+            <input className="input" name={col} onChange={changeFilter} placeholder="range 12,88 or exact 66" value={filterBy[col].display} />
+          </label>
         </div>
       );
     } else if (data_type.type === "VARCHAR") {
       filters.push(
         <div className="multiple-input" key={`fl-ch-${col}`}>
-          <div className="label" ondblclick={removeFilter} data-name={col}>{col} (LIKE)</div>
-          <input name={col} onchange={changeFilter} placeholder="text to search" value={filterBy[col].display} />
+          <div className="label" onDoubleClick={removeFilter}>{col} (LIKE)</div>
+          <input name={col} onChange={changeFilter} placeholder="text to search" value={filterBy[col].display} />
         </div>
       );
     } else if (data_type.type === "DATE") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" ondblclick={removeFilter} data-name={col}>{col} (from, to)</div>
-          <input name={col} data-meta="from" type="date" onchange={changeFilter} value={filterBy[col].display} />
-          <input name={col} data-meta="to" type="date" onchange={changeFilter} value={filterBy[col].display} />
+          <div className="label" onDoubleClick={removeFilter}>{col} (from, to)</div>
+          <input name={col} data-meta="from" type="date" onChange={changeFilter} value={filterBy[col].display} />
+          <input name={col} data-meta="to" type="date" onChange={changeFilter} value={filterBy[col].display} />
         </div>
       )
     } else if (data_type.type === "TIMESTAMP") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" ondblclick={removeFilter} data-name={col}>{col} (from, to)</div>
-          <input name={col} data-meta="from" type="datetime-local" onchange={changeFilter} value={filterBy[col].from} />
-          <input name={col} data-meta="to" type="datetime-local" onchange={changeFilter} value={filterBy[col].to} />
+          <div className="label" onDoubleClick={removeFilter}>{col} (from, to)</div>
+          <input name={col} data-meta="from" type="datetime-local" onChange={changeFilter} value={filterBy[col].from} />
+          <input name={col} data-meta="to" type="datetime-local" onChange={changeFilter} value={filterBy[col].to} />
         </div>
       )
     } else if (data_type.type === "BOOLEAN") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" ondblclick={removeFilter} data-name={col}>{col}</div>
+          <div className="label" onDoubleClick={removeFilter}>{col}</div>
           <div className="checkbox">
             <label for={`fl_${col}_true`}>true</label>
             <input type="checkbox" name={col} id={`fl_${col}_true`} value="true" checked={filterBy[col].value === true} onChange={changeFilter} />
@@ -146,18 +144,26 @@ const FilterEditor = ({isReady, schemaColumns, filterBy, setFilters}) => {
     filterByOptions.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
   }
 
+  const handleSubmit = event => {
+    event.preventDefault();
+    fetchData();
+  };
+
   return (
     <div id="filter-editor">
-      <Hx x="6">Filters</Hx>
-      <div className="control">
-        <div className="select">
-          <select name="filter_column" onChange={addFilter}>
-            { filterByOptions }
-          </select>
-        </div>
+      <Section>
+        <Hx x="6">Filters</Hx>
+        <div className="control">
+          <div className="select">
+            <select name="filter_column" onChange={addFilter}>
+              { filterByOptions }
+            </select>
+          </div>
 
-        {filters}
-      </div>
+          {filters}
+          <button className="button is-fullwidth is-success" onClick={handleSubmit}>Apply</button>
+        </div>
+      </Section>
     </div>
   );
 }
@@ -197,6 +203,7 @@ export default withRouter(connect(
   mapStateToProps,
   {
     // toggleColumnSelection,
+    setFilter,
     fetchData,
   }
 )(FilterEditor));

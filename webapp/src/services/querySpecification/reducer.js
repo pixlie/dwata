@@ -1,8 +1,7 @@
 import {
   TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
-  TOGGLE_ORDER,
-  NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
-  TOGGLE_COLUMN_SELECTION
+  TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
+  TOGGLE_COLUMN_SELECTION, SET_QUERY_FILTER
 } from "./actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
@@ -176,6 +175,14 @@ export default (state = initialState, action) => {
           ],
         });
       }
+
+    case SET_QUERY_FILTER:
+      return setDeltaAndCache({
+        filterBy: {
+          ...state.filterBy,
+          [action.columnName]: action.filters,
+        }
+      });
 
     default:
       return {

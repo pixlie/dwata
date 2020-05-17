@@ -36,7 +36,7 @@ const ColumnSelector = ({sourceId, tableName, schemaColumns, isVisible, qsColumn
       <Section>
         <Hx x="6">Visible columns</Hx>
         <div className="field">
-          {schemaColumns.columns.map((head, i) => (
+          {schemaColumns.map((head, i) => (
             <div key={`col-get-${i}`} className="control">
               <label className="checkbox">
                 <BoundInput head={head} />
