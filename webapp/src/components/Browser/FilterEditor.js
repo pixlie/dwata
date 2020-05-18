@@ -90,7 +90,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
   const filters = [<p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>];
   for (const [col, filter_spec] of Object.entries(filterBy)) {
     const data_type = schemaColumns.find(x => x.name === col);
-    if (data_type.type === "INTEGER") {
+    if (data_type.type === "INTEGER" || data_type.type === "FLOAT") {
       filters.push(
         <div className="field is-horizontal" key={`fl-int-${col}`}>
           <div className="field-label">
@@ -138,10 +138,20 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
       );
     } else if (data_type.type === "TIMESTAMP") {
       filters.push(
-        <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" onDoubleClick={removeFilter}>{col}</div>
-          <input name={col} data-meta="from" type="datetime-local" onChange={changeFilter} value={filterBy[col].from} />
-          <input name={col} data-meta="to" type="datetime-local" onChange={changeFilter} value={filterBy[col].to} />
+        <div className="field is-horizontal" key={`fl-dt-${col}`}>
+          <div className="field-label">
+            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+          </div>
+
+          <div className="field-body">
+            <div className="field">
+              <input className="input" name={col} data-meta="from" type="datetime-local" onChange={changeFilter} value={filterBy[col].from} />
+            </div>
+
+            <div className="field">
+              <input className="input" name={col} data-meta="to" type="datetime-local" onChange={changeFilter} value={filterBy[col].to} />
+            </div>
+          </div>
         </div>
       )
     } else if (data_type.type === "BOOLEAN") {
@@ -192,7 +202,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
           <div className="control">
             <div className="select is-fullwidth">
               <select name="filter_column" onChange={addFilter}>
-                { filterByOptions }
+                {filterByOptions}
               </select>
             </div>
           </div>
