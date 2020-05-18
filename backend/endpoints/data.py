@@ -32,7 +32,7 @@ def apply_filters(query_specification, sel_obj, current_table, unavailable_colum
             continue
         if col in current_table.columns:
             column_def = current_table.columns[col]
-            if str(column_def.type) == "INTEGER":
+            if str(column_def.type) in ["INTEGER", "FLOAT"]:
                 # We can do an equals query or a range query
                 if filter_spec.get("equal", None):
                     sel_obj = sel_obj.where(column(col) == filter_spec["equal"])
