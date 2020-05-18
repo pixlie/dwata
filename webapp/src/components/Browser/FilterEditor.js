@@ -92,50 +92,82 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
     const data_type = schemaColumns.find(x => x.name === col);
     if (data_type.type === "INTEGER") {
       filters.push(
-        <div className="multiple-input" key={`fl-int-${col}`}>
-          <label className="label" onDoubleClick={removeFilter}>
-            {col}
-            <input className="input" name={col} onChange={changeFilter} placeholder="range 12,88 or exact 66" value={filterBy[col].display} />
-          </label>
+        <div className="field is-horizontal" key={`fl-int-${col}`}>
+          <div className="field-label">
+            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+          </div>
+
+          <div className="field-body">
+            <div className="field">
+              <input className="input" name={col} onChange={changeFilter} placeholder="range 12,88 or exact 66" value={filterBy[col].display} />
+            </div>
+          </div>
         </div>
       );
     } else if (data_type.type === "VARCHAR") {
       filters.push(
-        <div className="multiple-input" key={`fl-ch-${col}`}>
-          <div className="label" onDoubleClick={removeFilter}>{col} (LIKE)</div>
-          <input name={col} onChange={changeFilter} placeholder="text to search" value={filterBy[col].display} />
+        <div className="field is-horizontal" key={`fl-ch-${col}`}>
+          <div className="field-label">
+            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+          </div>
+
+          <div className="field-body">
+            <div className="field">
+              <input className="input" name={col} onChange={changeFilter} placeholder="text to search" value={filterBy[col].display} />
+            </div>
+          </div>
         </div>
       );
     } else if (data_type.type === "DATE") {
       filters.push(
-        <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" onDoubleClick={removeFilter}>{col} (from, to)</div>
-          <input name={col} data-meta="from" type="date" onChange={changeFilter} value={filterBy[col].display} />
-          <input name={col} data-meta="to" type="date" onChange={changeFilter} value={filterBy[col].display} />
+        <div className="field is-horizontal" key={`fl-dt-${col}`}>
+          <div className="field-label">
+            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+          </div>
+
+          <div className="field-body">
+            <div className="field">
+              <input className="input" name={col} data-meta="from" type="date" onChange={changeFilter} value={filterBy[col].display} />
+            </div>
+
+            <div className="field">
+              <input className="input" name={col} data-meta="to" type="date" onChange={changeFilter} value={filterBy[col].display} />
+            </div>
+          </div>
         </div>
-      )
+      );
     } else if (data_type.type === "TIMESTAMP") {
       filters.push(
         <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" onDoubleClick={removeFilter}>{col} (from, to)</div>
+          <div className="label" onDoubleClick={removeFilter}>{col}</div>
           <input name={col} data-meta="from" type="datetime-local" onChange={changeFilter} value={filterBy[col].from} />
           <input name={col} data-meta="to" type="datetime-local" onChange={changeFilter} value={filterBy[col].to} />
         </div>
       )
     } else if (data_type.type === "BOOLEAN") {
       filters.push(
-        <div className="multiple-input" key={`fl-dt-${col}-st`}>
-          <div className="label" onDoubleClick={removeFilter}>{col}</div>
-          <div className="checkbox">
-            <label for={`fl_${col}_true`}>true</label>
-            <input type="checkbox" name={col} id={`fl_${col}_true`} value="true" checked={filterBy[col].value === true} onChange={changeFilter} />
+        <div className="field is-horizontal" key={`fl-bl-${col}`}>
+          <div className="field-label">
+            <label className="label" onDoubleClick={removeFilter}>{col}</label>
           </div>
-          <div className="checkbox">
-            <label for={`fl_${col}_false`}>false</label>
-            <input type="checkbox" name={col} id={`fl_${col}_false`} value="false" checked={filterBy[col].value === false} onChange={changeFilter} />
+
+          <div className="field-body">
+            <div className="field is-narrow">
+              <div className="control">
+                <label className="radio">
+                  <input type="radio" name={col} value="true" checked={filterBy[col].value === true} onChange={changeFilter} />
+                  &nbsp;Yes
+                </label>
+
+                <label className="radio">
+                  <input type="radio" name={col} value="false" checked={filterBy[col].value === false} onChange={changeFilter} />
+                  &nbsp;No
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-      )
+      );
     }
   }
 
@@ -153,16 +185,20 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
     <div id="filter-editor">
       <Section>
         <Hx x="6">Filters</Hx>
-        <div className="control">
-          <div className="select">
-            <select name="filter_column" onChange={addFilter}>
-              { filterByOptions }
-            </select>
-          </div>
 
-          {filters}
-          <button className="button is-fullwidth is-success" onClick={handleSubmit}>Apply</button>
+        {filters}
+
+        <div className="field">
+          <div className="control">
+            <div className="select is-fullwidth">
+              <select name="filter_column" onChange={addFilter}>
+                { filterByOptions }
+              </select>
+            </div>
+          </div>
         </div>
+
+        <button className="button is-fullwidth is-success" onClick={handleSubmit}>Apply</button>
       </Section>
     </div>
   );

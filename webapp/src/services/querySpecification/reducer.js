@@ -20,7 +20,7 @@ const initialState = {
 
   isFEVisible: false,
   isCSVisible: false,
-  isSEVisible: false,
+  isOEVisible: false,
 
   isReady: false,
   _cacheKey: null,
@@ -71,18 +71,24 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isFEVisible: !state.isFEVisible,
+        isCSVisible: false,
+        isOEVisible: false,
       };
 
     case TOGGLE_COLUMN_SELECTOR_UI:
       return {
         ...state,
         isCSVisible: !state.isCSVisible,
+        isFEVisible: false,
+        isOEVisible: false,
       };
 
     case TOGGLE_SORT_EDITOR:
       return {
         ...state,
-        isSEVisible: !state.isSEVisible,
+        isOEVisible: !state.isOEVisible,
+        isFEVisible: false,
+        isCSVisible: false,
       };
 
     case CHANGE_LIMIT:

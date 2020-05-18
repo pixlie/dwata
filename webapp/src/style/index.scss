@@ -230,7 +230,52 @@ table {
   box-shadow: $box-shadow;
   border-left: 4px solid #efefef;
   position: fixed;
-  min-width: 24rem;
+  min-width: 32rem;
+  top: 4rem;
+  right: 1rem;
+
+  &:hover {
+    border-left: 4px solid #48c774;
+  }
+
+  section {
+    padding: 1rem;
+
+    .button {
+      &.close {
+        position: absolute;
+        top: -1.6rem;
+        right: -2rem;
+      }
+    }
+
+    .container {
+      .columns {
+        .column {
+          &.has-meta-data {
+            min-height: 21rem;
+            background-color: whitesmoke;
+
+            .input {
+              &:disabled {
+                background-color: #efefef;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#order-editor {
+  z-index: 90;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-left: 4px solid #efefef;
+  position: fixed;
+  min-width: 32rem;
   top: 4rem;
   right: 1rem;
 

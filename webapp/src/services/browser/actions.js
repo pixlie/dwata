@@ -28,11 +28,11 @@ export const fetchData = callback => (dispatch, getState) => {
     sourceId,
     tableName,
   });
-  const {columnsSelected, orderBy, limit, offset} = getState().querySpecification;
+  const {columnsSelected, orderBy, filterBy, limit, offset} = getState().querySpecification;
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
-    // filterBy,
+    filter_by: filterBy,
     limit,
     offset,
   };

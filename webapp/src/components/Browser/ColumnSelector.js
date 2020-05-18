@@ -7,12 +7,12 @@ import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
-const ColumnSelector = ({sourceId, tableName, schemaColumns, isVisible, qsColumns, dataColumns, toggleColumnSelection, fetchData}) => {
-  if (sourceId === null || tableName === null || !isVisible) {
+const ColumnSelector = ({isReady, isVisible, schemaColumns, qsColumns, dataColumns, toggleColumnSelection, fetchData}) => {
+  if (!isReady || !isVisible) {
     return null;
   }
-  const colsAreAvailable = qsColumns.every((col, i) => dataColumns.includes(col));
 
+  const colsAreAvailable = qsColumns.every((col, i) => dataColumns.includes(col));
   const BoundInput = ({head}) => {
     const handleClick = event => {
       event.preventDefault();
@@ -34,7 +34,7 @@ const ColumnSelector = ({sourceId, tableName, schemaColumns, isVisible, qsColumn
   return (
     <div id="column-selector">
       <Section>
-        <Hx x="6">Visible columns</Hx>
+        <Hx x="6">Columns</Hx>
         <div className="field">
           {schemaColumns.map((head, i) => (
             <div key={`col-get-${i}`} className="control">

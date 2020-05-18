@@ -58,7 +58,7 @@ const Navbar = ({
           <div className="navbar-item">
             <div className="field">
               <p className="control has-icons-left">
-                <input className="input" type="text" placeholder="Search" />
+                <input className="input" type="text" placeholder="Coming soon..." />
                 <span className="icon is-small is-left">
                   <i className="fas fa-search"></i>
                 </span>
@@ -71,10 +71,10 @@ const Navbar = ({
                 <i className="fas fa-columns" />&nbsp;Columns
               </button>
               <button className="button" disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
-                <i className="fas fa-filter" />&nbsp;Filter
+                <i className="fas fa-filter" />&nbsp;Filters
               </button>
               <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
-                <i className="fas fa-sort" />&nbsp;Sort
+                <i className="fas fa-sort" />&nbsp;Ordering
               </button>
             </div>
           </div>
