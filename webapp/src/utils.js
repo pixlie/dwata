@@ -15,8 +15,28 @@ export const slugify = text => text.toString().toLowerCase()
   .replace(/-+$/, '');            // Trim - from end of text
 
 
-export const matchBrowserPath = pathname => matchPath(pathname, {
-    path: "/browse/:sourceId/:tableName",
-    exact: true,
-    strict: false,
-  });
+export const getSourceFromPath = pathname => {
+  let match = matchPath(
+    pathname, {
+      path: "/browse/:sourceId/:tableName",
+      exact: true,
+      strict: false,
+    }
+  );
+  if (match !== null && "params" in match) {
+    return match;
+  }
+  
+  match = matchPath(
+    pathname, {
+      path: "/browse/:sourceId/:tableName/:detailId",
+      exact: true,
+      strict: false,
+    }
+  );
+  if (match !== null && "params" in match) {
+    return match;
+  }
+
+  return null;
+}

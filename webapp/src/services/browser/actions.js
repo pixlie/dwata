@@ -1,13 +1,13 @@
 import axios from "axios";
 
 import { dataURL } from "services/urls";
-import { matchBrowserPath } from "utils";
+import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
 
 
 export const fetchData = callback => (dispatch, getState) => {
   const state = getState();
-  const {params: {sourceId, tableName}} = matchBrowserPath(state.router.location.pathname);
+  const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
   const _cacheKey = `${sourceId}/${tableName}`;
 
   if (state.browser._cacheKey !== _cacheKey) {

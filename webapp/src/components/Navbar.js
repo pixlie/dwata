@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
 import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
-import { matchBrowserPath } from "utils";
+import { getSourceFromPath } from "utils";
 
 
 const Navbar = ({
@@ -86,7 +86,7 @@ const Navbar = ({
 
 
 const mapStateToProps = (state, props) => {
-  const match = matchBrowserPath(props.location.pathname);
+  const match = getSourceFromPath(props.location.pathname);
   const { sourceId, tableName } = match != null ? match.params : { sourceId: null, tableName: null };
 
   return {
