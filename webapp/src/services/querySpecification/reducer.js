@@ -1,7 +1,7 @@
 import {
   TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
-  TOGGLE_COLUMN_SELECTION, SET_QUERY_FILTER
+  TOGGLE_COLUMN_SELECTION, SET_QUERY_FILTER, REMOVE_QUERY_FILTER
 } from "./actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
@@ -188,6 +188,24 @@ export default (state = initialState, action) => {
           ...state.filterBy,
           [action.columnName]: action.filters,
         }
+      });
+
+    case REMOVE_QUERY_FILTER:
+      // We create a reducer that will add any key (and its corresponding value from current filters)
+      //  if the key is not the one that we want to remove
+      const reducer = (acc, key) => {
+        if (key !== action.columnName) {
+          return {
+            ...acc,
+            [key]: state.filterBy[key],
+          };
+        }
+        return {
+          ...acc,
+        };
+      };
+      return setDeltaAndCache({
+        filterBy: Object.keys(state.filterBy).reduce(reducer, {}),
       });
 
     default:

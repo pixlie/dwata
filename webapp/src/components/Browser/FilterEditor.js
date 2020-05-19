@@ -3,11 +3,11 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fetchData } from "services/browser/actions";
-import { setFilter } from "services/querySpecification/actions";
+import { setFilter, removeFilter } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
-const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, fetchData}) => {
+const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, fetchData, removeFilter}) => {
   if (!isReady || !isVisible) {
     return null;
   }
@@ -37,7 +37,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
 
   const changeFilter = event => {
     event.preventDefault();
-    const { name, value, dataset } = event.target;
+    const {name, value, dataset} = event.target;
 
     const temp = {};
     const data_type = schemaColumns.find(x => x.name === name);
@@ -77,24 +77,27 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
     setFilter(name, temp);
   }
 
-  const removeFilter = event => {
+  const handleRemoveFilter = name => event => {
     event.preventDefault();
-    const { name } = event.target.dataset;
-    if (name, name in filterBy) {
-      const temp = {...filterBy};
-      delete temp[name];
-      // setFilter(temp);
+    if (name in filterBy) {
+      removeFilter(name);
     }
   }
 
-  const filters = [<p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>];
-  for (const [col, filter_spec] of Object.entries(filterBy)) {
+  const filters = [];
+  if (Object.keys(filterBy).length > 0) {
+    filters.push(
+      <p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>
+    );
+  }
+
+  for (const [col, _] of Object.entries(filterBy)) {
     const data_type = schemaColumns.find(x => x.name === col);
     if (data_type.type === "INTEGER" || data_type.type === "FLOAT") {
       filters.push(
         <div className="field is-horizontal" key={`fl-int-${col}`}>
           <div className="field-label">
-            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+            <label className="label" onDoubleClick={handleRemoveFilter(col)}>{col}</label>
           </div>
 
           <div className="field-body">
@@ -108,7 +111,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
       filters.push(
         <div className="field is-horizontal" key={`fl-ch-${col}`}>
           <div className="field-label">
-            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+            <label className="label" onDoubleClick={handleRemoveFilter(col)}>{col}</label>
           </div>
 
           <div className="field-body">
@@ -122,7 +125,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
       filters.push(
         <div className="field is-horizontal" key={`fl-dt-${col}`}>
           <div className="field-label">
-            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+            <label className="label" onDoubleClick={handleRemoveFilter(col)}>{col}</label>
           </div>
 
           <div className="field-body">
@@ -140,7 +143,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
       filters.push(
         <div className="field is-horizontal" key={`fl-dt-${col}`}>
           <div className="field-label">
-            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+            <label className="label" onDoubleClick={handleRemoveFilter(col)}>{col}</label>
           </div>
 
           <div className="field-body">
@@ -158,7 +161,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
       filters.push(
         <div className="field is-horizontal" key={`fl-bl-${col}`}>
           <div className="field-label">
-            <label className="label" onDoubleClick={removeFilter}>{col}</label>
+            <label className="label" onDoubleClick={handleRemoveFilter(col)}>{col}</label>
           </div>
 
           <div className="field-body">
@@ -181,7 +184,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
     }
   }
 
-  const filterByOptions = [<option value="" key="fl-hd">Filter by</option>];
+  const filterByOptions = [<option value="---" key="fl-hd">Filter by</option>];
   for (const head of schemaColumns) {
     filterByOptions.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
   }
@@ -201,7 +204,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, setFilter, f
         <div className="field">
           <div className="control">
             <div className="select is-fullwidth">
-              <select name="filter_column" onChange={addFilter}>
+              <select name="filter_column" onChange={addFilter} value="---">
                 {filterByOptions}
               </select>
             </div>
@@ -248,8 +251,8 @@ const mapStateToProps = (state, props) => {
 export default withRouter(connect(
   mapStateToProps,
   {
-    // toggleColumnSelection,
     setFilter,
     fetchData,
+    removeFilter,
   }
 )(FilterEditor));

@@ -119,7 +119,7 @@ const cellRenderer = (column, sourceId) => {
 }
 
 
-const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
+const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, tableColumns, tableRows, history}) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       history.push(`/browse/${sourceId}/${tableName}`);
@@ -133,12 +133,12 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
     }
   }, []);
   let currentRow = {};
-  if (!schema.isReady || !tableData.isReady) {
+  if (!isReady) {
     return (
       <div>Loading...</div>
     );
   }
-  currentRow = tableData.rows.find(x => x[0] == pk);
+  currentRow = tableRows.find(x => x[0] == pk);
 
   return (
     <div id="detail-modal">
@@ -149,18 +149,18 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
 
         <div className="columns">
           <div className="column is-9">
-            { currentRow.map((cell, i) => {
-              if (schema.columns[i].ui_hints.includes("is_meta")) { return null; }
-              const Cell = cellRenderer(schema.columns[i], sourceId);
-              return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schema.columns[i]} /> : null;
-            }) }
+            {currentRow.map((cell, i) => {
+              if (schemaColumns[i].ui_hints.includes("is_meta")) { return null; }
+              const Cell = cellRenderer(schemaColumns[i], sourceId);
+              return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schemaColumns[i]} /> : null;
+            })}
           </div>
 
           <div className="column is-3 has-meta-data">
             { currentRow.map((cell, i) => {
-              if (!schema.columns[i].ui_hints.includes("is_meta")) { return null; }
-              const Cell = cellRenderer(schema.columns[i], sourceId);
-              return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schema.columns[i]} /> : null;
+              if (!schemaColumns[i].ui_hints.includes("is_meta")) { return null; }
+              const Cell = cellRenderer(schemaColumns[i], sourceId);
+              return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schemaColumns[i]} /> : null;
             }) }
           </div>
         </div>
@@ -171,24 +171,34 @@ const Detail = ({ sourceId, tableName, pk, schema, tableData, history }) => {
 
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName, pk } = props.match.params;
+  let {sourceId, tableName, pk} = props.match.params;
   sourceId = parseInt(sourceId);
   const _browserCacheKey = `${sourceId}/${tableName}`;
-  const tableData = state.browser.isReady && state.browser._cacheKey === _browserCacheKey ? state.browser : {
-    isReady: false,
-  };
+  let isReady = false;
 
-  return {
-    sourceId,
-    tableName,
-    pk,
-    schema: state.schema.isReady && state.schema.sourceId === parseInt(sourceId) ? {
-      ...state.schema.rows.find(x => x.table_name === tableName),
-      isReady: true,
-    } : {
-      isReady: false,
-    },
-    tableData
+  // We are ready only when all the needed data is there
+  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+    state.browser.isReady && state.browser._cacheKey === _browserCacheKey) {
+    isReady = true;
+  }
+
+  if (isReady) {
+    return {
+      isReady,
+      sourceId,
+      tableName,
+      pk,
+      schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
+      tableColumns: state.browser.columns,
+      tableRows: state.browser.rows,
+      querySpecificationColumns: state.querySpecification.columnsSelected,
+    }
+  } else {
+    return {
+      isReady,
+      sourceId,
+      tableName,
+    };
   }
 }
 

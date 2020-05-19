@@ -3,7 +3,7 @@ import {
   ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER,
   TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   NEXT_PAGE, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
-  SET_QUERY_FILTER
+  SET_QUERY_FILTER, REMOVE_QUERY_FILTER
 } from "./actionTypes";
 
 
@@ -84,4 +84,10 @@ export const setFilter = (columnName, filters) => dispatch => dispatch({
   type: SET_QUERY_FILTER,
   columnName,
   filters,
+});
+
+
+export const removeFilter = columnName => dispatch => dispatch({
+  type: REMOVE_QUERY_FILTER,
+  columnName,
 });

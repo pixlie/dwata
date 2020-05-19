@@ -40,3 +40,19 @@ export const getSourceFromPath = pathname => {
 
   return null;
 }
+
+
+export const getItemPartsFromPath = pathname => {
+  const match = matchPath(
+    pathname, {
+      path: "/browse/:sourceId/:tableName/:pk",
+      exact: true,
+      strict: false,
+    }
+  );
+  if (match !== null && "params" in match) {
+    return match;
+  }
+
+  return null;
+}
