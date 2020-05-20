@@ -1,7 +1,7 @@
 from sqlalchemy import MetaData
 
 from utils.response import RapidJSONResponse
-from utils.database import connect_database, get_unavailable_columns
+from utils.database import connect_database, get_unavailable_columns, get_system_tables
 from utils.source import get_all_sources, get_source_settings
 from services import all_services
 
@@ -46,11 +46,26 @@ def column_definition(col, col_def):
     }
 
 
+def get_table_properties(source_settings):
+    system_tables = get_system_tables(source_settings=source_settings)
+
+    def inner(name):
+        if name in system_tables:
+            return {
+                "is_system_table": True
+            }
+        return {
+            "is_system_table": False
+        }
+    return inner
+
+
 async def get_source_database(source_settings, table_name):
     engine, conn = await connect_database(db_url=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=source_settings, meta=meta)
+    table_properties = get_table_properties(source_settings=source_settings)
 
     if table_name and table_name in meta.tables.keys():
         columns = [
@@ -62,7 +77,7 @@ async def get_source_database(source_settings, table_name):
     else:
         tables = sorted([
             (
-                name, [
+                name, table_properties(name=name), [
                     column_definition(col, col_def) for col, col_def in schema.columns.items()
                     if col not in unavailable_columns.get(name, [])
                 ]
@@ -70,7 +85,7 @@ async def get_source_database(source_settings, table_name):
         ], key=lambda x: x[0])
         conn.close()
         return RapidJSONResponse({
-            "columns": ["table_name", "columns"],
+            "columns": ["table_name", "properties", "columns"],
             "rows": tables
         })
 
