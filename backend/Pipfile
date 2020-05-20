@@ -11,6 +11,11 @@ starlette = "*"
 uvicorn = "*"
 python-decouple = "*"
 python-rapidjson = "*"
+loguru = "*"
+aiohttp = "*"
+aioredis = "*"
+rapidjson = "*"
+toml = "*"
 psycopg2 = "*"
 
 [requires]

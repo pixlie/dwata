@@ -1,16 +1,21 @@
 import React from "react";
-import { Link, withRouter, matchPath } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar } from "services/global/actions";
+import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
+import { getSourceFromPath } from "utils";
 
 
-const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
+const Navbar = ({
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching,
+  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor
+}) => {
   return (
-    <nav className="navbar is-light" role="navigation" aria-label="main navigation">
+    <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          Supernova
+          [dwata]
         </Link>
 
         <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" href="/">
@@ -24,8 +29,8 @@ const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
         <div className="navbar-start">
           <div className="navbar-item">
             <div className="buttons">
-              <button className="button is-grey" onClick={toggleSidebar}>
-                Sources
+              <button className="button is-grey" onClick={toggleSidebar} disabled={isSourceFetching}>
+                <i className="fas fa-database" />&nbsp;Sources
               </button>
             </div>
           </div>
@@ -33,12 +38,19 @@ const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
           { tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
               <a className="navbar-link">
-                {db.label}
+                <i className="fas fa-table" />&nbsp;Tables
               </a>
 
               { schema.isReady ? (
                 <div className="navbar-dropdown">
-                  { schema.rows.map(head => (
+                  {schema.rows.filter(s => s.properties.is_system_table === false).map(head => (
+                    <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
+                      {head.table_name}
+                    </Link>
+                  ))}
+                  <hr className="navbar-divider" />
+                  <div className="navbar-item">System tables</div>
+                  {schema.rows.filter(s => s.properties.is_system_table === true).map(head => (
                     <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
                       {head.table_name}
                     </Link>
@@ -51,8 +63,26 @@ const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
 
         <div className="navbar-end">
           <div className="navbar-item">
-            <div className="buttons">
-              <button className="button is-info">Filter/Order</button>
+            <div className="field">
+              <p className="control has-icons-left">
+                <input className="input" type="text" placeholder="Coming soon..." />
+                <span className="icon is-small is-left">
+                  <i className="fas fa-search"></i>
+                </span>
+              </p>
+            </div>
+          </div>
+          <div className="navbar-item">
+            <div className="buttons has-addons">
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
+                <i className="fas fa-columns" />&nbsp;Columns
+              </button>
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
+                <i className="fas fa-filter" />&nbsp;Filters
+              </button>
+              <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
+                <i className="fas fa-sort" />&nbsp;Ordering
+              </button>
             </div>
           </div>
         </div>
@@ -63,23 +93,26 @@ const Navbar = ({ sourceId, tableName, db, schema, match, toggleSidebar }) => {
 
 
 const mapStateToProps = (state, props) => {
-  const match = matchPath(props.location.pathname, {
-    path: "/browse/:sourceId/:tableName",
-    exact: true,
-    strict: false,
-  });
+  const match = getSourceFromPath(props.location.pathname);
   const { sourceId, tableName } = match != null ? match.params : { sourceId: null, tableName: null };
 
   return {
     schema: state.schema,
+    isSourceFetching: state.source.isFetching,
     db: state.source.isReady ? state.source.rows[sourceId] : {},
     sourceId,
     tableName,
+    isFilterEnabled: sourceId && tableName,
   }
 }
 
 
 export default withRouter(connect(
   mapStateToProps,
-  { toggleSidebar }
+  {
+    toggleSidebar,
+    toggleFilterEditor,
+    toggleColumnSelector,
+    toggleSortEditor
+  }
 )(Navbar));

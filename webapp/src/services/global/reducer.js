@@ -1,9 +1,9 @@
-import { TOGGLE_SIDEBAR } from './actionTypes';
+import { TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR } from './actionTypes';
 
 
 const initialState = {
   isSidebarOn: false,
-  currentTableID: null,
+  isQueryEditorOpen: false,
 };
 
 
@@ -13,6 +13,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isSidebarOn: !state.isSidebarOn,
+      }
+
+    case TOGGLE_FILTER_EDITOR:
+      return {
+        ...state,
+        isQueryEditorOpen: !state.isQueryEditorOpen,
       }
 
     default:

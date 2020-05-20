@@ -1,5 +1,4 @@
 import React, { useEffect, Fragment, useState } from "react";
-import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { Section, Panel, Hx } from "components/BulmaHelpers";
@@ -15,7 +14,8 @@ const Source = ({ source, fetchSource }) => {
     sourceIndex: null,
   });
   const { sourceIndex } = state;
-  const SourceItem = ({ s, i }) => {
+
+  const SourceItem = ({ s, i, sourceType }) => {
     const handleClickSource = event => {
       event.preventDefault();
       setState({
@@ -26,20 +26,27 @@ const Source = ({ source, fetchSource }) => {
 
     return (
       <Fragment>
-        <div className="panel-block" to={`/browse/${i}`} onClick={handleClickSource}>
-          {s.label}&nbsp;<span className="tag is-info is-light">{s.engine}</span>
+        <div className="panel-block" onClick={handleClickSource}>
+          <strong>{s.label}</strong>&nbsp;<span className="tag is-info is-light">{s.provider}</span>
         </div>
 
-        { sourceIndex === i ? <TableList sourceIndex={sourceIndex} /> : null }
+        { sourceIndex === i ? <TableList sourceIndex={sourceIndex} sourceType={sourceType} /> : null }
       </Fragment>
     );
   }
+  const count_database = source.isReady ? source.rows.filter(x => x.type === "database").length : 0;
 
   return (
     <Section>
-      <Panel title="Select a database">
-        { source.isReady ? source.rows.map((s, i) => (
-          <SourceItem s={s} i={i} key={`sr-${i}`} />
+      <Panel title="Databases">
+        { source.isReady ? source.rows.filter(x => x.type === "database").map((s, i) => (
+          <SourceItem s={s} i={i} sourceType="database" key={`sr-${i}`} />
+        )) : null }
+      </Panel>
+
+      <Panel title="Services">
+        { source.isReady ? source.rows.filter(x => x.type === "service").map((s, i) => (
+          <SourceItem s={s} i={count_database + i} sourceType="service" key={`sr-${count_database + i}`} />
         )) : null }
       </Panel>
     </Section>

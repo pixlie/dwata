@@ -1,10 +1,10 @@
 import React from 'react';
 
 
-export const Hero = ({ size = "", children }) => (
-  <section className={`hero ${size}`}>
+export const Hero = ({ size = "", textCentered = false, style = {}, children }) => (
+  <section className={`hero ${size}`} style={style}>
     <div className="hero-body">
-      <div className="container">
+      <div className={`container${textCentered ? " has-text-centered" : null}`}>
         {children}
       </div>
     </div>
@@ -12,8 +12,8 @@ export const Hero = ({ size = "", children }) => (
 );
 
 
-export const Section = ({ size = "", children }) => (
-  <section className={`section ${size}`}>
+export const Section = ({ size = "", style = {}, children }) => (
+  <section className={`section ${size}`} style={style}>
     <div className="container">
       { children }
     </div>

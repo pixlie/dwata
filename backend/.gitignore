@@ -100,5 +100,6 @@ node_modules
 .sass-cache/
 alembic.ini
 settings.ini
+settings.toml
 
 db-migrations/migrate.cfg

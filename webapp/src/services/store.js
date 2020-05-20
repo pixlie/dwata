@@ -1,22 +1,28 @@
 import { compose, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
+import { routerMiddleware } from "connected-react-router";
 
-import rootReducer from './reducers';
+import createRootReducer from './reducers';
+import history from "./history";
 
 
+/**
+ * We are using a connected React Router + Redux store.
+ * Please refer to https://github.com/supasate/connected-react-router
+ **/
 export default initialState => {
   initialState =
     JSON.parse(window.localStorage.getItem("cache.redux.state")) || initialState;
 
   const store = createStore(
-    rootReducer,
+    createRootReducer(history), // root reducer with router state
     initialState,
     compose(
       applyMiddleware(
-        thunk
-      )
-      /* window.__REDUX_DEVTOOLS_EXTENSION__ &&
-        window.__REDUX_DEVTOOLS_EXTENSION__() */
+        thunk,
+        routerMiddleware(history) // for dispatching history actions
+      ),
+      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
     )
   );
 
