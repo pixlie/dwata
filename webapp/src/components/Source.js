@@ -14,6 +14,7 @@ const Source = ({ source, fetchSource }) => {
     sourceIndex: null,
   });
   const { sourceIndex } = state;
+
   const SourceItem = ({ s, i, sourceType }) => {
     const handleClickSource = event => {
       event.preventDefault();
@@ -26,7 +27,7 @@ const Source = ({ source, fetchSource }) => {
     return (
       <Fragment>
         <div className="panel-block" onClick={handleClickSource}>
-          {s.label}&nbsp;<span className="tag is-info is-light">{s.provider}</span>
+          <strong>{s.label}</strong>&nbsp;<span className="tag is-info is-light">{s.provider}</span>
         </div>
 
         { sourceIndex === i ? <TableList sourceIndex={sourceIndex} sourceType={sourceType} /> : null }

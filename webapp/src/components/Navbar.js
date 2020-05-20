@@ -43,7 +43,14 @@ const Navbar = ({
 
               { schema.isReady ? (
                 <div className="navbar-dropdown">
-                  { schema.rows.map(head => (
+                  {schema.rows.filter(s => s.properties.is_system_table === false).map(head => (
+                    <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
+                      {head.table_name}
+                    </Link>
+                  ))}
+                  <hr className="navbar-divider" />
+                  <div className="navbar-item">System tables</div>
+                  {schema.rows.filter(s => s.properties.is_system_table === true).map(head => (
                     <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
                       {head.table_name}
                     </Link>

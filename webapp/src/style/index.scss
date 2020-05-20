@@ -72,7 +72,6 @@ h1, h2, h3 {
 }
 
 .navbar {
-  font-weight: bold;
   background-color: #efefef;
   opacity: 0.3;
 
@@ -88,6 +87,12 @@ h1, h2, h3 {
     .navbar-item {
       font-size: x-large;
       padding: 0 3rem;
+    }
+  }
+
+  a {
+    &.navbar-item {
+      font-weight: bold;
     }
   }
 }
