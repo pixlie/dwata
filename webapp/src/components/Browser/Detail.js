@@ -2,6 +2,7 @@ import React, { useEffect, useCallback } from "react";
 import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 
+import { fetchDataItem } from "services/dataItem/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
@@ -119,7 +120,10 @@ const cellRenderer = (column, sourceId) => {
 }
 
 
-const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, tableColumns, tableRows, history}) => {
+const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, dataItem, history, fetchDataItem}) => {
+  useEffect(() => {
+    fetchDataItem();
+  }, [sourceId, tableName, pk]);
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       history.push(`/browse/${sourceId}/${tableName}`);
@@ -132,13 +136,11 @@ const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, tableColumns, 
       document.removeEventListener("keydown", handleKey, false);
     }
   }, []);
-  let currentRow = {};
   if (!isReady) {
     return (
       <div>Loading...</div>
     );
   }
-  currentRow = tableRows.find(x => x[0] == pk);
 
   return (
     <div id="detail-modal">
@@ -149,19 +151,21 @@ const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, tableColumns, 
 
         <div className="columns">
           <div className="column is-9">
-            {currentRow.map((cell, i) => {
-              if (schemaColumns[i].ui_hints.includes("is_meta")) { return null; }
+            {Object.keys(dataItem).map((col, i) => {
+              if (schemaColumns.find(x => x.name === col).ui_hints.includes("is_meta")) { return null; }
+              const cell = dataItem[col];
               const Cell = cellRenderer(schemaColumns[i], sourceId);
               return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schemaColumns[i]} /> : null;
             })}
           </div>
 
           <div className="column is-3 has-meta-data">
-            { currentRow.map((cell, i) => {
-              if (!schemaColumns[i].ui_hints.includes("is_meta")) { return null; }
+            {Object.keys(dataItem).map((col, i) => {
+              if (!schemaColumns.find(x => x.name === col).ui_hints.includes("is_meta")) { return null; }
+              const cell = dataItem[col];
               const Cell = cellRenderer(schemaColumns[i], sourceId);
               return Cell !== null ? <Cell key={`cl-${i}`} data={cell} column={schemaColumns[i]} /> : null;
-            }) }
+            })}
           </div>
         </div>
       </Section>
@@ -173,12 +177,12 @@ const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, tableColumns, 
 const mapStateToProps = (state, props) => {
   let {sourceId, tableName, pk} = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const _cacheKey = `${sourceId}/${tableName}/${pk}`;
   let isReady = false;
 
   // We are ready only when all the needed data is there
   if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.browser.isReady && state.browser._cacheKey === _browserCacheKey) {
+    _cacheKey in state.dataItem && state.dataItem[_cacheKey].isReady) {
     isReady = true;
   }
 
@@ -189,15 +193,14 @@ const mapStateToProps = (state, props) => {
       tableName,
       pk,
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
-      tableColumns: state.browser.columns,
-      tableRows: state.browser.rows,
-      querySpecificationColumns: state.querySpecification.columnsSelected,
+      dataItem: state.dataItem[_cacheKey].data,
     }
   } else {
     return {
       isReady,
       sourceId,
       tableName,
+      pk,
     };
   }
 }
@@ -205,5 +208,7 @@ const mapStateToProps = (state, props) => {
 
 export default withRouter(connect(
   mapStateToProps,
-  {}
+  {
+    fetchDataItem,
+  }
 )(Detail));
