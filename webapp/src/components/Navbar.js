@@ -9,7 +9,8 @@ import { getSourceFromPath } from "utils";
 
 const Navbar = ({
   sourceId, tableName, schema, isFilterEnabled, isSourceFetching,
-  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor
+  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor,
+  isInTable, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
 }) => {
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -62,29 +63,34 @@ const Navbar = ({
         </div>
 
         <div className="navbar-end">
-          <div className="navbar-item">
-            <div className="field">
-              <p className="control has-icons-left">
-                <input className="input" type="text" placeholder="Coming soon..." />
-                <span className="icon is-small is-left">
-                  <i className="fas fa-search"></i>
-                </span>
-              </p>
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="field">
+                <p className="control has-icons-left">
+                  <input className="input" type="text" placeholder="Coming soon..." />
+                  <span className="icon is-small is-left">
+                    <i className="fas fa-search"></i>
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="navbar-item">
-            <div className="buttons has-addons">
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
-                <i className="fas fa-columns" />&nbsp;Columns
-              </button>
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
-                <i className="fas fa-filter" />&nbsp;Filters
-              </button>
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
-                <i className="fas fa-sort" />&nbsp;Ordering
-              </button>
+          ): null}
+
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="buttons has-addons">
+                <button className={`button${hasColumnsSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
+                  <i className="fas fa-columns" />&nbsp;Columns
+                </button>
+                <button className={`button${hasFiltersSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
+                  <i className="fas fa-filter" />&nbsp;Filters
+                </button>
+                <button className={`button${hasOrderingSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleSortEditor}>
+                  <i className="fas fa-sort" />&nbsp;Ordering
+                </button>
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </nav>
@@ -94,15 +100,33 @@ const Navbar = ({
 
 const mapStateToProps = (state, props) => {
   const match = getSourceFromPath(props.location.pathname);
-  const { sourceId, tableName } = match != null ? match.params : { sourceId: null, tableName: null };
+  const {sourceId, tableName} = match != null ? match.params : {sourceId: null, tableName: null};
+  let isInTable = false;
+  let hasColumnsSpecified = false;
+  let hasFiltersSpecified = false;
+  let hasOrderingSpecified = false;
+  if (sourceId && tableName) {
+    isInTable = true;
+    const _browserCacheKey = `${sourceId}/${tableName}`;
+    if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+      state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
+      state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+      hasColumnsSpecified = state.querySpecification.columnsSelected.length !== state.schema.rows.find(x => x.table_name === tableName).columns.length;
+      hasFiltersSpecified = Object.keys(state.querySpecification.filterBy).length > 0;
+      hasOrderingSpecified = Object.keys(state.querySpecification.orderBy).length > 0;
+    }
+  }
 
   return {
     schema: state.schema,
     isSourceFetching: state.source.isFetching,
-    db: state.source.isReady ? state.source.rows[sourceId] : {},
     sourceId,
     tableName,
     isFilterEnabled: sourceId && tableName,
+    isInTable,
+    hasColumnsSpecified,
+    hasFiltersSpecified,
+    hasOrderingSpecified,
   }
 }
 
