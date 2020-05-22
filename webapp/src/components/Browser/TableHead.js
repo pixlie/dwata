@@ -6,12 +6,11 @@ import TableHeadItem from "./TableHeadItem";
 
 
 const TableHead = ({isReady, schemaColumns, tableColumns, querySpecificationColumns}) => {
-  const headList = [];
-  const DefaultCell = ({data}) => <TableHeadItem head={data} />;
-
   if (!isReady) {
     return null;
   }
+  const headList = [];
+  const DefaultCell = ({data}) => <TableHeadItem head={data} />;
 
   for (const col of tableColumns) {
     if (!querySpecificationColumns.includes(col)) {

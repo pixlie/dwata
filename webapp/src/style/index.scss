@@ -122,10 +122,48 @@ table {
   thead {
     tr {
       th {
-        cursor: n-resize;
+        .hd-btn {
+          display: inline-block;
+          padding: 0 0.6rem;
+          background-color: #efefef;
+          border-radius: 0.4rem;
+          position: relative;
+          cursor: pointer;
+          color: #787878;
+
+          &.hdicn {
+            padding: 0 1.2rem 0 0.6rem;
+          }
+
+          &.hdicn::after {
+            border: 2px solid #787878;
+            border-right: 0;
+            border-top: 0;
+            content: " ";
+            display: block;
+            height: 0.4em;
+            width: 0.4em;
+            pointer-events: none;
+            position: absolute;
+            top: 60%;
+            transform-origin: center;
+            right: 0.5rem;
+            margin-top: -0.375em;
+          }
+
+          &.icn-asc::after {
+            top: 65%;
+            transform: rotate(135deg);
+          }
+          &.icn-desc::after {
+            transform: rotate(-45deg);
+          }
+        }
 
         &:hover {
-          background-color: #efefef;
+          .hd-btn {
+            color: #4c4c4c;
+          }
         }
       }
     }
@@ -144,6 +182,7 @@ table {
   }
 }
 
+
 #paginator {
   z-index: 80;
   background-color: #fdf7e3;
@@ -154,6 +193,7 @@ table {
   bottom: 4rem;
   right: 12rem;
 }
+
 
 #detail-modal {
   z-index: 100;
@@ -326,4 +366,17 @@ table {
       }
     }
   }
+}
+
+
+.col-hd-spec-box {
+  z-index: 80;
+  background-color: #fdf7e3;
+  padding: 0.4rem 0.6rem;
+  box-shadow: $box-shadow;
+  border-radius: $radius-small;
+  position: absolute;
+  top: 5.65rem;
+  min-width: 12rem;
+  display: block;
 }

@@ -3,7 +3,7 @@ import {
   ADD_ORDER, CHANGE_ORDER, TOGGLE_ORDER,
   TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   NEXT_PAGE, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
-  SET_QUERY_FILTER, REMOVE_QUERY_FILTER
+  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER,
 } from "./actionTypes";
 
 
@@ -77,6 +77,13 @@ export const gotoPage = pageNum => dispatch => {
 export const toggleColumnSelection = columnName => dispatch => dispatch({
   type: TOGGLE_COLUMN_SELECTION,
   columnName,
+});
+
+
+export const initiateFilter = (columnName, dataType) => dispatch => dispatch({
+  type: INITIATE_QUERY_FILTER,
+  columnName,
+  dataType,
 });
 
 

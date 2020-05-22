@@ -1,9 +1,10 @@
-import { TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR } from './actionTypes';
+import { TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_HEAD_SPECIFICATION } from './actionTypes';
 
 
 const initialState = {
   isSidebarOn: false,
   isQueryEditorOpen: false,
+  activeColumnHeadSpecification: null,
 };
 
 
@@ -20,6 +21,18 @@ export default (state = initialState, action) => {
         ...state,
         isQueryEditorOpen: !state.isQueryEditorOpen,
       }
+
+    case TOGGLE_COLUMN_HEAD_SPECIFICATION:
+      if (state.activeColumnHeadSpecification === action.columnName) {
+        return {
+          ...state,
+          activeColumnHeadSpecification: null,
+        };
+      }
+      return {
+        ...state,
+        activeColumnHeadSpecification: action.columnName,
+      };
 
     default:
       return state;
