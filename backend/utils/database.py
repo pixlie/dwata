@@ -32,6 +32,12 @@ async def connect_database(db_url):
     return engine, conn
 
 
+async def connect_admin_meta_database(db_url):
+    engine = create_engine(db_url)
+    conn = engine.connect()
+    return engine, conn
+
+
 def get_unavailable_columns(source_settings, meta):
     unavailable_columns = {}
 

@@ -1,5 +1,5 @@
 from utils.response import RapidJSONResponse
-from utils.source import get_all_sources
+from utils.settings import get_all_sources
 
 
 async def source_get(request):

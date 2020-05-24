@@ -26,3 +26,8 @@ def get_source_settings(source_index):
         return settings.DATABASES[requested_source[0]]
     elif requested_source[1] == "service":
         return getattr(settings, requested_source[2].upper())[requested_source[0]]
+
+
+def get_admin_meta_settings():
+    if "admin_meta" in settings.DATABASES:
+        return settings.DATABASES["admin_meta"]

@@ -5,7 +5,7 @@ import aioredis
 import rapidjson
 
 from utils.response import RapidJSONResponse, RapidJSONEncoder
-from utils.source import get_all_sources, get_source_settings
+from utils.settings import get_all_sources, get_source_settings
 from services import all_services
 
 

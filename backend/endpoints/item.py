@@ -3,7 +3,7 @@ from sqlalchemy import MetaData, select, column, table
 
 from utils.response import RapidJSONResponse
 from utils.database import connect_database, get_unavailable_columns
-from utils.source import get_source_settings
+from utils.settings import get_source_settings
 
 
 async def item_get(request):

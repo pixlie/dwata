@@ -5,7 +5,7 @@ from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
 from utils.database import connect_database, get_unavailable_columns
-from utils.source import get_source_settings
+from utils.settings import get_source_settings
 
 
 # Example query specification:
