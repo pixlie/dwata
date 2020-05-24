@@ -2,16 +2,22 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { toggleSidebar } from "services/global/actions";
+import { toggleSidebar, showNotes } from "services/global/actions";
 import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
 import { getSourceFromPath } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching,
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor,
   isInTable, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
+  showNotes,
 }) => {
+  const handleNotesClick = event => {
+    event.preventDefault();
+    showNotes(pathKey);
+  }
+
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -36,13 +42,13 @@ const Navbar = ({
             </div>
           </div>
 
-          { tableName ? (
+          {tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
               <a className="navbar-link">
                 <i className="fas fa-table" />&nbsp;Tables
               </a>
 
-              { schema.isReady ? (
+              {schema.isReady ? (
                 <div className="navbar-dropdown">
                   {schema.rows.filter(s => s.properties.is_system_table === false).map(head => (
                     <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
@@ -57,9 +63,9 @@ const Navbar = ({
                     </Link>
                   ))}
                 </div>
-              ) : null }
+              ) : null}
             </div>
-          ) : null }
+          ) : null}
         </div>
 
         <div className="navbar-end">
@@ -75,6 +81,20 @@ const Navbar = ({
               </div>
             </div>
           ): null}
+
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="field">
+                <p className="control">
+                  <button className="button" onClick={handleNotesClick}>
+                    <span className="icon">
+                      <i className="fas fa-sticky-note" />
+                    </span>&nbsp; Notes
+                  </button>
+                </p>
+              </div>
+            </div>
+          ) : null}
 
           {isInTable ? (
             <div className="navbar-item">
@@ -105,9 +125,9 @@ const mapStateToProps = (state, props) => {
   let hasColumnsSpecified = false;
   let hasFiltersSpecified = false;
   let hasOrderingSpecified = false;
+  const _browserCacheKey = `${sourceId}/${tableName}`;
   if (sourceId && tableName) {
     isInTable = true;
-    const _browserCacheKey = `${sourceId}/${tableName}`;
     if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
       state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
       state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
@@ -127,6 +147,7 @@ const mapStateToProps = (state, props) => {
     hasColumnsSpecified,
     hasFiltersSpecified,
     hasOrderingSpecified,
+    pathKey: _browserCacheKey,
   }
 }
 
@@ -137,6 +158,7 @@ export default withRouter(connect(
     toggleSidebar,
     toggleFilterEditor,
     toggleColumnSelector,
-    toggleSortEditor
+    toggleSortEditor,
+    showNotes,
   }
 )(Navbar));

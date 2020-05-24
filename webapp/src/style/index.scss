@@ -380,3 +380,32 @@ table {
   min-width: 12rem;
   display: block;
 }
+
+
+#notes-modal {
+  z-index: 100;
+  background-color: white;
+  box-shadow: $box-shadow;
+  position: fixed;
+  top: 4rem;
+  left: 12rem;
+  width: 60%;
+
+  section {
+    padding: 1rem;
+
+    .button {
+      &.close {
+        position: absolute;
+        top: -1.6rem;
+        right: -2rem;
+        z-index: 110;
+      }
+    }
+
+    .content {
+      background-color: #fdf7e3;
+      padding: 0.8rem;
+    }
+  }
+}

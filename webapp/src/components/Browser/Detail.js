@@ -3,7 +3,7 @@ import { withRouter, Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { fetchDataItem } from "services/dataItem/actions";
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section } from "components/BulmaHelpers";
 
 
 const cellRenderer = (column, sourceId) => {

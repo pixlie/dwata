@@ -113,7 +113,7 @@ export default (state = initialState, action) => {
       });
 
     case COMPLETE_FETCH_DATA:
-      if (`${action.sourceId}/${action.tableName}` != state._cacheKey) {
+      if (`${action.sourceId}/${action.tableName}` !== state._cacheKey) {
         // We have a problem, some data race perhaps
         // Todo: tackle this issue if it happens
         console.log("This is a huge problem, please check");
