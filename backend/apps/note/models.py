@@ -5,7 +5,7 @@ meta = MetaData()
 
 
 notes = Table(
-    "admin_notes",
+    "admin_meta_notes",
     Column("id", Integer, primary_key=True),
     Column("path", String(length=100), nullable=False),
     Column("content", Text, nullable=False)

@@ -5,8 +5,14 @@ from utils.config import settings
 
 def get_all_sources():
     from services import all_services
+
+    def get_properties(label):
+        return {
+            "is_system_db": True if label == "admin_meta" else False
+        }
+
     databases = [
-        [label, "database", db.scheme] for (label, db) in [
+        [label, "database", db.scheme, get_properties(label=label)] for (label, db) in [
             (label, urlparse(value["db_url"])) for label, value in settings.DATABASES.items()
         ]
     ]

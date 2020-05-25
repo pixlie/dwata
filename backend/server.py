@@ -11,15 +11,17 @@ from endpoints.schema import schema_get
 from endpoints.data import data_post
 from endpoints.item import item_get
 from endpoints.service import service_fetch
+from endpoints.capability import capability_get
 
 
 handlers = [
-    Route(r"/api/source/", source_get, methods=["GET"]),
+    Route(r"/api/source", source_get, methods=["GET"]),
     Route(r"/api/schema/{source_index:int}/{table_name:str}", schema_get, methods=["GET"]),
     Route(r"/api/schema/{source_index:int}", schema_get, methods=["GET"]),
     Route(r"/api/data/{source_index:int}/{table_name:str}", data_post, methods=["GET", "POST"]),
     Route(r"/api/item/{source_index:int}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
-    Route(r"/api/service/{source_index:int}/{resource_name:str}", service_fetch, methods=["GET", "POST"])
+    Route(r"/api/service/{source_index:int}/{resource_name:str}", service_fetch, methods=["GET", "POST"]),
+    Route(r"/api/capability", capability_get, methods=["GET"]),
 ]
 
 

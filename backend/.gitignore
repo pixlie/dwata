@@ -103,3 +103,6 @@ settings.ini
 settings.toml
 
 db-migrations/migrate.cfg
+
+# Admin meta SQLite DB
+admin_meta.db

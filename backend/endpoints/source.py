@@ -6,7 +6,7 @@ async def source_get(request):
     """Get the list of data sources that have been configured"""
     return RapidJSONResponse({
         "columns": [
-            "label", "type", "provider"
+            "label", "type", "provider", "properties",
         ],
         "rows": get_all_sources()
     })
