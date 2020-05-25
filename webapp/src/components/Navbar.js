@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { toggleSidebar, showNotes } from "services/global/actions";
+import { toggleSidebar, showNotes, getCapabilities } from "services/global/actions";
 import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
 import { getSourceFromPath } from "utils";
 
@@ -11,8 +11,11 @@ const Navbar = ({
   sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor,
   isInTable, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
-  showNotes,
+  showNotes, getCapabilities,
 }) => {
+  useEffect(() => {
+    getCapabilities();
+  }, []);
   const handleNotesClick = event => {
     event.preventDefault();
     showNotes(pathKey);
@@ -160,5 +163,6 @@ export default withRouter(connect(
     toggleColumnSelector,
     toggleSortEditor,
     showNotes,
+    getCapabilities,
   }
 )(Navbar));

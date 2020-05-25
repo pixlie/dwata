@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
-import { showNotes } from "services/global/actions";
+import { showNotes, fetchNote } from "services/global/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
@@ -20,7 +20,7 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 `;
 
 
-const Notes = ({isReady, showNotes}) => {
+const Notes = ({isReady, showNotesFor, hasNotesCapability, showNotes, fetchNote}) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       showNotes(null);
@@ -33,6 +33,11 @@ const Notes = ({isReady, showNotes}) => {
       document.removeEventListener("keydown", handleKey, false);
     }
   }, []);
+  useEffect(() => {
+    if (isReady) {
+      fetchNote();
+    }
+  }, [showNotesFor]);
   const doStates = Object.freeze({
     read: "read",
     edit: "edit",
@@ -96,12 +101,13 @@ const Notes = ({isReady, showNotes}) => {
 
 
 const mapStateToProps = state => {
-  const {showNotesFor} = state.global;
+  const {showNotesFor, hasNotesCapability} = state.global;
   let isReady = showNotesFor !== null;
 
   if (isReady) {
     return {
       isReady,
+      hasNotesCapability,
       showNotesFor,
     }
   } else {
@@ -116,5 +122,6 @@ export default withRouter(connect(
   mapStateToProps,
   {
     showNotes,
+    fetchNote,
   }
 )(Notes));
