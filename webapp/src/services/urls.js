@@ -8,4 +8,4 @@ export const schemanURL = `${apiRoot}/schema`;
 export const dataURL = `${apiRoot}/data`;
 export const apiDataURL = `${apiRoot}/service`;
 export const dataItemURL = `${apiRoot}/item`;
-export const capabilityURL = `${apiRoot}/capability`;
+export const appURL = `${apiRoot}/app`;

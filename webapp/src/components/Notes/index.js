@@ -20,7 +20,7 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 `;
 
 
-const Notes = ({isReady, showNotesFor, hasNotesCapability, showNotes, fetchNote}) => {
+const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote}) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       showNotes(null);
@@ -101,13 +101,13 @@ const Notes = ({isReady, showNotesFor, hasNotesCapability, showNotes, fetchNote}
 
 
 const mapStateToProps = state => {
-  const {showNotesFor, hasNotesCapability} = state.global;
+  const {showNotesFor, isNoteAppEnabled} = state.global;
   let isReady = showNotesFor !== null;
 
   if (isReady) {
     return {
       isReady,
-      hasNotesCapability,
+      isNoteAppEnabled,
       showNotesFor,
     }
   } else {

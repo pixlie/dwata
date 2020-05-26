@@ -1,11 +1,11 @@
 import axios from "axios";
 
-import { capabilityURL, dataItemURL } from "services/urls";
+import { appURL, dataItemURL } from "services/urls";
 import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
 import {
   TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_HEAD_SPECIFICATION, SHOW_NOTES_FOR,
-  COMPLETE_FETCH_CAPABILITY
+  COMPLETE_FETCH_APP
 } from './actionTypes';
 
 
@@ -31,17 +31,17 @@ export const showNotes = identifier => dispatch => dispatch({
 });
 
 
-export const getCapabilities = () => dispatch => {
+export const getApps = () => dispatch => {
   return axios
-    .get(capabilityURL)
+    .get(appURL)
     .then(res => {
       dispatch({
-        type: COMPLETE_FETCH_CAPABILITY,
+        type: COMPLETE_FETCH_APP,
         payload: res.data,
       });
     })
     .catch(err => {
-      console.log("Could not fetch capabilities. Try again later.");
+      console.log("Could not fetch apps. Try again later.");
       console.log(err);
     });
 };
@@ -57,12 +57,12 @@ export const fetchNote = callback => (dispatch, getState) => {
     return false;
   }
   console.log(i++);
-  const {hasNotesCapability, notesCapability} = state.global;
-  if (!hasNotesCapability || !notesCapability) {
+  const {isNoteAppEnabled, noteAppConfig} = state.global;
+  if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
   console.log(i++);
-  const {source_id: sourceId, table_name: tableName} = notesCapability;
+  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
 
   dispatch({
     type: INITIATE_FETCH_ITEM,
