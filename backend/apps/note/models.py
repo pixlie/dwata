@@ -10,7 +10,7 @@ note = Table(
     metadata,
 
     Column("id", Integer, primary_key=True),
-    Column("path", String(length=100), nullable=False),
+    Column("path", String(length=100), nullable=False, unique=True),
     Column("content", Text, nullable=False),
 
     Column("created_at", DateTime, nullable=False),

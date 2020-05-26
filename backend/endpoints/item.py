@@ -1,4 +1,6 @@
+from importlib import import_module
 from starlette.responses import Response
+from starlette.requests import Request
 from sqlalchemy import MetaData, select, column, table
 from json.decoder import JSONDecodeError
 
@@ -7,7 +9,7 @@ from utils.database import connect_database, get_unavailable_columns
 from utils.settings import get_source_settings
 
 
-async def item_get(request):
+async def item_get(request: Request):
     """
     This method fetches a single row of data given the source_id, table_name and primary key id.
     There are tables which do not have a primary key and in those case an index might be used.
@@ -45,7 +47,7 @@ async def item_get(request):
     )
 
 
-async def item_post(request):
+async def item_post(request: Request):
     source_index = request.path_params["source_index"]
     table_name = request.path_params["table_name"]
     settings = get_source_settings(source_index=source_index)
@@ -58,6 +60,7 @@ async def item_post(request):
     if not table_name or (table_name and table_name not in meta.tables):
         conn.close()
         return Response("", status_code=404)
+    table_to_insert = meta.tables[table_name]
     table_column_names = meta.tables[table_name].columns.keys()
     columns = [col for col in table_column_names if col not in unavailable_columns and col != "id"]
 
@@ -73,9 +76,17 @@ async def item_post(request):
             error_code="request.params_mismatch",
             message="There are columns in the request payload that are not allowed"
         )
-    ins_obj = table(table_name).insert().values(**payload)
+    if request.app.state.IS_DWATA_APP:
+        app_name = request.app.state.DWATA_APP_NAME
+        module = import_module("apps.{}.models".format(app_name))
+        if hasattr(module, "{}_pre_insert".format(app_name)):
+            payload = getattr(module, "{}_pre_insert".format(app_name))(payload)
+
+    ins_obj = table_to_insert.insert().values(**payload)
     exc = conn.execute(ins_obj)
 
     return RapidJSONResponse({
         "status": "success",
+        "lastrowid": exc.lastrowid,
+        "rowcount": exc.rowcount,
     })

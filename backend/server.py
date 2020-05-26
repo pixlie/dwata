@@ -6,10 +6,11 @@ from starlette.routing import Route
 
 from utils.config import settings
 from utils.exceptions import web_exception_handlers
+from utils.app import DwataAppMiddleware
 from endpoints.source import source_get
 from endpoints.schema import schema_get
 from endpoints.data import data_post
-from endpoints.item import item_get
+from endpoints.item import item_get, item_post
 from endpoints.service import service_fetch
 from endpoints.app import app_get, app_setup
 
@@ -24,6 +25,7 @@ handlers = [
 
     Route(r"/api/item/{source_index:int}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
     Route(r"/api/item/{source_index:int}/{table_name:str}/{item_pk:str}", item_get, methods=["GET"]),
+    Route(r"/api/item/{source_index:int}/{table_name:str}", item_post, methods=["POST"]),
 
     Route(r"/api/service/{source_index:int}/{resource_name:str}", service_fetch, methods=["GET", "POST"]),
 
@@ -39,7 +41,8 @@ middleware = [
         allow_methods=["OPTIONS", "GET", "POST"],
         allow_headers="Authorization,Access-Control-Allow-Headers,Origin,Accept,X-Requested-With"
                       ",Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers"
-    )
+    ),
+    Middleware(DwataAppMiddleware)
 ]
 
 
