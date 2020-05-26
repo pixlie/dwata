@@ -1,7 +1,8 @@
 from starlette.responses import Response
 from sqlalchemy import MetaData, select, column, table
+from json.decoder import JSONDecodeError
 
-from utils.response import RapidJSONResponse
+from utils.response import RapidJSONResponse, web_error
 from utils.database import connect_database, get_unavailable_columns
 from utils.settings import get_source_settings
 
@@ -11,7 +12,6 @@ async def item_get(request):
     This method fetches a single row of data given the source_id, table_name and primary key id.
     There are tables which do not have a primary key and in those case an index might be used.
     """
-    from .schema import column_definition
     source_index = request.path_params["source_index"]
     table_name = request.path_params["table_name"]
     item_pk = request.path_params["item_pk"]
@@ -34,9 +34,48 @@ async def item_get(request):
     sel_obj = sel_obj.limit(1)
     exc = conn.execute(sel_obj)
 
+    if exc.rowcount != 1:
+        return Response("", status_code=404)
+
     return RapidJSONResponse(
         dict(
             item=dict(zip(exc.keys(), exc.cursor.fetchone())),
             query_sql=str(sel_obj),
         )
     )
+
+
+async def item_post(request):
+    source_index = request.path_params["source_index"]
+    table_name = request.path_params["table_name"]
+    settings = get_source_settings(source_index=source_index)
+
+    engine, conn = await connect_database(db_url=settings["db_url"])
+    meta = MetaData(bind=engine)
+    meta.reflect()
+    unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
+
+    if not table_name or (table_name and table_name not in meta.tables):
+        conn.close()
+        return Response("", status_code=404)
+    table_column_names = meta.tables[table_name].columns.keys()
+    columns = [col for col in table_column_names if col not in unavailable_columns and col != "id"]
+
+    try:
+        payload = await request.json()
+    except JSONDecodeError:
+        return web_error(
+            error_code="request.json_decode_error",
+            message="We could not handle that request, perhaps something is wrong with the server."
+        )
+    if len([x for x in payload.keys() if x not in columns]) > 0:
+        return web_error(
+            error_code="request.params_mismatch",
+            message="There are columns in the request payload that are not allowed"
+        )
+    ins_obj = table(table_name).insert().values(**payload)
+    exc = conn.execute(ins_obj)
+
+    return RapidJSONResponse({
+        "status": "success",
+    })

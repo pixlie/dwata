@@ -1,18 +1,51 @@
-from utils.response import RapidJSONResponse
+from importlib import import_module
+from json.decoder import JSONDecodeError
+
+from utils.response import RapidJSONResponse, web_error
 
 
-async def capability_get(_):
-    """Get the list of dwata provided capabilities that have been configured"""
+async def app_get(_):
+    """
+    Get the list of dwata provided capabilities that have been configured
+    """
     # Todo: this is a hack, please update in [ch162]
     return RapidJSONResponse({
         "columns": [
-            "label", "is_enabled", "properties"
+            "label", "is_enabled", "config"
         ],
         "rows": [
-            ["notes", True, {
+            ["note", True, {
                 "in_use": True,
                 "source_id": 0,
-                "table_name": "admin_meta_notes",
+                "table_name": "admin_meta_note",
             }]
         ]
+    })
+
+
+async def app_setup(request):
+    """
+    This method is used to setup an app, usually by creating the table(s) that the app needs
+    """
+    app_name = request.path_params["app_name"]
+    module = import_module("apps.{}.setup".format(app_name))
+    setup_params = {}
+    if hasattr(module, "required_setup_params"):
+        required_setup_params = getattr(module, "required_setup_params")()
+        try:
+            setup_params = await request.json()
+        except JSONDecodeError:
+            return web_error(
+                error_code="request.json_decode_error",
+                message="We could not handle that request, perhaps something is wrong with the server."
+            )
+        if len([x for x in required_setup_params if x not in setup_params.keys()]) > 0:
+            return web_error(
+                error_code="request.params_mismatch",
+                message="Setting up {} app needs parameters that have not been specified"
+            )
+
+    await getattr(module, "setup_app")(**setup_params)
+    return RapidJSONResponse({
+        "status": "success"
     })
