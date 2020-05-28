@@ -16,7 +16,6 @@ const initialState = {
 
 export default (state = initialState, action) => {
   const _cacheKey = `${action.sourceId}/${action.tableName}/${action.pk}`;
-  console.log(action.type, _cacheKey);
 
   switch (action.type) {
     case INITIATE_FETCH_ITEM:
@@ -38,10 +37,11 @@ export default (state = initialState, action) => {
         ...state,
         [_cacheKey]: {
           ...state[_cacheKey],
-          data: action.payload.item,
-          querySQL: action.payload.query_sql,
+          data: action.errorStatus ? null : action.payload.item,
+          querySQL: action.errorStatus ? null : action.payload.query_sql,
           isFetching: false,
           isReady: true,
+          errorStatus: action.errorStatus,
         }
       }
     }

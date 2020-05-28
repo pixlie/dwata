@@ -81,8 +81,17 @@ export const fetchNote = () => (dispatch, getState) => {
       });
     })
     .catch(err => {
-      console.log("Could not fetch notes. Try again later.");
-      console.log(err);
+      console.log("Could not fetch notes. Try again later.", err.response.status);
+      if (err.response.status === 404) {
+        dispatch({
+          type: COMPLETE_FETCH_ITEM,
+          payload: null,
+          sourceId,
+          tableName,
+          pk: path,
+          errorStatus: err.response.status,
+        });
+      }
     });
 };
 

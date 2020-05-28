@@ -34,7 +34,6 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
     }
   }, []);
   useEffect(() => {
-    console.log(showNotesFor);
     fetchNote();
   }, [showNotesFor]);
   const doStates = Object.freeze({
@@ -48,11 +47,13 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
     existingNote: {},
   });
   useEffect(() => {
-    setState({
-      ...state,
-      content: dataItem ? dataItem.content : defaultNote,
-      existingNote: dataItem ? dataItem : {},
-    });
+    if (dataItem) {
+      setState({
+        ...state,
+        content: dataItem.content,
+        existingNote: dataItem,
+      });
+    }
   }, [dataItem]);
   const toggleState = transitionTo => event => {
     event.preventDefault();
@@ -81,7 +82,7 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
     event.preventDefault();
     saveNote({
       content: state.content,
-    }, state.existingNote ? state.existingNote.id : null);
+    }, state.existingNote.id ? state.existingNote.id : null);
   }
 
   return (
@@ -120,7 +121,6 @@ const mapStateToProps = state => {
   const {showNotesFor, isNoteAppEnabled, noteAppConfig} = state.global;
   const {source_id: sourceId, table_name: tableName} = noteAppConfig;
   const _cacheKey = `${sourceId}/${tableName}/${showNotesFor}`;
-  console.log(_cacheKey);
 
   let isReady = false;
   if (showNotesFor !== null && _cacheKey in state.dataItem && state.dataItem[_cacheKey].isReady) {
