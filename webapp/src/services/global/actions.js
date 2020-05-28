@@ -87,7 +87,7 @@ export const fetchNote = () => (dispatch, getState) => {
 };
 
 
-export const saveNote = (payload, upsert, callback) => (dispatch, getState) => {
+export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
   const state = getState();
   let path = null;
   try {
@@ -101,13 +101,16 @@ export const saveNote = (payload, upsert, callback) => (dispatch, getState) => {
     return false;
   }
   const {source_id: sourceId, table_name: tableName} = noteAppConfig;
-  const url = upsert === true ? `${dataItemURL}/${sourceId}/${tableName}?upsert=1` : `${dataItemURL}/${sourceId}/${tableName}`;
+  const url = pk !== null ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
 
-  return axios
-    .post(url, {
+  return axios({
+    method: pk !== null ? "put" : "post",
+    url,
+    data: {
       path,
       ...payload,
-    })
+    }
+  })
     .then(res => {
       if (!!callback) {
         callback();

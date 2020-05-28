@@ -128,7 +128,7 @@ const mapStateToProps = (state, props) => {
   let hasColumnsSpecified = false;
   let hasFiltersSpecified = false;
   let hasOrderingSpecified = false;
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const _browserCacheKey = btoa(`${sourceId}/${tableName}`);
   if (sourceId && tableName) {
     isInTable = true;
     if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&

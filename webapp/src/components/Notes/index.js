@@ -20,7 +20,7 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 `;
 
 
-const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, saveNote}) => {
+const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fetchNote, saveNote}) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       showNotes(null);
@@ -34,9 +34,8 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, s
     }
   }, []);
   useEffect(() => {
-    if (isReady) {
-      fetchNote();
-    }
+    console.log(showNotesFor);
+    fetchNote();
   }, [showNotesFor]);
   const doStates = Object.freeze({
     read: "read",
@@ -45,8 +44,16 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, s
   });
   const [state, setState] = useState({
     current: doStates.read,
-    content: defaultNote,
+    content: dataItem || defaultNote,
+    existingNote: {},
   });
+  useEffect(() => {
+    setState({
+      ...state,
+      content: dataItem ? dataItem.content : defaultNote,
+      existingNote: dataItem ? dataItem : {},
+    });
+  }, [dataItem]);
   const toggleState = transitionTo => event => {
     event.preventDefault();
     setState({
@@ -62,7 +69,7 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, s
     });
   }
 
-  if (!isReady || !isNoteAppEnabled) {
+  if (!isNoteAppEnabled || !isReady) {
     return null;
   }
   const handleClose = event => {
@@ -74,7 +81,7 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, s
     event.preventDefault();
     saveNote({
       content: state.content,
-    }, true);
+    }, state.existingNote ? state.existingNote.id : null);
   }
 
   return (
@@ -110,18 +117,29 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, s
 
 
 const mapStateToProps = state => {
-  const {showNotesFor, isNoteAppEnabled} = state.global;
-  let isReady = showNotesFor !== null;
+  const {showNotesFor, isNoteAppEnabled, noteAppConfig} = state.global;
+  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
+  const _cacheKey = `${sourceId}/${tableName}/${showNotesFor}`;
+  console.log(_cacheKey);
+
+  let isReady = false;
+  if (showNotesFor !== null && _cacheKey in state.dataItem && state.dataItem[_cacheKey].isReady) {
+    isReady = true;
+  }
 
   if (isReady) {
     return {
       isReady,
       isNoteAppEnabled,
       showNotesFor,
+      cacheKey: _cacheKey,
+      dataItem: state.dataItem[_cacheKey].data,
     }
   } else {
     return {
       isReady,
+      cacheKey: _cacheKey,
+      showNotesFor,
     };
   }
 }

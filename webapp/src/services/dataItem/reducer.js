@@ -16,6 +16,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
   const _cacheKey = `${action.sourceId}/${action.tableName}/${action.pk}`;
+  console.log(action.type, _cacheKey);
 
   switch (action.type) {
     case INITIATE_FETCH_ITEM:
