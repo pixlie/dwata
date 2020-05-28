@@ -16,6 +16,7 @@ import FilterEditor from "components/Browser/FilterEditor";
 import OrderEditor from "components/Browser/OrderEditor";
 import DetailView from "components/Browser/Detail";
 import Paginator from "components/Browser/Paginator";
+import Notes from "components/Notes";
 
 
 export default ({ initialState }) => {
@@ -23,6 +24,7 @@ export default ({ initialState }) => {
     <Provider store={configureStore(initialState)}>
       <ConnectedRouter history={history}>
         <Navbar />
+        <Notes />
 
         <Sidebar>
           <Source />

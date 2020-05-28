@@ -1,16 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { toggleSidebar } from "services/global/actions";
+import { toggleSidebar, showNotes, getApps } from "services/global/actions";
 import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
 import { getSourceFromPath } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching,
-  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey,
+  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor,
+  isInTable, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
+  showNotes, getApps,
 }) => {
+  useEffect(() => {
+    getApps();
+  }, []);
+  const handleNotesClick = event => {
+    event.preventDefault();
+    showNotes(pathKey);
+  }
+
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
@@ -35,13 +45,13 @@ const Navbar = ({
             </div>
           </div>
 
-          { tableName ? (
+          {tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
               <a className="navbar-link">
                 <i className="fas fa-table" />&nbsp;Tables
               </a>
 
-              { schema.isReady ? (
+              {schema.isReady ? (
                 <div className="navbar-dropdown">
                   {schema.rows.filter(s => s.properties.is_system_table === false).map(head => (
                     <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
@@ -56,35 +66,54 @@ const Navbar = ({
                     </Link>
                   ))}
                 </div>
-              ) : null }
+              ) : null}
             </div>
-          ) : null }
+          ) : null}
         </div>
 
         <div className="navbar-end">
-          <div className="navbar-item">
-            <div className="field">
-              <p className="control has-icons-left">
-                <input className="input" type="text" placeholder="Coming soon..." />
-                <span className="icon is-small is-left">
-                  <i className="fas fa-search"></i>
-                </span>
-              </p>
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="field">
+                <p className="control has-icons-left">
+                  <input className="input" type="text" placeholder="Coming soon..." />
+                  <span className="icon is-small is-left">
+                    <i className="fas fa-search"></i>
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="navbar-item">
-            <div className="buttons has-addons">
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
-                <i className="fas fa-columns" />&nbsp;Columns
-              </button>
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
-                <i className="fas fa-filter" />&nbsp;Filters
-              </button>
-              <button className="button" disabled={!isFilterEnabled} onClick={toggleSortEditor}>
-                <i className="fas fa-sort" />&nbsp;Ordering
-              </button>
+          ): null}
+
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="field">
+                <p className="control">
+                  <button className="button" onClick={handleNotesClick}>
+                    <span className="icon">
+                      <i className="far fa-sticky-note" />
+                    </span>&nbsp; Notes
+                  </button>
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="buttons has-addons">
+                <button className={`button${hasColumnsSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleColumnSelector}>
+                  <i className="fas fa-columns" />&nbsp;Columns
+                </button>
+                <button className={`button${hasFiltersSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleFilterEditor}>
+                  <i className="fas fa-filter" />&nbsp;Filters
+                </button>
+                <button className={`button${hasOrderingSpecified ? " is-spec" : ""}`} disabled={!isFilterEnabled} onClick={toggleSortEditor}>
+                  <i className="fas fa-sort" />&nbsp;Ordering
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </nav>
@@ -94,15 +123,34 @@ const Navbar = ({
 
 const mapStateToProps = (state, props) => {
   const match = getSourceFromPath(props.location.pathname);
-  const { sourceId, tableName } = match != null ? match.params : { sourceId: null, tableName: null };
+  const {sourceId, tableName} = match != null ? match.params : {sourceId: null, tableName: null};
+  let isInTable = false;
+  let hasColumnsSpecified = false;
+  let hasFiltersSpecified = false;
+  let hasOrderingSpecified = false;
+  const _browserCacheKey = btoa(`${sourceId}/${tableName}`);
+  if (sourceId && tableName) {
+    isInTable = true;
+    if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+      state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
+      state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+      hasColumnsSpecified = state.querySpecification.columnsSelected.length !== state.schema.rows.find(x => x.table_name === tableName).columns.length;
+      hasFiltersSpecified = Object.keys(state.querySpecification.filterBy).length > 0;
+      hasOrderingSpecified = Object.keys(state.querySpecification.orderBy).length > 0;
+    }
+  }
 
   return {
     schema: state.schema,
     isSourceFetching: state.source.isFetching,
-    db: state.source.isReady ? state.source.rows[sourceId] : {},
     sourceId,
     tableName,
     isFilterEnabled: sourceId && tableName,
+    isInTable,
+    hasColumnsSpecified,
+    hasFiltersSpecified,
+    hasOrderingSpecified,
+    pathKey: _browserCacheKey,
   }
 }
 
@@ -113,6 +161,8 @@ export default withRouter(connect(
     toggleSidebar,
     toggleFilterEditor,
     toggleColumnSelector,
-    toggleSortEditor
+    toggleSortEditor,
+    showNotes,
+    getApps,
   }
 )(Navbar));

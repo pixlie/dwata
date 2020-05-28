@@ -8,7 +8,15 @@ import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM, LOAD_ITEM_FROM_CACHE } from "
 
 export const fetchDataItem = callback => (dispatch, getState) => {
   const state = getState();
-  const {params: {sourceId, tableName, pk}} = getItemPartsFromPath(state.router.location.pathname);
+  let sourceId = null,
+    tableName = null,
+    pk = null;
+  try {
+    const {params} = getItemPartsFromPath(state.router.location.pathname);
+    ({sourceId, tableName, pk} = params);
+  } catch (error) {
+    return false;
+  }
 
   dispatch({
     type: INITIATE_FETCH_ITEM,

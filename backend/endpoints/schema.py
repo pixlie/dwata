@@ -2,7 +2,7 @@ from sqlalchemy import MetaData
 
 from utils.response import RapidJSONResponse
 from utils.database import connect_database, get_unavailable_columns, get_system_tables
-from utils.source import get_all_sources, get_source_settings
+from utils.settings import get_all_sources, get_source_settings
 from services import all_services
 
 

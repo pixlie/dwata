@@ -15,6 +15,12 @@ server_port = 12121
 # db_url = "postgresql://db_user:db_password@db_host/db_name"
 
 
+# If you need the meta DB, for featues like note, pinned rows, etc.
+# The DB name dwata_meta is constant, please do not change it
+[database.admin_meta]
+# db_url = "sqlite:///admin_meta.db"
+
+
 [mailchimp.some_label]
 # api_key = "api_key"
 

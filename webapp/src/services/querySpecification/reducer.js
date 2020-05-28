@@ -1,7 +1,8 @@
 import {
   TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
   TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
-  TOGGLE_COLUMN_SELECTION, SET_QUERY_FILTER, REMOVE_QUERY_FILTER
+  TOGGLE_COLUMN_SELECTION,
+  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER,
 } from "./actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
@@ -112,7 +113,7 @@ export default (state = initialState, action) => {
       });
 
     case COMPLETE_FETCH_DATA:
-      if (`${action.sourceId}/${action.tableName}` != state._cacheKey) {
+      if (`${action.sourceId}/${action.tableName}` !== state._cacheKey) {
         // We have a problem, some data race perhaps
         // Todo: tackle this issue if it happens
         console.log("This is a huge problem, please check");
@@ -181,6 +182,33 @@ export default (state = initialState, action) => {
           ],
         });
       }
+
+    case INITIATE_QUERY_FILTER:
+      if (action.columnName in state.filterBy) {
+        return {
+          ...state
+        };
+      }
+
+      let initialFilter = {};
+      if (["INTEGER", "VARCHAR", "TIMESTAMP"].includes(action.dataType.type)) {
+        initialFilter = {
+          display: ""
+        };
+      } else if (action.dataType.type === "BOOLEAN") {
+        initialFilter = {
+          display: "true",
+          value: true,
+        };
+      }
+      return setDeltaAndCache({
+        filterBy: {
+          ...state.filterBy,
+          [action.columnName]: {
+            ...initialFilter,
+          },
+        }
+      });
 
     case SET_QUERY_FILTER:
       return setDeltaAndCache({

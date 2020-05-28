@@ -22,7 +22,7 @@ export default initialState => {
         thunk,
         routerMiddleware(history) // for dispatching history actions
       ),
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+      // window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
     )
   );
 

@@ -1,7 +1,7 @@
 import React from "react";
 
 
-const HeadItem = ({ toggleOrderBy, head }) => {
+/* const HeadItem = ({ toggleOrderBy, head }) => {
   const handleClick = event => {
     event.preventDefault();
     toggleOrderBy(head);
@@ -10,7 +10,7 @@ const HeadItem = ({ toggleOrderBy, head }) => {
   return (
     <th onClick={handleClick}>{head}</th>
   );
-}
+} */
 
 
 export default (columns) => {

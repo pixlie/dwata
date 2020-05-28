@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&family=Alegreya:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');
 
 // Update Bulma's global variables
 $family-sans-serif: "Titillium Web", sans-serif;
-$family-serif: "Alegreya";
 
 // Reduce the size of the default shadow
 $scheme-invert: hsl(0, 0%, 4%);
@@ -14,6 +13,7 @@ $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 @import '../../node_modules/bulma';
 @import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '../../node_modules/@fortawesome/fontawesome-free/css/solid.css';
+@import '../../node_modules/@fortawesome/fontawesome-free/css/regular.css';
 
 html {
   min-width: 100%;
@@ -28,7 +28,6 @@ body {
 
 h1, h2, h3 {
   &.title {
-    font-family: $family-serif;
     font-weight: 900;
   }
 }
@@ -95,6 +94,16 @@ h1, h2, h3 {
       font-weight: bold;
     }
   }
+
+  .navbar-end {
+    .navbar-item {
+      .button {
+        &.is-spec {
+          border-bottom: 2px solid #48c774;
+        }
+      }
+    }
+  }
 }
 
 table {
@@ -112,10 +121,48 @@ table {
   thead {
     tr {
       th {
-        cursor: n-resize;
+        .hd-btn {
+          display: inline-block;
+          padding: 0 0.6rem;
+          background-color: #efefef;
+          border-radius: 0.4rem;
+          position: relative;
+          cursor: pointer;
+          color: #787878;
+
+          &.hdicn {
+            padding: 0 1.2rem 0 0.6rem;
+          }
+
+          &.hdicn::after {
+            border: 2px solid #787878;
+            border-right: 0;
+            border-top: 0;
+            content: " ";
+            display: block;
+            height: 0.4em;
+            width: 0.4em;
+            pointer-events: none;
+            position: absolute;
+            top: 60%;
+            transform-origin: center;
+            right: 0.5rem;
+            margin-top: -0.375em;
+          }
+
+          &.icn-asc::after {
+            top: 65%;
+            transform: rotate(135deg);
+          }
+          &.icn-desc::after {
+            transform: rotate(-45deg);
+          }
+        }
 
         &:hover {
-          background-color: #efefef;
+          .hd-btn {
+            color: #4c4c4c;
+          }
         }
       }
     }
@@ -134,6 +181,7 @@ table {
   }
 }
 
+
 #paginator {
   z-index: 80;
   background-color: #fdf7e3;
@@ -144,6 +192,7 @@ table {
   bottom: 4rem;
   right: 12rem;
 }
+
 
 #detail-modal {
   z-index: 100;
@@ -314,6 +363,48 @@ table {
           }
         }
       }
+    }
+  }
+}
+
+
+.col-hd-spec-box {
+  z-index: 80;
+  background-color: #fdf7e3;
+  padding: 0.4rem 0.6rem;
+  box-shadow: $box-shadow;
+  border-radius: $radius-small;
+  position: absolute;
+  top: 5.65rem;
+  min-width: 12rem;
+  display: block;
+}
+
+
+#notes-modal {
+  z-index: 100;
+  background-color: white;
+  box-shadow: $box-shadow;
+  position: fixed;
+  top: 4rem;
+  left: 12rem;
+  width: 60%;
+
+  section {
+    padding: 1rem;
+
+    .button {
+      &.close {
+        position: absolute;
+        top: -1.6rem;
+        right: -2rem;
+        z-index: 110;
+      }
+    }
+
+    .content {
+      background-color: #fdf7e3;
+      padding: 0.8rem;
     }
   }
 }
