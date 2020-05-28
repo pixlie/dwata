@@ -128,12 +128,13 @@ async def data_post(request):
         count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
                                       unavailable_columns=unavailable_columns)
     count = conn.execute(count_sel_obj).scalar()
+    rows = exc.cursor.fetchall()
     conn.close()
 
     return RapidJSONResponse(
         dict(
             columns=exc.keys(),
-            rows=exc.cursor.fetchall(),
+            rows=rows,
             count=count,
             limit=query_specification.get("limit", default_per_page),
             offset=query_specification.get("offset", 0),

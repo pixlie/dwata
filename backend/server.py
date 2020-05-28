@@ -25,6 +25,7 @@ handlers = [
 
     Route(r"/api/item/{source_index:int}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
     Route(r"/api/item/{source_index:int}/{table_name:str}/{item_pk:str}", item_get, methods=["GET"]),
+    Route(r"/api/item/{source_index:int}/{table_name:str}", item_get, methods=["GET"]),
     Route(r"/api/item/{source_index:int}/{table_name:str}", item_post, methods=["POST"]),
 
     Route(r"/api/service/{source_index:int}/{resource_name:str}", service_fetch, methods=["GET", "POST"]),
