@@ -125,7 +125,7 @@ async def item_put(request: Request):
     if not table_name or (table_name and table_name not in meta.tables):
         conn.close()
         return Response("", status_code=404)
-    table_to_insert = meta.tables[table_name]
+    table_to_update = meta.tables[table_name]
     table_column_names = meta.tables[table_name].columns.keys()
     columns = [col for col in table_column_names if col not in unavailable_columns and col != "id"]
 
@@ -144,11 +144,11 @@ async def item_put(request: Request):
     if request.app.state.IS_DWATA_APP:
         app_name = request.app.state.DWATA_APP_NAME
         module = import_module("apps.{}.models".format(app_name))
-        if hasattr(module, "{}_pre_insert".format(app_name)):
-            payload = getattr(module, "{}_pre_insert".format(app_name))(payload)
+        if hasattr(module, "{}_pre_update".format(app_name)):
+            payload = getattr(module, "{}_pre_update".format(app_name))(payload)
 
-    upd_obj = table_to_insert.update().where(
-        getattr(table_to_insert.c, "id") == item_pk
+    upd_obj = table_to_update.update().where(
+        getattr(table_to_update.c, "id") == item_pk
     ).values(**payload)
     try:
         exc = conn.execute(upd_obj)
