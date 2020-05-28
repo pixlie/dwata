@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
-import { showNotes, fetchNote } from "services/global/actions";
+import { showNotes, fetchNote, saveNote } from "services/global/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 
@@ -20,7 +20,7 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 `;
 
 
-const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote}) => {
+const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote, saveNote}) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       showNotes(null);
@@ -62,12 +62,19 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote}) 
     });
   }
 
-  if (!isReady) {
+  if (!isReady || !isNoteAppEnabled) {
     return null;
   }
   const handleClose = event => {
     event.preventDefault();
     showNotes(null);
+  }
+
+  const handleSave = event => {
+    event.preventDefault();
+    saveNote({
+      content: state.content,
+    }, true);
   }
 
   return (
@@ -89,7 +96,9 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, showNotes, fetchNote}) 
           </div>
         )}
         <div className="buttons">
-          {[doStates.edit, doStates.preview].includes(state.current) ? <button className="button is-primary" disabled={defaultNote === state.content}>Save</button> : null}
+          {[doStates.edit, doStates.preview].includes(state.current) ?
+            <button className="button is-primary" disabled={defaultNote === state.content} onClick={handleSave}>Save</button>
+          : null}
           {[doStates.read, doStates.preview].includes(state.current) ? <button className="button is-primary" onClick={toggleState(doStates.edit)}>Edit note</button> : null}
           {state.current === doStates.edit ? <button className="button is-light" onClick={toggleState(doStates.preview)}>Preview</button> : null}
           {state.current === doStates.edit ? <button className="button is-light" onClick={toggleState(doStates.read)}>Cancel</button> : null}
@@ -123,5 +132,6 @@ export default withRouter(connect(
   {
     showNotes,
     fetchNote,
+    saveNote,
   }
 )(Notes));

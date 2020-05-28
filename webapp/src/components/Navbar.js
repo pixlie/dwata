@@ -91,7 +91,7 @@ const Navbar = ({
                 <p className="control">
                   <button className="button" onClick={handleNotesClick}>
                     <span className="icon">
-                      <i className="fas fa-sticky-note" />
+                      <i className="far fa-sticky-note" />
                     </span>&nbsp; Notes
                   </button>
                 </p>

@@ -47,48 +47,74 @@ export const getApps = () => dispatch => {
 };
 
 
-export const fetchNote = callback => (dispatch, getState) => {
+export const fetchNote = () => (dispatch, getState) => {
   const state = getState();
-  let pk = null, i = 0;
+  let path = null;
   try {
     const {params} = getSourceFromPath(state.router.location.pathname);
-    pk = btoa(`${params.sourceId}/${params.tableName}`);
+    path = btoa(`${params.sourceId}/${params.tableName}`);
   } catch (error) {
     return false;
   }
-  console.log(i++);
   const {isNoteAppEnabled, noteAppConfig} = state.global;
   if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
-  console.log(i++);
   const {source_id: sourceId, table_name: tableName} = noteAppConfig;
 
   dispatch({
     type: INITIATE_FETCH_ITEM,
     sourceId,
     tableName,
-    pk,
+    pk: path,
   });
-  console.log(i++);
 
   return axios
-    .get(`${dataItemURL}/${sourceId}/${tableName}/${pk}`)
+    .get(`${dataItemURL}/${sourceId}/${tableName}?path=${path}`)
     .then(res => {
-      if (!!callback) {
-        callback();
-      }
-
       dispatch({
         type: COMPLETE_FETCH_ITEM,
         payload: res.data,
         sourceId,
         tableName,
-        pk,
+        pk: path,
       });
     })
     .catch(err => {
-      console.log("Could not fetch sources. Try again later.");
+      console.log("Could not fetch notes. Try again later.");
+      console.log(err);
+    });
+};
+
+
+export const saveNote = (payload, upsert, callback) => (dispatch, getState) => {
+  const state = getState();
+  let path = null;
+  try {
+    const {params} = getSourceFromPath(state.router.location.pathname);
+    path = btoa(`${params.sourceId}/${params.tableName}`);
+  } catch (error) {
+    return false;
+  }
+  const {isNoteAppEnabled, noteAppConfig} = state.global;
+  if (!isNoteAppEnabled || !noteAppConfig) {
+    return false;
+  }
+  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
+  const url = upsert === true ? `${dataItemURL}/${sourceId}/${tableName}?upsert=1` : `${dataItemURL}/${sourceId}/${tableName}`;
+
+  return axios
+    .post(url, {
+      path,
+      ...payload,
+    })
+    .then(res => {
+      if (!!callback) {
+        callback();
+      }
+    })
+    .catch(err => {
+      console.log("Could not fetch notes. Try again later.");
       console.log(err);
     });
 };
