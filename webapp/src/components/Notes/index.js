@@ -33,9 +33,6 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
       document.removeEventListener("keydown", handleKey, false);
     }
   }, []);
-  useEffect(() => {
-    fetchNote();
-  }, [showNotesFor]);
   const doStates = Object.freeze({
     read: "read",
     edit: "edit",
@@ -43,9 +40,16 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
   });
   const [state, setState] = useState({
     current: doStates.read,
-    content: dataItem || defaultNote,
+    content: defaultNote,
     existingNote: {},
   });
+  useEffect(() => {
+    fetchNote();
+    setState({
+      ...state,
+      content: defaultNote,
+    })
+  }, [showNotesFor]);
   useEffect(() => {
     if (dataItem) {
       setState({

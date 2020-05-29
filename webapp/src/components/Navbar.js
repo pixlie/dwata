@@ -39,7 +39,7 @@ const Navbar = ({
         <div className="navbar-start">
           <div className="navbar-item">
             <div className="buttons">
-              <button className="button is-grey" onClick={toggleSidebar} disabled={isSourceFetching}>
+              <button className={`button ${isInTable ? "is-grey" : "is-success"}`} onClick={toggleSidebar} disabled={isSourceFetching}>
                 <i className="fas fa-database" />&nbsp;Sources
               </button>
             </div>
