@@ -8,7 +8,7 @@ import { fetchSchema } from "services/schema/actions";
 const TableList = ({sourceIndex, schema, fetchSchema, sourceType}) => {
   useEffect(() => {
     fetchSchema(sourceIndex);
-  }, []);
+  }, [sourceIndex, fetchSchema]);
   const urlBase = sourceType === "database" ? "/browse" : "/service";
 
   return (

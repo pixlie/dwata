@@ -12,7 +12,7 @@ const PageItem = ({number, currentPage, gotoPage}) => {
   }
   
   return (
-    <li><a className={`pagination-link${number === currentPage ? " is-current" : ""}`} aria-label={`Goto page ${number}`} onClick={handleGotoPage}>{number}</a></li>
+    <li><a className={`pagination-link${number === currentPage ? " is-current" : ""}`} aria-label={`Goto page ${number}`} onClick={handleGotoPage} href={`?page=${number}`}>{number}</a></li>
   );
 }
 
@@ -21,7 +21,6 @@ const PageSlots = ({count, limit, offset, gotoPage}) => {
   const slots = 9;  // Includes all page numbers to be shown and ellipses
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(count / limit);
-  const slotComponents = [];
   if (totalPages < slots) {
     return (
       <ul className="pagination-list">
@@ -57,14 +56,14 @@ const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious, g
     <div id="paginator">
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
-          <a className="pagination-previous" disabled>Previous</a>
+          <span className="pagination-previous" disabled>Previous</span>
         ) : (
-          <a className="pagination-previous" onClick={handlePrevious}>Previous</a>
+          <span className="pagination-previous" onClick={handlePrevious}>Previous</span>
         )}
         {offset + limit >= count ? (
-          <a className="pagination-next" disabled>Next page</a>
+          <span className="pagination-next" disabled>Next page</span>
         ) : (
-          <a className="pagination-next" onClick={handleNext}>Next page</a>
+          <span className="pagination-next" onClick={handleNext}>Next page</span>
         )}
         <PageSlots count={count} limit={limit} offset={offset} gotoPage={gotoPage} />
       </nav>

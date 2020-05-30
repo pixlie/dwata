@@ -1,7 +1,7 @@
 import React, { useEffect, Fragment, useState } from "react";
 import { connect } from "react-redux";
 
-import { Section, Panel, Hx } from "components/BulmaHelpers";
+import { Section, Panel } from "components/BulmaHelpers";
 import { fetchSource } from "services/source/actions";
 import TableList from "components/TableList";
 
@@ -9,7 +9,7 @@ import TableList from "components/TableList";
 const Source = ({source, fetchSource}) => {
   useEffect(() => {
     fetchSource();
-  }, []);
+  }, [fetchSource]);
   const [ state, setState ] = useState({
     sourceIndex: null,
   });

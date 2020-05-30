@@ -123,19 +123,19 @@ const cellRenderer = (column, sourceId) => {
 const Detail = ({isReady, sourceId, tableName, pk, schemaColumns, dataItem, history, fetchDataItem}) => {
   useEffect(() => {
     fetchDataItem();
-  }, [sourceId, tableName, pk]);
+  }, [sourceId, tableName, pk, fetchDataItem]);
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       history.push(`/browse/${sourceId}/${tableName}`);
     }
-  }, []);
+  }, [history, sourceId, tableName]);
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);
 
     return () => {
       document.removeEventListener("keydown", handleKey, false);
     }
-  }, []);
+  }, [handleKey]);
   if (!isReady) {
     return (
       <div>Loading...</div>

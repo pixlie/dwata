@@ -15,7 +15,7 @@ const Navbar = ({
 }) => {
   useEffect(() => {
     getApps();
-  }, []);
+  }, [getApps]);
   const handleNotesClick = event => {
     event.preventDefault();
     showNotes(pathKey);
@@ -47,9 +47,9 @@ const Navbar = ({
 
           {tableName ? (
             <div className="navbar-item has-dropdown is-hoverable">
-              <a className="navbar-link">
+              <span className="navbar-link">
                 <i className="fas fa-table" />&nbsp;Tables
-              </a>
+              </span>
 
               {schema.isReady ? (
                 <div className="navbar-dropdown">

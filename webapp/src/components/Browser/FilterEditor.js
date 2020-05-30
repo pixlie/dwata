@@ -37,7 +37,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
     );
   }
 
-  for (const [columnName, _] of Object.entries(filterBy)) {
+  for (const [columnName] of Object.entries(filterBy)) {
     filters.push(
       <div key={`fl-${columnName}`} className="field is-horizontal">
         <div className="field-label">

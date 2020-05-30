@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 import { showNotes, fetchNote, saveNote } from "services/global/actions";
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section } from "components/BulmaHelpers";
 
 
 const defaultNote = `# Notes
@@ -25,14 +25,14 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
     if (event.keyCode === 27) {
       showNotes(null);
     }
-  }, []);
+  }, [showNotes]);
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);
 
     return () => {
       document.removeEventListener("keydown", handleKey, false);
     }
-  }, []);
+  }, [handleKey]);
   const doStates = Object.freeze({
     read: "read",
     edit: "edit",
@@ -45,18 +45,18 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
   });
   useEffect(() => {
     fetchNote();
-    setState({
+    setState(state => ({
       ...state,
       content: defaultNote,
-    })
-  }, [showNotesFor]);
+    }));
+  }, [showNotesFor, fetchNote]);
   useEffect(() => {
     if (dataItem) {
-      setState({
+      setState(state => ({
         ...state,
         content: dataItem.content,
         existingNote: dataItem,
-      });
+      }));
     }
   }, [dataItem]);
   const toggleState = transitionTo => event => {

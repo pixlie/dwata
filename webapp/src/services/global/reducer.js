@@ -56,10 +56,12 @@ export default (state = initialState, action) => {
             noteAppConfig: app.config,
           };
         }
+        // Todo: refactor the return to be outside the for loop
         return {
           ...state,
         };
       }
+      break;
 
     default:
       return state;

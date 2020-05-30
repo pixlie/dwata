@@ -3,11 +3,11 @@ import React from "react";
 
 export default (columns) => {
   const rowList = [];
-  const date_time_options = {
-    year: "numeric", month: "numeric", day: "numeric",
-    hour: "numeric", minute: "numeric", second: "numeric",
-    hour12: false,
-  };
+  // const date_time_options = {
+  //   year: "numeric", month: "numeric", day: "numeric",
+  //   hour: "numeric", minute: "numeric", second: "numeric",
+  //   hour12: false,
+  // };
 
   const DefaultCell = ({ data }) => <td>{data}</td>;
   // const PrimaryKeyCell = ({ data }) => <th>{data}</th>;

@@ -34,9 +34,9 @@ export const fetchAPIData = (sourceId, tableName, callback) => (dispatch, getSta
     [ele.name]: true
   }), {}) : {};
   const querySpecification = {
-    columns: Object.keys(columnsSelected).
-      map(col => columnsSelected[col] === true ? col : undefined).
-      filter(col => col !== undefined),
+    columns: Object.keys(columnsSelected)
+      .map(col => columnsSelected[col] === true ? col : undefined)
+      .filter(col => col !== undefined),
     orderBy,
     // filterBy,
     // limit,

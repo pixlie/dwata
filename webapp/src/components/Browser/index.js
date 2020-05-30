@@ -15,7 +15,7 @@ const Browser = ({
   useEffect(() => {
     fetchSchema(sourceId);
     fetchData();
-  }, [sourceId, tableName]);
+  }, [sourceId, tableName, fetchSchema, fetchData]);
   if (!isReady) {
     return (
       <div>Loading...</div>

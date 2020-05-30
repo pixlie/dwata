@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { dataItemURL } from "services/urls";
 import { getItemPartsFromPath } from "utils";
-import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM, LOAD_ITEM_FROM_CACHE } from "./actionTypes";
+import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "./actionTypes";
 
 
 
