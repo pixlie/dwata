@@ -8,10 +8,9 @@ import { getSourceFromPath } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey,
-  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor,
-  isInTable, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
-  showNotes, getApps,
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey, selectedRowList,
+  toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
+  hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified, showNotes, getApps,
 }) => {
   useEffect(() => {
     getApps();
@@ -89,6 +88,20 @@ const Navbar = ({
             <div className="navbar-item">
               <div className="field">
                 <p className="control">
+                  <button className={`button ${selectedRowList.length > 0 ? " is-success" : ""}`} disabled={selectedRowList.length === 0} onClick={handleNotesClick}>
+                    <span className="icon">
+                      <i className="far fa-check-square" />
+                    </span>&nbsp; Actions
+                  </button>
+                </p>
+              </div>
+            </div>
+          ) : null}
+
+          {isInTable ? (
+            <div className="navbar-item">
+              <div className="field">
+                <p className="control">
                   <button className="button" onClick={handleNotesClick}>
                     <span className="icon">
                       <i className="far fa-sticky-note" />
@@ -150,6 +163,7 @@ const mapStateToProps = (state, props) => {
     hasColumnsSpecified,
     hasFiltersSpecified,
     hasOrderingSpecified,
+    selectedRowList: state.browser.selectedRowList,
     pathKey: _browserCacheKey,
   }
 }

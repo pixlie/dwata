@@ -1,4 +1,4 @@
-import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
 const initialState = {
@@ -7,6 +7,7 @@ const initialState = {
   columns: [],
   rows: [],
   querySQL: null,
+  selectedRowList: [],
 
   isFetching: false,
   isReady: false,
@@ -71,6 +72,26 @@ export default (state = initialState, action) => {
         },
       };
     }
+
+    case TOGGLE_ROW_SELECTION:
+      if (state.selectedRowList.includes(action.rowId)) {
+        const temp = state.selectedRowList.indexOf(action.rowId);
+        return {
+          ...state,
+          selectedRowList: [
+            ...state.selectedRowList.slice(0, temp),
+            ...state.selectedRowList.slice(temp + 1)
+          ],
+        };
+      } else {
+        return {
+          ...state,
+          selectedRowList: [
+            ...state.selectedRowList,
+            action.rowId,
+          ]
+        };
+      }
 
     default:
       return {

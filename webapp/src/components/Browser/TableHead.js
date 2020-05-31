@@ -26,6 +26,7 @@ const TableHead = ({isReady, schemaColumns, tableColumns, querySpecificationColu
 
   return (
     <tr>
+      <th>&nbsp;</th>
       {headList}
     </tr>
   );

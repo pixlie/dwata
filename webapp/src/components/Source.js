@@ -23,10 +23,10 @@ const Source = ({source, fetchSource}) => {
     }
     const handleClickSource = event => {
       event.preventDefault();
-      setState({
+      setState(state => ({
         ...state,
         sourceIndex: i,
-      });
+      }));
     };
 
     return (

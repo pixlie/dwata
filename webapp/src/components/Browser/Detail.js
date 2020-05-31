@@ -72,16 +72,16 @@ const cellRenderer = (column, sourceId) => {
     </div>
   );
 
-  const JSONCell = ({ data }) => (
+  const JSONCell = ({data}) => (
     <div className="field">
       <label className="label">{column.name}</label>
       <div className="control">
-        {data !== null ? <div onClick={() => { alert(JSON.stringify(data)); }}>{"{ click to expand }"}</div> : "-"}
+        {data !== null ? <div onClick={() => { alert(JSON.stringify(data)); }}>{"{JSON}"}</div> : "{}"}
       </div>
     </div>
   );
 
-  const TimeStampCell = (({ data }) => {
+  const TimeStampCell = (({data}) => {
     let parsedDate = null;
     if (data !== null) {
       try {
@@ -94,7 +94,7 @@ const cellRenderer = (column, sourceId) => {
       <div className="field">
         <label className="label">{column.name}</label>
         <div className="control">
-          <input className="input" type="text" value={parsedDate === null ? "" : data} disabled />
+          <input className="input" type="text" value={parsedDate === null ? "-" : data} disabled />
         </div>
       </div>
     )

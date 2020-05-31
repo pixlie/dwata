@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import { fetchData } from "services/browser/actions";
+import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
@@ -10,7 +10,7 @@ import TableHead from "./TableHead";
 
 const Browser = ({
   isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
-  querySpecificationColumns, fetchData, fetchSchema
+  querySpecificationColumns, selectedRowList, fetchData, fetchSchema, toggleRowSelection
 }) => {
   useEffect(() => {
     fetchSchema(sourceId);
@@ -23,6 +23,40 @@ const Browser = ({
   }
 
   const rowRendererList = rowRenderer(schemaColumns, tableColumns, querySpecificationColumns);
+  const RowSelectorCell = ({row}) => {
+    const handleRowSelect = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleRowSelection(row[0]);
+    }
+
+    const stopPropagation = event => {
+      event.stopPropagation();
+    }
+
+    return (
+      <td onClick={handleRowSelect}>
+        <input className="checkbox" type="checkbox" onClick={stopPropagation} onChange={handleRowSelect} checked={selectedRowList.includes(row[0])} />
+      </td>
+    );
+  }
+
+  const Row = ({row, index}) => {
+    const handleRowClick = event => {
+      event.preventDefault();
+      history.push(`/browse/${sourceId}/${tableName}/${row[0]}`);
+    }
+
+    return (
+      <tr onClick={handleRowClick}>
+        <RowSelectorCell row={row} />
+        {row.map((cell, j) => {
+          const Cell = rowRendererList[j];
+          return Cell !== null ? <Cell key={`td-${index}-${j}`} data={cell} /> : null;
+        })}
+      </tr>
+    );
+  }
 
   return (
     <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
@@ -32,12 +66,7 @@ const Browser = ({
 
       <tbody>
         {tableRows.map((row, i) => (
-          <tr key={`tr-${i}`} onClick={() => {history.push(`/browse/${sourceId}/${tableName}/${row[0]}`)}}>
-            {row.map((cell, j) => {
-              const Cell = rowRendererList[j];
-              return Cell !== null ? <Cell key={`td-${i}-${j}`} data={cell} /> : null;
-            })}
-          </tr>
+          <Row key={`tr-${i}`} row={row} index={i} />
         ))}
       </tbody>
     </table>
@@ -66,6 +95,7 @@ const mapStateToProps = (state, props) => {
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       tableColumns: state.browser.columns,
       tableRows: state.browser.rows,
+      selectedRowList: state.browser.selectedRowList,
       querySpecificationColumns: state.querySpecification.columnsSelected,
     }
   } else {
@@ -83,5 +113,6 @@ export default withRouter(connect(
   {
     fetchData,
     fetchSchema,
+    toggleRowSelection,
   }
 )(Browser));

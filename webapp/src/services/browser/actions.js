@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { dataURL } from "services/urls";
 import { getSourceFromPath } from "utils";
-import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "./actionTypes";
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
 export const fetchData = callback => (dispatch, getState) => {
@@ -55,4 +55,12 @@ export const fetchData = callback => (dispatch, getState) => {
       console.log("Could not fetch sources. Try again later.");
       console.log(err);
     });
+};
+
+
+export const toggleRowSelection = rowId => dispatch => {
+  dispatch({
+    type: TOGGLE_ROW_SELECTION,
+    rowId,
+  });
 };

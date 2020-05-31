@@ -61,17 +61,17 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
   }, [dataItem]);
   const toggleState = transitionTo => event => {
     event.preventDefault();
-    setState({
+    setState(state => ({
       ...state,
       current: transitionTo,
-    });
+    }));
   }
   const handleChange = event => {
     event.preventDefault();
-    setState({
+    setState(state => ({
       ...state,
       content: event.target.value,
-    });
+    }));
   }
 
   if (!isNoteAppEnabled || !isReady) {
