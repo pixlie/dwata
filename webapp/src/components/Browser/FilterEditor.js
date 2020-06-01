@@ -103,7 +103,7 @@ const mapStateToProps = (state, props) => {
       tableName,
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       filterBy: state.querySpecification.filterBy,
-      isVisible: state.querySpecification.isFEVisible,
+      isVisible: state.global.isFEVisible,
     };
   } else {
     return {

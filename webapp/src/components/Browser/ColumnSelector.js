@@ -71,7 +71,7 @@ const mapStateToProps = (state, props) => {
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       dataColumns: state.browser.columns,
       qsColumns: state.querySpecification.columnsSelected,
-      isVisible: state.querySpecification.isCSVisible,
+      isVisible: state.global.isCSVisible,
     };
   } else {
     return {

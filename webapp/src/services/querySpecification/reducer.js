@@ -1,7 +1,5 @@
 import {
-  TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
-  TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
-  TOGGLE_COLUMN_SELECTION,
+  TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
   INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER,
 } from "./actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
@@ -18,10 +16,6 @@ const initialState = {
   count: undefined,
   limit: undefined,
   offset: undefined,
-
-  isFEVisible: false,
-  isCSVisible: false,
-  isOEVisible: false,
 
   isReady: false,
   _cacheKey: null,
@@ -66,30 +60,6 @@ export default (state = initialState, action) => {
           ...state._cachedData,
           [`${action.sourceId}/${action.tableName}`]: undefined,
         }
-      };
-
-    case TOGGLE_FILTER_EDITOR:
-      return {
-        ...state,
-        isFEVisible: !state.isFEVisible,
-        isCSVisible: false,
-        isOEVisible: false,
-      };
-
-    case TOGGLE_COLUMN_SELECTOR_UI:
-      return {
-        ...state,
-        isCSVisible: !state.isCSVisible,
-        isFEVisible: false,
-        isOEVisible: false,
-      };
-
-    case TOGGLE_SORT_EDITOR:
-      return {
-        ...state,
-        isOEVisible: !state.isOEVisible,
-        isFEVisible: false,
-        isCSVisible: false,
       };
 
     case CHANGE_LIMIT:

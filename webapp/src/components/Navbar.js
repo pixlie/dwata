@@ -2,8 +2,7 @@ import React, { useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { toggleSidebar, showNotes, getApps } from "services/global/actions";
-import { toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/querySpecification/actions";
+import { toggleSidebar, showNotes, getApps, toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/global/actions";
 import { getSourceFromPath } from "utils";
 
 

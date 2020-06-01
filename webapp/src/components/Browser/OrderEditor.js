@@ -86,7 +86,7 @@ const mapStateToProps = (state, props) => {
       isReady,
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       orderBy: state.querySpecification.orderBy,
-      isVisible: state.querySpecification.isOEVisible,
+      isVisible: state.global.isOEVisible,
     };
   } else {
     return {
