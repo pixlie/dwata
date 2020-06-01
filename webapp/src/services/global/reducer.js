@@ -1,28 +1,24 @@
 import {
   TOGGLE_SIDEBAR, TOGGLE_COLUMN_HEAD_SPECIFICATION, SHOW_NOTES_FOR,
-  COMPLETE_FETCH_APP, TOGGLE_ACTIONS, CLOSE_ALL_MODALS,
+  TOGGLE_ACTIONS, CLOSE_ALL_MODALS,
   TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_FILTER_EDITOR, TOGGLE_SORT_EDITOR,
 } from './actionTypes';
-import { transformData } from "utils";
 
 
 const initialState = {
-  isSidebarOn: false,  // Is Sidebar modal On
-  isActionsOn: false,  // Is Actions modal On
+  isSidebarVisible: false,  // Is Sidebar modal On
+  isActionsVisible: false,  // Is Actions modal On
   isFEVisible: false,  // Is FilterEditor modal On
   isCSVisible: false,  // Is ColumnSeletor modal On
   isOEVisible: false,  // Is OrderEditor modal On
-
   activeColumnHeadSpecification: null,  // Which Table Column is selected to show ordering/filter options
-  isNoteAppEnabled: false,  // Is the notes app enabled - as in it's backend is setup
-  noteAppConfig: {},
   showNotesFor: null,  // Any path or identifier to tell the UI how to query notes from API; null means Notes modal is Off
 };
 
 
 const allModalsClosedState = {
-  isSidebarOn: false,
-  isActionsOn: false,
+  isSidebarVisible: false,
+  isActionsVisible: false,
   isFEVisible: false,
   isCSVisible: false,
   isOEVisible: false,
@@ -36,7 +32,7 @@ export default (state = initialState, action) => {
     case TOGGLE_SIDEBAR:
       return {
         ...state,
-        isSidebarOn: !state.isSidebarOn,
+        isSidebarVisible: !state.isSidebarVisible,
       }
 
     case TOGGLE_COLUMN_HEAD_SPECIFICATION:
@@ -52,7 +48,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         ...allModalsClosedState,
-        isActionsOn: !state.isActionsOn,
+        isActionsVisible: !state.isActionsVisible,
       };
 
     case SHOW_NOTES_FOR:
@@ -88,22 +84,6 @@ export default (state = initialState, action) => {
         ...state,
         ...allModalsClosedState,
       };
-
-    case COMPLETE_FETCH_APP:
-      for (const app of action.payload.rows.map(row => transformData(action.payload.columns, row))) {
-        if (app.label === "note") {
-          return {
-            ...state,
-            isNoteAppEnabled: true,
-            noteAppConfig: app.config,
-          };
-        }
-        // Todo: refactor the return to be outside the for loop
-        return {
-          ...state,
-        };
-      }
-      break;
 
     default:
       return state;

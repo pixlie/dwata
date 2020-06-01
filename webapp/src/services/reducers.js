@@ -9,6 +9,7 @@ import browser from "./browser/reducer";
 import dataItem from "./dataItem/reducer";
 import querySpecification from "./querySpecification/reducer";
 import apiBrowser from "./apiBrowser/reducer";
+import apps from "./apps/reducer";
 
 
 export default (history) => combineReducers({
@@ -20,4 +21,5 @@ export default (history) => combineReducers({
   dataItem,
   querySpecification,
   apiBrowser,
+  apps,
 });

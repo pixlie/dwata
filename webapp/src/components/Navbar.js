@@ -2,14 +2,16 @@ import React, { useEffect } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { toggleSidebar, showNotes, getApps, toggleFilterEditor, toggleColumnSelector, toggleSortEditor } from "services/global/actions";
+import { toggleSidebar, showNotes, toggleFilterEditor, toggleColumnSelector,
+  toggleSortEditor, toggleActions } from "services/global/actions";
+import { getApps } from "services/apps/actions";
 import { getSourceFromPath } from "utils";
 
 
 const Navbar = ({
   sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey, selectedRowList,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
-  hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified, showNotes, getApps,
+  hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified, showNotes, getApps, toggleActions
 }) => {
   useEffect(() => {
     getApps();
@@ -17,6 +19,10 @@ const Navbar = ({
   const handleNotesClick = event => {
     event.preventDefault();
     showNotes(pathKey);
+  }
+  const handleActionsClick = event => {
+    event.preventDefault();
+    toggleActions();
   }
 
   return (
@@ -87,7 +93,7 @@ const Navbar = ({
             <div className="navbar-item">
               <div className="field">
                 <p className="control">
-                  <button className={`button ${selectedRowList.length > 0 ? " is-success" : ""}`} disabled={selectedRowList.length === 0} onClick={handleNotesClick}>
+                  <button className={`button ${selectedRowList.length > 0 ? " is-success" : ""}`} disabled={selectedRowList.length === 0} onClick={handleActionsClick}>
                     <span className="icon">
                       <i className="far fa-check-square" />
                     </span>&nbsp; Actions
@@ -177,5 +183,6 @@ export default withRouter(connect(
     toggleSortEditor,
     showNotes,
     getApps,
+    toggleActions,
   }
 )(Navbar));

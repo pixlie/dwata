@@ -17,6 +17,7 @@ import OrderEditor from "components/Browser/OrderEditor";
 import DetailView from "components/Browser/Detail";
 import Paginator from "components/Browser/Paginator";
 import Notes from "components/Notes";
+import Actions from "components/Browser/Actions";
 
 
 export default ({ initialState }) => {
@@ -41,6 +42,7 @@ export default ({ initialState }) => {
             <ColumnSelector />
             <FilterEditor />
             <OrderEditor />
+            <Actions />
             <Browser />
             <Paginator />
           </Route>

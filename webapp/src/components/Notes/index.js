@@ -3,7 +3,8 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
-import { showNotes, fetchNote, saveNote } from "services/global/actions";
+import { showNotes } from "services/global/actions";
+import { fetchNote, saveNote } from "services/apps/actions";
 import { Section } from "components/BulmaHelpers";
 
 
@@ -122,7 +123,8 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
 
 
 const mapStateToProps = state => {
-  const {showNotesFor, isNoteAppEnabled, noteAppConfig} = state.global;
+  const {showNotesFor} = state.global;
+  const {isNoteAppEnabled, noteAppConfig} = state.apps;
   const {source_id: sourceId, table_name: tableName} = noteAppConfig;
   const _cacheKey = `${sourceId}/${tableName}/${showNotesFor}`;
 

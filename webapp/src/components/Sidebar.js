@@ -5,7 +5,7 @@ import { toggleSidebar } from "services/global/actions";
 
 
 const Sidebar = ({ global, toggleSidebar, children }) => {
-  if (global.isSidebarOn) {
+  if (global.isSidebarVisible) {
     return (
       <div id="sidebar">
         <div className="head">

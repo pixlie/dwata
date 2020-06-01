@@ -368,6 +368,18 @@ table {
 }
 
 
+#actions-modal {
+  z-index: 90;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-left: 4px solid #efefef;
+  position: fixed;
+  min-width: 32rem;
+  top: 4rem;
+  right: 1rem;
+}
+
+
 .col-hd-spec-box {
   z-index: 80;
   background-color: #fdf7e3;
