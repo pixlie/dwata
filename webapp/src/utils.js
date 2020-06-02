@@ -56,3 +56,9 @@ export const getItemPartsFromPath = pathname => {
 
   return null;
 }
+
+
+export const getCacheKey = state => {
+  const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
+  return `${sourceId}/${tableName}`;
+};

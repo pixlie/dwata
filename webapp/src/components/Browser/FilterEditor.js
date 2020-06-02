@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
 import { initiateFilter, removeFilter } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
@@ -88,11 +89,12 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
 const mapStateToProps = (state, props) => {
   let { sourceId, tableName } = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
   let isReady = false;
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
-    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+
+  if (state.schema.isReady && state.schema.sourceId === sourceId &&
+    state.browser.isReady && state.browser.cacheKey === cacheKey &&
+    state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
 

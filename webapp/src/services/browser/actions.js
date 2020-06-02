@@ -1,34 +1,33 @@
 import axios from "axios";
 
 import { dataURL } from "services/urls";
-import { getSourceFromPath } from "utils";
+import { getSourceFromPath, getCacheKey } from "utils";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
 export const fetchData = (filterByOverride, callback) => (dispatch, getState) => {
   const state = getState();
   const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
-  const _cacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
 
-  if (state.browser._cacheKey !== _cacheKey) {
-    // The browser reducer is currently not holding data for the page we are at.
-    // Check if cache has our needed data.
-    if (state.browser._cachedData && _cacheKey in state.browser._cachedData) {
-      // We have needed data in cache. Swap that into the state
-      return dispatch({
-        type: LOAD_DATA_FROM_CACHE,
-        sourceId,
-        tableName,
-      });
-    }
+  if (Object.keys(state.listCache).includes(cacheKey)) {
+    // We have needed data in cache. Swap that into the state
+    const {columns, rows, querySQL} = state.listCache[cacheKey];
+    return dispatch({
+      type: LOAD_DATA_FROM_CACHE,
+      payload: {
+        columns,
+        rows,
+        querySQL,
+      },
+    });
   }
 
   dispatch({
     type: INITIATE_FETCH_DATA,
-    sourceId,
-    tableName,
+    cacheKey,
   });
-  const {columnsSelected, orderBy, filterBy, limit, offset} = getState().querySpecification;
+  const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
@@ -47,8 +46,7 @@ export const fetchData = (filterByOverride, callback) => (dispatch, getState) =>
       dispatch({
         type: COMPLETE_FETCH_DATA,
         payload: res.data,
-        sourceId,
-        tableName,
+        cacheKey,
       });
     })
     .catch(err => {

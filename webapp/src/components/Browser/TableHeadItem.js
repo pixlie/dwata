@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
 import { toggleOrderBy, initiateFilter } from "services/querySpecification/actions";
 import { toggleColumnHeadSpecification } from "services/global/actions";
@@ -80,11 +81,12 @@ const TableHeadItem = ({
 
 const mapStateToProps = (state, props) => {
   const {sourceId, tableName} = props.match.params;
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
   let isReady = false;
+
   if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
-    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+    state.browser.isReady && state.browser.cacheKey === cacheKey &&
+    state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
 

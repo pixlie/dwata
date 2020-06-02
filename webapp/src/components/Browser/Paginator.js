@@ -2,6 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
+import { getCacheKey } from "utils";
 import { nextPage, previousPage, gotoPage } from "services/querySpecification/actions";
 
 
@@ -75,9 +76,10 @@ const Paginator = ({isReady, count, limit, offset, handleNext, handlePrevious, g
 const mapStateToProps = (state, props) => {
   let {sourceId, tableName} = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
   let isReady = false;
-  if (state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+
+  if (state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
 

@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { getCacheKey } from "utils";
 import { Section, Hx } from "components/BulmaHelpers";
 import { pinRecords } from "services/apps/actions";
 
@@ -32,11 +33,12 @@ const Actions = ({isReady, isVisible, selectedRowList, pinRecords}) => {
 const mapStateToProps = (state, props) => {
   let { sourceId, tableName } = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
   let isReady = false;
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
-    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+
+  if (state.schema.isReady && state.schema.sourceId === sourceId &&
+    state.browser.isReady && state.browser.cacheKey === cacheKey &&
+    state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
 

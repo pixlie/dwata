@@ -5,6 +5,7 @@ import { connectRouter } from "connected-react-router";
 import global from "./global/reducer";
 import source from "./source/reducer";
 import schema from "./schema/reducer";
+import listCache from "./listCache/reducer";
 import browser from "./browser/reducer";
 import dataItem from "./dataItem/reducer";
 import querySpecification from "./querySpecification/reducer";
@@ -17,6 +18,7 @@ export default (history) => combineReducers({
   global,
   source,
   schema,
+  listCache,
   browser,
   dataItem,
   querySpecification,

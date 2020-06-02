@@ -5,11 +5,11 @@ import { connect } from "react-redux";
 import { toggleSidebar, showNotes, toggleFilterEditor, toggleColumnSelector,
   toggleSortEditor, toggleActions } from "services/global/actions";
 import { getApps } from "services/apps/actions";
-import { getSourceFromPath } from "utils";
+import { getSourceFromPath, getCacheKey } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey, selectedRowList,
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, cacheKey, selectedRowList,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
   isNoteAppEnabled, isRecordPinAppEnabled, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
   showNotes, getApps, toggleActions
@@ -19,7 +19,7 @@ const Navbar = ({
   }, [getApps]);
   const handleNotesClick = event => {
     event.preventDefault();
-    showNotes(pathKey);
+    showNotes(cacheKey);
   }
   const handleActionsClick = event => {
     event.preventDefault();
@@ -150,12 +150,13 @@ const mapStateToProps = (state, props) => {
   let hasColumnsSpecified = false;
   let hasFiltersSpecified = false;
   let hasOrderingSpecified = false;
-  const _browserCacheKey = btoa(`${sourceId}/${tableName}`);
+  const cacheKey = getCacheKey(state);
+
   if (sourceId && tableName) {
     isInTable = true;
     if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-      state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
-      state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+      state.browser.isReady && state.browser.cacheKey === cacheKey &&
+      state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
       hasColumnsSpecified = state.querySpecification.columnsSelected.length !== state.schema.rows.find(x => x.table_name === tableName).columns.length;
       hasFiltersSpecified = Object.keys(state.querySpecification.filterBy).length > 0;
       hasOrderingSpecified = Object.keys(state.querySpecification.orderBy).length > 0;
@@ -174,7 +175,7 @@ const mapStateToProps = (state, props) => {
     hasFiltersSpecified,
     hasOrderingSpecified,
     selectedRowList: state.browser.selectedRowList,
-    pathKey: _browserCacheKey,
+    cacheKey,
     isNoteAppEnabled,
     isRecordPinAppEnabled,
   }

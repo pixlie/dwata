@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchPins } from "services/apps/actions";
 import { fetchSchema } from "services/schema/actions";
@@ -84,15 +85,16 @@ const Browser = ({
 const mapStateToProps = (state, props) => {
   let {sourceId, tableName} = props.match.params;
   sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
+  const cacheKey = getCacheKey(state);
   let isReady = false;
 
   // We are ready only when all the needed data is there
   if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.browser.isReady && state.browser._cacheKey === _browserCacheKey &&
-    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
+    state.browser.isReady && state.browser.cacheKey === cacheKey &&
+    state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
+  console.log(isReady);
 
   if (isReady) {
     return {
