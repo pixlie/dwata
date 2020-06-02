@@ -106,6 +106,7 @@ async def item_post(request: Request):
             "rowcount": exc.rowcount,
         })
     except IntegrityError as e:
+        # Todo: handle error when required fields are not provided
         if hasattr(e, "args") and "UNIQUE constraint failed" in e.args[0]:
             # Todo: update this response status
             return Response("", status_code=404)

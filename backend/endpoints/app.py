@@ -18,6 +18,11 @@ async def app_get(_):
                 "in_use": True,
                 "source_id": 0,
                 "table_name": "admin_meta_note",
+            }],
+            ["record_pin", True, {
+                "in_use": True,
+                "source_id": 0,
+                "table_name": "admin_record_pin",
             }]
         ]
     })
@@ -42,7 +47,7 @@ async def app_setup(request):
         if len([x for x in required_setup_params if x not in setup_params.keys()]) > 0:
             return web_error(
                 error_code="request.params_mismatch",
-                message="Setting up {} app needs parameters that have not been specified"
+                message="Setting up {} app needs parameters that have not been specified".format(app_name)
             )
 
     await getattr(module, "setup_app")(**setup_params)

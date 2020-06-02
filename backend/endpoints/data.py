@@ -1,6 +1,6 @@
 from starlette.responses import Response
 import sqlalchemy
-from sqlalchemy import MetaData, select, column, table, text, func
+from sqlalchemy import MetaData, select, column, table, text, func, or_
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
@@ -35,7 +35,10 @@ def apply_filters(query_specification, sel_obj, current_table, unavailable_colum
             if str(column_def.type) in ["INTEGER", "FLOAT"]:
                 # We can do an equals query or a range query
                 if filter_spec.get("equal", None):
-                    sel_obj = sel_obj.where(column(col) == filter_spec["equal"])
+                    if isinstance(filter_spec["equal"], list):
+                        sel_obj = sel_obj.where(or_(*[(column(col) == x) for x in filter_spec["equal"]]))
+                    else:
+                        sel_obj = sel_obj.where(column(col) == filter_spec["equal"])
                 elif filter_spec.get("from", None) and filter_spec.get("to", None):
                     sel_obj = sel_obj.where(column(col) >= filter_spec["from"])
                     sel_obj = sel_obj.where(column(col) <= filter_spec["to"])
