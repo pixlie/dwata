@@ -34,7 +34,7 @@ const ColumnSelector = ({isReady, isVisible, schemaColumns, qsColumns, dataColum
   return (
     <div id="column-selector">
       <Section>
-        <Hx x="6">Columns</Hx>
+        <Hx x="4">Columns</Hx>
         <div className="field">
           {schemaColumns.map((head, i) => (
             <div key={`col-get-${i}`} className="control">

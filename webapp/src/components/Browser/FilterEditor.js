@@ -64,7 +64,7 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
   return (
     <div id="filter-editor">
       <Section>
-        <Hx x="6">Filters</Hx>
+        <Hx x="4">Filters</Hx>
 
         {filters}
 

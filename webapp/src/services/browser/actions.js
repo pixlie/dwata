@@ -5,7 +5,7 @@ import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
-export const fetchData = callback => (dispatch, getState) => {
+export const fetchData = (filterByOverride, callback) => (dispatch, getState) => {
   const state = getState();
   const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
   const _cacheKey = `${sourceId}/${tableName}`;
@@ -32,7 +32,7 @@ export const fetchData = callback => (dispatch, getState) => {
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
-    filter_by: filterBy,
+    filter_by: filterByOverride ? filterByOverride : filterBy,
     limit,
     offset,
   };
@@ -41,7 +41,7 @@ export const fetchData = callback => (dispatch, getState) => {
     .post(`${dataURL}/${sourceId}/${tableName}`, querySpecification)
     .then(res => {
       if (!!callback) {
-        callback();
+        return callback(res.data);
       }
 
       dispatch({

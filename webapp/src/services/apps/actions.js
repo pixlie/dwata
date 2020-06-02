@@ -1,8 +1,9 @@
 import axios from "axios";
 
-import { appURL, dataItemURL } from "services/urls";
+import { appURL, dataItemURL, dataURL } from "services/urls";
 import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
+import { fetchData } from "services/browser/actions";
 import { COMPLETE_FETCH_APP } from './actionTypes';
 
 
@@ -31,7 +32,7 @@ export const fetchNote = () => (dispatch, getState) => {
   } catch (error) {
     return false;
   }
-  const {isNoteAppEnabled, noteAppConfig} = state.global;
+  const {isNoteAppEnabled, noteAppConfig} = state.apps;
   if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
@@ -80,7 +81,7 @@ export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
   } catch (error) {
     return false;
   }
-  const {isNoteAppEnabled, noteAppConfig} = state.global;
+  const {isNoteAppEnabled, noteAppConfig} = state.apps;
   if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
@@ -97,11 +98,64 @@ export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
   })
     .then(res => {
       if (!!callback) {
-        callback();
+        callback(res);
       }
     })
     .catch(err => {
       console.log("Could not fetch notes. Try again later.");
       console.log(err);
+    });
+};
+
+
+export const pinRecords = () => (dispatch, getState) => {
+  const state = getState();
+  let path = null;
+  try {
+    const {params} = getSourceFromPath(state.router.location.pathname);
+    path = btoa(`${params.sourceId}/${params.tableName}`);
+  } catch (error) {
+    return false;
+  }
+  const {selectedRowList} = state.browser;
+  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
+  if (!isRecordPinAppEnabled || !recordPinAppConfig) {
+    return false;
+  }
+  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
+
+  for (const rowId of selectedRowList) {
+    axios
+    .post(`${dataItemURL}/${sourceId}/${tableName}`, {
+      path,
+      record_id: rowId,
+    });
+  }
+}
+
+
+export const fetchPins = () => (dispatch, getState) => {
+  const state = getState();
+  let path = null;
+  try {
+    const {params} = getSourceFromPath(state.router.location.pathname);
+    path = btoa(`${params.sourceId}/${params.tableName}`);
+  } catch (error) {
+    return false;
+  }
+  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
+  if (!isRecordPinAppEnabled || !recordPinAppConfig) {
+    return false;
+  }
+  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
+
+  axios
+    .post(`${dataURL}/${sourceId}/${tableName}`, {
+      columns: ["id", "path", "record_id"],
+      filterBy: {
+        path: {
+          equal: path,
+        }
+      }
     });
 };

@@ -11,7 +11,8 @@ import { getSourceFromPath } from "utils";
 const Navbar = ({
   sourceId, tableName, schema, isFilterEnabled, isSourceFetching, pathKey, selectedRowList,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
-  hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified, showNotes, getApps, toggleActions
+  isNoteAppEnabled, isRecordPinAppEnabled, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
+  showNotes, getApps, toggleActions
 }) => {
   useEffect(() => {
     getApps();
@@ -105,14 +106,17 @@ const Navbar = ({
 
           {isInTable ? (
             <div className="navbar-item">
-              <div className="field">
-                <p className="control">
+              <div className="buttons has-addons">
+                {isNoteAppEnabled ? (
                   <button className="button" onClick={handleNotesClick}>
-                    <span className="icon">
-                      <i className="far fa-sticky-note" />
-                    </span>&nbsp; Notes
+                    <i className="far fa-sticky-note" />&nbsp; Notes
                   </button>
-                </p>
+                ) : null}
+                {isRecordPinAppEnabled ? (
+                  <Link className="button" to={{search: "?pins=1"}}>
+                    <i className="fas fa-thumbtack" />&nbsp; Pins
+                  </Link>
+                ) : null}
               </div>
             </div>
           ) : null}
@@ -157,6 +161,7 @@ const mapStateToProps = (state, props) => {
       hasOrderingSpecified = Object.keys(state.querySpecification.orderBy).length > 0;
     }
   }
+  const {isNoteAppEnabled, isRecordPinAppEnabled} = state.apps;
 
   return {
     schema: state.schema,
@@ -170,6 +175,8 @@ const mapStateToProps = (state, props) => {
     hasOrderingSpecified,
     selectedRowList: state.browser.selectedRowList,
     pathKey: _browserCacheKey,
+    isNoteAppEnabled,
+    isRecordPinAppEnabled,
   }
 }
 

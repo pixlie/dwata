@@ -3,14 +3,15 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { fetchData, toggleRowSelection } from "services/browser/actions";
+import { fetchPins } from "services/apps/actions";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
 
 
 const Browser = ({
-  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
-  querySpecificationColumns, selectedRowList, fetchData, fetchSchema, toggleRowSelection
+  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history, urlSearch,
+  querySpecificationColumns, selectedRowList, fetchData, fetchSchema, toggleRowSelection, fetchPins,
 }) => {
   useEffect(() => {
     fetchSchema(sourceId);
@@ -20,6 +21,12 @@ const Browser = ({
     return (
       <div>Loading...</div>
     );
+  }
+  if (urlSearch !== null) {
+    const searchParams = new URLSearchParams(urlSearch);
+    if (searchParams.get("pins") === "1") {
+      fetchPins();
+    }
   }
 
   const rowRendererList = rowRenderer(schemaColumns, tableColumns, querySpecificationColumns);
@@ -92,6 +99,7 @@ const mapStateToProps = (state, props) => {
       isReady,
       sourceId,
       tableName,
+      urlSearch: "search" in props.location && props.location.search ? props.location.search : null,
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       tableColumns: state.browser.columns,
       tableRows: state.browser.rows,
@@ -114,5 +122,6 @@ export default withRouter(connect(
     fetchData,
     fetchSchema,
     toggleRowSelection,
+    fetchPins,
   }
 )(Browser));

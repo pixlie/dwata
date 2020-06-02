@@ -20,7 +20,7 @@ const OrderEditor = ({isReady, isVisible, schemaColumns, orderBy, addOrderBy, ch
   return (
     <div id="order-editor">
       <Section>
-        <Hx x="6">Ordering</Hx>
+        <Hx x="4">Ordering</Hx>
 
         {Object.keys(orderBy).map(col => (
           <div className="field is-horizontal" key={`or-${col}`}>
