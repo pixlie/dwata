@@ -1,8 +1,8 @@
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
 import {
   TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
-  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER,
+  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER, LOAD_QS_FROM_CACHE
 } from "./actionTypes";
-import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
 
 /**
@@ -33,6 +33,7 @@ const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
 
 
 export default (state = initialState, action) => {
+  const {cacheKey} = action;
   const setDeltaAndCache = delta => ({
     ...state,
     ...delta,
@@ -47,18 +48,18 @@ export default (state = initialState, action) => {
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
-      if (action.cacheKey === state.cacheKey) {
+      if (cacheKey === state.cacheKey) {
         // No need to initiate multiple times
         return {
-          ...state
+          ...state,
         };
       }
       return {
         ...initialState,
-        cacheKey: action.cacheKey,
+        cacheKey: cacheKey,
         _cachedData: {
           ...state._cachedData,
-          [action.cacheKey]: undefined,
+          [cacheKey]: undefined,
         }
       };
 
@@ -83,7 +84,7 @@ export default (state = initialState, action) => {
       });
 
     case COMPLETE_FETCH_DATA:
-      if (action.cacheKey !== state.cacheKey) {
+      if (cacheKey !== state.cacheKey) {
         // We have a problem, some data race perhaps
         // Todo: tackle this issue if it happens
         console.log("This is a huge problem, please check");
@@ -99,12 +100,18 @@ export default (state = initialState, action) => {
         isReady: true,
       });
 
-    case LOAD_DATA_FROM_CACHE:
-      if (action.cacheKey in state._cachedData) {
+    case LOAD_QS_FROM_CACHE:
+      if (cacheKey === state.cacheKey) {
+        // We already have the correct query specifications loaded, nothing to do
+        return {
+          ...state,
+        }
+      }
+      if (Object.keys(state._cachedData).includes(cacheKey)) {
         // Data found in cache, let us set that cached data to the main state of this reducer
         return {
           ...initialState,
-          ...state._cachedData[action.cacheKey],
+          ...state._cachedData[cacheKey],
           isReady: true,
           _cachedData: {
             ...state._cachedData
@@ -114,10 +121,10 @@ export default (state = initialState, action) => {
       // Requested cacheKey is not in cacheData, we simply initiate fresh data in the state of this reducer
       return {
         ...initialState,
-        cacheKey: action.cacheKey,
+        cacheKey: cacheKey,
         _cachedData: {
           ...state._cachedData,
-          [action.cacheKey]: undefined,
+          [cacheKey]: undefined,
         }
       };
 

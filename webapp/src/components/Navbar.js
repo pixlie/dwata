@@ -3,16 +3,16 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 import { toggleSidebar, showNotes, toggleFilterEditor, toggleColumnSelector,
-  toggleSortEditor, toggleActions } from "services/global/actions";
+  toggleSortEditor, toggleActions, togglePinnedRecords } from "services/global/actions";
 import { getApps } from "services/apps/actions";
 import { getSourceFromPath, getCacheKey } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, cacheKey, selectedRowList,
+  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, cacheKey, selectedRowList, showPinnedRecords,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
   isNoteAppEnabled, isRecordPinAppEnabled, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
-  showNotes, getApps, toggleActions
+  showNotes, getApps, toggleActions, togglePinnedRecords,
 }) => {
   useEffect(() => {
     getApps();
@@ -24,6 +24,10 @@ const Navbar = ({
   const handleActionsClick = event => {
     event.preventDefault();
     toggleActions();
+  }
+  const handlePinClick = event => {
+    event.preventDefault();
+    togglePinnedRecords();
   }
 
   return (
@@ -113,9 +117,9 @@ const Navbar = ({
                   </button>
                 ) : null}
                 {isRecordPinAppEnabled ? (
-                  <Link className="button" to={{search: "?pins=1"}}>
+                  <button className={`button${showPinnedRecords ? " is-success" : ""}`} onClick={handlePinClick}>
                     <i className="fas fa-thumbtack" />&nbsp; Pins
-                  </Link>
+                  </button>
                 ) : null}
               </div>
             </div>
@@ -178,6 +182,7 @@ const mapStateToProps = (state, props) => {
     cacheKey,
     isNoteAppEnabled,
     isRecordPinAppEnabled,
+    showPinnedRecords: state.global.showPinnedRecords,
   }
 }
 
@@ -192,5 +197,6 @@ export default withRouter(connect(
     showNotes,
     getApps,
     toggleActions,
+    togglePinnedRecords,
   }
 )(Navbar));

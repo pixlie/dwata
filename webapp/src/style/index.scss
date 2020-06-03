@@ -171,6 +171,10 @@ table {
   tbody {
     tr {
       cursor: pointer;
+
+      &.is-pin {
+        background-color: #efefef;
+      }
     }
   }
 }

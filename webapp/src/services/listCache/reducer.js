@@ -1,4 +1,5 @@
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
+import { INITIATE_FETCH_DATA_TO_CACHE, COMPLETE_FETCH_DATA_TO_CACHE } from "./actionTypes";
 
 
 const initialState = {
@@ -17,6 +18,7 @@ export default (state = {}, action) => {
   const {cacheKey} = action;  // This is a hash made of how the query is being made to API including pagination
 
   switch (action.type) {
+    case INITIATE_FETCH_DATA_TO_CACHE:
     case INITIATE_FETCH_DATA:
       /* if (Object.keys(state).includes(cacheKey)) {
         return {
@@ -34,7 +36,8 @@ export default (state = {}, action) => {
         },
       };
 
-    case COMPLETE_FETCH_DATA: {
+    case COMPLETE_FETCH_DATA_TO_CACHE:
+    case COMPLETE_FETCH_DATA:
       /* if (Object.keys(state).includes(cacheKey)) {
         // Append to existing data for this cacheKey
         return {
@@ -62,7 +65,6 @@ export default (state = {}, action) => {
           isReady: true,
         }
       }
-    }
 
     default:
       return {

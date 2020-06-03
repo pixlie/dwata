@@ -59,6 +59,17 @@ export const getItemPartsFromPath = pathname => {
 
 
 export const getCacheKey = state => {
-  const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
+  if (state.router && state.router.location && state.router.location.pathname) {
+    const fromPath = getSourceFromPath(state.router.location.pathname);
+    if (fromPath) {
+      const {params: {sourceId, tableName}} = fromPath;
+      return `${sourceId}/${tableName}`;
+    }
+  }
+  return null;
+};
+
+
+export const createCacheKeyFromParts = (sourceId, tableName) => {
   return `${sourceId}/${tableName}`;
 };

@@ -1,6 +1,6 @@
 import {
   TOGGLE_SIDEBAR, TOGGLE_COLUMN_HEAD_SPECIFICATION, SHOW_NOTES_FOR,
-  TOGGLE_ACTIONS, CLOSE_ALL_MODALS,
+  TOGGLE_ACTIONS, TOGGLE_PINNED_RECORDS, CLOSE_ALL_MODALS,
   TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_FILTER_EDITOR, TOGGLE_SORT_EDITOR,
 } from './actionTypes';
 
@@ -13,6 +13,7 @@ const initialState = {
   isOEVisible: false,  // Is OrderEditor modal On
   activeColumnHeadSpecification: null,  // Which Table Column is selected to show ordering/filter options
   showNotesFor: null,  // Any path or identifier to tell the UI how to query notes from API; null means Notes modal is Off
+  showPinnedRecords: false,
 };
 
 
@@ -79,7 +80,14 @@ export default (state = initialState, action) => {
         isOEVisible: !state.isOEVisible,
       };
   
-    case CLOSE_ALL_MODALS:
+    case TOGGLE_PINNED_RECORDS:
+      console.log(state.showPinnedRecords);
+      return {
+        ...state,
+        showPinnedRecords: !state.showPinnedRecords,
+      };
+
+      case CLOSE_ALL_MODALS:
       return {
         ...state,
         ...allModalsClosedState,

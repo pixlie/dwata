@@ -2,10 +2,11 @@ import axios from "axios";
 
 import { dataURL } from "services/urls";
 import { getSourceFromPath, getCacheKey } from "utils";
+import { LOAD_QS_FROM_CACHE } from "services/querySpecification/actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
-export const fetchData = (filterByOverride, callback) => (dispatch, getState) => {
+export const fetchData = (callback) => (dispatch, getState) => {
   const state = getState();
   const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
   const cacheKey = getCacheKey(state);
@@ -13,13 +14,17 @@ export const fetchData = (filterByOverride, callback) => (dispatch, getState) =>
   if (Object.keys(state.listCache).includes(cacheKey)) {
     // We have needed data in cache. Swap that into the state
     const {columns, rows, querySQL} = state.listCache[cacheKey];
-    return dispatch({
+    dispatch({
       type: LOAD_DATA_FROM_CACHE,
       payload: {
         columns,
         rows,
         querySQL,
       },
+    });
+    dispatch({
+      type: LOAD_QS_FROM_CACHE,
+      cacheKey,
     });
   }
 
@@ -31,7 +36,7 @@ export const fetchData = (filterByOverride, callback) => (dispatch, getState) =>
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
-    filter_by: filterByOverride ? filterByOverride : filterBy,
+    filter_by: filterBy,
     limit,
     offset,
   };

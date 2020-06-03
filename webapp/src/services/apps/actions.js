@@ -1,10 +1,11 @@
 import axios from "axios";
 
-import { appURL, dataItemURL, dataURL } from "services/urls";
+import { appURL, dataItemURL } from "services/urls";
 import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
-import { fetchData } from "services/browser/actions";
-import { COMPLETE_FETCH_APP } from './actionTypes';
+import { fetchDataToCache } from "services/listCache/actions";
+import { COMPLETE_FETCH_APP } from "./actionTypes";
+import { getRecordPinAppConfig } from "./getters";
 
 
 export const getApps = () => dispatch => {
@@ -118,11 +119,7 @@ export const pinRecords = () => (dispatch, getState) => {
     return false;
   }
   const {selectedRowList} = state.browser;
-  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
-  if (!isRecordPinAppEnabled || !recordPinAppConfig) {
-    return false;
-  }
-  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
+  const {sourceId, tableName} = getRecordPinAppConfig(state);
 
   for (const rowId of selectedRowList) {
     axios
@@ -136,26 +133,13 @@ export const pinRecords = () => (dispatch, getState) => {
 
 export const fetchPins = () => (dispatch, getState) => {
   const state = getState();
-  let path = null;
-  try {
-    const {params} = getSourceFromPath(state.router.location.pathname);
-    path = btoa(`${params.sourceId}/${params.tableName}`);
-  } catch (error) {
-    return false;
-  }
-  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
-  if (!isRecordPinAppEnabled || !recordPinAppConfig) {
-    return false;
-  }
-  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
+  const {sourceId, tableName, cacheKey} = getRecordPinAppConfig(state);
 
-  axios
-    .post(`${dataURL}/${sourceId}/${tableName}`, {
-      columns: ["id", "path", "record_id"],
-      filterBy: {
-        path: {
-          equal: path,
-        }
-      }
-    });
+  dispatch(fetchDataToCache(
+    sourceId,
+    tableName,
+    cacheKey, {
+      columnsSelected: ["id", "path", "record_id"],
+    }
+  ));
 };

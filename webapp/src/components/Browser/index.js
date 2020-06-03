@@ -1,33 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Fragment } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchPins } from "services/apps/actions";
+import { getPinsFromCache } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
 
 
 const Browser = ({
-  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history, urlSearch,
-  querySpecificationColumns, selectedRowList, fetchData, fetchSchema, toggleRowSelection, fetchPins,
+  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
+  querySpecificationColumns, selectedRowList, showPinnedRecords, pins,
+  fetchData, fetchSchema, toggleRowSelection, fetchPins,
 }) => {
   useEffect(() => {
     fetchSchema(sourceId);
     fetchData();
   }, [sourceId, tableName, fetchSchema, fetchData]);
+  useEffect(() => {
+    if (isReady && showPinnedRecords) {
+      fetchPins();
+    }
+  }, [isReady, showPinnedRecords, fetchPins]);
+
   if (!isReady) {
     return (
       <div>Loading...</div>
     );
-  }
-  if (urlSearch !== null) {
-    const searchParams = new URLSearchParams(urlSearch);
-    if (searchParams.get("pins") === "1") {
-      fetchPins();
-    }
   }
 
   const rowRendererList = rowRenderer(schemaColumns, tableColumns, querySpecificationColumns);
@@ -49,14 +51,14 @@ const Browser = ({
     );
   }
 
-  const Row = ({row, index}) => {
+  const Row = ({row, index, pinned = false}) => {
     const handleRowClick = event => {
       event.preventDefault();
       history.push(`/browse/${sourceId}/${tableName}/${row[0]}`);
     }
 
     return (
-      <tr onClick={handleRowClick}>
+      <tr onClick={handleRowClick} className={pinned ? "is-pin" : ""}>
         <RowSelectorCell row={row} />
         {row.map((cell, j) => {
           const Cell = rowRendererList[j];
@@ -65,6 +67,7 @@ const Browser = ({
       </tr>
     );
   }
+  const pinnedRowIds = pins && pins.length > 0 ? pins.map(x => x[2]) : null;
 
   return (
     <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
@@ -73,6 +76,13 @@ const Browser = ({
       </thead>
 
       <tbody>
+        {pinnedRowIds && showPinnedRecords ? (
+          <Fragment>
+            {tableRows.filter(x => pinnedRowIds.includes(x[0])).map((row, i) => (
+              <Row key={`tr-${i}`} row={row} index={i} pinned />
+            ))}
+          </Fragment>
+        ) : null}
         {tableRows.map((row, i) => (
           <Row key={`tr-${i}`} row={row} index={i} />
         ))}
@@ -94,19 +104,25 @@ const mapStateToProps = (state, props) => {
     state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;
   }
-  console.log(isReady);
+  let pins = [];
+  try {
+    pins = getPinsFromCache(state);
+  } catch (error) {
+    // Do nothing for now
+  }
 
   if (isReady) {
     return {
       isReady,
       sourceId,
       tableName,
-      urlSearch: "search" in props.location && props.location.search ? props.location.search : null,
       schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
       tableColumns: state.browser.columns,
       tableRows: state.browser.rows,
       selectedRowList: state.browser.selectedRowList,
       querySpecificationColumns: state.querySpecification.columnsSelected,
+      showPinnedRecords: state.global.showPinnedRecords,
+      pins,
     }
   } else {
     return {
