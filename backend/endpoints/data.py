@@ -1,6 +1,6 @@
 from starlette.responses import Response
 import sqlalchemy
-from sqlalchemy import MetaData, select, column, table, text, func, or_
+from sqlalchemy import MetaData, select, table, text, func, or_
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
@@ -36,34 +36,36 @@ def apply_filters(query_specification, sel_obj, current_table, unavailable_colum
                 # We can do an equals query or a range query
                 if filter_spec.get("equal", None):
                     if isinstance(filter_spec["equal"], list):
-                        sel_obj = sel_obj.where(or_(*[(column(col) == x) for x in filter_spec["equal"]]))
+                        sel_obj = sel_obj.where(
+                            or_(*[(getattr(current_table.c, col) == x) for x in filter_spec["equal"]])
+                        )
                     else:
-                        sel_obj = sel_obj.where(column(col) == filter_spec["equal"])
+                        sel_obj = sel_obj.where(getattr(current_table.c, col) == filter_spec["equal"])
                 elif filter_spec.get("from", None) and filter_spec.get("to", None):
-                    sel_obj = sel_obj.where(column(col) >= filter_spec["from"])
-                    sel_obj = sel_obj.where(column(col) <= filter_spec["to"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) >= filter_spec["from"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) <= filter_spec["to"])
                 elif filter_spec.get("from", None) and not filter_spec.get("to", None):
-                    sel_obj = sel_obj.where(column(col) >= filter_spec["from"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) >= filter_spec["from"])
                 elif filter_spec.get("to", None) and not filter_spec.get("from", None):
-                    sel_obj = sel_obj.where(column(col) <= filter_spec["to"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) <= filter_spec["to"])
             elif "VARCHAR" in str(column_def.type):
                 if filter_spec.get("like", None):
-                    sel_obj = sel_obj.where(column(col).ilike("%{}%".format(filter_spec["like"])))
+                    sel_obj = sel_obj.where(getattr(current_table.c, col).ilike("%{}%".format(filter_spec["like"])))
             elif "TIMESTAMP" in str(column_def.type):
                 if filter_spec.get("equal", None):
-                    sel_obj = sel_obj.where(column(col) == filter_spec["equal"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) == filter_spec["equal"])
                 elif filter_spec.get("from", None) and filter_spec.get("to", None):
-                    sel_obj = sel_obj.where(column(col) >= filter_spec["from"])
-                    sel_obj = sel_obj.where(column(col) <= filter_spec["to"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) >= filter_spec["from"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) <= filter_spec["to"])
                 elif filter_spec.get("from", None) and not filter_spec.get("to", None):
-                    sel_obj = sel_obj.where(column(col) >= filter_spec["from"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) >= filter_spec["from"])
                 elif filter_spec.get("to", None) and not filter_spec.get("from", None):
-                    sel_obj = sel_obj.where(column(col) <= filter_spec["to"])
+                    sel_obj = sel_obj.where(getattr(current_table.c, col) <= filter_spec["to"])
             elif str(column_def.type) == "BOOLEAN" and filter_spec.get("value", None) is not None:
                 if filter_spec["value"] is True:
-                    sel_obj = sel_obj.where(column(col))
+                    sel_obj = sel_obj.where(getattr(current_table.c, col))
                 else:
-                    sel_obj = sel_obj.where(~column(col))
+                    sel_obj = sel_obj.where(~getattr(current_table.c, col))
     return sel_obj
 
 
@@ -102,8 +104,9 @@ async def data_post(request):
     current_table = meta.tables[table_name]
     if len(query_specification.get("columns", [])) > 0:
         # If there is an "id" column then it is always included, the UI hides it as needed
-        columns = [column("id")] if "id" not in query_specification["columns"] and "id" in table_column_names else []
-        columns = columns + [column(col) for col in table_column_names
+        columns = [getattr(current_table.c, "id")] if\
+            ("id" not in query_specification["columns"] and "id" in table_column_names) else []
+        columns = columns + [getattr(current_table.c, col) for col in table_column_names
                              if col in query_specification["columns"] and col not in unavailable_columns]
     else:
         # If we have not been asked to show specific columns then we do not send columns which are
@@ -112,11 +115,11 @@ async def data_post(request):
             column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
             if col not in unavailable_columns
         ] if "is_meta" in col["ui_hints"]]
-        columns = [column("id")] + [column(col) for col in table_column_names
-                                    if col not in unavailable_columns and col not in meta_data_column_names]
+        columns = [getattr(current_table.c, "id")] +\
+                  [getattr(current_table.c, col) for col in table_column_names
+                   if col not in unavailable_columns and col not in meta_data_column_names]
 
     sel_obj = select(columns)
-    sel_obj = sel_obj.select_from(table(table_name))
     if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     if query_specification.get("filter_by", None):
@@ -124,14 +127,14 @@ async def data_post(request):
     sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
     exc = conn.execute(sel_obj)
+    rows = exc.cursor.fetchall()
 
     # We use a separate query to count the total number of rows in the given query
-    count_sel_obj = select([func.count(text("*"))]).select_from(table(table_name))
+    count_sel_obj = select([func.count(getattr(current_table.c, "id"))])
     if query_specification.get("filter_by", None):
         count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
                                       unavailable_columns=unavailable_columns)
     count = conn.execute(count_sel_obj).scalar()
-    rows = exc.cursor.fetchall()
     conn.close()
 
     return RapidJSONResponse(
