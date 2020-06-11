@@ -14,6 +14,7 @@ const initialState = {
   activeColumnHeadSpecification: null,  // Which Table Column is selected to show ordering/filter options
   showNotesFor: null,  // Any path or identifier to tell the UI how to query notes from API; null means Notes modal is Off
   showPinnedRecords: false,
+  isUnifiedQuerySpecification: true,  // A view like Kanban may have multiple query specs, one per column, so no buttons on top nav
 };
 
 
