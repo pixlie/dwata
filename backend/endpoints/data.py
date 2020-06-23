@@ -1,6 +1,6 @@
 from starlette.responses import Response
 import sqlalchemy
-from sqlalchemy import MetaData, select, table, text, func, or_
+from sqlalchemy import MetaData, select, func, or_
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
