@@ -13,7 +13,6 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
   const dataType = schemaColumns.find(x => x.name === columnName);
 
   const handleChange = event => {
-    event.preventDefault();
     const {name, value, dataset} = event.target;
 
     const temp = {};
@@ -47,7 +46,12 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
         temp["to"] = value;
       }
     } else if (dataType.type === "BOOLEAN") {
-      temp["value"] = value === "true" ? true : false;
+      temp["value"] = null;
+      if (value === "true") {
+        temp["value"] = true;
+      } else if (value === "false") {
+        temp["value"] = false;
+      }
     }
   
     setFilter(name, temp);
@@ -88,7 +92,7 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
           <input className="input" name={columnName} data-meta="to" type="datetime-local" onChange={handleChange} value={filterBy[columnName].to} />
         </div>
       </Fragment>
-    )
+    );
   } else if (dataType.type === "BOOLEAN") {
     return (
       <div className="control is-narrow">

@@ -128,7 +128,7 @@ export const pinRecords = () => (dispatch, getState) => {
       record_id: rowId,
     });
   }
-}
+};
 
 
 export const fetchPins = () => (dispatch, getState) => {
@@ -143,3 +143,35 @@ export const fetchPins = () => (dispatch, getState) => {
     }
   ));
 };
+
+
+export const saveQuerySpecification = (label, pk) => (dispatch, getState) => {
+  const state = getState();
+  let path = null;
+  try {
+    const {params} = getSourceFromPath(state.router.location.pathname);
+    path = btoa(`${params.sourceId}/${params.tableName}`);
+  } catch (error) {
+    return false;
+  }
+  const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
+  if (!isSavedQuerySpecificationAppEnabled || !savedQuerySpecificationAppConfig) {
+    return false;
+  }
+  const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
+  const url = pk !== null ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
+
+  return axios({
+    method: pk !== null ? "put" : "post",
+    url,
+    data: {
+      path,
+    }
+  })
+    .then(res => {
+    })
+    .catch(err => {
+      console.log("Could not fetch notes. Try again later.");
+      console.log(err);
+    });
+}

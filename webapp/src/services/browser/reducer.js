@@ -15,10 +15,16 @@ const initialState = {
 
 export default (state = initialState, action) => {
   const {cacheKey} = action;
+  if (!cacheKey) {
+    return {
+      ...state,
+    };
+  }
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
       if (state.cacheKey === cacheKey) {
+        // No need to initiate multiple times
         return {
           ...state
         };
@@ -26,6 +32,7 @@ export default (state = initialState, action) => {
       return {
         ...initialState,
         isFetching: true,
+        cacheKey,
       };
 
     case COMPLETE_FETCH_DATA: {
@@ -43,9 +50,7 @@ export default (state = initialState, action) => {
     case LOAD_DATA_FROM_CACHE: {
       return {
         ...initialState,
-        columns: action.payload.columns,
-        rows: action.payload.rows,  // Here we do not transform data into maps/dicts
-        querySQL: action.payload.querySQL,
+        ...action.payload,
         isFetching: false,
         isReady: true,
         cacheKey,

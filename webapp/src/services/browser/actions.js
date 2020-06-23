@@ -13,19 +13,33 @@ export const fetchData = (callback) => (dispatch, getState) => {
 
   if (Object.keys(state.listCache).includes(cacheKey)) {
     // We have needed data in cache. Swap that into the state
-    const {columns, rows, querySQL} = state.listCache[cacheKey];
+    const {columns, rows, querySQL, selectedRowList} = state.listCache[cacheKey];
     dispatch({
       type: LOAD_DATA_FROM_CACHE,
+      cacheKey,
       payload: {
         columns,
         rows,
         querySQL,
+        selectedRowList,
       },
     });
-    dispatch({
-      type: LOAD_QS_FROM_CACHE,
-      cacheKey,
-    });
+    if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
+      const {columnsSelected, filterBy, orderBy, count, limit, offset} = state.querySpecificationCache[cacheKey];
+      dispatch({
+        type: LOAD_QS_FROM_CACHE,
+        cacheKey,
+        payload: {
+          columnsSelected,
+          filterBy,
+          orderBy,
+          count,
+          limit,
+          offset,
+        },
+      });
+    }
+    return;
   }
 
   dispatch({

@@ -79,7 +79,11 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
           </div>
         </div>
 
-        <button className="button is-fullwidth is-success" onClick={handleSubmit}>Apply</button>
+        <div className="buttons">
+          <button className="button is-success" onClick={handleSubmit}>Apply</button>
+          <button className="button is-success" onClick={() => {}}>Save</button>
+          <button className="button is-success" onClick={() => {}}>Start funnel</button>
+        </div>
       </Section>
     </div>
   );

@@ -16,19 +16,15 @@ const initialState = {
 
 export default (state = {}, action) => {
   const {cacheKey} = action;  // This is a hash made of how the query is being made to API including pagination
+  if (!cacheKey) {
+    return {
+      ...state
+    };
+  }
 
   switch (action.type) {
     case INITIATE_FETCH_DATA_TO_CACHE:
     case INITIATE_FETCH_DATA:
-      /* if (Object.keys(state).includes(cacheKey)) {
-        return {
-          ...state,
-          [cacheKey]: {
-            ...state.cacheKey,
-            isFetching: true,
-          },
-        };
-      } */
       return {
         ...state,
         [cacheKey]: {
@@ -38,22 +34,6 @@ export default (state = {}, action) => {
 
     case COMPLETE_FETCH_DATA_TO_CACHE:
     case COMPLETE_FETCH_DATA:
-      /* if (Object.keys(state).includes(cacheKey)) {
-        // Append to existing data for this cacheKey
-        return {
-          ...state,
-          [cacheKey]: {
-            rows: [
-              ...state.cacheKey.rows,
-              ...action.payload.rows,  // Here we do not transform data into maps/dicts
-            ],
-            querySQL: action.payload.query_sql,
-            isFetching: false,
-            isReady: true,
-            lastFetchedAt: Math.round((new Date()).getTime() / 1000),
-          }
-        }
-      } */
       return {
         ...state,
         [cacheKey]: {

@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
@@ -9,7 +9,6 @@ import { getPinsFromCache } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import { Hx } from "components/BulmaHelpers";
 import rowRenderer from "./rowRenderer";
-// import TableHead from "./TableHead";
 
 
 const Kanban = ({
@@ -68,7 +67,7 @@ const Kanban = ({
       </div>
     );
   }
-  const pinnedRowIds = pins && pins.length > 0 ? pins.map(x => x[2]) : null;
+  // const pinnedRowIds = pins && pins.length > 0 ? pins.map(x => x[2]) : null;
 
   return (
     <div className="container">

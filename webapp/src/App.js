@@ -11,7 +11,7 @@ import Sidebar from "components/Sidebar";
 import Home from "components/Home";
 import Grid from "components/Grid";
 import DetailView from "components/Detail";
-import Kanban from "components/Kanban";
+import Funnel from "components/Funnel";
 import APIBrowser from "components/APIBrowser";
 import ColumnSelector from "components/QueryEditor/ColumnSelector";
 import FilterEditor from "components/QueryEditor/FilterEditor";
@@ -53,8 +53,7 @@ export default ({ initialState }) => {
             <FilterEditor />
             <OrderEditor />
             <Actions />
-            {/* <Grid /> */}
-            <Kanban />
+            <Funnel />
             <Paginator />
           </Route>
 
