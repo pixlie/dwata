@@ -1,8 +1,9 @@
 import axios from "axios";
+import _ from "lodash";
 
 import { dataURL } from "services/urls";
 import { getSourceFromPath, getCacheKey } from "utils";
-import { LOAD_QS_FROM_CACHE } from "services/querySpecification/actionTypes";
+import { LOAD_QS_FROM_CACHE, LAST_QUERY_SPECIFICATION } from "services/querySpecification/actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
@@ -10,43 +11,49 @@ export const fetchData = (callback) => (dispatch, getState) => {
   const state = getState();
   const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
   const cacheKey = getCacheKey(state);
+  const {columnsSelected, orderBy, filterBy, limit, offset, lastQuerySpecification} = state.querySpecification;
 
   if (Object.keys(state.listCache).includes(cacheKey)) {
-    // We have needed data in cache. Swap that into the state
-    const {columns, rows, querySQL, selectedRowList} = state.listCache[cacheKey];
-    dispatch({
-      type: LOAD_DATA_FROM_CACHE,
-      cacheKey,
-      payload: {
-        columns,
-        rows,
-        querySQL,
-        selectedRowList,
-      },
-    });
-    if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
-      const {columnsSelected, filterBy, orderBy, count, limit, offset} = state.querySpecificationCache[cacheKey];
+    // We have needed data in cache.
+    // Let's check if the last Query Specification is same as what user wants now
+    if (_.isEqual({
+      columnsSelected, orderBy, filterBy, limit, offset
+    }, lastQuerySpecification)) {
+      // OK so the Query Specification has not changed, let's load the data from cache
+      const {columns, rows, querySQL, selectedRowList} = state.listCache[cacheKey];
       dispatch({
-        type: LOAD_QS_FROM_CACHE,
+        type: LOAD_DATA_FROM_CACHE,
         cacheKey,
         payload: {
-          columnsSelected,
-          filterBy,
-          orderBy,
-          count,
-          limit,
-          offset,
+          columns,
+          rows,
+          querySQL,
+          selectedRowList,
         },
       });
+      if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
+        const {columnsSelected, filterBy, orderBy, count, limit, offset} = state.querySpecificationCache[cacheKey];
+        dispatch({
+          type: LOAD_QS_FROM_CACHE,
+          cacheKey,
+          payload: {
+            columnsSelected,
+            filterBy,
+            orderBy,
+            count,
+            limit,
+            offset,
+          },
+        });
+      }
+      return;  
     }
-    return;
   }
 
   dispatch({
     type: INITIATE_FETCH_DATA,
     cacheKey,
   });
-  const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
   const querySpecification = {
     columns: columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
@@ -65,6 +72,11 @@ export const fetchData = (callback) => (dispatch, getState) => {
       dispatch({
         type: COMPLETE_FETCH_DATA,
         payload: res.data,
+        cacheKey,
+      });
+      dispatch({
+        type: LAST_QUERY_SPECIFICATION,
+        payload: querySpecification,
         cacheKey,
       });
     })

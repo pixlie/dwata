@@ -6,6 +6,7 @@ const initialState = {
   columns: [],
   rows: [],
   querySQL: null,
+  selectedRowList: [],
 
   isFetching: false,
   isReady: false,

@@ -57,6 +57,10 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
     setFilter(name, temp);
   }
 
+  if (!Object.keys(filterBy).includes(columnName)) {
+    return null;
+  }
+
   if (dataType.type === "INTEGER" || dataType.type === "FLOAT") {
     return (
       <div className="control">

@@ -1,7 +1,8 @@
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
 import {
   TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
-  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER, LOAD_QS_FROM_CACHE
+  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER, LOAD_QS_FROM_CACHE,
+  LAST_QUERY_SPECIFICATION
 } from "./actionTypes";
 
 
@@ -19,19 +20,23 @@ const initialState = {
 
   isReady: false,
   cacheKey: null,
+
+  // This is needed to check if user altered the spec so as to demand new data fetch
+  lastQuerySpecification: {},
 };
 
 
 export default (state = initialState, action) => {
   const {cacheKey} = action;
-  if (!cacheKey) {
-    return {
-      ...state,
-    };
-  }
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
+      if (!cacheKey) {
+        return {
+          ...state,
+        };
+      }
+    
       if (cacheKey === state.cacheKey) {
         // No need to initiate multiple times
         return {
@@ -68,6 +73,12 @@ export default (state = initialState, action) => {
       };
 
     case COMPLETE_FETCH_DATA:
+      if (!cacheKey) {
+        return {
+          ...state,
+        };
+      }
+    
       if (cacheKey !== state.cacheKey) {
         // We have a problem, some data race perhaps
         // Todo: tackle this issue if it happens
@@ -86,6 +97,12 @@ export default (state = initialState, action) => {
       };
 
     case LOAD_QS_FROM_CACHE:
+      if (!cacheKey) {
+        return {
+          ...state,
+        };
+      }
+    
       return {
         ...initialState,
         ...action.payload,
@@ -129,7 +146,7 @@ export default (state = initialState, action) => {
       }
 
     case INITIATE_QUERY_FILTER:
-      if (action.columnName in state.filterBy) {
+      if (Object.keys(state.filterBy).includes(action.columnName)) {
         return {
           ...state,
         };
@@ -181,6 +198,14 @@ export default (state = initialState, action) => {
       return {
         ...state,
         filterBy: Object.keys(state.filterBy).reduce(reducer, {}),
+      };
+
+    case LAST_QUERY_SPECIFICATION:
+      return {
+        ...state,
+        lastQuerySpecification: {
+          ...action.payload,
+        },
       };
 
     default:
