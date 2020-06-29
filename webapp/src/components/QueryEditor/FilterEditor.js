@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { Fragment, useState } from 'react';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
+import { saveQuerySpecification } from "services/apps/actions";
 import { initiateFilter, removeFilter } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
 
-const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData}) => {
+const FilterEditor = ({
+  isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData,
+  saveQuerySpecification
+}) => {
+  const [state, setState] = useState({
+    isSavingFilters: false,
+    savedFiltersLabel: "",
+  });
+
   if (!isReady || !isVisible) {
     return null;
   }
-
   const addFilter = event => {
     event.preventDefault();
     const {value} = event.target;
@@ -62,6 +70,32 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
     fetchData();
   };
 
+  const handleSaveFilters = event => {
+    if (state.isSavingFilters) {
+      saveQuerySpecification(state.savedFiltersLabel);
+    } else {
+      setState(state => ({
+        ...state,
+        isSavingFilters: true,
+      }));
+    }
+  }
+
+  const cancelSaveFilters = event => {
+    setState(state => ({
+      ...state,
+      isSavingFilters: false,
+    }));
+  }
+
+  const handleSavedFilterLabelChange = event => {
+    const { value } = event.target;
+    setState(state => ({
+      ...state,
+      savedFiltersLabel: value,
+    }));
+  }
+
   return (
     <div id="filter-editor">
       <Section>
@@ -79,10 +113,27 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
           </div>
         </div>
 
+        {state.isSavingFilters ? (
+          <div className="field">
+            <div className="control">
+              <input className="input" onChange={handleSavedFilterLabelChange} value={state.savedFiltersLabel} placeholder="Label for this filter(s)" />
+            </div>
+          </div>
+        ) : null}
+
         <div className="buttons">
-          <button className="button is-success" onClick={handleSubmit}>Apply</button>
-          <button className="button is-success" onClick={() => {}}>Save</button>
-          <button className="button is-success" onClick={() => {}}>Start funnel</button>
+          {state.isSavingFilters ? (
+            <Fragment>
+              <button className="button is-success" onClick={handleSaveFilters}>Save Filter(s)</button>
+              <button className="button is-white" onClick={cancelSaveFilters}>Cancel</button>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <button className="button is-success" onClick={handleSubmit}>Apply</button>
+              <button className="button is-success" onClick={handleSaveFilters}>Save Filter(s)</button>
+              <button className="button is-success" onClick={() => {}}>Start funnel</button>
+            </Fragment>
+          )}
         </div>
       </Section>
     </div>
@@ -125,5 +176,6 @@ export default withRouter(connect(
     initiateFilter,
     removeFilter,
     fetchData,
+    saveQuerySpecification,
   }
 )(FilterEditor));

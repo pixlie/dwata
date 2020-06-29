@@ -5,7 +5,7 @@ import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
 import { fetchDataToCache } from "services/listCache/actions";
 import { COMPLETE_FETCH_APP } from "./actionTypes";
-import { getRecordPinAppConfig } from "./getters";
+import { getRecordPinAppConfig, getSavedQuerySpecificationAppConfig } from "./getters";
 
 
 export const getApps = () => dispatch => {
@@ -147,31 +147,35 @@ export const fetchPins = () => (dispatch, getState) => {
 
 export const saveQuerySpecification = (label, pk) => (dispatch, getState) => {
   const state = getState();
-  let path = null;
+  const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
+  const {sourceId, tableName} = getSavedQuerySpecificationAppConfig(state);
+  const url = !!pk ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
+
   try {
     const {params} = getSourceFromPath(state.router.location.pathname);
-    path = btoa(`${params.sourceId}/${params.tableName}`);
+    return axios({
+      method: !!pk ? "put" : "post",
+      url,
+      data: {
+        label,
+        source_id: params.sourceId,
+        table_name: params.tableName,
+        query_specification: {
+          columns: columnsSelected.length > 0 ? columnsSelected : undefined,
+          order_by: orderBy,
+          filter_by: filterBy,
+          limit,
+          offset,
+        }
+      }
+    })
+      .then(res => {
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  
   } catch (error) {
     return false;
   }
-  const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
-  if (!isSavedQuerySpecificationAppEnabled || !savedQuerySpecificationAppConfig) {
-    return false;
-  }
-  const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
-  const url = pk !== null ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
-
-  return axios({
-    method: pk !== null ? "put" : "post",
-    url,
-    data: {
-      path,
-    }
-  })
-    .then(res => {
-    })
-    .catch(err => {
-      console.log("Could not fetch notes. Try again later.");
-      console.log(err);
-    });
-}
+};

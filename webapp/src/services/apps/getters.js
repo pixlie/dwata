@@ -54,3 +54,20 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
     throw new AppException(AppExceptionCodes.dataNotLoaded);
   }
 };
+
+
+export const getSavedQuerySpecificationAppConfig = (state) => {
+  const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
+  if (!isSavedQuerySpecificationAppEnabled) {
+    throw new AppException(AppExceptionCodes.notEnabled, "recordPin");
+  } else if (!savedQuerySpecificationAppConfig) {
+    throw new AppException(AppExceptionCodes.configNotLoaded, "recordPin");
+  }
+  const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
+  const cacheKey = createCacheKeyFromParts(sourceId, tableName);
+  return {
+    sourceId,
+    tableName,
+    cacheKey,
+  };
+};
