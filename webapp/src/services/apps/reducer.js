@@ -11,6 +11,8 @@ const initialState = {
 
   isSavedQuerySpecificationAppEnabled: false,
   savedQuerySpecificationAppConfig: {},
+
+  isReady: false,
 };
 
 
@@ -43,6 +45,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         ...apps,
+        isReady: true,
       };
 
     default:

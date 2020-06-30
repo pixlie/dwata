@@ -33,6 +33,15 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
+          <Route path="/browse/saved/:savedQueryId" exact>
+            <ColumnSelector />
+            <FilterEditor />
+            <OrderEditor />
+            <Actions />
+            <Grid />
+            <Paginator />
+          </Route>
+
           <Route path="/browse/:sourceId/:tableName/:pk" exact>
             <Grid />
             <DetailView />
@@ -40,12 +49,6 @@ export default ({ initialState }) => {
           </Route>
 
           <Route path="/browse/:sourceId/:tableName" exact>
-            <ColumnSelector />
-            <FilterEditor />
-            <OrderEditor />
-            <Actions />
-            <Grid />
-            <Paginator />
           </Route>
 
           <Route path="/funnel" exact>

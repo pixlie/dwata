@@ -13,7 +13,7 @@ const Source = ({sourceList, fetchSource}) => {
   const [ state, setState ] = useState({
     sourceIndex: null,
   });
-  const {sourceIndex} = state;
+  // const {sourceIndex} = state;
 
   const SourceItem = ({source, i, sourceType}) => {
     if (source.properties["is_system_db"]) {

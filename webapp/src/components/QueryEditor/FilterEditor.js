@@ -15,8 +15,8 @@ const FilterEditor = ({
   saveQuerySpecification
 }) => {
   const [state, setState] = useState({
-    isSavingFilters: false,
-    savedFiltersLabel: "",
+    isSavingQuery: false,
+    savedQueryLabel: "",
   });
 
   if (!isReady || !isVisible) {
@@ -70,21 +70,21 @@ const FilterEditor = ({
     fetchData();
   };
 
-  const handleSaveFilters = event => {
-    if (state.isSavingFilters) {
-      saveQuerySpecification(state.savedFiltersLabel);
+  const handleSaveQuery = event => {
+    if (state.isSavingQuery) {
+      saveQuerySpecification(state.savedQueryLabel);
     } else {
       setState(state => ({
         ...state,
-        isSavingFilters: true,
+        isSavingQuery: true,
       }));
     }
   }
 
-  const cancelSaveFilters = event => {
+  const cancelSaveQuery = event => {
     setState(state => ({
       ...state,
-      isSavingFilters: false,
+      isSavingQuery: false,
     }));
   }
 
@@ -92,7 +92,7 @@ const FilterEditor = ({
     const { value } = event.target;
     setState(state => ({
       ...state,
-      savedFiltersLabel: value,
+      savedQueryLabel: value,
     }));
   }
 
@@ -113,24 +113,24 @@ const FilterEditor = ({
           </div>
         </div>
 
-        {state.isSavingFilters ? (
+        {state.isSavingQuery ? (
           <div className="field">
             <div className="control">
-              <input className="input" onChange={handleSavedFilterLabelChange} value={state.savedFiltersLabel} placeholder="Label for this filter(s)" />
+              <input className="input" onChange={handleSavedFilterLabelChange} value={state.savedQueryLabel} placeholder="Label for this Query" />
             </div>
           </div>
         ) : null}
 
         <div className="buttons">
-          {state.isSavingFilters ? (
+          {state.isSavingQuery ? (
             <Fragment>
-              <button className="button is-success" onClick={handleSaveFilters}>Save Filter(s)</button>
-              <button className="button is-white" onClick={cancelSaveFilters}>Cancel</button>
+              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
+              <button className="button is-white" onClick={cancelSaveQuery}>Cancel</button>
             </Fragment>
           ) : (
             <Fragment>
               <button className="button is-success" onClick={handleSubmit}>Apply</button>
-              <button className="button is-success" onClick={handleSaveFilters}>Save Filter(s)</button>
+              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
               <button className="button is-success" onClick={() => {}}>Start funnel</button>
             </Fragment>
           )}

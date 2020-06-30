@@ -4,21 +4,33 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
-import { fetchPins } from "services/apps/actions";
-import { getPinsFromCache } from "services/apps/getters";
+import { fetchPins, fetchSavedQuerySpecification } from "services/apps/actions";
+import { getPinsFromCache, getSavedQuerySpecification } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
 
 
-const Browser = ({
+const SavedQueryLoader = ({ savedQueryId, fetchSavedQuerySpecification }) => {
+  useEffect(() => {
+    fetchSavedQuerySpecification(savedQueryId);
+  }, [savedQueryId, fetchSavedQuerySpecification]);
+
+  return (
+    <div>Loading Saved Query...</div>
+  )
+}
+
+const Grid = ({
   isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
-  querySpecificationColumns, selectedRowList, showPinnedRecords, pins,
-  fetchData, fetchSchema, toggleRowSelection, fetchPins,
+  querySpecificationColumns, selectedRowList, showPinnedRecords, pins, savedQueryId, savedQuerySpecification,
+  fetchData, fetchSchema, toggleRowSelection, fetchPins, fetchSavedQuerySpecification
 }) => {
   useEffect(() => {
-    fetchSchema(sourceId);
-    fetchData();
+    if (sourceId) {
+      fetchSchema(sourceId);
+      fetchData();
+    }
   }, [sourceId, tableName, fetchSchema, fetchData]);
   useEffect(() => {
     if (isReady && showPinnedRecords) {
@@ -27,6 +39,9 @@ const Browser = ({
   }, [isReady, showPinnedRecords, fetchPins]);
 
   if (!isReady) {
+    if (!!savedQueryId) {
+      return <SavedQueryLoader savedQueryId={savedQueryId} fetchSavedQuerySpecification={fetchSavedQuerySpecification} />
+    }
     return (
       <div>Loading...</div>
     );
@@ -93,7 +108,25 @@ const Browser = ({
 
 
 const mapStateToProps = (state, props) => {
-  let {sourceId, tableName} = props.match.params;
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {sourceId, tableName, savedQueryId} = props.match.params;
+  if (!!savedQueryId) {
+    // The Grid was called on a saved query, we need to find the real data source and query spec
+    const appsIsReady = state.apps.isReady;
+    if (!appsIsReady) {
+      return {
+        isReady: false,
+        appsIsReady,
+      };
+    }
+
+    return {
+      isReady: false,
+      appsIsReady,
+      savedQueryId,
+      savedQuerySpecification: getSavedQuerySpecification(state, savedQueryId),
+    };
+  }
   sourceId = parseInt(sourceId);
   const cacheKey = getCacheKey(state);
   let isReady = false;
@@ -141,5 +174,6 @@ export default withRouter(connect(
     fetchSchema,
     toggleRowSelection,
     fetchPins,
+    fetchSavedQuerySpecification,
   }
-)(Browser));
+)(Grid));

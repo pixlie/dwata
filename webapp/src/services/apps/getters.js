@@ -20,18 +20,12 @@ export const getRecordPinAppConfig = (state) => {
 
 
 export const getPinsFromCache = (state, path = undefined, allPins = false) => {
-  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
-  if (!isRecordPinAppEnabled) {
-    throw new AppException(AppExceptionCodes.notEnabled, "recordPin");
-  } else if (!recordPinAppConfig) {
-    throw new AppException(AppExceptionCodes.configNotLoaded, "recordPin");
-  }
-  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
-  const cacheKey = createCacheKeyFromParts(sourceId, tableName);
+  const {cacheKey} = getRecordPinAppConfig(state);
 
   if (Object.keys(state.listCache).includes(cacheKey)) {
     if (allPins) {
       // We are asked to return all pins
+      // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
       return state.listCache[cacheKey];
     }
     if (path !== undefined) {
@@ -45,13 +39,14 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
         const {params: {sourceId, tableName}} = fromPath;
         const temp = btoa(`${sourceId}/${tableName}`);
         // Return pins for current URL
+        // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
         return state.listCache[cacheKey].rows.filter(x => x[1] === temp).map(x => [x[0], x[1], parseInt(x[2])]);
       }
     }
     // Return all pins
     return state.listCache[cacheKey];
   } else {
-    throw new AppException(AppExceptionCodes.dataNotLoaded);
+    throw new AppException(AppExceptionCodes.dataNotLoaded, "recordPin");
   }
 };
 
@@ -59,9 +54,9 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
 export const getSavedQuerySpecificationAppConfig = (state) => {
   const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
   if (!isSavedQuerySpecificationAppEnabled) {
-    throw new AppException(AppExceptionCodes.notEnabled, "recordPin");
+    throw new AppException(AppExceptionCodes.notEnabled, "savedQuerySpecification");
   } else if (!savedQuerySpecificationAppConfig) {
-    throw new AppException(AppExceptionCodes.configNotLoaded, "recordPin");
+    throw new AppException(AppExceptionCodes.configNotLoaded, "savedQuerySpecification");
   }
   const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
   const cacheKey = createCacheKeyFromParts(sourceId, tableName);
@@ -71,3 +66,33 @@ export const getSavedQuerySpecificationAppConfig = (state) => {
     cacheKey,
   };
 };
+
+
+export const getSavedQuerySpecification = (state, savedQueryId, sourceId, tableName) => {
+  const {cacheKey} = getSavedQuerySpecificationAppConfig(state);
+
+  if (Object.keys(state.listCache).includes(cacheKey)) {
+    if (!!savedQueryId) {
+      // We are being asked for a single Saved Query Specification
+      return state.dataItem[`${cacheKey}/${savedQueryId}`].data;
+    }
+    if (!sourceId) {
+      // We have been asked for all Saved Query Specifications
+      return state.listCache[cacheKey];
+    }
+    if (!!sourceId && !!tableName) {
+      // We have a sourceId and tableName, let's return Saved Query Specifications for that
+      // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
+      return state.listCache[cacheKey].rows.filter(x => x[2] === sourceId && x[3] === tableName);
+    }
+    if (!!sourceId) {
+      // We have a sourceId, let's return Saved Query Specifications for that
+      // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
+      return state.listCache[cacheKey].rows.filter(x => x[2] === sourceId);
+    }
+    // Return all Saved Query Specifications
+    return state.listCache[cacheKey];
+  } else {
+    return {};
+  }
+}

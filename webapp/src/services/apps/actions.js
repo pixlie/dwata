@@ -6,6 +6,7 @@ import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/acti
 import { fetchDataToCache } from "services/listCache/actions";
 import { COMPLETE_FETCH_APP } from "./actionTypes";
 import { getRecordPinAppConfig, getSavedQuerySpecificationAppConfig } from "./getters";
+import { fetchDataItem } from "services/dataItem/actions";
 
 
 export const getApps = () => dispatch => {
@@ -177,5 +178,23 @@ export const saveQuerySpecification = (label, pk) => (dispatch, getState) => {
   
   } catch (error) {
     return false;
+  }
+};
+
+
+export const fetchSavedQuerySpecification = savedQueryId => (dispatch, getState) => {
+  const state = getState();
+  const {sourceId, tableName, cacheKey} = getSavedQuerySpecificationAppConfig(state);
+
+  if (!savedQueryId) {
+    dispatch(fetchDataToCache(
+      sourceId,
+      tableName,
+      cacheKey, {
+        columnsSelected: ["id", "label", "source_id", "table_name", "query_specification"],
+      }
+    ));
+  } else {
+    dispatch(fetchDataItem(`/browse/${sourceId}/${tableName}/${savedQueryId}`));
   }
 };
