@@ -71,11 +71,12 @@ export const getSavedQuerySpecificationAppConfig = (state) => {
 export const getSavedQuerySpecification = (state, savedQueryId, sourceId, tableName) => {
   const {cacheKey} = getSavedQuerySpecificationAppConfig(state);
 
-  if (Object.keys(state.listCache).includes(cacheKey)) {
-    if (!!savedQueryId) {
-      // We are being asked for a single Saved Query Specification
+  if (!!savedQueryId) {
+    // We are being asked for a single Saved Query Specification
+    if (Object.keys(state.dataItem).includes(`${cacheKey}/${savedQueryId}`)) {
       return state.dataItem[`${cacheKey}/${savedQueryId}`].data;
     }
+  } else if (Object.keys(state.listCache).includes(cacheKey)) {
     if (!sourceId) {
       // We have been asked for all Saved Query Specifications
       return state.listCache[cacheKey];
@@ -95,4 +96,4 @@ export const getSavedQuerySpecification = (state, savedQueryId, sourceId, tableN
   } else {
     return {};
   }
-}
+};

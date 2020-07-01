@@ -7,15 +7,34 @@ import { LOAD_QS_FROM_CACHE, LAST_QUERY_SPECIFICATION } from "services/querySpec
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
 
 
-export const fetchData = (callback) => (dispatch, getState) => {
+export const fetchData = savedQuery => (dispatch, getState) => {
   const state = getState();
-  const {params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname);
-  const cacheKey = getCacheKey(state);
-  const {columnsSelected, orderBy, filterBy, limit, offset, lastQuerySpecification} = state.querySpecification;
+  let sourceId = null, tableName = null, cacheKey = null, qS = null;
+  if (!!savedQuery) {
+    // Todo: Refactor the repeat code in cache key and path parts
+    sourceId = savedQuery.source_id;
+    tableName = savedQuery.table_name;
+    ({params: {sourceId, tableName}} = getSourceFromPath(`/browse/${sourceId}/${tableName}`));
+    // Todo: Frontend should not have to parse as JSON, backend should respond with JSON and not String
+    qS = JSON.parse(savedQuery.query_specification);
+    qS = {
+      ...qS,
+      columnsSelected: qS.columns,
+      orderBy: qS.order_by,
+      filterBy: qS.filter_by,
+      lastQuerySpecification: null,
+    }
+  } else {
+    ({params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname));
+    cacheKey = getCacheKey(state);
+    qS = state.querySpecification;
+  }
+  const {columnsSelected, orderBy, filterBy, limit, offset} = qS;
 
-  if (Object.keys(state.listCache).includes(cacheKey)) {
+  if (!savedQuery && Object.keys(state.listCache).includes(cacheKey)) {
     // We have needed data in cache.
     // Let's check if the last Query Specification is same as what user wants now
+    const {lastQuerySpecification} = qS;
     if (_.isEqual({
       columnsSelected, orderBy, filterBy, limit, offset
     }, lastQuerySpecification)) {
@@ -65,10 +84,6 @@ export const fetchData = (callback) => (dispatch, getState) => {
   return axios
     .post(`${dataURL}/${sourceId}/${tableName}`, querySpecification)
     .then(res => {
-      if (!!callback) {
-        return callback(res.data);
-      }
-
       dispatch({
         type: COMPLETE_FETCH_DATA,
         payload: res.data,

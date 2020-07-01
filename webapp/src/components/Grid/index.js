@@ -23,15 +23,19 @@ const SavedQueryLoader = ({ savedQueryId, fetchSavedQuerySpecification }) => {
 
 const Grid = ({
   isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
-  querySpecificationColumns, selectedRowList, showPinnedRecords, pins, savedQueryId, savedQuerySpecification,
+  querySpecificationColumns, selectedRowList, showPinnedRecords, pins, savedQueryId, savedQuery,
   fetchData, fetchSchema, toggleRowSelection, fetchPins, fetchSavedQuerySpecification
 }) => {
   useEffect(() => {
-    if (sourceId) {
+    if (!!sourceId) {
       fetchSchema(sourceId);
       fetchData();
     }
-  }, [sourceId, tableName, fetchSchema, fetchData]);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      fetchSchema(savedQuery.source_id);
+      fetchData(savedQuery);
+    }
+  }, [sourceId, tableName, fetchSchema, fetchData, savedQuery]);
   useEffect(() => {
     if (isReady && showPinnedRecords) {
       fetchPins();
@@ -124,7 +128,7 @@ const mapStateToProps = (state, props) => {
       isReady: false,
       appsIsReady,
       savedQueryId,
-      savedQuerySpecification: getSavedQuerySpecification(state, savedQueryId),
+      savedQuery: getSavedQuerySpecification(state, savedQueryId),
     };
   }
   sourceId = parseInt(sourceId);

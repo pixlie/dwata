@@ -146,7 +146,7 @@ export const fetchPins = () => (dispatch, getState) => {
 };
 
 
-export const saveQuerySpecification = (label, pk) => (dispatch, getState) => {
+export const saveQuery = (label, pk) => (dispatch, getState) => {
   const state = getState();
   const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
   const {sourceId, tableName} = getSavedQuerySpecificationAppConfig(state);

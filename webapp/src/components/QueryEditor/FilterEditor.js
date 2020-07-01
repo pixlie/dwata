@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
-import { saveQuerySpecification } from "services/apps/actions";
+import { saveQuery } from "services/apps/actions";
 import { initiateFilter, removeFilter } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
@@ -12,7 +12,7 @@ import FilterItem from "./FilterItem";
 
 const FilterEditor = ({
   isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData,
-  saveQuerySpecification
+  saveQuery
 }) => {
   const [state, setState] = useState({
     isSavingQuery: false,
@@ -72,7 +72,7 @@ const FilterEditor = ({
 
   const handleSaveQuery = event => {
     if (state.isSavingQuery) {
-      saveQuerySpecification(state.savedQueryLabel);
+      saveQuery(state.savedQueryLabel);
     } else {
       setState(state => ({
         ...state,
@@ -176,6 +176,6 @@ export default withRouter(connect(
     initiateFilter,
     removeFilter,
     fetchData,
-    saveQuerySpecification,
+    saveQuery,
   }
 )(FilterEditor));
