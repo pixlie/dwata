@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
-import { fetchPins, fetchSavedQuery, saveQuery } from "services/apps/actions";
+import { fetchPins, fetchSavedQuery } from "services/apps/actions";
 import { getPinsFromCache, getSavedQuerySpecification } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
