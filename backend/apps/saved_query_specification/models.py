@@ -25,6 +25,7 @@ saved_query_specification = Table(
 
 def saved_query_specification_pre_insert(values):
     values["created_at"] = datetime.utcnow()
+    values["source_id"] = int(values["source_id"])
     values["query_specification"] = RapidJSONEncoder().encode(values["query_specification"]).encode("utf-8")
     return values
 

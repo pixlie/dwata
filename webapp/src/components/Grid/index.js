@@ -4,38 +4,51 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
-import { fetchPins, fetchSavedQuerySpecification } from "services/apps/actions";
+import { fetchPins, fetchSavedQuery, saveQuery } from "services/apps/actions";
 import { getPinsFromCache, getSavedQuerySpecification } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
 
 
-const SavedQueryLoader = ({ savedQueryId, fetchSavedQuerySpecification }) => {
+const SavedQueryLoader = ({ savedQueryId, savedQuery, fetchSchema, fetchData, fetchSavedQuery }) => {
+  // We made this small separate component just for the separate useEffect used here
   useEffect(() => {
-    fetchSavedQuerySpecification(savedQueryId);
-  }, [savedQueryId, fetchSavedQuerySpecification]);
+    if (!!savedQueryId && !savedQuery) {
+      fetchSavedQuery(savedQueryId);
+    }
+
+    if (!!savedQueryId && !!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      fetchSchema(parseInt(savedQuery.source_id));
+      fetchData(savedQuery);
+    }
+  }, [savedQueryId, savedQuery, fetchSchema, fetchData, fetchSavedQuery]);
 
   return (
-    <div>Loading Saved Query...</div>
-  )
+    <div>Loading data for Saved Query...</div>
+  );
 }
 
-const Grid = ({
-  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
-  querySpecificationColumns, selectedRowList, showPinnedRecords, pins, savedQueryId, savedQuery,
-  fetchData, fetchSchema, toggleRowSelection, fetchPins, fetchSavedQuerySpecification
-}) => {
+
+const QueryLoader = ({ sourceId, tableName, fetchSchema, fetchData }) => {
+  // We made this small separate component just for the separate useEffect used here
   useEffect(() => {
     if (!!sourceId) {
       fetchSchema(sourceId);
       fetchData();
     }
-    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
-      fetchSchema(savedQuery.source_id);
-      fetchData(savedQuery);
-    }
-  }, [sourceId, tableName, fetchSchema, fetchData, savedQuery]);
+  }, [sourceId, tableName, fetchSchema, fetchData]);
+
+  return (
+    <div>Loading data...</div>
+  );
+}
+
+const Grid = ({
+  isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
+  querySpecificationColumns, selectedRowList, showPinnedRecords, pins, savedQueryId, savedQuery,
+  fetchData, fetchSchema, toggleRowSelection, fetchPins, fetchSavedQuery
+}) => {
   useEffect(() => {
     if (isReady && showPinnedRecords) {
       fetchPins();
@@ -44,10 +57,23 @@ const Grid = ({
 
   if (!isReady) {
     if (!!savedQueryId) {
-      return <SavedQueryLoader savedQueryId={savedQueryId} fetchSavedQuerySpecification={fetchSavedQuerySpecification} />
+      return (
+        <SavedQueryLoader
+          savedQueryId={savedQueryId}
+          savedQuery={savedQuery}
+          fetchSchema={fetchSchema}
+          fetchData={fetchData}
+          fetchSavedQuery={fetchSavedQuery}
+        />
+      );
     }
     return (
-      <div>Loading...</div>
+      <QueryLoader
+        sourceId={sourceId}
+        tableName={tableName}
+        fetchSchema={fetchSchema}
+        fetchData={fetchData}
+      />
     );
   }
 
@@ -114,6 +140,8 @@ const Grid = ({
 const mapStateToProps = (state, props) => {
   // Our Grid can be called either for a particular data source/table or from a saved query
   let {sourceId, tableName, savedQueryId} = props.match.params;
+  let cacheKey = null;
+  let returnDefaults = {};
   if (!!savedQueryId) {
     // The Grid was called on a saved query, we need to find the real data source and query spec
     const appsIsReady = state.apps.isReady;
@@ -124,15 +152,28 @@ const mapStateToProps = (state, props) => {
       };
     }
 
-    return {
-      isReady: false,
-      appsIsReady,
-      savedQueryId,
-      savedQuery: getSavedQuerySpecification(state, savedQueryId),
-    };
+    const savedQuery = getSavedQuerySpecification(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      cacheKey = getCacheKey(null, savedQuery);
+      sourceId = parseInt(parseInt(savedQuery.source_id));
+      tableName = savedQuery.table_name;
+      returnDefaults = {
+        ...returnDefaults,
+        appsIsReady,
+        savedQueryId,
+        savedQuery,
+      }
+    } else {
+      return {
+        isReady: false,
+        appsIsReady,
+        savedQueryId,
+      };
+    }
+  } else {
+    cacheKey = getCacheKey(state);
+    sourceId = parseInt(sourceId);
   }
-  sourceId = parseInt(sourceId);
-  const cacheKey = getCacheKey(state);
   let isReady = false;
 
   // We are ready only when all the needed data is there
@@ -150,6 +191,7 @@ const mapStateToProps = (state, props) => {
 
   if (isReady) {
     return {
+      ...returnDefaults,
       isReady,
       sourceId,
       tableName,
@@ -163,6 +205,7 @@ const mapStateToProps = (state, props) => {
     }
   } else {
     return {
+      ...returnDefaults,
       isReady,
       sourceId,
       tableName,
@@ -178,6 +221,6 @@ export default withRouter(connect(
     fetchSchema,
     toggleRowSelection,
     fetchPins,
-    fetchSavedQuerySpecification,
+    fetchSavedQuery,
   }
 )(Grid));

@@ -14,15 +14,16 @@ export const fetchData = savedQuery => (dispatch, getState) => {
     // Todo: Refactor the repeat code in cache key and path parts
     sourceId = savedQuery.source_id;
     tableName = savedQuery.table_name;
+    cacheKey = getCacheKey(null, savedQuery);
     ({params: {sourceId, tableName}} = getSourceFromPath(`/browse/${sourceId}/${tableName}`));
     // Todo: Frontend should not have to parse as JSON, backend should respond with JSON and not String
     qS = JSON.parse(savedQuery.query_specification);
     qS = {
-      ...qS,
       columnsSelected: qS.columns,
       orderBy: qS.order_by,
       filterBy: qS.filter_by,
-      lastQuerySpecification: null,
+      limit: qS.limit,
+      offset: qS.offset,
     }
   } else {
     ({params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname));
@@ -31,7 +32,7 @@ export const fetchData = savedQuery => (dispatch, getState) => {
   }
   const {columnsSelected, orderBy, filterBy, limit, offset} = qS;
 
-  if (!savedQuery && Object.keys(state.listCache).includes(cacheKey)) {
+  if (Object.keys(state.listCache).includes(cacheKey)) {
     // We have needed data in cache.
     // Let's check if the last Query Specification is same as what user wants now
     const {lastQuerySpecification} = qS;

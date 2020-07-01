@@ -5,7 +5,7 @@ import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
 import { fetchDataToCache } from "services/listCache/actions";
 import { COMPLETE_FETCH_APP } from "./actionTypes";
-import { getRecordPinAppConfig, getSavedQuerySpecificationAppConfig } from "./getters";
+import { getRecordPinAppConfig, getSavedQueryAppConfig } from "./getters";
 import { fetchDataItem } from "services/dataItem/actions";
 
 
@@ -149,7 +149,7 @@ export const fetchPins = () => (dispatch, getState) => {
 export const saveQuery = (label, pk) => (dispatch, getState) => {
   const state = getState();
   const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
-  const {sourceId, tableName} = getSavedQuerySpecificationAppConfig(state);
+  const {sourceId, tableName} = getSavedQueryAppConfig(state);
   const url = !!pk ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
 
   try {
@@ -182,9 +182,9 @@ export const saveQuery = (label, pk) => (dispatch, getState) => {
 };
 
 
-export const fetchSavedQuerySpecification = savedQueryId => (dispatch, getState) => {
+export const fetchSavedQuery = savedQueryId => (dispatch, getState) => {
   const state = getState();
-  const {sourceId, tableName, cacheKey} = getSavedQuerySpecificationAppConfig(state);
+  const {sourceId, tableName, cacheKey} = getSavedQueryAppConfig(state);
 
   if (!savedQueryId) {
     dispatch(fetchDataToCache(

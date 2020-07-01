@@ -4,14 +4,14 @@ import { connect } from "react-redux";
 
 import { Panel } from "components/BulmaHelpers";
 import { transformData } from "utils";
-import { fetchSavedQuerySpecification } from "services/apps/actions";
+import { fetchSavedQuery } from "services/apps/actions";
 import { getSavedQuerySpecification } from "services/apps/getters";
 
 
-const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fetchSavedQuerySpecification}) => {
+const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fetchSavedQuery}) => {
   useEffect(() => {
-    appsIsReady && fetchSavedQuerySpecification();
-  }, [appsIsReady, fetchSavedQuerySpecification]);
+    appsIsReady && fetchSavedQuery();
+  }, [appsIsReady, fetchSavedQuery]);
 
   if (!appsIsReady) {
     return null;
@@ -50,5 +50,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { fetchSavedQuerySpecification }
+  { fetchSavedQuery }
 )(SavedQuerySpecifications);

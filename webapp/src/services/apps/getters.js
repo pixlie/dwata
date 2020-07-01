@@ -51,7 +51,7 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
 };
 
 
-export const getSavedQuerySpecificationAppConfig = (state) => {
+export const getSavedQueryAppConfig = (state) => {
   const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
   if (!isSavedQuerySpecificationAppEnabled) {
     throw new AppException(AppExceptionCodes.notEnabled, "savedQuerySpecification");
@@ -69,7 +69,7 @@ export const getSavedQuerySpecificationAppConfig = (state) => {
 
 
 export const getSavedQuerySpecification = (state, savedQueryId, sourceId, tableName) => {
-  const {cacheKey} = getSavedQuerySpecificationAppConfig(state);
+  const {cacheKey} = getSavedQueryAppConfig(state);
 
   if (!!savedQueryId) {
     // We are being asked for a single Saved Query Specification

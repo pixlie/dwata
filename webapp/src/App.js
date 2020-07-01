@@ -49,6 +49,12 @@ export default ({ initialState }) => {
           </Route>
 
           <Route path="/browse/:sourceId/:tableName" exact>
+            <ColumnSelector />
+            <FilterEditor />
+            <OrderEditor />
+            <Actions />
+            <Grid />
+            <Paginator />
           </Route>
 
           <Route path="/funnel" exact>
