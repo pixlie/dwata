@@ -126,7 +126,7 @@ const mapStateToProps = state => {
   const {showNotesFor} = state.global;
   const {isNoteAppEnabled, noteAppConfig} = state.apps;
   const {source_id: sourceId, table_name: tableName} = noteAppConfig;
-  const _cacheKey = `${sourceId}/${tableName}/${showNotesFor}`;
+  const _cacheKey = `${sourceId}/${tableName}/${btoa(showNotesFor)}`;
 
   let isReady = false;
   if (showNotesFor !== null && _cacheKey in state.dataItem && state.dataItem[_cacheKey].isReady) {

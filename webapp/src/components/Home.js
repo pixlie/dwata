@@ -1,13 +1,30 @@
 import React, { Fragment } from "react";
 
-import { Hero, Hx } from "components/BulmaHelpers";
+import { Hero, Hx, Section } from "components/BulmaHelpers";
+import Source from "components/Source";
+import SavedQuerySpecifications from "components/SavedQuerySpecifications";
 
 
-export default () => (
-  <Fragment>
-    <Hero size="is-fullheight-with-navbar" textCentered={true}>
-      <Hx x="1">Welcome to dwata</Hx>
-      <Hx x="4" titleClass="subtitle">Let's get awesome stuff done!</Hx>
-    </Hero>
-  </Fragment>
-);
+export default () => {
+  return (
+    <Fragment>
+      <Hero textCentered={true}>
+        <Hx x="1">Welcome to dwata</Hx>
+      </Hero>
+
+      <Section>
+        <div className="columns">
+          <div className="column is-4">
+            <Source />
+          </div>
+          <div className="column is-4">
+            <SavedQuerySpecifications />
+          </div>
+          <div className="column is-4">
+            <Hx x="3">Reports</Hx>
+          </div>
+        </div>
+      </Section>
+    </Fragment>
+  );
+};

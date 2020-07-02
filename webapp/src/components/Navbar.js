@@ -9,7 +9,7 @@ import { getSourceFromPath, getCacheKey } from "utils";
 
 
 const Navbar = ({
-  sourceId, tableName, schema, isFilterEnabled, isSourceFetching, cacheKey, selectedRowList, showPinnedRecords,
+  isFilterEnabled, isSourceFetching, cacheKey, selectedRowList, showPinnedRecords,
   toggleSidebar, toggleFilterEditor, toggleColumnSelector, toggleSortEditor, isInTable,
   isNoteAppEnabled, isRecordPinAppEnabled, hasColumnsSpecified, hasFiltersSpecified, hasOrderingSpecified,
   showNotes, getApps, toggleActions, togglePinnedRecords,
@@ -34,7 +34,7 @@ const Navbar = ({
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          [dwata]
+          Home
         </Link>
 
         <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" href="/">
@@ -49,35 +49,10 @@ const Navbar = ({
           <div className="navbar-item">
             <div className="buttons">
               <button className={`button ${isInTable ? "is-grey" : "is-success"}`} onClick={toggleSidebar} disabled={isSourceFetching}>
-                <i className="fas fa-database" />&nbsp;Sources
+                <i className="fas fa-database" />&nbsp;Browse
               </button>
             </div>
           </div>
-
-          {tableName ? (
-            <div className="navbar-item has-dropdown is-hoverable">
-              <span className="navbar-link">
-                <i className="fas fa-table" />&nbsp;Tables
-              </span>
-
-              {schema.isReady ? (
-                <div className="navbar-dropdown">
-                  {schema.rows.filter(s => s.properties.is_system_table === false).map(head => (
-                    <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
-                      {head.table_name}
-                    </Link>
-                  ))}
-                  <hr className="navbar-divider" />
-                  <div className="navbar-item">System tables</div>
-                  {schema.rows.filter(s => s.properties.is_system_table === true).map(head => (
-                    <Link className="navbar-item" key={`tbl-${head.table_name}`} to={`/browse/${sourceId}/${head.table_name}`}>
-                      {head.table_name}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
         </div>
 
         <div className="navbar-end">
@@ -169,7 +144,6 @@ const mapStateToProps = (state, props) => {
   const {isNoteAppEnabled, isRecordPinAppEnabled} = state.apps;
 
   return {
-    schema: state.schema,
     isSourceFetching: state.source.isFetching,
     sourceId,
     tableName,

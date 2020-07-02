@@ -5,7 +5,8 @@ import { getSourceFromPath } from "utils";
 import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
 import { fetchDataToCache } from "services/listCache/actions";
 import { COMPLETE_FETCH_APP } from "./actionTypes";
-import { getRecordPinAppConfig } from "./getters";
+import { getRecordPinAppConfig, getSavedQueryAppConfig } from "./getters";
+import { fetchDataItem } from "services/dataItem/actions";
 
 
 export const getApps = () => dispatch => {
@@ -128,7 +129,7 @@ export const pinRecords = () => (dispatch, getState) => {
       record_id: rowId,
     });
   }
-}
+};
 
 
 export const fetchPins = () => (dispatch, getState) => {
@@ -142,4 +143,58 @@ export const fetchPins = () => (dispatch, getState) => {
       columnsSelected: ["id", "path", "record_id"],
     }
   ));
+};
+
+
+export const saveQuery = (label, pk) => (dispatch, getState) => {
+  const state = getState();
+  const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
+  const {sourceId, tableName} = getSavedQueryAppConfig(state);
+  const url = !!pk ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
+
+  try {
+    const {params} = getSourceFromPath(state.router.location.pathname);
+    return axios({
+      method: !!pk ? "put" : "post",
+      url,
+      data: {
+        label,
+        source_id: params.sourceId,
+        table_name: params.tableName,
+        query_specification: {
+          columns: columnsSelected.length > 0 ? columnsSelected : undefined,
+          order_by: orderBy,
+          filter_by: filterBy,
+          limit,
+          offset,
+        }
+      }
+    })
+      .then(res => {
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  
+  } catch (error) {
+    return false;
+  }
+};
+
+
+export const fetchSavedQuery = savedQueryId => (dispatch, getState) => {
+  const state = getState();
+  const {sourceId, tableName, cacheKey} = getSavedQueryAppConfig(state);
+
+  if (!savedQueryId) {
+    dispatch(fetchDataToCache(
+      sourceId,
+      tableName,
+      cacheKey, {
+        columnsSelected: ["id", "label", "source_id", "table_name", "query_specification"],
+      }
+    ));
+  } else {
+    dispatch(fetchDataItem(`/browse/${sourceId}/${tableName}/${savedQueryId}`));
+  }
 };

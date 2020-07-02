@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { setFilter } from "services/querySpecification/actions";
+import { getSavedQuery } from "services/apps/getters";
 
 
 const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
@@ -13,7 +14,6 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
   const dataType = schemaColumns.find(x => x.name === columnName);
 
   const handleChange = event => {
-    event.preventDefault();
     const {name, value, dataset} = event.target;
 
     const temp = {};
@@ -47,10 +47,19 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
         temp["to"] = value;
       }
     } else if (dataType.type === "BOOLEAN") {
-      temp["value"] = value === "true" ? true : false;
+      temp["value"] = null;
+      if (value === "true") {
+        temp["value"] = true;
+      } else if (value === "false") {
+        temp["value"] = false;
+      }
     }
   
     setFilter(name, temp);
+  }
+
+  if (!Object.keys(filterBy).includes(columnName)) {
+    return null;
   }
 
   if (dataType.type === "INTEGER" || dataType.type === "FLOAT") {
@@ -88,7 +97,7 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
           <input className="input" name={columnName} data-meta="to" type="datetime-local" onChange={handleChange} value={filterBy[columnName].to} />
         </div>
       </Fragment>
-    )
+    );
   } else if (dataType.type === "BOOLEAN") {
     return (
       <div className="control is-narrow">
@@ -115,7 +124,25 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
 
 
 const mapStateToProps = (state, props) => {
-  let {tableName} = props.match.params;
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {tableName, savedQueryId} = props.match.params;
+  if (!!savedQueryId) {
+    // The Grid was called on a saved query, we need to find the real data source and query spec
+    if (!state.apps.isReady) {
+      return {
+        isReady: false,
+      };
+    }
+
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  }
 
   return {
     schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,

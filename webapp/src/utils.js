@@ -58,9 +58,17 @@ export const getItemPartsFromPath = pathname => {
 }
 
 
-export const getCacheKey = state => {
-  if (state.router && state.router.location && state.router.location.pathname) {
+export const getCacheKey = (state, savedQuery) => {
+  if (!!state && state.router && state.router.location && state.router.location.pathname) {
     const fromPath = getSourceFromPath(state.router.location.pathname);
+    if (fromPath) {
+      const {params: {sourceId, tableName}} = fromPath;
+      return `${sourceId}/${tableName}`;
+    }
+  } else if (!!savedQuery) {
+    const sourceId = savedQuery.source_id;
+    const tableName = savedQuery.table_name;
+    const fromPath = getSourceFromPath(`/browse/${sourceId}/${tableName}`);
     if (fromPath) {
       const {params: {sourceId, tableName}} = fromPath;
       return `${sourceId}/${tableName}`;

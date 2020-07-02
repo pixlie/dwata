@@ -1,19 +1,28 @@
-import React from 'react';
+import React, { Fragment, useState } from 'react';
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
+import { getSavedQuery } from "services/apps/getters";
+import { saveQuery } from "services/apps/actions";
 import { initiateFilter, removeFilter } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
 
-const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData}) => {
+const FilterEditor = ({
+  isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData,
+  saveQuery
+}) => {
+  const [state, setState] = useState({
+    isSavingQuery: false,
+    savedQueryLabel: "",
+  });
+
   if (!isReady || !isVisible) {
     return null;
   }
-
   const addFilter = event => {
     event.preventDefault();
     const {value} = event.target;
@@ -62,6 +71,32 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
     fetchData();
   };
 
+  const handleSaveQuery = event => {
+    if (state.isSavingQuery) {
+      saveQuery(state.savedQueryLabel);
+    } else {
+      setState(state => ({
+        ...state,
+        isSavingQuery: true,
+      }));
+    }
+  }
+
+  const cancelSaveQuery = event => {
+    setState(state => ({
+      ...state,
+      isSavingQuery: false,
+    }));
+  }
+
+  const handleSavedFilterLabelChange = event => {
+    const { value } = event.target;
+    setState(state => ({
+      ...state,
+      savedQueryLabel: value,
+    }));
+  }
+
   return (
     <div id="filter-editor">
       <Section>
@@ -79,7 +114,28 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
           </div>
         </div>
 
-        <button className="button is-fullwidth is-success" onClick={handleSubmit}>Apply</button>
+        {state.isSavingQuery ? (
+          <div className="field">
+            <div className="control">
+              <input className="input" onChange={handleSavedFilterLabelChange} value={state.savedQueryLabel} placeholder="Label for this Query" />
+            </div>
+          </div>
+        ) : null}
+
+        <div className="buttons">
+          {state.isSavingQuery ? (
+            <Fragment>
+              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
+              <button className="button is-white" onClick={cancelSaveQuery}>Cancel</button>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <button className="button is-success" onClick={handleSubmit}>Apply</button>
+              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
+              <button className="button is-success" onClick={() => {}}>Start funnel</button>
+            </Fragment>
+          )}
+        </div>
       </Section>
     </div>
   );
@@ -87,9 +143,31 @@ const FilterEditor = ({isReady, isVisible, schemaColumns, filterBy, initiateFilt
 
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName } = props.match.params;
-  sourceId = parseInt(sourceId);
-  const cacheKey = getCacheKey(state);
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {sourceId, tableName, savedQueryId} = props.match.params;
+  let cacheKey = null;
+  if (!!savedQueryId) {
+    // The Grid was called on a saved query, we need to find the real data source and query spec
+    if (!state.apps.isReady) {
+      return {
+        isReady: false,
+      };
+    }
+
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      cacheKey = getCacheKey(null, savedQuery);
+      sourceId = parseInt(savedQuery.source_id);
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  } else {
+    cacheKey = getCacheKey(state);
+    sourceId = parseInt(sourceId);
+  }
   let isReady = false;
 
   if (state.schema.isReady && state.schema.sourceId === sourceId &&
@@ -121,5 +199,6 @@ export default withRouter(connect(
     initiateFilter,
     removeFilter,
     fetchData,
+    saveQuery,
   }
 )(FilterEditor));

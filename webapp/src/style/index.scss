@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
 
 // Update Bulma's global variables
-$family-sans-serif: "Titillium Web", sans-serif;
+$family-sans-serif: "Quicksand", sans-serif;
 
 // Reduce the size of the default shadow
 $scheme-invert: hsl(0, 0%, 4%);
@@ -72,11 +72,6 @@ h1, h2, h3 {
 
 .navbar {
   background-color: #efefef;
-  opacity: 0.3;
-
-  &:hover {
-    opacity: 1;
-  }
 
   button {
     font-weight: bold;
@@ -84,7 +79,6 @@ h1, h2, h3 {
 
   .navbar-brand {
     .navbar-item {
-      font-size: x-large;
       padding: 0 3rem;
     }
   }

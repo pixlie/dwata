@@ -6,7 +6,7 @@ metadata = MetaData()
 
 
 record_pin = Table(
-    "admin_record_pin",
+    "admin_meta_record_pin",
     metadata,
 
     Column("id", Integer, primary_key=True),

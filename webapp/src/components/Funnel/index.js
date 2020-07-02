@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
@@ -7,11 +7,11 @@ import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchPins } from "services/apps/actions";
 import { getPinsFromCache } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
+import { Hx } from "components/BulmaHelpers";
 import rowRenderer from "./rowRenderer";
-import TableHead from "./TableHead";
 
 
-const Browser = ({
+const Kanban = ({
   isReady, sourceId, tableName, tableColumns, tableRows, schemaColumns, history,
   querySpecificationColumns, selectedRowList, showPinnedRecords, pins,
   fetchData, fetchSchema, toggleRowSelection, fetchPins,
@@ -45,9 +45,9 @@ const Browser = ({
     }
 
     return (
-      <td onClick={handleRowSelect}>
+      <span onClick={handleRowSelect}>
         <input className="checkbox" type="checkbox" onClick={stopPropagation} onChange={handleRowSelect} checked={selectedRowList.includes(row[0])} />
-      </td>
+      </span>
     );
   }
 
@@ -58,36 +58,50 @@ const Browser = ({
     }
 
     return (
-      <tr onClick={handleRowClick} className={pinned ? "is-pin" : ""}>
+      <div onClick={handleRowClick} className={`box ${pinned ? "is-pin" : ""}`}>
         <RowSelectorCell row={row} />
         {row.map((cell, j) => {
           const Cell = rowRendererList[j];
           return Cell !== null ? <Cell key={`td-${index}-${j}`} data={cell} /> : null;
         })}
-      </tr>
+      </div>
     );
   }
-  const pinnedRowIds = pins && pins.length > 0 ? pins.map(x => x[2]) : null;
+  // const pinnedRowIds = pins && pins.length > 0 ? pins.map(x => x[2]) : null;
 
   return (
-    <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
-      <thead>
-        <TableHead />
-      </thead>
+    <div className="container">
+      <p>&nbsp;</p>
 
-      <tbody>
-        {pinnedRowIds && showPinnedRecords ? (
-          <Fragment>
-            {tableRows.filter(x => pinnedRowIds.includes(x[0])).map((row, i) => (
-              <Row key={`tr-${i}`} row={row} index={i} pinned />
-            ))}
-          </Fragment>
-        ) : null}
-        {tableRows.map((row, i) => (
-          <Row key={`tr-${i}`} row={row} index={i} />
-        ))}
-      </tbody>
-    </table>
+      <div className="columns">
+        <div className="column is-4">
+          <div className="content has-text-centered">
+            <Hx x="4">New users this week</Hx>
+          </div>
+          {tableRows.map((row, i) => (
+            <Row key={`tr-${i}`} row={row} index={i} />
+          ))}
+        </div>
+
+        <div className="column is-4">
+          <div className="content has-text-centered">
+            <Hx x="4">Activated users</Hx>
+          </div>
+          {tableRows.filter(row => row[5] === true).map((row, i) => (
+            <Row key={`tr-${i}`} row={row} index={i} />
+          ))}
+        </div>
+
+        <div className="column is-4">
+          <div className="content has-text-centered">
+            <Hx x="4">Bio added</Hx>
+          </div>
+          {tableRows.filter(row => !!row[10] && row[10].length > 10).map((row, i) => (
+            <Row key={`tr-${i}`} row={row} index={i} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -142,4 +156,4 @@ export default withRouter(connect(
     toggleRowSelection,
     fetchPins,
   }
-)(Browser));
+)(Kanban));

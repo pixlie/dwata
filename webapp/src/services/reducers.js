@@ -9,6 +9,7 @@ import listCache from "./listCache/reducer";
 import browser from "./browser/reducer";
 import dataItem from "./dataItem/reducer";
 import querySpecification from "./querySpecification/reducer";
+import querySpecificationCache from "./querySpecificationCache/reducer";
 import apiBrowser from "./apiBrowser/reducer";
 import apps from "./apps/reducer";
 
@@ -22,6 +23,7 @@ export default (history) => combineReducers({
   browser,
   dataItem,
   querySpecification,
+  querySpecificationCache,
   apiBrowser,
   apps,
 });

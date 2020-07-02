@@ -9,15 +9,16 @@ import Navbar from "components/Navbar";
 import Source from "components/Source";
 import Sidebar from "components/Sidebar";
 import Home from "components/Home";
-import Browser from "components/Browser";
+import Grid from "components/Grid";
+import DetailView from "components/Detail";
+import Funnel from "components/Funnel";
 import APIBrowser from "components/APIBrowser";
-import ColumnSelector from "components/Browser/ColumnSelector";
-import FilterEditor from "components/Browser/FilterEditor";
-import OrderEditor from "components/Browser/OrderEditor";
-import DetailView from "components/Browser/Detail";
-import Paginator from "components/Browser/Paginator";
+import ColumnSelector from "components/QueryEditor/ColumnSelector";
+import FilterEditor from "components/QueryEditor/FilterEditor";
+import OrderEditor from "components/QueryEditor/OrderEditor";
+import Paginator from "components/QueryEditor/Paginator";
 import Notes from "components/Notes";
-import Actions from "components/Browser/Actions";
+import Actions from "components/Actions";
 
 
 export default ({ initialState }) => {
@@ -32,8 +33,17 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
+          <Route path="/browse/saved/:savedQueryId" exact>
+            <Grid />
+            <ColumnSelector />
+            <FilterEditor />
+            <OrderEditor />
+            <Actions />
+            <Paginator />
+          </Route>
+
           <Route path="/browse/:sourceId/:tableName/:pk" exact>
-            <Browser />
+            <Grid />
             <DetailView />
             <Paginator />
           </Route>
@@ -43,7 +53,16 @@ export default ({ initialState }) => {
             <FilterEditor />
             <OrderEditor />
             <Actions />
-            <Browser />
+            <Grid />
+            <Paginator />
+          </Route>
+
+          <Route path="/funnel" exact>
+            <ColumnSelector />
+            <FilterEditor />
+            <OrderEditor />
+            <Actions />
+            <Funnel />
             <Paginator />
           </Route>
 

@@ -6,13 +6,13 @@ import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "./actionTypes";
 
 
 
-export const fetchDataItem = callback => (dispatch, getState) => {
+export const fetchDataItem = customPath => (dispatch, getState) => {
   const state = getState();
   let sourceId = null,
     tableName = null,
     pk = null;
   try {
-    const {params} = getItemPartsFromPath(state.router.location.pathname);
+    const {params} = getItemPartsFromPath(!!customPath ? customPath : state.router.location.pathname);
     ({sourceId, tableName, pk} = params);
   } catch (error) {
     return false;
@@ -28,10 +28,6 @@ export const fetchDataItem = callback => (dispatch, getState) => {
   return axios
     .get(`${dataItemURL}/${sourceId}/${tableName}/${pk}`)
     .then(res => {
-      if (!!callback) {
-        callback();
-      }
-
       dispatch({
         type: COMPLETE_FETCH_ITEM,
         payload: res.data,

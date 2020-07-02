@@ -4,9 +4,10 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
+import { getSavedQuery } from "services/apps/getters";
 import { toggleOrderBy, initiateFilter } from "services/querySpecification/actions";
 import { toggleColumnHeadSpecification } from "services/global/actions";
-import FilterItem from "./FilterItem";
+import FilterItem from "components/QueryEditor/FilterItem";
 
 
 const ColumnHeadSpecification = ({toggleOrderBy, head, fetchData}) => {
@@ -80,11 +81,27 @@ const TableHeadItem = ({
 
 
 const mapStateToProps = (state, props) => {
-  const {sourceId, tableName} = props.match.params;
-  const cacheKey = getCacheKey(state);
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {sourceId, tableName, savedQueryId} = props.match.params;
+  let cacheKey = null;
+  if (!!savedQueryId) {
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      cacheKey = getCacheKey(null, savedQuery);
+      sourceId = parseInt(savedQuery.source_id);
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  } else {
+    cacheKey = getCacheKey(state);
+    sourceId = parseInt(sourceId);
+  }
   let isReady = false;
 
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+  if (state.schema.isReady && state.schema.sourceId === sourceId &&
     state.browser.isReady && state.browser.cacheKey === cacheKey &&
     state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;

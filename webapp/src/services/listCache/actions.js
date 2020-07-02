@@ -27,8 +27,8 @@ export const fetchDataToCache = (sourceId, tableName, cacheKey, qsOverride = {},
       limit,
       offset,
     };
-  } else if (Object.keys(state.querySpecification._cachedData).includes(cacheKey)) {
-    const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification._cachedData[cacheKey];
+  } else if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
+    const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecificationCache[cacheKey];
     querySpecification = {
       columns: qsOverride.columnsSelected ? qsOverride.columnsSelected : (columnsSelected.length > 0 ? columnsSelected : undefined),
       order_by: orderBy,

@@ -1,19 +1,19 @@
 import React, { useEffect, Fragment, useState } from "react";
 import { connect } from "react-redux";
 
-import { Section, Panel } from "components/BulmaHelpers";
+import { Panel } from "components/BulmaHelpers";
 import { fetchSource } from "services/source/actions";
 import TableList from "components/TableList";
 
 
-const Source = ({source, fetchSource}) => {
+const Source = ({sourceList, fetchSource}) => {
   useEffect(() => {
     fetchSource();
   }, [fetchSource]);
   const [ state, setState ] = useState({
     sourceIndex: null,
   });
-  const { sourceIndex } = state;
+  // const {sourceIndex} = state;
 
   const SourceItem = ({source, i, sourceType}) => {
     if (source.properties["is_system_db"]) {
@@ -35,32 +35,32 @@ const Source = ({source, fetchSource}) => {
           <strong>{source.label}</strong>&nbsp;<span className="tag is-info is-light">{source.provider}</span>
         </div>
 
-        {sourceIndex === i ? <TableList sourceIndex={sourceIndex} sourceType={sourceType} /> : null}
+        <TableList sourceIndex={i} sourceType={sourceType} />
       </Fragment>
     );
   }
-  const count_database = source.isReady ? source.rows.filter(x => x.type === "database").length : 0;
+  const count_database = sourceList.isReady ? sourceList.rows.filter(x => x.type === "database").length : 0;
 
   return (
-    <Section>
+    <Fragment>
       <Panel title="Databases">
-        {source.isReady ? source.rows.filter(x => x.type === "database").map((source, i) => (
+        {sourceList.isReady ? sourceList.rows.filter(x => x.type === "database").map((source, i) => (
           <SourceItem source={source} i={i} sourceType="database" key={`sr-${i}`} />
         )) : null}
       </Panel>
 
-      <Panel title="Services">
-        {source.isReady ? source.rows.filter(x => x.type === "service").map((s, i) => (
+      {/* <Panel title="Services">
+        {sourceList.isReady ? sourceList.rows.filter(x => x.type === "service").map((s, i) => (
           <SourceItem s={s} i={count_database + i} sourceType="service" key={`sr-${count_database + i}`} />
         )) : null}
-      </Panel>
-    </Section>
+      </Panel> */}
+    </Fragment>
   );
 }
 
 
 const mapStateToProps = state => ({
-  source: state.source,
+  sourceList: state.source,
 });
 
 

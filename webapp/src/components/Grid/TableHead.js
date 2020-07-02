@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
+import { getSavedQuery } from "services/apps/getters";
 import TableHeadItem from "./TableHeadItem";
 
 
@@ -35,9 +36,24 @@ const TableHead = ({isReady, schemaColumns, tableColumns, querySpecificationColu
 
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName } = props.match.params;
-  sourceId = parseInt(sourceId);
-  const cacheKey = getCacheKey(state);
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {sourceId, tableName, savedQueryId} = props.match.params;
+  let cacheKey = null;
+  if (!!savedQueryId) {
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      cacheKey = getCacheKey(null, savedQuery);
+      sourceId = parseInt(savedQuery.source_id);
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  } else {
+    cacheKey = getCacheKey(state);
+    sourceId = parseInt(sourceId);
+  }
   let isReady = false;
 
   if (state.schema.isReady && state.schema.sourceId === sourceId &&
