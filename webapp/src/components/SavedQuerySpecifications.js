@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { Panel } from "components/BulmaHelpers";
 import { transformData } from "utils";
 import { fetchSavedQuery } from "services/apps/actions";
-import { getSavedQuerySpecification } from "services/apps/getters";
+import { getSavedQuery } from "services/apps/getters";
 
 
 const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fetchSavedQuery}) => {
@@ -36,7 +36,7 @@ const mapStateToProps = state => {
       appsIsReady,
     };
   }
-  const savedQuerySpecificationList = getSavedQuerySpecification(state);
+  const savedQuerySpecificationList = getSavedQuery(state);
 
   return {
     appsIsReady,

@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
-import { getSavedQuerySpecification } from "services/apps/getters";
+import { getSavedQuery } from "services/apps/getters";
 import { toggleOrderBy, initiateFilter } from "services/querySpecification/actions";
 import { toggleColumnHeadSpecification } from "services/global/actions";
 import FilterItem from "components/QueryEditor/FilterItem";
@@ -85,10 +85,10 @@ const mapStateToProps = (state, props) => {
   let {sourceId, tableName, savedQueryId} = props.match.params;
   let cacheKey = null;
   if (!!savedQueryId) {
-    const savedQuery = getSavedQuerySpecification(state, savedQueryId);
+    const savedQuery = getSavedQuery(state, savedQueryId);
     if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
       cacheKey = getCacheKey(null, savedQuery);
-      sourceId = parseInt(parseInt(savedQuery.source_id));
+      sourceId = parseInt(savedQuery.source_id);
       tableName = savedQuery.table_name;
     } else {
       return {
@@ -101,7 +101,7 @@ const mapStateToProps = (state, props) => {
   }
   let isReady = false;
 
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+  if (state.schema.isReady && state.schema.sourceId === sourceId &&
     state.browser.isReady && state.browser.cacheKey === cacheKey &&
     state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;

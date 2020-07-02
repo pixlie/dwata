@@ -5,7 +5,7 @@ import { withRouter } from "react-router-dom";
 import { getCacheKey } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchPins, fetchSavedQuery } from "services/apps/actions";
-import { getPinsFromCache, getSavedQuerySpecification } from "services/apps/getters";
+import { getPinsFromCache, getSavedQuery } from "services/apps/getters";
 import { fetchSchema } from "services/schema/actions";
 import rowRenderer from "./rowRenderer";
 import TableHead from "./TableHead";
@@ -152,10 +152,10 @@ const mapStateToProps = (state, props) => {
       };
     }
 
-    const savedQuery = getSavedQuerySpecification(state, savedQueryId);
+    const savedQuery = getSavedQuery(state, savedQueryId);
     if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
       cacheKey = getCacheKey(null, savedQuery);
-      sourceId = parseInt(parseInt(savedQuery.source_id));
+      sourceId = parseInt(savedQuery.source_id);
       tableName = savedQuery.table_name;
       returnDefaults = {
         ...returnDefaults,
@@ -177,7 +177,7 @@ const mapStateToProps = (state, props) => {
   let isReady = false;
 
   // We are ready only when all the needed data is there
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
+  if (state.schema.isReady && state.schema.sourceId === sourceId &&
     state.browser.isReady && state.browser.cacheKey === cacheKey &&
     state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
     isReady = true;

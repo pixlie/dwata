@@ -21,7 +21,7 @@ export default () => {
             <SavedQuerySpecifications />
           </div>
           <div className="column is-4">
-            <Hx x="3">Funnels</Hx>
+            <Hx x="3">Reports</Hx>
           </div>
         </div>
       </Section>

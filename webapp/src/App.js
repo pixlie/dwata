@@ -34,11 +34,11 @@ export default ({ initialState }) => {
 
         <Switch>
           <Route path="/browse/saved/:savedQueryId" exact>
+            <Grid />
             <ColumnSelector />
             <FilterEditor />
             <OrderEditor />
             <Actions />
-            <Grid />
             <Paginator />
           </Route>
 

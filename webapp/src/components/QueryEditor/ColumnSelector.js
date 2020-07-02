@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { fetchData } from "services/browser/actions";
+import { getSavedQuery } from "services/apps/getters";
 import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
@@ -54,9 +55,31 @@ const ColumnSelector = ({isReady, isVisible, schemaColumns, qsColumns, dataColum
 
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName } = props.match.params;
-  sourceId = parseInt(sourceId);
-  const cacheKey = getCacheKey(state);
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {sourceId, tableName, savedQueryId} = props.match.params;
+  let cacheKey = null;
+  if (!!savedQueryId) {
+    // The Grid was called on a saved query, we need to find the real data source and query spec
+    if (!state.apps.isReady) {
+      return {
+        isReady: false,
+      };
+    }
+
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      cacheKey = getCacheKey(null, savedQuery);
+      sourceId = parseInt(savedQuery.source_id);
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  } else {
+    cacheKey = getCacheKey(state);
+    sourceId = parseInt(sourceId);
+  }
   let isReady = false;
 
   if (state.schema.isReady && state.schema.sourceId === sourceId &&

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
-import { getSavedQuerySpecification } from "services/apps/getters";
+import { getSavedQuery } from "services/apps/getters";
 import TableHeadItem from "./TableHeadItem";
 
 
@@ -40,10 +40,10 @@ const mapStateToProps = (state, props) => {
   let {sourceId, tableName, savedQueryId} = props.match.params;
   let cacheKey = null;
   if (!!savedQueryId) {
-    const savedQuery = getSavedQuerySpecification(state, savedQueryId);
+    const savedQuery = getSavedQuery(state, savedQueryId);
     if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
       cacheKey = getCacheKey(null, savedQuery);
-      sourceId = parseInt(parseInt(savedQuery.source_id));
+      sourceId = parseInt(savedQuery.source_id);
       tableName = savedQuery.table_name;
     } else {
       return {

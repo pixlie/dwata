@@ -54,9 +54,9 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
 export const getSavedQueryAppConfig = (state) => {
   const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
   if (!isSavedQuerySpecificationAppEnabled) {
-    throw new AppException(AppExceptionCodes.notEnabled, "savedQuerySpecification");
+    throw new AppException(AppExceptionCodes.notEnabled, "savedQuery");
   } else if (!savedQuerySpecificationAppConfig) {
-    throw new AppException(AppExceptionCodes.configNotLoaded, "savedQuerySpecification");
+    throw new AppException(AppExceptionCodes.configNotLoaded, "savedQuery");
   }
   const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
   const cacheKey = createCacheKeyFromParts(sourceId, tableName);
@@ -68,7 +68,7 @@ export const getSavedQueryAppConfig = (state) => {
 };
 
 
-export const getSavedQuerySpecification = (state, savedQueryId, sourceId, tableName) => {
+export const getSavedQuery = (state, savedQueryId, sourceId, tableName) => {
   const {cacheKey} = getSavedQueryAppConfig(state);
 
   if (!!savedQueryId) {

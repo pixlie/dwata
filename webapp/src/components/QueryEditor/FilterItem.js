@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { setFilter } from "services/querySpecification/actions";
+import { getSavedQuery } from "services/apps/getters";
 
 
 const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
@@ -123,7 +124,25 @@ const FilterItem = ({columnName, schemaColumns, filterBy, setFilter}) => {
 
 
 const mapStateToProps = (state, props) => {
-  let {tableName} = props.match.params;
+  // Our Grid can be called either for a particular data source/table or from a saved query
+  let {tableName, savedQueryId} = props.match.params;
+  if (!!savedQueryId) {
+    // The Grid was called on a saved query, we need to find the real data source and query spec
+    if (!state.apps.isReady) {
+      return {
+        isReady: false,
+      };
+    }
+
+    const savedQuery = getSavedQuery(state, savedQueryId);
+    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
+      tableName = savedQuery.table_name;
+    } else {
+      return {
+        isReady: false,
+      };
+    }
+  }
 
   return {
     schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
