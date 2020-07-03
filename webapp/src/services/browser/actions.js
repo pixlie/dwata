@@ -9,7 +9,7 @@ import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_
 
 export const fetchData = savedQuery => (dispatch, getState) => {
   const state = getState();
-  let sourceId = null, tableName = null, cacheKey = null, qS = null;
+  let sourceId = null, tableName = null, cacheKey = null, qS = {};
   if (!!savedQuery) {
     // Todo: Refactor the repeat code in cache key and path parts
     sourceId = savedQuery.source_id;
@@ -28,7 +28,9 @@ export const fetchData = savedQuery => (dispatch, getState) => {
   } else {
     ({params: {sourceId, tableName}} = getSourceFromPath(state.router.location.pathname));
     cacheKey = getCacheKey(state);
-    qS = state.querySpecification;
+    if (state.querySpecification.cacheKey === cacheKey) {
+      qS = state.querySpecification;
+    }
   }
   const {columnsSelected, orderBy, filterBy, limit, offset} = qS;
 
@@ -75,7 +77,7 @@ export const fetchData = savedQuery => (dispatch, getState) => {
     cacheKey,
   });
   const querySpecification = {
-    columns: columnsSelected.length > 0 ? columnsSelected : undefined,
+    columns: !!columnsSelected && columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
     filter_by: filterBy,
     limit,
