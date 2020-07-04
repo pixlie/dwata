@@ -1,4 +1,5 @@
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
+import { SAVE_QS_TO_CACHE } from "./actionTypes";
 
 
 const initialState = {
@@ -31,18 +32,34 @@ export default (state = {}, action) => {
         };
       }
       return {
-        ...initialState,
-        cacheKey: cacheKey,
-        _cachedData: {
-          ...state._cachedData,
-          [cacheKey]: undefined,
+        ...state,
+        [cacheKey]: {
+          ...initialState,
         }
       };
 
     case COMPLETE_FETCH_DATA:
       return {
         ...state,
+        [cacheKey]: {
+          ...initialState,
+          columnsSelected: action.payload.columns,
+          count: action.payload.count,
+          limit: action.payload.limit,
+          offset: action.payload.offset,
+          isReady: true,
+        },
       };
+
+    case SAVE_QS_TO_CACHE:
+      return {
+        ...state,
+        [cacheKey]: {
+          ...initialState,
+          ...action.payload,
+          isReady: true,
+        },
+      }
 
     default:
       return {

@@ -5,8 +5,15 @@ import { dataURL } from "services/urls";
 import { getSourceFromPath, getCacheKey } from "utils";
 import { LOAD_QS_FROM_CACHE, LAST_QUERY_SPECIFICATION } from "services/querySpecification/actionTypes";
 import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE, TOGGLE_ROW_SELECTION } from "./actionTypes";
+import { SAVE_QS_TO_CACHE } from "services/querySpecificationCache/actionTypes";
 
 
+/**
+ * Fetch a list of data rows from a table-like source using the dwata API. This method checks if we
+ * are fetching from a saved query, or if the requested data is already there in cache, etc.
+ * 
+ * @param {Object} savedQuery - The Object containing a query that user had saved earlier
+ */
 export const fetchData = savedQuery => (dispatch, getState) => {
   const state = getState();
   let sourceId = null, tableName = null, cacheKey = null, qS = {};
@@ -32,6 +39,7 @@ export const fetchData = savedQuery => (dispatch, getState) => {
       qS = state.querySpecification;
     }
   }
+
   const {columnsSelected, orderBy, filterBy, limit, offset} = qS;
 
   if (Object.keys(state.listCache).includes(cacheKey)) {
@@ -53,7 +61,9 @@ export const fetchData = savedQuery => (dispatch, getState) => {
           selectedRowList,
         },
       });
+
       if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
+        // If the query specification is in cache, then let's load it from there
         const {columnsSelected, filterBy, orderBy, count, limit, offset} = state.querySpecificationCache[cacheKey];
         dispatch({
           type: LOAD_QS_FROM_CACHE,
@@ -76,6 +86,19 @@ export const fetchData = savedQuery => (dispatch, getState) => {
     type: INITIATE_FETCH_DATA,
     cacheKey,
   });
+  // Since we are fetching new data, perhaps for a new table, we cache current query specification
+  if (!!state.querySpecification.cacheKey) {
+    dispatch({
+      type: SAVE_QS_TO_CACHE,
+      payload: {
+        ...state.querySpecification,
+        isReady: undefined,
+        cacheKey: undefined,
+        lastQuerySpecification: undefined,
+      },
+      cacheKey: state.querySpecification.cacheKey,
+    });
+  }
   const querySpecification = {
     columns: !!columnsSelected && columnsSelected.length > 0 ? columnsSelected : undefined,
     order_by: orderBy,
@@ -97,6 +120,27 @@ export const fetchData = savedQuery => (dispatch, getState) => {
         payload: querySpecification,
         cacheKey,
       });
+
+      if (cacheKey !== state.querySpecification.cacheKey) {
+        // We are loading data for a table-like source that is different than the one currently loaded.
+        // Check if we have a cached query specification for this newly loaded data.
+        if (Object.keys(state.querySpecificationCache).includes(cacheKey)) {
+          // Yes! We have query specification in cache, then let's load it from there.
+          const {columnsSelected, filterBy, orderBy, count, limit, offset} = state.querySpecificationCache[cacheKey];
+          dispatch({
+            type: LOAD_QS_FROM_CACHE,
+            cacheKey,
+            payload: {
+              columnsSelected,
+              filterBy,
+              orderBy,
+              count,
+              limit,
+              offset,
+            },
+          });
+        }
+      }
     })
     .catch(err => {
       console.log("Could not fetch sources. Try again later.");
