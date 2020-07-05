@@ -8,8 +8,8 @@ metadata = MetaData()
 
 
 # Todo: Change source_id to source_label
-saved_query_specification = Table(
-    "admin_meta_saved_query_specification",
+saved_query = Table(
+    "admin_meta_saved_query",
     metadata,
 
     Column("id", Integer, primary_key=True),
@@ -23,21 +23,21 @@ saved_query_specification = Table(
 )
 
 
-def saved_query_specification_pre_insert(values):
+def saved_query_pre_insert(values):
     values["created_at"] = datetime.utcnow()
     values["source_id"] = int(values["source_id"])
     values["query_specification"] = RapidJSONEncoder().encode(values["query_specification"]).encode("utf-8")
     return values
 
 
-def saved_query_specification_pre_update(values):
+def saved_query_pre_update(values):
     values["modified_at"] = datetime.utcnow()
     return values
 
 
-def saved_query_specification_post_read(data):
+def saved_query_post_read(data):
     pass
 
 
-def saved_query_specification_post_list():
+def saved_query_post_list():
     pass

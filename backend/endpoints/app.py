@@ -24,10 +24,10 @@ async def app_get(_):
                 "source_id": 0,
                 "table_name": "admin_record_pin",
             }],
-            ["saved_query_specification", True, {
+            ["saved_query", True, {
                 "in_use": True,
                 "source_id": 0,
-                "table_name": "admin_meta_saved_query_specification",
+                "table_name": "admin_meta_saved_query",
             }],
         ]
     })
