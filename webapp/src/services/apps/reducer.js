@@ -9,12 +9,11 @@ const initialState = {
   isRecordPinAppEnabled: false,
   recordPinAppConfig: {},
 
-  isSavedQuerySpecificationAppEnabled: false,
-  savedQuerySpecificationAppConfig: {},
+  isSavedQueryAppEnabled: false,
+  savedQueryAppConfig: {},
 
   isReady: false,
 };
-
 
 
 export default (state = initialState, action) => {
@@ -34,11 +33,11 @@ export default (state = initialState, action) => {
             isRecordPinAppEnabled: true,
             recordPinAppConfig: app.config,
           };
-        } else if (app.label === "saved_query_specification") {
+        } else if (app.label === "saved_query") {
           apps = {
             ...apps,
-            isSavedQuerySpecificationAppEnabled: true,
-            savedQuerySpecificationAppConfig: app.config,
+            isSavedQueryAppEnabled: true,
+            savedQueryAppConfig: app.config,
           };
         }
       }

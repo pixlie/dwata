@@ -4,7 +4,6 @@ import { Hero, Hx, Section } from "components/BulmaHelpers";
 import Source from "components/Source";
 import SavedQuerySpecifications from "components/SavedQuerySpecifications";
 
-
 export default () => {
   return (
     <Fragment>
@@ -22,6 +21,10 @@ export default () => {
           </div>
           <div className="column is-4">
             <Hx x="3">Reports</Hx>
+
+            <a href="/report/create" className="button is-success is-medium">
+              New Report
+            </a>
           </div>
         </div>
       </Section>

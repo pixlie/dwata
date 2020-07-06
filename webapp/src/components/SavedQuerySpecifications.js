@@ -21,7 +21,7 @@ const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fet
     <Panel title="Saved Queries">
       {savedQuerySpecificationList.isReady ? savedQuerySpecificationList.rows.map((sQS, i) => (
         <Link className="panel-block" to={`/browse/saved/${sQS.id}`} key={`sr-${i}`}>
-          {sQS.label}
+          <span className="tag is-light is-info">#{sQS.id}</span>&nbsp;{sQS.label}
         </Link>
       )) : null}
     </Panel>

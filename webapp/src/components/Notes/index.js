@@ -17,11 +17,12 @@ You can use notes to:
 - Which tables are important at which stage of business
 - Which tables are important for which teams in your business
 
-The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) syntax, which is automatically convered to HTML.
+The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+syntax, which is automatically converted to HTML.
 `;
 
 
-const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fetchNote, saveNote}) => {
+const Notes = ({ isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fetchNote, saveNote }) => {
   const handleKey = useCallback(event => {
     if (event.keyCode === 27) {
       showNotes(null);
@@ -68,10 +69,10 @@ const Notes = ({isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fe
     }));
   }
   const handleChange = event => {
-    event.preventDefault();
+    const { value } = event.target;
     setState(state => ({
       ...state,
-      content: event.target.value,
+      content: value,
     }));
   }
 

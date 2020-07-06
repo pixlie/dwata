@@ -19,7 +19,7 @@ import OrderEditor from "components/QueryEditor/OrderEditor";
 import Paginator from "components/QueryEditor/Paginator";
 import Notes from "components/Notes";
 import Actions from "components/Actions";
-
+import Report from "components/Report";
 
 export default ({ initialState }) => {
   return (
@@ -70,6 +70,14 @@ export default ({ initialState }) => {
             <APIBrowser />
           </Route>
 
+          <Route path="/report/create" exact>
+            <Report />
+          </Route>
+
+          <Route path="/report/:reportId" exact>
+            <Report />
+          </Route>
+
           <Route path="/" exact>
             <Home />
           </Route>
@@ -77,4 +85,4 @@ export default ({ initialState }) => {
       </ConnectedRouter>
     </Provider>
   );
-}
+};

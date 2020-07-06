@@ -52,13 +52,13 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
 
 
 export const getSavedQueryAppConfig = (state) => {
-  const {isSavedQuerySpecificationAppEnabled, savedQuerySpecificationAppConfig} = state.apps;
-  if (!isSavedQuerySpecificationAppEnabled) {
+  const {isSavedQueryAppEnabled, savedQueryAppConfig} = state.apps;
+  if (!isSavedQueryAppEnabled) {
     throw new AppException(AppExceptionCodes.notEnabled, "savedQuery");
-  } else if (!savedQuerySpecificationAppConfig) {
+  } else if (!savedQueryAppConfig) {
     throw new AppException(AppExceptionCodes.configNotLoaded, "savedQuery");
   }
-  const {source_id: sourceId, table_name: tableName} = savedQuerySpecificationAppConfig;
+  const {source_id: sourceId, table_name: tableName} = savedQueryAppConfig;
   const cacheKey = createCacheKeyFromParts(sourceId, tableName);
   return {
     sourceId,

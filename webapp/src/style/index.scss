@@ -1,19 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap");
 
 // Update Bulma's global variables
 $family-sans-serif: "Quicksand", sans-serif;
 
 // Reduce the size of the default shadow
 $scheme-invert: hsl(0, 0%, 4%);
-$card-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
-$panel-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
-$box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+$card-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
+$panel-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
+$box-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
 $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 
-@import '../../node_modules/bulma';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/solid.css';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/regular.css';
+@import "../../node_modules/bulma";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
 
 html {
   min-width: 100%;
@@ -21,12 +24,13 @@ html {
 }
 
 body {
-  background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
   min-height: 100%;
   min-width: 100%;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   &.title {
     font-weight: 900;
   }
@@ -179,7 +183,6 @@ table {
   }
 }
 
-
 #paginator {
   z-index: 80;
   background-color: #fdf7e3;
@@ -190,7 +193,6 @@ table {
   bottom: 4rem;
   right: 12rem;
 }
-
 
 #detail-modal {
   z-index: 100;
@@ -250,7 +252,6 @@ table {
   }
 }
 
-
 #filter-editor {
   z-index: 90;
   background-color: white;
@@ -269,7 +270,6 @@ table {
     padding: 1.2rem 1.6rem;
   }
 }
-
 
 #order-editor {
   z-index: 90;
@@ -290,7 +290,6 @@ table {
   }
 }
 
-
 #actions-modal {
   z-index: 90;
   background-color: white;
@@ -310,7 +309,6 @@ table {
   }
 }
 
-
 .col-hd-spec-box {
   z-index: 80;
   background-color: #fdf7e3;
@@ -322,7 +320,6 @@ table {
   min-width: 12rem;
   display: block;
 }
-
 
 #notes-modal {
   z-index: 100;
