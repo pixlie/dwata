@@ -162,14 +162,9 @@ const mapStateToProps = (state, props) => {
   const { source_id: sourceId, table_name: tableName } = noteAppConfig;
   const _cacheKey = `${sourceId}/${tableName}/${btoa(showNotesFor)}`;
 
-  let isReady = false;
   if (showNotesFor !== null) {
-    isReady = true;
-  }
-
-  if (isReady) {
     return {
-      isReady,
+      isReady: true,
       isNoteAppEnabled,
       showNotesFor,
       cacheKey: _cacheKey,
@@ -177,13 +172,13 @@ const mapStateToProps = (state, props) => {
         ? state.dataItem[_cacheKey].data
         : null,
     };
-  } else {
-    return {
-      isReady,
-      cacheKey: _cacheKey,
-      showNotesFor,
-    };
   }
+
+  return {
+    isReady: false,
+    cacheKey: _cacheKey,
+    showNotesFor,
+  };
 };
 
 export default withRouter(

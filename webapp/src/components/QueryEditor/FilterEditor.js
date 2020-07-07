@@ -1,19 +1,26 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import { getCacheKey } from "utils";
+import { getQueryDetails } from "services/browser/getters";
 import { fetchData } from "services/browser/actions";
-import { getSavedQuery } from "services/apps/getters";
 import { saveQuery } from "services/apps/actions";
-import { initiateFilter, removeFilter } from "services/querySpecification/actions";
+import {
+  initiateFilter,
+  removeFilter,
+} from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
-
 const FilterEditor = ({
-  isReady, isVisible, schemaColumns, filterBy, initiateFilter, removeFilter, fetchData,
-  saveQuery
+  isReady,
+  isVisible,
+  schemaColumns,
+  filterBy,
+  initiateFilter,
+  removeFilter,
+  fetchData,
+  saveQuery,
 }) => {
   const [state, setState] = useState({
     isSavingQuery: false,
@@ -23,27 +30,29 @@ const FilterEditor = ({
   if (!isReady || !isVisible) {
     return null;
   }
-  const addFilter = event => {
+  const addFilter = (event) => {
     event.preventDefault();
-    const {value} = event.target;
+    const { value } = event.target;
     if (value === "") {
       return;
     }
-    const dataType = schemaColumns.find(x => x.name === value);
+    const dataType = schemaColumns.find((x) => x.name === value);
     initiateFilter(value, dataType);
-  }
+  };
 
-  const handleRemoveFilter = name => event => {
+  const handleRemoveFilter = (name) => (event) => {
     event.preventDefault();
     if (name in filterBy) {
       removeFilter(name);
     }
-  }
+  };
 
   const filters = [];
   if (Object.keys(filterBy).length > 0) {
     filters.push(
-      <p className="tip" key="fl-rm-hd">Double click column name to remove filter</p>
+      <p className="tip" key="fl-rm-hd">
+        Double click column name to remove filter
+      </p>
     );
   }
 
@@ -51,7 +60,12 @@ const FilterEditor = ({
     filters.push(
       <div key={`fl-${columnName}`} className="field is-horizontal">
         <div className="field-label">
-          <label className="label" onDoubleClick={handleRemoveFilter(columnName)}>{columnName}</label>
+          <label
+            className="label"
+            onDoubleClick={handleRemoveFilter(columnName)}
+          >
+            {columnName}
+          </label>
         </div>
 
         <div className="field-body">
@@ -61,41 +75,49 @@ const FilterEditor = ({
     );
   }
 
-  const filterByOptions = [<option value="---" key="fl-hd">Filter by</option>];
+  const filterByOptions = [
+    <option value="---" key="fl-hd">
+      Filter by
+    </option>,
+  ];
   for (const head of schemaColumns) {
-    filterByOptions.push(<option value={head.name} key={`fl-${head.name}`}>{head.name}</option>);
+    filterByOptions.push(
+      <option value={head.name} key={`fl-${head.name}`}>
+        {head.name}
+      </option>
+    );
   }
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     fetchData();
   };
 
-  const handleSaveQuery = event => {
+  const handleSaveQuery = (event) => {
     if (state.isSavingQuery) {
       saveQuery(state.savedQueryLabel);
     } else {
-      setState(state => ({
+      setState((state) => ({
         ...state,
         isSavingQuery: true,
       }));
     }
-  }
+  };
 
-  const cancelSaveQuery = event => {
-    setState(state => ({
+  const cancelSaveQuery = (event) => {
+    setState((state) => ({
       ...state,
       isSavingQuery: false,
     }));
-  }
+  };
 
-  const handleSavedFilterLabelChange = event => {
+  const handleSavedFilterLabelChange = (event) => {
     const { value } = event.target;
-    setState(state => ({
+    setState((state) => ({
       ...state,
       savedQueryLabel: value,
     }));
-  }
+  };
 
   return (
     <div id="filter-editor">
@@ -117,7 +139,12 @@ const FilterEditor = ({
         {state.isSavingQuery ? (
           <div className="field">
             <div className="control">
-              <input className="input" onChange={handleSavedFilterLabelChange} value={state.savedQueryLabel} placeholder="Label for this Query" />
+              <input
+                className="input"
+                onChange={handleSavedFilterLabelChange}
+                value={state.savedQueryLabel}
+                placeholder="Label for this Query"
+              />
             </div>
           </div>
         ) : null}
@@ -125,80 +152,64 @@ const FilterEditor = ({
         <div className="buttons">
           {state.isSavingQuery ? (
             <Fragment>
-              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
-              <button className="button is-white" onClick={cancelSaveQuery}>Cancel</button>
+              <button className="button is-success" onClick={handleSaveQuery}>
+                Save Query
+              </button>
+              <button className="button is-white" onClick={cancelSaveQuery}>
+                Cancel
+              </button>
             </Fragment>
           ) : (
             <Fragment>
-              <button className="button is-success" onClick={handleSubmit}>Apply</button>
-              <button className="button is-success" onClick={handleSaveQuery}>Save Query</button>
-              <button className="button is-success" onClick={() => {}}>Start funnel</button>
+              <button className="button is-success" onClick={handleSubmit}>
+                Apply
+              </button>
+              <button className="button is-success" onClick={handleSaveQuery}>
+                Save Query
+              </button>
+              <button className="button is-success" onClick={() => {}}>
+                Start funnel
+              </button>
             </Fragment>
           )}
         </div>
       </Section>
     </div>
   );
-}
-
+};
 
 const mapStateToProps = (state, props) => {
-  // Our Grid can be called either for a particular data source/table or from a saved query
-  let {sourceId, tableName, savedQueryId} = props.match.params;
-  let cacheKey = null;
-  if (!!savedQueryId) {
-    // The Grid was called on a saved query, we need to find the real data source and query spec
-    if (!state.apps.isReady) {
-      return {
-        isReady: false,
-      };
-    }
+  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
-    const savedQuery = getSavedQuery(state, savedQueryId);
-    if (!!savedQuery && Object.keys(savedQuery).includes("source_id")) {
-      cacheKey = getCacheKey(null, savedQuery);
-      sourceId = parseInt(savedQuery.source_id);
-      tableName = savedQuery.table_name;
-    } else {
-      return {
-        isReady: false,
-      };
-    }
-  } else {
-    cacheKey = getCacheKey(state);
-    sourceId = parseInt(sourceId);
-  }
-  let isReady = false;
-
-  if (state.schema.isReady && state.schema.sourceId === sourceId &&
-    state.browser.isReady && state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady && state.querySpecification.cacheKey === cacheKey) {
-    isReady = true;
-  }
-
-  if (isReady) {
+  if (
+    state.schema.isReady &&
+    state.schema.sourceId === sourceId &&
+    state.browser.isReady &&
+    state.browser.cacheKey === cacheKey &&
+    state.querySpecification.isReady &&
+    state.querySpecification.cacheKey === cacheKey
+  ) {
     return {
-      isReady,
+      isReady: true,
       sourceId,
       tableName,
-      schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
+      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
+        .columns,
       filterBy: state.querySpecification.filterBy,
       isVisible: state.global.isFEVisible,
     };
-  } else {
-    return {
-      isReady,
-    };
   }
-}
 
+  return {
+    isReady: false,
+  };
+};
 
-export default withRouter(connect(
-  mapStateToProps,
-  {
+export default withRouter(
+  connect(mapStateToProps, {
     initiateFilter,
     removeFilter,
     fetchData,
     saveQuery,
-  }
-)(FilterEditor));
+  })(FilterEditor)
+);

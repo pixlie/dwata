@@ -7,7 +7,6 @@ import { showNotes } from "services/global/actions";
 import { fetchNote, saveNote } from "services/apps/actions";
 import { Section } from "components/BulmaHelpers";
 
-
 const defaultNote = `# Notes
 Notes help you and your team save time to understand data in relation to your business.
 Notes are great documentation for onboarding new team members.
@@ -21,24 +20,34 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 syntax, which is automatically converted to HTML.
 `;
 
-
-const Notes = ({ isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, fetchNote, saveNote }) => {
-  const handleKey = useCallback(event => {
-    if (event.keyCode === 27) {
-      showNotes(null);
-    }
-  }, [showNotes]);
+const Notes = ({
+  isReady,
+  showNotesFor,
+  isNoteAppEnabled,
+  dataItem,
+  showNotes,
+  fetchNote,
+  saveNote,
+}) => {
+  const handleKey = useCallback(
+    (event) => {
+      if (event.keyCode === 27) {
+        showNotes(null);
+      }
+    },
+    [showNotes]
+  );
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);
 
     return () => {
       document.removeEventListener("keydown", handleKey, false);
-    }
+    };
   }, [handleKey]);
   const doStates = Object.freeze({
     read: "read",
     edit: "edit",
-    preview: "preview",  // This is like read, but with the save button
+    preview: "preview", // This is like read, but with the save button
   });
   const [state, setState] = useState({
     current: doStates.read,
@@ -47,61 +56,72 @@ const Notes = ({ isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, f
   });
   useEffect(() => {
     fetchNote();
-    setState(state => ({
+    setState((state) => ({
       ...state,
       content: defaultNote,
     }));
   }, [showNotesFor, fetchNote]);
   useEffect(() => {
     if (dataItem) {
-      setState(state => ({
+      setState((state) => ({
         ...state,
         content: dataItem.content,
         existingNote: dataItem,
       }));
     }
   }, [dataItem]);
-  const toggleState = transitionTo => event => {
+  const toggleState = (transitionTo) => (event) => {
     event.preventDefault();
-    setState(state => ({
+    setState((state) => ({
       ...state,
       current: transitionTo,
     }));
-  }
-  const handleChange = event => {
+  };
+  const handleChange = (event) => {
     const { value } = event.target;
-    setState(state => ({
+    setState((state) => ({
       ...state,
       content: value,
     }));
-  }
+  };
 
   if (!isNoteAppEnabled || !isReady) {
     return null;
   }
-  const handleClose = event => {
+  const handleClose = (event) => {
     event.preventDefault();
     showNotes(null);
-  }
+  };
 
-  const handleSave = event => {
+  const handleSave = (event) => {
     event.preventDefault();
-    saveNote({
-      content: state.content,
-    }, state.existingNote.id ? state.existingNote.id : null);
-  }
+    saveNote(
+      {
+        content: state.content,
+      },
+      state.existingNote.id ? state.existingNote.id : null
+    );
+  };
 
   return (
     <div id="notes-modal">
       <Section>
-        <button className="button is-rounded is-dark close" onClick={handleClose}>
+        <button
+          className="button is-rounded is-dark close"
+          onClick={handleClose}
+        >
           Close&nbsp;<i className="fas fa-times"></i>
         </button>
 
         {state.current === doStates.edit ? (
           <div className="field">
             <div className="control">
-              <textarea className="textarea" defaultValue={state.content} rows="12" onChange={handleChange}></textarea>
+              <textarea
+                className="textarea"
+                defaultValue={state.content}
+                rows="12"
+                onChange={handleChange}
+              ></textarea>
             </div>
           </div>
         ) : (
@@ -110,53 +130,76 @@ const Notes = ({ isReady, showNotesFor, isNoteAppEnabled, dataItem, showNotes, f
           </div>
         )}
         <div className="buttons">
-          {[doStates.edit, doStates.preview].includes(state.current) ?
-            <button className="button is-primary" disabled={defaultNote === state.content} onClick={handleSave}>Save</button>
-          : null}
-          {[doStates.read, doStates.preview].includes(state.current) ? <button className="button is-primary" onClick={toggleState(doStates.edit)}>Edit note</button> : null}
-          {state.current === doStates.edit ? <button className="button is-light" onClick={toggleState(doStates.preview)}>Preview</button> : null}
-          {state.current === doStates.edit ? <button className="button is-light" onClick={toggleState(doStates.read)}>Cancel</button> : null}
+          {[doStates.edit, doStates.preview].includes(state.current) ? (
+            <button
+              className="button is-primary"
+              disabled={defaultNote === state.content}
+              onClick={handleSave}
+            >
+              Save
+            </button>
+          ) : null}
+          {[doStates.read, doStates.preview].includes(state.current) ? (
+            <button
+              className="button is-primary"
+              onClick={toggleState(doStates.edit)}
+            >
+              Edit note
+            </button>
+          ) : null}
+          {state.current === doStates.edit ? (
+            <button
+              className="button is-light"
+              onClick={toggleState(doStates.preview)}
+            >
+              Preview
+            </button>
+          ) : null}
+          {state.current === doStates.edit ? (
+            <button
+              className="button is-light"
+              onClick={toggleState(doStates.read)}
+            >
+              Cancel
+            </button>
+          ) : null}
         </div>
       </Section>
     </div>
   );
-}
+};
 
-
-const mapStateToProps = state => {
-  const {showNotesFor} = state.global;
-  const {isNoteAppEnabled, noteAppConfig} = state.apps;
-  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
+const mapStateToProps = (state) => {
+  const { showNotesFor } = state.global;
+  const { isNoteAppEnabled, noteAppConfig } = state.apps;
+  const { source_id: sourceId, table_name: tableName } = noteAppConfig;
   const _cacheKey = `${sourceId}/${tableName}/${btoa(showNotesFor)}`;
 
-  let isReady = false;
-  if (showNotesFor !== null && _cacheKey in state.dataItem && state.dataItem[_cacheKey].isReady) {
-    isReady = true;
-  }
-
-  if (isReady) {
+  if (
+    showNotesFor !== null &&
+    _cacheKey in state.dataItem &&
+    state.dataItem[_cacheKey].isReady
+  ) {
     return {
-      isReady,
+      isReady: true,
       isNoteAppEnabled,
       showNotesFor,
       cacheKey: _cacheKey,
       dataItem: state.dataItem[_cacheKey].data,
-    }
-  } else {
-    return {
-      isReady,
-      cacheKey: _cacheKey,
-      showNotesFor,
     };
   }
-}
 
+  return {
+    isReady: false,
+    cacheKey: _cacheKey,
+    showNotesFor,
+  };
+};
 
-export default withRouter(connect(
-  mapStateToProps,
-  {
+export default withRouter(
+  connect(mapStateToProps, {
     showNotes,
     fetchNote,
     saveNote,
-  }
-)(Notes));
+  })(Notes)
+);

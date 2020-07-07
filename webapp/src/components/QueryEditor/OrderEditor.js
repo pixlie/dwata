@@ -2,19 +2,34 @@ import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { getQueryDetails } from "services/browser/getters";
 import { fetchData } from "services/browser/actions";
 import { addOrderBy, changeOrderBy } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
-
-const OrderEditor = ({isReady, isVisible, schemaColumns, orderBy, addOrderBy, changeOrderBy}) => {
+const OrderEditor = ({
+  isReady,
+  isVisible,
+  schemaColumns,
+  orderBy,
+  addOrderBy,
+  changeOrderBy,
+}) => {
   if (!isReady || !isVisible) {
     return null;
   }
 
-  const order_by_options = [<option value="" key="ord-hd">Order by</option>];
+  const order_by_options = [
+    <option value="" key="ord-hd">
+      Order by
+    </option>,
+  ];
   for (const head of schemaColumns) {
-    order_by_options.push(<option value={head.name} key={`ord-${head.name}`}>{head.name}</option>);
+    order_by_options.push(
+      <option value={head.name} key={`ord-${head.name}`}>
+        {head.name}
+      </option>
+    );
   }
 
   return (
@@ -22,7 +37,7 @@ const OrderEditor = ({isReady, isVisible, schemaColumns, orderBy, addOrderBy, ch
       <Section>
         <Hx x="4">Ordering</Hx>
 
-        {Object.keys(orderBy).map(col => (
+        {Object.keys(orderBy).map((col) => (
           <div className="field is-horizontal" key={`or-${col}`}>
             <div className="field-label">
               <label className="label">{col}</label>
@@ -32,12 +47,24 @@ const OrderEditor = ({isReady, isVisible, schemaColumns, orderBy, addOrderBy, ch
               <div className="field is-narrow">
                 <div className="control">
                   <label className="radio">
-                    <input type="radio" name={col} value="asc" checked={orderBy[col] === "asc"} onChange={changeOrderBy} />
+                    <input
+                      type="radio"
+                      name={col}
+                      value="asc"
+                      checked={orderBy[col] === "asc"}
+                      onChange={changeOrderBy}
+                    />
                     &nbsp;asc
                   </label>
 
                   <label className="radio">
-                    <input type="radio" name={col} value="desc" checked={orderBy[col] === "desc"} onChange={changeOrderBy} />
+                    <input
+                      type="radio"
+                      name={col}
+                      value="desc"
+                      checked={orderBy[col] === "desc"}
+                      onChange={changeOrderBy}
+                    />
                     &nbsp;desc
                   </label>
                 </div>
@@ -60,43 +87,38 @@ const OrderEditor = ({isReady, isVisible, schemaColumns, orderBy, addOrderBy, ch
 
         <div className="control">
           <div className="select is-fullwidth">
-            <select onChange={addOrderBy}>
-              {order_by_options}
-            </select>
+            <select onChange={addOrderBy}>{order_by_options}</select>
           </div>
         </div>
       </Section>
     </div>
   );
-}
-
+};
 
 const mapStateToProps = (state, props) => {
-  let { sourceId, tableName } = props.match.params;
-  sourceId = parseInt(sourceId);
-  const _browserCacheKey = `${sourceId}/${tableName}`;
-  let isReady = false;
-  if (state.schema.isReady && state.schema.sourceId === parseInt(sourceId) &&
-    state.querySpecification.isReady && state.querySpecification._cacheKey === _browserCacheKey) {
-    isReady = true;
-  }
+  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
-  if (isReady) {
+  if (
+    state.schema.isReady &&
+    state.schema.sourceId === sourceId &&
+    state.querySpecification.isReady &&
+    state.querySpecification.cacheKey === cacheKey
+  ) {
     return {
-      isReady,
-      schemaColumns: state.schema.rows.find(x => x.table_name === tableName).columns,
+      isReady: true,
+      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
+        .columns,
       orderBy: state.querySpecification.orderBy,
       isVisible: state.global.isOEVisible,
     };
-  } else {
-    return {
-      isReady,
-    };
   }
-}
 
+  return {
+    isReady: false,
+  };
+};
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
   addOrderBy: (event) => {
     event.preventDefault();
     const { value } = event.target;
@@ -114,7 +136,6 @@ const mapDispatchToProps = dispatch => ({
   fetchData,
 });
 
-export default withRouter(connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(OrderEditor));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(OrderEditor)
+);
