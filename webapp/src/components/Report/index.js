@@ -2,6 +2,7 @@ import React from "react";
 
 import { Section } from "components/BulmaHelpers";
 import Grid from "components/Grid";
+import { QueryContext } from "utils";
 import NoteEditor from "./NoteEditor";
 
 export default () => {
@@ -11,7 +12,9 @@ export default () => {
         <div className="column is-10">
           <NoteEditor showNotesFor="report/12" />
 
-          <Grid />
+          <QueryContext.Provider value={{ queryDetails: { savedQueryId: 2 } }}>
+            <Grid />
+          </QueryContext.Provider>
         </div>
 
         <div className="column is-2">

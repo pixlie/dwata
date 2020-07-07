@@ -33,7 +33,7 @@ export default ({ initialState }) => {
         </Sidebar>
 
         <Switch>
-          <Route path="/browse/saved/:savedQueryId" exact>
+          <Route path="/saved/:savedQueryId" exact>
             <Grid />
             <ColumnSelector />
             <FilterEditor />

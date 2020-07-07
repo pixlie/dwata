@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 import { getQueryDetails } from "services/browser/getters";
+import { withQueryDetails } from "utils";
 import { fetchData, toggleRowSelection } from "services/browser/actions";
 import { fetchPins, fetchSavedQuery } from "services/apps/actions";
 import { fetchSchema } from "services/schema/actions";
@@ -39,11 +40,13 @@ const mapStateToProps = (state, props) => {
 };
 
 export default withRouter(
-  connect(mapStateToProps, {
-    fetchData,
-    fetchSchema,
-    toggleRowSelection,
-    fetchPins,
-    fetchSavedQuery,
-  })(SavedQueryLoader)
+  withQueryDetails(
+    connect(mapStateToProps, {
+      fetchData,
+      fetchSchema,
+      toggleRowSelection,
+      fetchPins,
+      fetchSavedQuery,
+    })(SavedQueryLoader)
+  )
 );

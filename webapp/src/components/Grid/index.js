@@ -2,6 +2,7 @@ import React, { useEffect, Fragment } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
+import { withQueryDetails } from "utils";
 import { toggleRowSelection } from "services/browser/actions";
 import { fetchPins } from "services/apps/actions";
 import { getPinsFromCache } from "services/apps/getters";
@@ -158,8 +159,10 @@ const mapStateToProps = (state, props) => {
 };
 
 export default withRouter(
-  connect(mapStateToProps, {
-    toggleRowSelection,
-    fetchPins,
-  })(Grid)
+  withQueryDetails(
+    connect(mapStateToProps, {
+      toggleRowSelection,
+      fetchPins,
+    })(Grid)
+  )
 );

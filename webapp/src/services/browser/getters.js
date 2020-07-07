@@ -5,6 +5,11 @@ export const getQueryDetails = (state, props) => {
   // Our Grid can be called either for a particular data source/table or from a saved query
   // First we see if sourceId, tableName, savedQueryId are directly in URL
   let { sourceId, tableName, pk, savedQueryId } = props.match.params;
+  if ((!sourceId || !savedQueryId) && "queryDetails" in props) {
+    // We could not find a sourceId or savedQueryId in URL
+    // Let's check for our QueryContext
+    ({ sourceId, tableName, pk, savedQueryId } = props.queryDetails);
+  }
   let cacheKey = null,
     savedQuery = {};
 

@@ -2,13 +2,16 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { Panel } from "components/BulmaHelpers";
 import { transformData } from "utils";
+import { Panel } from "components/BulmaHelpers";
 import { fetchSavedQuery } from "services/apps/actions";
 import { getSavedQuery } from "services/apps/getters";
 
-
-const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fetchSavedQuery}) => {
+const SavedQuerySpecifications = ({
+  appsIsReady,
+  savedQuerySpecificationList,
+  fetchSavedQuery,
+}) => {
   useEffect(() => {
     appsIsReady && fetchSavedQuery();
   }, [appsIsReady, fetchSavedQuery]);
@@ -19,17 +22,23 @@ const SavedQuerySpecifications = ({appsIsReady, savedQuerySpecificationList, fet
 
   return (
     <Panel title="Saved Queries">
-      {savedQuerySpecificationList.isReady ? savedQuerySpecificationList.rows.map((sQS, i) => (
-        <Link className="panel-block" to={`/browse/saved/${sQS.id}`} key={`sr-${i}`}>
-          <span className="tag is-light is-info">#{sQS.id}</span>&nbsp;{sQS.label}
-        </Link>
-      )) : null}
+      {savedQuerySpecificationList.isReady
+        ? savedQuerySpecificationList.rows.map((sQS, i) => (
+            <Link
+              className="panel-block"
+              to={`/saved/${sQS.id}`}
+              key={`sr-${i}`}
+            >
+              <span className="tag is-light is-info">#{sQS.id}</span>&nbsp;
+              {sQS.label}
+            </Link>
+          ))
+        : null}
     </Panel>
   );
-}
+};
 
-
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const appsIsReady = state.apps.isReady;
   if (!appsIsReady) {
     return {
@@ -40,15 +49,18 @@ const mapStateToProps = state => {
 
   return {
     appsIsReady,
-    savedQuerySpecificationList: savedQuerySpecificationList.isReady === true ? {
-      ...savedQuerySpecificationList,
-      rows: [...savedQuerySpecificationList.rows].map(row => transformData(savedQuerySpecificationList.columns, row)),
-    } : savedQuerySpecificationList,
-  }
-}
+    savedQuerySpecificationList:
+      savedQuerySpecificationList.isReady === true
+        ? {
+            ...savedQuerySpecificationList,
+            rows: [...savedQuerySpecificationList.rows].map((row) =>
+              transformData(savedQuerySpecificationList.columns, row)
+            ),
+          }
+        : savedQuerySpecificationList,
+  };
+};
 
-
-export default connect(
-  mapStateToProps,
-  { fetchSavedQuery }
-)(SavedQuerySpecifications);
+export default connect(mapStateToProps, { fetchSavedQuery })(
+  SavedQuerySpecifications
+);
