@@ -15,6 +15,12 @@ export default () => {
           <QueryContext.Provider value={{ queryDetails: { savedQueryId: 2 } }}>
             <Grid />
           </QueryContext.Provider>
+
+          <NoteEditor showNotesFor="report/12" />
+
+          <QueryContext.Provider value={{ queryDetails: { savedQueryId: 1 } }}>
+            <Grid />
+          </QueryContext.Provider>
         </div>
 
         <div className="column is-2">
