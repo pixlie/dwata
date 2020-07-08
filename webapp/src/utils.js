@@ -1,5 +1,7 @@
 import React from "react";
-import { matchPath } from "react-router-dom";
+// import { matchPath } from "react-router-dom";
+
+const matchPath = () => ({});
 
 export const transformData = (columns, row) =>
   row.reduce(
