@@ -1,6 +1,4 @@
 import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { getQueryDetails } from "services/browser/getters";
@@ -43,7 +41,7 @@ const ColumnHeadSpecification = ({ toggleOrderBy, head, fetchData }) => {
   );
 };
 
-const TableHeadItem = ({
+export default ({
   isReady,
   head,
   ordering,
@@ -118,6 +116,7 @@ const TableHeadItem = ({
   }
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -151,3 +150,4 @@ export default withRouter(
     fetchData,
   })(TableHeadItem)
 );
+*/

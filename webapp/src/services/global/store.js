@@ -1,7 +1,10 @@
 import create from "zustand";
 
+import * as constants from "./constants";
+
 const initialState = {
-  mainApp: "home",
+  mainApp: constants.APP_NAME_HOME,
+  queryContext: {},
   isSidebarVisible: false, // Is Sidebar modal On
   isActionsVisible: false, // Is Actions modal On
   isFEVisible: false, // Is FilterEditor modal On
@@ -23,60 +26,60 @@ const allModalsClosedState = {
   showNotesFor: null,
 };
 
-const toggleSidebar = (state) => ({
-  ...state,
-  isSidebarVisible: !state.isSidebarVisible,
+const toggleSidebar = (inner) => ({
+  ...inner,
+  isSidebarVisible: !inner.isSidebarVisible,
 });
 
-const toggleColumnHeadSpecification = (state, columnName) => ({
-  ...state,
+const toggleColumnHeadSpecification = (inner, columnName) => ({
+  ...inner,
   ...allModalsClosedState,
   activeColumnHeadSpecification:
-    state.activeColumnHeadSpecification === null ||
-    state.activeColumnHeadSpecification !== columnName
+    inner.activeColumnHeadSpecification === null ||
+    inner.activeColumnHeadSpecification !== columnName
       ? columnName
       : null,
 });
 
-const toggleActions = (state) => ({
-  ...state,
+const toggleActions = (inner) => ({
+  ...inner,
   ...allModalsClosedState,
-  isActionsVisible: !state.isActionsVisible,
+  isActionsVisible: !inner.isActionsVisible,
 });
 
-const showNotesFor = (state, identifier) => ({
-  ...state,
+const showNotesFor = (inner, identifier) => ({
+  ...inner,
   ...allModalsClosedState,
-  showNotesFor: state.showNotesFor === null ? identifier : null,
+  showNotesFor: inner.showNotesFor === null ? identifier : null,
 });
 
-const toggleFilterEditor = (state) => ({
-  ...state,
+const toggleFilterEditor = (inner) => ({
+  ...inner,
   ...allModalsClosedState,
-  isFEVisible: !state.isFEVisible,
+  isFEVisible: !inner.isFEVisible,
 });
 
-const toggleColumnSelectorUI = (state) => ({
-  ...state,
+const toggleColumnSelectorUI = (inner) => ({
+  ...inner,
   ...allModalsClosedState,
-  isCSVisible: !state.isCSVisible,
+  isCSVisible: !inner.isCSVisible,
 });
 
-const toggleSortEditor = (state) => ({
-  ...state,
+const toggleSortEditor = (inner) => ({
+  ...inner,
   ...allModalsClosedState,
-  isOEVisible: !state.isOEVisible,
+  isOEVisible: !inner.isOEVisible,
 });
 
 // case TOGGLE_PINNED_RECORDS:
 //   return {
-//     ...state,
-//     showPinnedRecords: !state.showPinnedRecords,
+//     ...inner,
+//     showPinnedRecords: !inner.showPinnedRecords,
 //   };
 
 // case CLOSE_ALL_MODALS:
 //   return {
-//     ...state,
+//     ...inner,
 //     ...allModalsClosedState,
 //   };
 
@@ -84,6 +87,21 @@ const [useStore] = create((set) => ({
   inner: {
     ...initialState,
   },
+
+  setMainApp: (appName, appContext) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        mainApp: appName,
+        queryContext: {
+          ...state.inner.queryContext,
+          main: {
+            ...appContext,
+            key: "main",
+          },
+        },
+      },
+    })),
 
   toggleSidebar: () =>
     set((state) => ({

@@ -11,24 +11,28 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = (state) => ({
-  ...state,
+const initiateFetch = (inner) => ({
+  ...inner,
   isFetching: true,
 });
 
-const completeFetch = (state, payload) => ({
+const completeFetch = (inner, payload) => ({
   columns: payload.columns,
   rows: payload.rows.map((row) => transformData(payload.columns, row)),
   isFetching: false,
   isReady: true,
 });
 
-const [useStore] = create((set) => ({
+const [useStore] = create((set, get) => ({
   inner: {
     ...initialState,
   },
 
   fetchSource: async () => {
+    if (get().inner.isFetching) {
+      return;
+    }
+
     set((state) => ({
       inner: initiateFetch(state.inner),
     }));

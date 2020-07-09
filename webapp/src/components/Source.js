@@ -8,14 +8,14 @@ export default () => {
   const fetchSource = useSource((state) => state.fetchSource);
   useEffect(() => {
     fetchSource();
-  });
+  }, [fetchSource]);
   const sourceList = useSource((state) => state.inner);
   const [state, setState] = useState({
     sourceIndex: null,
   });
   // const {sourceIndex} = state;
 
-  const SourceItem = ({ source, i, sourceType }) => {
+  const SourceItem = ({ source, sourceType }) => {
     if (source.properties["is_system_db"]) {
       // This is hackish, we need this since we use the index of source as in response from API
       // Todo: Remove this in [ch161] when moving to source label
@@ -25,7 +25,7 @@ export default () => {
       event.preventDefault();
       setState((state) => ({
         ...state,
-        sourceIndex: i,
+        sourceIndex: source.label,
       }));
     };
 
@@ -36,13 +36,10 @@ export default () => {
           <span className="tag is-info is-light">{source.provider}</span>
         </div>
 
-        <TableList sourceIndex={i} sourceType={sourceType} />
+        <TableList sourceLabel={source.label} sourceType={sourceType} />
       </Fragment>
     );
   };
-  const count_database = sourceList.isReady
-    ? sourceList.rows.filter((x) => x.type === "database").length
-    : 0;
 
   return (
     <Fragment>
@@ -50,12 +47,11 @@ export default () => {
         {sourceList.isReady
           ? sourceList.rows
               .filter((x) => x.type === "database")
-              .map((source, i) => (
+              .map((source) => (
                 <SourceItem
                   source={source}
-                  i={i}
                   sourceType="database"
-                  key={`sr-${i}`}
+                  key={`sr-${source.label}`}
                 />
               ))
           : null}

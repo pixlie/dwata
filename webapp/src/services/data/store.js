@@ -1,4 +1,7 @@
 import create from "zustand";
+import axios from "axios";
+
+import { dataURL } from "services/urls";
 
 const initialState = {
   columns: [],
@@ -12,31 +15,27 @@ const initialState = {
   lastFetchedAt: null,
 };
 
-const initiateFetch = (state, queryUUID) => {
-  if (!queryUUID) {
+const initiateFetch = (inner, key) => {
+  if (key in inner) {
     return {
-      ...state,
+      // No need to initiate multiple times
+      ...inner,
     };
   }
 
   return {
-    ...state,
-    [queryUUID]: {
+    ...inner,
+    [key]: {
       ...initialState,
+      isFetching: true,
     },
   };
 };
 
-const completeFetch = (state, queryUUID, payload) => {
-  if (!queryUUID) {
-    return {
-      ...state,
-    };
-  }
-
+const completeFetch = (inner, key, payload) => {
   return {
-    ...state,
-    [queryUUID]: {
+    ...inner,
+    [key]: {
       ...initialState,
       columns: payload.columns,
       rows: payload.rows, // Here we do not transform data into maps/dicts
@@ -47,18 +46,39 @@ const completeFetch = (state, queryUUID, payload) => {
   };
 };
 
-const [useStore] = create((set) => ({
+const [useStore] = create((set, get) => ({
   inner: {},
 
-  initiateFetch: (queryUUID) =>
-    set((state) => ({
-      inner: initiateFetch(state.inner, queryUUID),
-    })),
+  fetchData: async (key, querySpecification, updateElse) => {
+    if (!key) {
+      return;
+    }
 
-  completeFetch: (queryUUID, payload) =>
+    if (get().inner[key] && get().inner[key].isFetching) {
+      return;
+    }
+
     set((state) => ({
-      inner: completeFetch(state.inner, queryUUID, payload),
-    })),
+      inner: initiateFetch(state.inner, key),
+    }));
+
+    try {
+      const response = await axios.post(dataURL, {
+        source_label: querySpecification.sourceLabel,
+        table_name: querySpecification.tableName,
+      });
+      set((state) => ({
+        inner: completeFetch(state.inner, key, response.data),
+      }));
+      if (!!updateElse) {
+        for (const updater of updateElse) {
+          updater(key, response.data);
+        }
+      }
+    } catch (error) {
+      console.log("Could not fetch schema. Try again later.");
+    }
+  },
 }));
 
 export default useStore;

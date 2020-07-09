@@ -12,38 +12,10 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = (state, queryUUID) => {
-  if (!queryUUID) {
-    return {
-      ...state,
-    };
-  }
-
-  if (queryUUID in state) {
-    // No need to initiate multiple times
-    return {
-      ...state,
-    };
-  }
-
+const setQuerySpecification = (inner, key, payload) => {
   return {
-    ...state,
-    [queryUUID]: {
-      ...initialState,
-    },
-  };
-};
-
-const completeFetch = (state, queryUUID, payload) => {
-  if (!queryUUID) {
-    return {
-      ...state,
-    };
-  }
-
-  return {
-    ...state,
-    [queryUUID]: {
+    ...inner,
+    [key]: {
       ...initialState,
       columnsSelected: payload.columns,
       count: payload.count,
@@ -54,16 +26,10 @@ const completeFetch = (state, queryUUID, payload) => {
   };
 };
 
-const cacheQuerySpecification = (state, queryUUID, editing) => {
-  if (!queryUUID) {
-    return {
-      ...state,
-    };
-  }
-
+const cacheQuerySpecification = (inner, key, editing) => {
   return {
-    ...state,
-    [queryUUID]: {
+    ...inner,
+    [key]: {
       ...initialState,
       ...editing,
       isReady: true,
@@ -75,19 +41,14 @@ const [useStore] = create((set) => ({
   inner: {},
   editing: {},
 
-  initiateFetch: (queryUUID) =>
+  setQuerySpecification: (key, payload) =>
     set((state) => ({
-      inner: initiateFetch(state.inner, queryUUID),
+      inner: setQuerySpecification(state.inner, key, payload),
     })),
 
-  completeFetch: (queryUUID, payload) =>
+  cacheQuerySpecification: (key) =>
     set((state) => ({
-      inner: completeFetch(state.inner, queryUUID, payload),
-    })),
-
-  cacheQuerySpecification: (queryUUID) =>
-    set((state) => ({
-      inner: cacheQuerySpecification(state.inner, queryUUID, state.editing),
+      inner: cacheQuerySpecification(state.inner, key, state.editing),
     })),
 }));
 

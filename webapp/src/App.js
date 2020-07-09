@@ -1,11 +1,13 @@
 import React, { Fragment } from "react";
 
 import useGlobal from "services/global/store";
+import * as globalConstants from "services/global/constants";
 // import Navbar from "components/Navbar";
 // import Source from "components/Source";
 // import Sidebar from "components/Sidebar";
+import { QueryContext } from "utils";
 import Home from "components/Home";
-// import Grid from "components/Grid";
+import Grid from "components/Grid";
 // import DetailView from "components/Detail";
 // import Funnel from "components/Funnel";
 // import APIBrowser from "components/APIBrowser";
@@ -19,29 +21,30 @@ import Home from "components/Home";
 
 export default () => {
   const mainApp = useGlobal((state) => state.inner.mainApp);
+  const queryContext = useGlobal((state) => state.inner.queryContext["main"]);
 
   return (
     <Fragment>
       {/* <Navbar /> */}
       {/* <Notes /> */}
-
       {/* <Sidebar><Source /></Sidebar> */}
 
-      {/* <Route path="/saved/:savedQueryId" exact>
-        <Grid />
-        <ColumnSelector />
-        <FilterEditor />
-        <OrderEditor />
-        <Actions />
-        <Paginator />
-      </Route>
+      {mainApp === globalConstants.APP_NAME_BROWSER ? (
+        <QueryContext.Provider value={queryContext}>
+          <Grid />
+          {/* <ColumnSelector />
+          <FilterEditor />
+          <OrderEditor />
+          <Actions />
+          <Paginator /> */}
+        </QueryContext.Provider>
+      ) : null}
 
-      <Route path="/browse/:sourceId/:tableName/:pk" exact>
+      {/*<Route path="/browse/:sourceId/:tableName/:pk" exact>
         <Grid />
         <DetailView />
         <Paginator />
       </Route>
-
       <Route path="/browse/:sourceId/:tableName" exact>
         <ColumnSelector />
         <FilterEditor />
@@ -49,8 +52,8 @@ export default () => {
         <Actions />
         <Grid />
         <Paginator />
-      </Route> */}
-
+      </Route>{" "}
+      */}
       {/* <Route path="/funnel" exact>
             <ColumnSelector />
             <FilterEditor />
@@ -59,7 +62,6 @@ export default () => {
             <Funnel />
             <Paginator />
           </Route> */}
-
       {/* <Route path="/service/:sourceId/:resourceName" exact>
             <APIBrowser />
           </Route>
@@ -71,8 +73,7 @@ export default () => {
           <Route path="/report/:reportId" exact>
             <Report />
         </Route> */}
-
-      {mainApp === "home" ? <Home /> : null}
+      {mainApp === globalConstants.APP_NAME_HOME ? <Home /> : null}
     </Fragment>
   );
 };

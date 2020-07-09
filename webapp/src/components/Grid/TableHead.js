@@ -1,13 +1,11 @@
 import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 
 import { getCacheKey } from "utils";
 import { getQueryDetails } from "services/browser/getters";
 import { getSavedQuery } from "services/apps/getters";
 import TableHeadItem from "./TableHeadItem";
 
-const TableHead = ({
+export default ({
   isReady,
   schemaColumns,
   tableColumns,
@@ -39,6 +37,7 @@ const TableHead = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -67,3 +66,4 @@ const mapStateToProps = (state, props) => {
 };
 
 export default withRouter(connect(mapStateToProps, {})(TableHead));
+*/
