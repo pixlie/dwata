@@ -76,20 +76,18 @@ async def data_post(request):
     We use JSON (in the POST payload) to specify the query.
     """
     from .schema import column_definition
-    source_label = request.path_params["source_label"]
-    table_name = request.path_params["table_name"]
-    settings = get_source_settings(source_label=source_label)
-    query_specification = {}
     default_per_page = 20
 
-    if request.method == "POST":
-        try:
-            query_specification = await request.json()
-        except JSONDecodeError:
-            return web_error(
-                error_code="request.json_decode_error",
-                message="We could not handle that request, perhaps something is wrong with the server."
-            )
+    try:
+        query_specification = await request.json()
+        source_label = query_specification["source_label"]
+        table_name = query_specification["table_name"]
+    except JSONDecodeError:
+        return web_error(
+            error_code="request.json_decode_error",
+            message="We could not handle that request, perhaps something is wrong with the server."
+        )
+    settings = get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)

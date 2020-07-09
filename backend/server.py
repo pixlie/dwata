@@ -21,7 +21,7 @@ handlers = [
     Route(r"/api/schema/{source_label:str}/{table_name:str}", schema_get, methods=["GET"]),
     Route(r"/api/schema/{source_label:str}", schema_get, methods=["GET"]),
 
-    Route(r"/api/data/{source_label:str}/{table_name:str}", data_post, methods=["GET", "POST"]),
+    Route(r"/api/data", data_post, methods=["GET", "POST"]),
 
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:str}", item_get, methods=["GET"]),
