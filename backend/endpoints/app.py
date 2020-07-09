@@ -17,7 +17,7 @@ async def app_get(_):
             ["note", True, {
                 "in_use": True,
                 "source_id": 0,
-                "table_name": "admin_meta_note",
+                "table_name": "dwata_meta_note",
             }],
             ["record_pin", True, {
                 "in_use": True,
@@ -27,7 +27,7 @@ async def app_get(_):
             ["saved_query", True, {
                 "in_use": True,
                 "source_id": 0,
-                "table_name": "admin_meta_saved_query",
+                "table_name": "dwata_meta_saved_query",
             }],
         ]
     })

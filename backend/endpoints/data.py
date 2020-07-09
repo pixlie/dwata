@@ -76,9 +76,9 @@ async def data_post(request):
     We use JSON (in the POST payload) to specify the query.
     """
     from .schema import column_definition
-    source_index = request.path_params["source_index"]
+    source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
-    settings = get_source_settings(source_index=source_index)
+    settings = get_source_settings(source_label=source_label)
     query_specification = {}
     default_per_page = 20
 

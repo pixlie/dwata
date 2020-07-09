@@ -9,7 +9,7 @@ metadata = MetaData()
 
 # Todo: Change source_id to source_label
 saved_query = Table(
-    "admin_meta_saved_query",
+    "dwata_meta_saved_query",
     metadata,
 
     Column("id", Integer, primary_key=True),

@@ -32,7 +32,7 @@ async def connect_database(db_url):
     return engine, conn
 
 
-async def connect_admin_meta_database(db_url):
+async def connect_dwata_meta_database(db_url):
     engine = create_engine(db_url)
     conn = engine.connect()
     return engine, conn
