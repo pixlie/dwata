@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 
-import { getCacheKey } from "utils";
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { getSavedQuery } from "services/apps/getters";
+import { QueryContext } from "utils";
+import useGlobal from "services/global/store";
+import useData from "services/data/store";
+import useSchema from "services/schema/store";
+import useQuerySpecification from "services/querySpecification/store";
 import {
   toggleOrderBy,
   initiateFilter,
@@ -11,15 +12,17 @@ import {
 import { toggleColumnHeadSpecification } from "services/global/actions";
 import FilterItem from "components/QueryEditor/FilterItem";
 
-const ColumnHeadSpecification = ({ toggleOrderBy, head, fetchData }) => {
+const ColumnHeadSpecification = ({ head }) => {
+  const queryContext = useContext(QueryContext);
+  const fetchData = useData((state) => state.fetchData);
   const handleClick = (event) => {
     event.preventDefault();
-    toggleOrderBy(head);
+    // toggleOrderBy(head);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetchData();
+    fetchData(queryContext.key);
   };
 
   return (
@@ -41,28 +44,27 @@ const ColumnHeadSpecification = ({ toggleOrderBy, head, fetchData }) => {
   );
 };
 
-export default ({
-  isReady,
-  head,
-  ordering,
-  activeColumnHeadSpecification,
-  schemaColumns,
-  toggleOrderBy,
-  toggleColumnHeadSpecification,
-  initiateFilter,
-  fetchData,
-}) => {
-  if (!isReady) {
-    return null;
-  }
+export default ({ head }) => {
+  const queryContext = useContext(QueryContext);
+  const activeColumnHeadSpecification = useGlobal(
+    (state) => state.inner.activeColumnHeadSpecification
+  );
+  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === queryContext.tableName
+  ).columns;
+
   const handleClick = (event) => {
     event.preventDefault();
     toggleColumnHeadSpecification(head);
     const dataType = schemaColumns.find((x) => x.name === head);
-    initiateFilter(head, dataType);
+    // initiateFilter(head, dataType);
   };
 
-  if (ordering === "asc") {
+  if (querySpecification.orderBy[head] === "asc") {
     return (
       <th>
         <span
@@ -72,15 +74,11 @@ export default ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
-  } else if (ordering === "desc") {
+  } else if (querySpecification.orderBy[head] === "desc") {
     return (
       <th>
         <span
@@ -90,11 +88,7 @@ export default ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
@@ -105,49 +99,9 @@ export default ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
   }
 };
-
-/*
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      ordering: state.querySpecification.orderBy[props.head],
-      activeColumnHeadSpecification: state.global.activeColumnHeadSpecification,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    toggleOrderBy,
-    initiateFilter,
-    toggleColumnHeadSpecification,
-    fetchData,
-  })(TableHeadItem)
-);
-*/

@@ -20,7 +20,7 @@ export default () => {
       if (!schema) {
         fetchSchema(queryContext.sourceLabel);
       }
-      fetchData("main", queryContext, [setQuerySpecification]);
+      fetchData(queryContext.key, queryContext, [setQuerySpecification]);
     }
   }, [queryContext, schema, fetchSchema, fetchData, setQuerySpecification]);
 
