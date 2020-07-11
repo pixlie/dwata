@@ -1,6 +1,6 @@
 import React from "react";
 
-import useGlobal from "services/global/store";
+import { useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 

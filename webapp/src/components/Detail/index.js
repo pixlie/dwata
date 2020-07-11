@@ -1,9 +1,6 @@
 import React, { useEffect, useCallback } from "react";
-import { withRouter, Link } from "react-router-dom";
-import { connect } from "react-redux";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchDataItem } from "services/dataItem/actions";
+import { QueryContext } from "utils";
 import { Section } from "components/BulmaHelpers";
 
 const cellRenderer = (column, sourceId) => {
@@ -83,7 +80,7 @@ const cellRenderer = (column, sourceId) => {
           disabled
         />
       </div>
-      {data ? (
+      {/* {data ? (
         <p className="help">
           Linked to{" "}
           {column.foreign_keys.map((link) => (
@@ -95,7 +92,7 @@ const cellRenderer = (column, sourceId) => {
             </Link>
           ))}
         </p>
-      ) : null}
+      ) : null} */}
     </div>
   );
 
@@ -174,16 +171,7 @@ const cellRenderer = (column, sourceId) => {
   }
 };
 
-const Detail = ({
-  isReady,
-  sourceId,
-  tableName,
-  pk,
-  schemaColumns,
-  dataItem,
-  history,
-  fetchDataItem,
-}) => {
+export default () => {
   useEffect(() => {
     fetchDataItem();
   }, [sourceId, tableName, pk, fetchDataItem]);
@@ -256,6 +244,7 @@ const Detail = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { sourceId, tableName, pk } = getQueryDetails(state, props);
   const _cacheKey = `${sourceId}/${tableName}/${pk}`;
@@ -291,3 +280,4 @@ export default withRouter(
     fetchDataItem,
   })(Detail)
 );
+*/

@@ -1,9 +1,7 @@
 import React, { useEffect, Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import useData from "services/data/store";
-import useSchema from "services/schema/store";
-import useQuerySpecification from "services/querySpecification/store";
+import { useData, useSchema, useQuerySpecification } from "services/store";
 import rowRenderer from "./rowRenderer";
 
 export default () => {

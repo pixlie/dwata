@@ -1,11 +1,11 @@
 import React, { Fragment } from "react";
 
-import useGlobal from "services/global/store";
+import { QueryContext } from "utils";
+import { useGlobal, useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
 import Navbar from "components/Navbar";
 // import Source from "components/Source";
 // import Sidebar from "components/Sidebar";
-import { QueryContext } from "utils";
 import Home from "components/Home";
 import Grid from "components/Grid";
 // import DetailView from "components/Detail";
@@ -21,7 +21,7 @@ import Paginator from "components/QueryEditor/Paginator";
 
 export default () => {
   const mainApp = useGlobal((state) => state.inner.mainApp);
-  const queryContext = useGlobal((state) => state.inner.queryContext["main"]);
+  const queryContext = useQueryContext((state) => state.inner["main"]);
 
   return (
     <Fragment>

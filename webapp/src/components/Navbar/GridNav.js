@@ -1,18 +1,10 @@
 import React, { useEffect, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import useApps from "services/apps/store";
-import useData from "services/data/store";
+import { useGlobal, useApps, useData } from "services/store";
 
 export default ({
-  isFilterEnabled,
   cacheKey,
-  showPinnedRecords,
-  toggleFilterEditor,
-  toggleColumnSelector,
-  toggleSortEditor,
-  isNoteAppEnabled,
-  isRecordPinAppEnabled,
   hasColumnsSpecified,
   hasFiltersSpecified,
   hasOrderingSpecified,
@@ -21,18 +13,28 @@ export default ({
   togglePinnedRecords,
 }) => {
   const queryContext = useContext(QueryContext);
+  const showPinnedRecords = useGlobal((state) => state.inner.showPinnedRecords);
+  const toggleFilterEditor = useGlobal((state) => state.toggleFilterEditor);
+  const toggleColumnSelector = useGlobal((state) => state.toggleColumnSelector);
+  const toggleOrderEditor = useGlobal((state) => state.toggleOrderEditor);
   const data = useData((state) => state.inner[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
+  const apps = useApps((state) => state.inner);
   useEffect(() => {
     fetchApps();
   }, [fetchApps]);
 
-  let isReady = false;
+  let isReady = false,
+    isNoteAppEnabled = false,
+    isRecordPinAppEnabled = false;
   if (data) {
     ({ isReady } = data);
   }
   if (!isReady) {
     return null;
+  }
+  if (apps.isReady) {
+    ({ isNoteAppEnabled, isRecordPinAppEnabled } = apps);
   }
   const { selectedRowList } = data;
 
@@ -94,7 +96,6 @@ export default ({
         <div className="buttons has-addons">
           <button
             className={`button${hasColumnsSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
             onClick={toggleColumnSelector}
           >
             <i className="fas fa-columns" />
@@ -102,7 +103,6 @@ export default ({
           </button>
           <button
             className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
             onClick={toggleFilterEditor}
           >
             <i className="fas fa-filter" />
@@ -110,8 +110,7 @@ export default ({
           </button>
           <button
             className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
-            onClick={toggleSortEditor}
+            onClick={toggleOrderEditor}
           >
             <i className="fas fa-sort" />
             &nbsp;Ordering
@@ -177,7 +176,7 @@ export default withRouter(
     toggleSidebar,
     toggleFilterEditor,
     toggleColumnSelector,
-    toggleSortEditor,
+    toggleOrderEditor,
     showNotes,
     getApps,
     toggleActions,

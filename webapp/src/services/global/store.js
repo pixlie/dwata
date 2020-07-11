@@ -4,7 +4,6 @@ import * as constants from "./constants";
 
 const initialState = {
   mainApp: constants.APP_NAME_HOME,
-  queryContext: {},
   isSidebarVisible: false, // Is Sidebar modal On
   isActionsVisible: false, // Is Actions modal On
   isFEVisible: false, // Is FilterEditor modal On
@@ -59,13 +58,13 @@ const toggleFilterEditor = (inner) => ({
   isFEVisible: !inner.isFEVisible,
 });
 
-const toggleColumnSelectorUI = (inner) => ({
+const toggleColumnSelector = (inner) => ({
   ...inner,
   ...allModalsClosedState,
   isCSVisible: !inner.isCSVisible,
 });
 
-const toggleSortEditor = (inner) => ({
+const toggleOrderEditor = (inner) => ({
   ...inner,
   ...allModalsClosedState,
   isOEVisible: !inner.isOEVisible,
@@ -88,24 +87,32 @@ const [useStore] = create((set) => ({
     ...initialState,
   },
 
-  setMainApp: (appName, appContext) =>
+  setMainApp: (appName) =>
     set((state) => ({
       inner: {
         ...state.inner,
         mainApp: appName,
-        queryContext: {
-          ...state.inner.queryContext,
-          main: {
-            ...appContext,
-            key: "main",
-          },
-        },
       },
     })),
 
   toggleSidebar: () =>
     set((state) => ({
       inner: toggleSidebar(state.inner),
+    })),
+
+  toggleFilterEditor: () =>
+    set((state) => ({
+      inner: toggleFilterEditor(state.inner),
+    })),
+
+  toggleColumnSelector: () =>
+    set((state) => ({
+      inner: toggleColumnSelector(state.inner),
+    })),
+
+  toggleOrderEditor: () =>
+    set((state) => ({
+      inner: toggleOrderEditor(state.inner),
     })),
 }));
 

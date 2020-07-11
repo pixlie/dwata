@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
-import useData from "services/data/store";
-import useQuerySpecification from "services/querySpecification/store";
+import { useData, useQuerySpecification } from "services/store";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
 import QueryLoader from "./QueryLoader";

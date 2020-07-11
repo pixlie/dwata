@@ -1,7 +1,6 @@
 import React, { useEffect, Fragment } from "react";
 
-import useSchema from "services/schema/store";
-import useGlobal from "services/global/store";
+import { useSchema, useGlobal, useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
 
 export default ({ sourceLabel, sourceType }) => {
@@ -11,12 +10,14 @@ export default ({ sourceLabel, sourceType }) => {
     fetchSchema(sourceLabel);
   }, [sourceLabel, fetchSchema]);
   const setMainApp = useGlobal((state) => state.setMainApp);
+  const setContext = useQueryContext((state) => state.setContext);
   const urlBase = sourceType === "database" ? "/browse" : "/service";
 
   const BrowserItem = ({ item }) => {
     const handleClick = (event) => {
       event.preventDefault();
-      setMainApp(globalConstants.APP_NAME_BROWSER, {
+      setMainApp(globalConstants.APP_NAME_BROWSER);
+      setContext("main", {
         sourceLabel,
         tableName: item.table_name,
       });
