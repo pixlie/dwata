@@ -1,23 +1,12 @@
-import React, { useEffect, Fragment } from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React, { useEffect, useContext, Fragment } from "react";
 
-import {
-  toggleSidebar,
-  showNotes,
-  toggleFilterEditor,
-  toggleColumnSelector,
-  toggleSortEditor,
-  toggleActions,
-  togglePinnedRecords,
-} from "services/global/actions";
-import { getApps } from "services/apps/actions";
-import { getSourceFromPath, getCacheKey } from "utils";
+import { QueryContext } from "utils";
+import useApps from "services/apps/store";
+import useData from "services/data/store";
 
-const Navbar = ({
+export default ({
   isFilterEnabled,
   cacheKey,
-  selectedRowList,
   showPinnedRecords,
   toggleFilterEditor,
   toggleColumnSelector,
@@ -28,13 +17,25 @@ const Navbar = ({
   hasFiltersSpecified,
   hasOrderingSpecified,
   showNotes,
-  getApps,
   toggleActions,
   togglePinnedRecords,
 }) => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const fetchApps = useApps((state) => state.fetchApps);
   useEffect(() => {
-    getApps();
-  }, [getApps]);
+    fetchApps();
+  }, [fetchApps]);
+
+  let isReady = false;
+  if (data) {
+    ({ isReady } = data);
+  }
+  if (!isReady) {
+    return null;
+  }
+  const { selectedRowList } = data;
+
   const handleNotesClick = (event) => {
     event.preventDefault();
     showNotes(cacheKey);
@@ -121,6 +122,7 @@ const Navbar = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const match = getSourceFromPath(props.location.pathname);
   const { sourceId, tableName } =
@@ -182,3 +184,4 @@ export default withRouter(
     togglePinnedRecords,
   })(Navbar)
 );
+*/

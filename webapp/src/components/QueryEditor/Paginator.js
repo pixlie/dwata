@@ -1,40 +1,54 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React, { useContext } from "react";
 
-import { getCacheKey } from "utils";
-import { getQueryDetails } from "services/browser/getters";
-import {
-  nextPage,
-  previousPage,
-  gotoPage,
-} from "services/querySpecification/actions";
+import { QueryContext } from "utils";
+import useData from "services/data/store";
+import useQuerySpecification from "services/querySpecification/store";
 
-const PageItem = ({ number, currentPage, gotoPage }) => {
+const PageItem = ({ number }) => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  const gotoPage = useQuerySpecification((state) => state.gotoPage);
+
+  let offset = null,
+    limit = null;
+  if (querySpecification) {
+    ({ offset, limit } = querySpecification);
+  }
+  const currentPage = Math.floor(offset / limit) + 1;
   const handleGotoPage = (event) => {
     event.preventDefault();
-    gotoPage(number);
+    gotoPage(queryContext.key, number);
   };
 
   return (
     <li>
-      <a
+      <span
         className={`pagination-link${
           number === currentPage ? " is-current" : ""
         }`}
         aria-label={`Goto page ${number}`}
         onClick={handleGotoPage}
-        href={`?page=${number}`}
       >
         {number}
-      </a>
+      </span>
     </li>
   );
 };
 
-const PageSlots = ({ count, limit, offset, gotoPage }) => {
+const PageSlots = () => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+
+  let count = null,
+    limit = null;
+  if (querySpecification) {
+    ({ count, limit } = querySpecification);
+  }
   const slots = 9; // Includes all page numbers to be shown and ellipses
-  const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(count / limit);
   if (totalPages < slots) {
     return (
@@ -43,12 +57,7 @@ const PageSlots = ({ count, limit, offset, gotoPage }) => {
           <span className="pagination-ellipsis">{limit}/page</span>
         </li>
         {[...Array(totalPages).keys()].map((x) => (
-          <PageItem
-            key={`pg-sl-${x + 1}`}
-            number={x + 1}
-            currentPage={currentPage}
-            gotoPage={gotoPage}
-          />
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
       </ul>
     );
@@ -59,41 +68,51 @@ const PageSlots = ({ count, limit, offset, gotoPage }) => {
           <span className="pagination-ellipsis">{limit}/page</span>
         </li>
         {[...Array(4).keys()].map((x) => (
-          <PageItem
-            key={`pg-sl-${x + 1}`}
-            number={x + 1}
-            currentPage={currentPage}
-            gotoPage={gotoPage}
-          />
+          <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
         <li>
           <span className="pagination-ellipsis">&hellip;</span>
         </li>
         {[...Array(4).keys()].reverse().map((x) => (
-          <PageItem
-            key={`pg-sl-${totalPages - x}`}
-            number={totalPages - x}
-            currentPage={currentPage}
-            gotoPage={gotoPage}
-          />
+          <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} />
         ))}
       </ul>
     );
   }
 };
 
-const Paginator = ({
-  isReady,
-  count,
-  limit,
-  offset,
-  handleNext,
-  handlePrevious,
-  gotoPage,
-}) => {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  const nextPage = useQuerySpecification((state) => state.nextPage);
+  const previousPage = useQuerySpecification((state) => state.previousPage);
+
+  let isReady = null;
+  if (data) {
+    ({ isReady } = data);
+  }
   if (!isReady) {
     return null;
   }
+  let count = null,
+    offset = null,
+    limit = null;
+  if (querySpecification) {
+    ({ count, offset, limit } = querySpecification);
+  }
+
+  const handleNext = (event) => {
+    event.preventDefault();
+    return nextPage(queryContext.key);
+  };
+
+  const handlePrevious = (event) => {
+    event.preventDefault();
+    return previousPage(queryContext.key);
+  };
 
   return (
     <div id="paginator">
@@ -116,51 +135,8 @@ const Paginator = ({
             Next page
           </span>
         )}
-        <PageSlots
-          count={count}
-          limit={limit}
-          offset={offset}
-          gotoPage={gotoPage}
-        />
+        <PageSlots />
       </nav>
     </div>
   );
 };
-
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      sourceId,
-      tableName,
-      count: state.querySpecification.count,
-      limit: state.querySpecification.limit,
-      offset: state.querySpecification.offset,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    handleNext: (event) => {
-      event.preventDefault();
-      return nextPage();
-    },
-
-    handlePrevious: (event) => {
-      event.preventDefault();
-      return previousPage();
-    },
-
-    gotoPage,
-  })(Paginator)
-);

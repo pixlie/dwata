@@ -90,13 +90,3 @@ export const createCacheKeyFromParts = (sourceId, tableName) => {
 
 export const QueryContext = React.createContext({});
 QueryContext.displayName = "QueryContext";
-
-/*
-export const withQueryDetails = (Component) => {
-  return (props) => (
-    <QueryContext.Consumer>
-      {(context) => <Component {...props} {...context} />}
-    </QueryContext.Consumer>
-  );
-};
-*/

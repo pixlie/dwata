@@ -37,6 +37,14 @@ const cacheQuerySpecification = (inner, key, editing) => {
   };
 };
 
+const gotoPage = (inner, key, pageNum) => ({
+  ...inner,
+  [key]: {
+    ...inner[key],
+    offset: (pageNum - 1) * inner[key].limit,
+  },
+});
+
 const [useStore] = create((set) => ({
   inner: {},
   editing: {},
@@ -49,6 +57,27 @@ const [useStore] = create((set) => ({
   cacheQuerySpecification: (key) =>
     set((state) => ({
       inner: cacheQuerySpecification(state.inner, key, state.editing),
+    })),
+
+  nextPage: () =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        offset: state.inner.offset + state.inner.limit,
+      },
+    })),
+
+  previousPage: () =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        offset: state.inner.offset - state.inner.limit,
+      },
+    })),
+
+  gotoPage: (key, pageNum) =>
+    set((state) => ({
+      inner: gotoPage(state.inner, key, pageNum),
     })),
 }));
 

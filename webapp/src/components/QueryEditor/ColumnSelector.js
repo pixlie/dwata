@@ -1,26 +1,35 @@
-import React, { Fragment } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { Fragment, useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
+import { QueryContext } from "utils";
+import useGlobal from "services/global/store";
+import useSchema from "services/schema/store";
+import useData from "services/data/store";
+import useQuerySpecification from "services/querySpecification/store";
 import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
-const ColumnSelector = ({
-  isReady,
-  isVisible,
-  schemaColumns,
-  qsColumns,
-  dataColumns,
-  toggleColumnSelection,
-  fetchData,
-}) => {
-  if (!isReady || !isVisible) {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const fetchData = useData((state) => state.fetchData);
+  const isCSVisible = useGlobal((state) => state.inner.isCSVisible);
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === queryContext.tableName
+  ).columns;
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  let isReady = false,
+    dataColumns = [];
+  if (data) {
+    ({ isReady } = data);
+  }
+  if (!isReady || !isCSVisible) {
     return null;
   }
 
-  const colsAreAvailable = qsColumns.every((col, i) =>
+  const colsAreAvailable = querySpecification.columnsSelected.every((col, i) =>
     dataColumns.includes(col)
   );
   const BoundInput = ({ head }) => {
@@ -34,7 +43,7 @@ const ColumnSelector = ({
         <input
           type="checkbox"
           name={head.name}
-          checked={qsColumns.includes(head.name)}
+          checked={querySpecification.columnsSelected.includes(head.name)}
           onChange={handleClick}
         />
         &nbsp;{head.name}
@@ -75,6 +84,7 @@ const ColumnSelector = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -109,3 +119,4 @@ export default withRouter(
     fetchData,
   })(ColumnSelector)
 );
+*/

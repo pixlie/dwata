@@ -15,7 +15,7 @@ export default () => {
     (state) => state.inner[queryContext.key]
   );
 
-  let isReady = null;
+  let isReady = false;
   if (data) {
     ({ isReady } = data);
   }
@@ -39,20 +39,3 @@ export default () => {
     </table>
   );
 };
-
-/*
-return {
-  isReady: true,
-  savedQueryId,
-  sourceId,
-  tableName,
-  schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-    .columns,
-  columns: state.browser.columns,
-  rows: state.browser.rows,
-  selectedRowList: state.browser.selectedRowList,
-  querySpecificationColumns: state.querySpecification.columnsSelected,
-  showPinnedRecords: state.global.showPinnedRecords,
-  pins,
-};
-*/

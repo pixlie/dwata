@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 
 import useGlobal from "services/global/store";
 import * as globalConstants from "services/global/constants";
-// import Navbar from "components/Navbar";
+import Navbar from "components/Navbar";
 // import Source from "components/Source";
 // import Sidebar from "components/Sidebar";
 import { QueryContext } from "utils";
@@ -11,10 +11,10 @@ import Grid from "components/Grid";
 // import DetailView from "components/Detail";
 // import Funnel from "components/Funnel";
 // import APIBrowser from "components/APIBrowser";
-// import ColumnSelector from "components/QueryEditor/ColumnSelector";
+import ColumnSelector from "components/QueryEditor/ColumnSelector";
 // import FilterEditor from "components/QueryEditor/FilterEditor";
 // import OrderEditor from "components/QueryEditor/OrderEditor";
-// import Paginator from "components/QueryEditor/Paginator";
+import Paginator from "components/QueryEditor/Paginator";
 // import Notes from "components/Notes";
 // import Actions from "components/Actions";
 // import Report from "components/Report";
@@ -25,18 +25,20 @@ export default () => {
 
   return (
     <Fragment>
-      {/* <Navbar /> */}
+      <QueryContext.Provider value={queryContext}>
+        <Navbar />
+      </QueryContext.Provider>
       {/* <Notes /> */}
       {/* <Sidebar><Source /></Sidebar> */}
 
       {mainApp === globalConstants.APP_NAME_BROWSER ? (
         <QueryContext.Provider value={queryContext}>
           <Grid />
-          {/* <ColumnSelector />
-          <FilterEditor />
+          <ColumnSelector />
+          {/* <FilterEditor />
           <OrderEditor />
-          <Actions />
-          <Paginator /> */}
+          <Actions /> */}
+          <Paginator />
         </QueryContext.Provider>
       ) : null}
 
