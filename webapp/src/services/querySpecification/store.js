@@ -15,6 +15,7 @@ const initialState = {
 
   isReady: false,
   isFetching: false,
+  lastDirtyAt: null,
 };
 
 const initiateQuerySpecification = (payload) => ({
@@ -27,6 +28,7 @@ const initiateQuerySpecification = (payload) => ({
 const setQuerySpecification = (inner, payload) => ({
   ...inner,
   ...payload,
+  columnsSelected: payload.columns,
 
   isReady: true,
   isFetching: false,
@@ -80,9 +82,22 @@ const removeFilter = (inner, columnName) => {
   };
 };
 
+const nextPage = (inner) => ({
+  ...inner,
+  offset: inner.offset + inner.limit,
+  lastDirtyAt: +new Date(),
+});
+
+const previousPage = (inner) => ({
+  ...inner,
+  offset: inner.offset - inner.limit,
+  lastDirtyAt: +new Date(),
+});
+
 const gotoPage = (inner, pageNum) => ({
   ...inner,
   offset: (pageNum - 1) * inner.limit,
+  lastDirtyAt: +new Date(),
 });
 
 const changeOrderBy = (inner) => {};
@@ -102,6 +117,7 @@ const toggleOrderBy = (inner, columnName) => {
       ...inner.orderBy,
       [columnName]: newOrder,
     },
+    lastDirtyAt: +new Date(),
   };
 };
 
@@ -122,7 +138,7 @@ const toggleColumnHeadSpecification = (inner, columnName) => ({
       : null,
 });
 
-const [useStore] = create((set) => ({
+const [useStore, querySpecificationStoreAPI] = create((set) => ({
   inner: {},
 
   initiateQuerySpecification: (key, payload) =>
@@ -145,10 +161,7 @@ const [useStore] = create((set) => ({
     set((state) => ({
       inner: {
         ...state.inner,
-        [key]: {
-          ...state.inner[key],
-          offset: state.inner.offset + state.inner.limit,
-        },
+        [key]: nextPage(state.inner[key]),
       },
     })),
 
@@ -156,10 +169,7 @@ const [useStore] = create((set) => ({
     set((state) => ({
       inner: {
         ...state.inner,
-        [key]: {
-          ...state.inner[key],
-          offset: state.inner.offset - state.inner.limit,
-        },
+        [key]: previousPage(state.inner[key]),
       },
     })),
 
@@ -220,4 +230,5 @@ const [useStore] = create((set) => ({
     })),
 }));
 
+export { querySpecificationStoreAPI };
 export default useStore;

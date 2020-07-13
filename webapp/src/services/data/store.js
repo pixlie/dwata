@@ -2,6 +2,7 @@ import create from "zustand";
 import axios from "axios";
 
 import { dataURL } from "services/urls";
+import { querySpecificationStoreAPI } from "services/querySpecification/store";
 
 const initialState = {
   columns: [],
@@ -42,6 +43,7 @@ const completeFetch = (inner, key, payload) => {
       querySQL: payload.query_sql,
       isFetching: false,
       isReady: true,
+      lastFetchedAt: +new Date(),
     },
   };
 };
@@ -78,6 +80,16 @@ const [useStore] = create((set, get) => ({
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");
     }
+
+    const subscriber = querySpecificationStoreAPI.subscribe(
+      (qs) =>
+        console.log(
+          "qs changed",
+          qs.lastDirtyAt,
+          get().inner[key].lastFetchedAt
+        ),
+      (state) => state.inner[key]
+    );
   },
 }));
 

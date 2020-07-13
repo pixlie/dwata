@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useQuerySpecification } from "services/store";
@@ -88,11 +88,32 @@ const PageSlots = () => {
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state.inner[queryContext.key]);
+  // const fetchData = useData((state) => state.fetchData);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);
+  // const setQuerySpecification = useQuerySpecification(
+  //   (state) => state.setQuerySpecification
+  // );
+
+  /*
+  useEffect(() => {
+    if (!querySpecification.isReady || data.isFetching) {
+      return;
+    }
+
+    fetchData(queryContext.key, querySpecification, [setQuerySpecification]);
+  }, [
+    querySpecification.isReady,
+    data.isFetching,
+    querySpecification.offset,
+    queryContext.key,
+    fetchData,
+    setQuerySpecification,
+  ]);
+  */
 
   if (
     !(data && data.isReady && querySpecification && querySpecification.isReady)
@@ -108,12 +129,12 @@ export default () => {
 
   const handleNext = (event) => {
     event.preventDefault();
-    return nextPage(queryContext.key);
+    nextPage(queryContext.key);
   };
 
   const handlePrevious = (event) => {
     event.preventDefault();
-    return previousPage(queryContext.key);
+    previousPage(queryContext.key);
   };
 
   return (
