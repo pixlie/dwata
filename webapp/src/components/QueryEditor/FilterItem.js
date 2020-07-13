@@ -1,13 +1,45 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 
-import { setFilter } from "services/querySpecification/actions";
-import { getSavedQuery } from "services/apps/getters";
+import { QueryContext } from "utils";
+import {
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
 
 /**
  * This method renders on the filter controls for a single column.
  * It is used in the top (common) filter editor, as well as in the per column head editor.
  */
-export default ({ columnName, schemaColumns, filterBy, setFilter }) => {
+export default ({ columnName }) => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const isFEVisible = useGlobal((state) => state.inner.isFEVisible);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
+  const setFilter = useQuerySpecification((state) => state.setFilter);
+
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isFEVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
+    return null;
+  }
+
+  const { filterBy } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === querySpecification.tableName
+  ).columns;
   const dataType = schemaColumns.find((x) => x.name === columnName);
 
   const handleChange = (event) => {
@@ -55,7 +87,7 @@ export default ({ columnName, schemaColumns, filterBy, setFilter }) => {
       }
     }
 
-    setFilter(name, temp);
+    setFilter(queryContext.key, name, temp);
   };
 
   if (!Object.keys(filterBy).includes(columnName)) {

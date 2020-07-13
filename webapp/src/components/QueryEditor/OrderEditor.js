@@ -11,13 +11,17 @@ import { Section, Hx } from "components/BulmaHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const data = useData((state) => state.inner[queryContext.key]);
-  const fetchData = useData((state) => state.fetchData);
+  // const fetchData = useData((state) => state.fetchData);
   const isOEVisible = useGlobal((state) => state.inner.isOEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
+  const changeOrderBy = useQuerySpecification((state) => state.changeOrderBy);
+  const addOrderBy = useQuerySpecification((state) => state.addOrderBy);
 
   if (
     !(
@@ -31,9 +35,24 @@ export default () => {
     return null;
   }
 
+  const handleChangeOrderBy = (event) => {
+    event.preventDefault();
+    const { name, value } = event.target;
+    changeOrderBy(queryContext.key, name.substring(6), value);
+  };
+
+  const handleAddOrderBy = (event) => {
+    event.preventDefault();
+    const { value } = event.target;
+    if (value === "") {
+      return;
+    }
+    addOrderBy(queryContext.key, value);
+  };
+
   const { orderBy } = querySpecification;
   const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
+    (x) => x.table_name === querySpecification.tableName
   ).columns;
   const order_by_options = [
     <option value="" key="ord-hd">
@@ -68,7 +87,7 @@ export default () => {
                       name={col}
                       value="asc"
                       checked={orderBy[col] === "asc"}
-                      onChange={changeOrderBy}
+                      onChange={handleChangeOrderBy}
                     />
                     &nbsp;asc
                   </label>
@@ -79,7 +98,7 @@ export default () => {
                       name={col}
                       value="desc"
                       checked={orderBy[col] === "desc"}
-                      onChange={changeOrderBy}
+                      onChange={handleChangeOrderBy}
                     />
                     &nbsp;desc
                   </label>
@@ -103,7 +122,7 @@ export default () => {
 
         <div className="control">
           <div className="select is-fullwidth">
-            <select onChange={addOrderBy}>{order_by_options}</select>
+            <select onChange={handleAddOrderBy}>{order_by_options}</select>
           </div>
         </div>
       </Section>

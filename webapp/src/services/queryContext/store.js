@@ -1,7 +1,13 @@
 import create from "zustand";
 
+import * as globalConstants from "services/global/constants";
+
 const [useQueryContext] = create((set) => ({
-  inner: {},
+  inner: {
+    main: {
+      appType: globalConstants.APP_NAME_HOME,
+    },
+  },
 
   setContext: (appName, context) =>
     set((state) => ({

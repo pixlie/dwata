@@ -12,18 +12,17 @@ import FilterItem from "./FilterItem";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const data = useData((state) => state.inner[queryContext.key]);
   const fetchData = useData((state) => state.fetchData);
   const isFEVisible = useGlobal((state) => state.inner.isFEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
-  let initiateFilter = useQuerySpecification((state) => state.initiateFilter);
-  initiateFilter = (columnName, dataType) =>
-    initiateFilter(queryContext.key, columnName, dataType);
-  let removeFilter = useQuerySpecification((state) => state.removeFilter);
-  removeFilter = (columnName) => removeFilter(queryContext.key, columnName);
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
+  const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
+  const removeFilter = useQuerySpecification((state) => state.removeFilter);
   const [state, setState] = useState({
     isSavingQuery: false,
     savedQueryLabel: "",
@@ -44,8 +43,9 @@ export default () => {
 
   const { filterBy } = querySpecification;
   const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
+    (x) => x.table_name === querySpecification.tableName
   ).columns;
+
   const addFilter = (event) => {
     event.preventDefault();
     const { value } = event.target;
@@ -53,13 +53,13 @@ export default () => {
       return;
     }
     const dataType = schemaColumns.find((x) => x.name === value);
-    initiateFilter(value, dataType);
+    initiateFilter(queryContext.key, value, dataType);
   };
 
   const handleRemoveFilter = (name) => (event) => {
     event.preventDefault();
     if (name in filterBy) {
-      removeFilter(name);
+      removeFilter(queryContext.key, name);
     }
   };
 

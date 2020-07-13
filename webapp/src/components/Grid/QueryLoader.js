@@ -1,28 +1,38 @@
 import React, { useEffect, useContext } from "react";
 
 import { QueryContext } from "utils";
-import useSchema from "services/schema/store";
-import useData from "services/data/store";
-import useQuerySpecification from "services/querySpecification/store";
+import { useSchema, useData, useQuerySpecification } from "services/store";
 
 export default () => {
   // We made this small separate component just for the separate useEffect used here
   const queryContext = useContext(QueryContext);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   const fetchData = useData((state) => state.fetchData);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
   const setQuerySpecification = useQuerySpecification(
     (state) => state.setQuerySpecification
   );
 
   useEffect(() => {
-    if (!!queryContext.sourceLabel) {
+    if (!!querySpecification.sourceLabel) {
       if (!schema) {
-        fetchSchema(queryContext.sourceLabel);
+        fetchSchema(querySpecification.sourceLabel);
       }
-      fetchData(queryContext.key, queryContext, [setQuerySpecification]);
+      fetchData(queryContext.key, querySpecification, [setQuerySpecification]);
     }
-  }, [queryContext, schema, fetchSchema, fetchData, setQuerySpecification]);
+  }, [
+    queryContext,
+    querySpecification,
+    schema,
+    fetchSchema,
+    fetchData,
+    setQuerySpecification,
+  ]);
 
   return <div>Loading data...</div>;
 };

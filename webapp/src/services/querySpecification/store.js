@@ -1,7 +1,9 @@
 import create from "zustand";
-import { concat, remove } from "lodash";
 
 const initialState = {
+  sourceLabel: null,
+  tableName: null,
+
   columnsSelected: [],
   filterBy: {},
   orderBy: {},
@@ -9,23 +11,26 @@ const initialState = {
   count: undefined,
   limit: undefined,
   offset: undefined,
+  activeColumnHeadSpecification: null,
 
   isReady: false,
+  isFetching: false,
 };
 
-const setQuerySpecification = (inner, key, payload) => {
-  return {
-    ...inner,
-    [key]: {
-      ...initialState,
-      columnsSelected: payload.columns,
-      count: payload.count,
-      limit: payload.limit,
-      offset: payload.offset,
-      isReady: true,
-    },
-  };
-};
+const initiateQuerySpecification = (payload) => ({
+  ...initialState,
+  ...payload,
+
+  // We do not set isReady:true implicitly
+});
+
+const setQuerySpecification = (inner, payload) => ({
+  ...inner,
+  ...payload,
+
+  isReady: true,
+  isFetching: false,
+});
 
 const initiateFilter = (inner, columnName, dataType) => {
   if (Object.keys(inner.filterBy).includes(columnName)) {
@@ -80,19 +85,70 @@ const gotoPage = (inner, pageNum) => ({
   offset: (pageNum - 1) * inner.limit,
 });
 
+const changeOrderBy = (inner) => {};
+
+const toggleOrderBy = (inner, columnName) => {
+  const currentOrder = inner.orderBy[columnName];
+  let newOrder = undefined;
+  if (currentOrder === undefined) {
+    newOrder = "asc";
+  } else if (currentOrder === "asc") {
+    newOrder = "desc";
+  }
+
+  return {
+    ...inner,
+    orderBy: {
+      ...inner.orderBy,
+      [columnName]: newOrder,
+    },
+  };
+};
+
+const setFilter = (inner, columnName, filters) => ({
+  ...inner,
+  filterBy: {
+    ...inner.filterBy,
+    [columnName]: filters,
+  },
+});
+
+const toggleColumnHeadSpecification = (inner, columnName) => ({
+  ...inner,
+  activeColumnHeadSpecification:
+    inner.activeColumnHeadSpecification === null ||
+    inner.activeColumnHeadSpecification !== columnName
+      ? columnName
+      : null,
+});
+
 const [useStore] = create((set) => ({
   inner: {},
 
+  initiateQuerySpecification: (key, payload) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: initiateQuerySpecification(payload),
+      },
+    })),
+
   setQuerySpecification: (key, payload) =>
     set((state) => ({
-      inner: setQuerySpecification(state.inner, key, payload),
+      inner: {
+        ...state.inner,
+        [key]: setQuerySpecification(state.inner[key], payload),
+      },
     })),
 
   nextPage: (key) =>
     set((state) => ({
       inner: {
         ...state.inner,
-        offset: state.inner.offset + state.inner.limit,
+        [key]: {
+          ...state.inner[key],
+          offset: state.inner.offset + state.inner.limit,
+        },
       },
     })),
 
@@ -100,7 +156,10 @@ const [useStore] = create((set) => ({
     set((state) => ({
       inner: {
         ...state.inner,
-        offset: state.inner.offset - state.inner.limit,
+        [key]: {
+          ...state.inner[key],
+          offset: state.inner.offset - state.inner.limit,
+        },
       },
     })),
 
@@ -112,7 +171,7 @@ const [useStore] = create((set) => ({
       },
     })),
 
-  initialFilter: (key, columnName, dataType) =>
+  initiateFilter: (key, columnName, dataType) =>
     set((state) => ({
       inner: {
         ...state.inner,
@@ -125,6 +184,38 @@ const [useStore] = create((set) => ({
       inner: {
         ...state.inner,
         [key]: removeFilter(state.inner[key], columnName),
+      },
+    })),
+
+  changeOrderBy: (key) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: changeOrderBy(state.inner[key]),
+      },
+    })),
+
+  toggleOrderBy: (key, columnName) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: toggleOrderBy(state.inner[key], columnName),
+      },
+    })),
+
+  setFilter: (key, columnName, filters) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: setFilter(state.inner[key], columnName, filters),
+      },
+    })),
+
+  toggleColumnHeadSpecification: (key, columnName) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: toggleColumnHeadSpecification(state.inner[key], columnName),
       },
     })),
 }));

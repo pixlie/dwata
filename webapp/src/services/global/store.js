@@ -1,9 +1,6 @@
 import create from "zustand";
 
-import * as constants from "./constants";
-
 const initialState = {
-  mainApp: constants.APP_NAME_HOME,
   isSidebarVisible: false, // Is Sidebar modal On
   isActionsVisible: false, // Is Actions modal On
   isFEVisible: false, // Is FilterEditor modal On
@@ -28,16 +25,6 @@ const allModalsClosedState = {
 const toggleSidebar = (inner) => ({
   ...inner,
   isSidebarVisible: !inner.isSidebarVisible,
-});
-
-const toggleColumnHeadSpecification = (inner, columnName) => ({
-  ...inner,
-  ...allModalsClosedState,
-  activeColumnHeadSpecification:
-    inner.activeColumnHeadSpecification === null ||
-    inner.activeColumnHeadSpecification !== columnName
-      ? columnName
-      : null,
 });
 
 const toggleActions = (inner) => ({
@@ -86,14 +73,6 @@ const [useStore] = create((set) => ({
   inner: {
     ...initialState,
   },
-
-  setMainApp: (appName) =>
-    set((state) => ({
-      inner: {
-        ...state.inner,
-        mainApp: appName,
-      },
-    })),
 
   toggleSidebar: () =>
     set((state) => ({

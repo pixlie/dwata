@@ -1,7 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useQuerySpecification } from "services/store";
+import { useData, useSchema, useQuerySpecification } from "services/store";
+// import DetailView from "components/Detail";
+import ColumnSelector from "components/QueryEditor/ColumnSelector";
+import FilterEditor from "components/QueryEditor/FilterEditor";
+import OrderEditor from "components/QueryEditor/OrderEditor";
+import Paginator from "components/QueryEditor/Paginator";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
 import QueryLoader from "./QueryLoader";
@@ -13,9 +18,19 @@ export default () => {
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
 
   if (
-    !(data && data.isReady && querySpecification && querySpecification.isReady)
+    !(
+      data &&
+      data.isReady &&
+      querySpecification &&
+      querySpecification.isReady &&
+      schema &&
+      schema.isReady
+    )
   ) {
     if (!!queryContext.savedQueryId) {
       return <SavedQueryLoader />;
@@ -24,14 +39,22 @@ export default () => {
   }
 
   return (
-    <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
-      <thead>
-        <TableHead />
-      </thead>
+    <Fragment>
+      <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
+        <thead>
+          <TableHead />
+        </thead>
 
-      <tbody>
-        <TableBody />
-      </tbody>
-    </table>
+        <tbody>
+          <TableBody />
+        </tbody>
+      </table>
+
+      <ColumnSelector />
+      <FilterEditor />
+      <OrderEditor />
+      {/* <Actions /> */}
+      <Paginator />
+    </Fragment>
   );
 };

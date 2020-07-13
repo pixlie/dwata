@@ -1,15 +1,17 @@
 import React from "react";
 
-import { useGlobal } from "services/store";
+import { useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 
 export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
-  const mainApp = useGlobal((state) => state.inner.mainApp);
-  const setMainApp = useGlobal((state) => state.setMainApp);
+  const mainApp = useQueryContext((state) => state.inner["main"]);
+  const setContext = useQueryContext((state) => state.setContext);
   const handleHome = (event) => {
     event.preventDefault();
-    setMainApp(globalConstants.APP_NAME_HOME);
+    setContext("main", {
+      appType: globalConstants.APP_NAME_HOME,
+    });
   };
 
   return (
@@ -38,7 +40,8 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
             <div className="buttons">
               <button
                 className={`button ${
-                  mainApp === globalConstants.APP_NAME_BROWSER
+                  mainApp &&
+                  mainApp.appType === globalConstants.APP_NAME_BROWSER
                     ? "is-grey"
                     : "is-success"
                 }`}
@@ -68,7 +71,9 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
         </div>
 
         <div className="navbar-end">
-          {mainApp === globalConstants.APP_NAME_BROWSER ? <GridNav /> : null}
+          {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
+            <GridNav />
+          ) : null}
         </div>
       </div>
     </nav>

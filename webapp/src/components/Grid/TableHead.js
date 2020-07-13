@@ -9,12 +9,14 @@ import TableHeadItem from "./TableHeadItem";
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state.inner[queryContext.key]);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
   const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
+    (x) => x.table_name === querySpecification.tableName
   ).columns;
   const headList = [];
   const DefaultCell = ({ data }) => <TableHeadItem head={data} />;

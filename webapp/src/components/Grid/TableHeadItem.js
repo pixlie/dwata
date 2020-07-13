@@ -1,23 +1,17 @@
 import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
-import useGlobal from "services/global/store";
-import useData from "services/data/store";
-import useSchema from "services/schema/store";
-import useQuerySpecification from "services/querySpecification/store";
-import {
-  toggleOrderBy,
-  initiateFilter,
-} from "services/querySpecification/actions";
-import { toggleColumnHeadSpecification } from "services/global/actions";
+import { useData, useSchema, useQuerySpecification } from "services/store";
 import FilterItem from "components/QueryEditor/FilterItem";
 
 const ColumnHeadSpecification = ({ head }) => {
   const queryContext = useContext(QueryContext);
   const fetchData = useData((state) => state.fetchData);
+  const toggleOrderBy = useQuerySpecification((state) => state.toggleOrderBy);
+
   const handleClick = (event) => {
     event.preventDefault();
-    // toggleOrderBy(head);
+    toggleOrderBy(queryContext.key, head);
   };
 
   const handleSubmit = (event) => {
@@ -46,22 +40,30 @@ const ColumnHeadSpecification = ({ head }) => {
 
 export default ({ head }) => {
   const queryContext = useContext(QueryContext);
-  const activeColumnHeadSpecification = useGlobal(
-    (state) => state.inner.activeColumnHeadSpecification
-  );
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
+  );
+  const toggleColumnHeadSpecification = useQuerySpecification(
+    (state) => state.toggleColumnHeadSpecification
+  );
+  const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
+
+  if (!(querySpecification && querySpecification.isReady)) {
+    return null;
+  }
+
+  const { activeColumnHeadSpecification } = querySpecification;
   const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
+    (x) => x.table_name === querySpecification.tableName
   ).columns;
 
-  const handleClick = (event) => {
-    event.preventDefault();
-    toggleColumnHeadSpecification(head);
+  const handleClick = () => {
+    toggleColumnHeadSpecification(queryContext.key, head);
     const dataType = schemaColumns.find((x) => x.name === head);
-    // initiateFilter(head, dataType);
+    initiateFilter(queryContext.key, head, dataType);
   };
 
   if (querySpecification.orderBy[head] === "asc") {

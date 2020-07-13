@@ -7,9 +7,11 @@ import rowRenderer from "./rowRenderer";
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state.inner[queryContext.key]);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
+  );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
   );
 
   // useEffect(() => {
@@ -27,7 +29,8 @@ export default () => {
   }
 
   const rowRendererList = rowRenderer(
-    schema.rows.find((x) => x.table_name === queryContext.tableName).columns,
+    schema.rows.find((x) => x.table_name === querySpecification.tableName)
+      .columns,
     columns,
     querySpecification.columnsSelected
   );
@@ -59,7 +62,7 @@ export default () => {
     const handleRowClick = (event) => {
       event.preventDefault();
       // history.push(
-      //   `/browse/${queryContext.sourceLabel}/${queryContext.tableName}/${row[0]}`
+      // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
       // );
     };
 

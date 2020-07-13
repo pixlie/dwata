@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
-import useData from "services/data/store";
-import useQuerySpecification from "services/querySpecification/store";
+import { useData, useQuerySpecification } from "services/store";
 
 const PageItem = ({ number }) => {
   const queryContext = useContext(QueryContext);
@@ -17,8 +16,8 @@ const PageItem = ({ number }) => {
     ({ offset, limit } = querySpecification);
   }
   const currentPage = Math.floor(offset / limit) + 1;
-  const handleGotoPage = (event) => {
-    event.preventDefault();
+
+  const handleGotoPage = () => {
     gotoPage(queryContext.key, number);
   };
 
@@ -43,6 +42,10 @@ const PageSlots = () => {
     (state) => state.inner[queryContext.key]
   );
 
+  if (!(querySpecification && querySpecification.isReady)) {
+    return null;
+  }
+
   let count = null,
     limit = null;
   if (querySpecification) {
@@ -50,6 +53,7 @@ const PageSlots = () => {
   }
   const slots = 9; // Includes all page numbers to be shown and ellipses
   const totalPages = Math.ceil(count / limit);
+
   if (totalPages < slots) {
     return (
       <ul className="pagination-list">

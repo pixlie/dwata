@@ -12,12 +12,14 @@ import { Section, Hx } from "components/BulmaHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
   const data = useData((state) => state.inner[queryContext.key]);
   const fetchData = useData((state) => state.fetchData);
   const isCSVisible = useGlobal((state) => state.inner.isCSVisible);
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
+  );
+  const schema = useSchema(
+    (state) => state.inner[querySpecification.sourceLabel]
   );
 
   if (
@@ -34,7 +36,7 @@ export default () => {
 
   let dataColumns = [];
   const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
+    (x) => x.table_name === querySpecification.tableName
   ).columns;
   const colsAreAvailable = querySpecification.columnsSelected.every((col, i) =>
     dataColumns.includes(col)
