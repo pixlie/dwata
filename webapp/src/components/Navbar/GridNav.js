@@ -24,15 +24,11 @@ export default ({
     fetchApps();
   }, [fetchApps]);
 
-  let isReady = false,
-    isNoteAppEnabled = false,
-    isRecordPinAppEnabled = false;
-  if (data) {
-    ({ isReady } = data);
-  }
-  if (!isReady) {
+  if (!(data && data.isReady)) {
     return null;
   }
+  let isNoteAppEnabled = false,
+    isRecordPinAppEnabled = false;
   if (apps.isReady) {
     ({ isNoteAppEnabled, isRecordPinAppEnabled } = apps);
   }

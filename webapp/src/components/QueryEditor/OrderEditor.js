@@ -1,24 +1,40 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { addOrderBy, changeOrderBy } from "services/querySpecification/actions";
+import { QueryContext } from "utils";
+import {
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
 import { Section, Hx } from "components/BulmaHelpers";
 
-const OrderEditor = ({
-  isReady,
-  isVisible,
-  schemaColumns,
-  orderBy,
-  addOrderBy,
-  changeOrderBy,
-}) => {
-  if (!isReady || !isVisible) {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const fetchData = useData((state) => state.fetchData);
+  const isOEVisible = useGlobal((state) => state.inner.isOEVisible);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isOEVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
     return null;
   }
 
+  const { orderBy } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === queryContext.tableName
+  ).columns;
   const order_by_options = [
     <option value="" key="ord-hd">
       Order by
@@ -95,6 +111,7 @@ const OrderEditor = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -139,3 +156,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(OrderEditor)
 );
+*/

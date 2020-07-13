@@ -90,11 +90,9 @@ export default () => {
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);
 
-  let isReady = null;
-  if (data) {
-    ({ isReady } = data);
-  }
-  if (!isReady) {
+  if (
+    !(data && data.isReady && querySpecification && querySpecification.isReady)
+  ) {
     return null;
   }
   let count = null,

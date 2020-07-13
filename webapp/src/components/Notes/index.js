@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
-import { showNotes } from "services/global/actions";
-import { fetchNote, saveNote } from "services/apps/actions";
+import { useGlobal } from "services/store";
 import { Section } from "components/BulmaHelpers";
 
 const defaultNote = `# Notes
@@ -20,22 +17,15 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 syntax, which is automatically converted to HTML.
 `;
 
-const Notes = ({
-  isReady,
-  showNotesFor,
-  isNoteAppEnabled,
-  dataItem,
-  showNotes,
-  fetchNote,
-  saveNote,
-}) => {
+export default () => {
+  const showNotesFor = useGlobal((state) => state.showNotesFor);
   const handleKey = useCallback(
     (event) => {
       if (event.keyCode === 27) {
-        showNotes(null);
+        showNotesFor(null);
       }
     },
-    [showNotes]
+    [showNotesFor]
   );
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);
@@ -90,7 +80,7 @@ const Notes = ({
   }
   const handleClose = (event) => {
     event.preventDefault();
-    showNotes(null);
+    showNotesFor(null);
   };
 
   const handleSave = (event) => {
@@ -169,6 +159,7 @@ const Notes = ({
   );
 };
 
+/*
 const mapStateToProps = (state) => {
   const { showNotesFor } = state.global;
   const { isNoteAppEnabled, noteAppConfig } = state.apps;
@@ -198,8 +189,9 @@ const mapStateToProps = (state) => {
 
 export default withRouter(
   connect(mapStateToProps, {
-    showNotes,
+    showNotesFor,
     fetchNote,
     saveNote,
   })(Notes)
 );
+*/

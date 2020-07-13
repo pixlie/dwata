@@ -14,12 +14,9 @@ export default () => {
     (state) => state.inner[queryContext.key]
   );
 
-  let isReady = false;
-  if (data) {
-    ({ isReady } = data);
-  }
-
-  if (!isReady || !querySpecification || !querySpecification.isReady) {
+  if (
+    !(data && data.isReady && querySpecification && querySpecification.isReady)
+  ) {
     if (!!queryContext.savedQueryId) {
       return <SavedQueryLoader />;
     }

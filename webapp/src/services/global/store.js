@@ -114,6 +114,11 @@ const [useStore] = create((set) => ({
     set((state) => ({
       inner: toggleOrderEditor(state.inner),
     })),
+
+  showNotesFor: (identifier) =>
+    set((state) => ({
+      inner: showNotesFor(state.inner, identifier),
+    })),
 }));
 
 export default useStore;

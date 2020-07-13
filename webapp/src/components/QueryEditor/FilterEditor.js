@@ -1,35 +1,51 @@
-import React, { Fragment, useState } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { Fragment, useState, useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { saveQuery } from "services/apps/actions";
+import { QueryContext } from "utils";
 import {
-  initiateFilter,
-  removeFilter,
-} from "services/querySpecification/actions";
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
-const FilterEditor = ({
-  isReady,
-  isVisible,
-  schemaColumns,
-  filterBy,
-  initiateFilter,
-  removeFilter,
-  fetchData,
-  saveQuery,
-}) => {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const schema = useSchema((state) => state.inner[queryContext.sourceLabel]);
+  const data = useData((state) => state.inner[queryContext.key]);
+  const fetchData = useData((state) => state.fetchData);
+  const isFEVisible = useGlobal((state) => state.inner.isFEVisible);
+  const querySpecification = useQuerySpecification(
+    (state) => state.inner[queryContext.key]
+  );
+  let initiateFilter = useQuerySpecification((state) => state.initiateFilter);
+  initiateFilter = (columnName, dataType) =>
+    initiateFilter(queryContext.key, columnName, dataType);
+  let removeFilter = useQuerySpecification((state) => state.removeFilter);
+  removeFilter = (columnName) => removeFilter(queryContext.key, columnName);
   const [state, setState] = useState({
     isSavingQuery: false,
     savedQueryLabel: "",
   });
+  const saveQuery = () => ({});
 
-  if (!isReady || !isVisible) {
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isFEVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
     return null;
   }
+
+  const { filterBy } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === queryContext.tableName
+  ).columns;
   const addFilter = (event) => {
     event.preventDefault();
     const { value } = event.target;
@@ -178,6 +194,7 @@ const FilterEditor = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -213,3 +230,4 @@ export default withRouter(
     saveQuery,
   })(FilterEditor)
 );
+*/

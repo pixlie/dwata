@@ -1,10 +1,12 @@
 import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import useGlobal from "services/global/store";
-import useSchema from "services/schema/store";
-import useData from "services/data/store";
-import useQuerySpecification from "services/querySpecification/store";
+import {
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
 import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
@@ -14,21 +16,26 @@ export default () => {
   const data = useData((state) => state.inner[queryContext.key]);
   const fetchData = useData((state) => state.fetchData);
   const isCSVisible = useGlobal((state) => state.inner.isCSVisible);
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === queryContext.tableName
-  ).columns;
   const querySpecification = useQuerySpecification(
     (state) => state.inner[queryContext.key]
   );
-  let isReady = false,
-    dataColumns = [];
-  if (data) {
-    ({ isReady } = data);
-  }
-  if (!isReady || !isCSVisible) {
+
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isCSVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
     return null;
   }
 
+  let dataColumns = [];
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === queryContext.tableName
+  ).columns;
   const colsAreAvailable = querySpecification.columnsSelected.every((col, i) =>
     dataColumns.includes(col)
   );

@@ -1,12 +1,9 @@
 import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 
-import { getQueryDetails } from "services/browser/getters";
 import { Section, Hx } from "components/BulmaHelpers";
 import { pinRecords } from "services/apps/actions";
 
-const Actions = ({ isReady, isVisible, selectedRowList, pinRecords }) => {
+export default () => {
   if (!isReady || !isVisible) {
     return null;
   }
@@ -35,6 +32,7 @@ const Actions = ({ isReady, isVisible, selectedRowList, pinRecords }) => {
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -65,3 +63,4 @@ export default withRouter(
     pinRecords,
   })(Actions)
 );
+*/

@@ -1,4 +1,5 @@
 import create from "zustand";
+import { concat, remove } from "lodash";
 
 const initialState = {
   columnsSelected: [],
@@ -26,40 +27,68 @@ const setQuerySpecification = (inner, key, payload) => {
   };
 };
 
-const cacheQuerySpecification = (inner, key, editing) => {
+const initiateFilter = (inner, columnName, dataType) => {
+  if (Object.keys(inner.filterBy).includes(columnName)) {
+    return {
+      ...inner,
+    };
+  }
+
+  let initialFilter = {};
+  if (["INTEGER", "VARCHAR", "TIMESTAMP"].includes(dataType.type)) {
+    initialFilter = {
+      display: "",
+    };
+  } else if (dataType.type === "BOOLEAN") {
+    initialFilter = {
+      value: null,
+    };
+  }
   return {
     ...inner,
-    [key]: {
-      ...initialState,
-      ...editing,
-      isReady: true,
+    filterBy: {
+      ...inner.filterBy,
+      [columnName]: {
+        ...initialFilter,
+      },
     },
   };
 };
 
-const gotoPage = (inner, key, pageNum) => ({
+const removeFilter = (inner, columnName) => {
+  // We create a reducer that will add any key (and its corresponding value from current filters)
+  //  if the key is not the one that we want to remove
+  const reducer = (acc, key) => {
+    if (key !== columnName) {
+      return {
+        ...acc,
+        [key]: inner.filterBy[key],
+      };
+    }
+    return {
+      ...acc,
+    };
+  };
+  return {
+    ...inner,
+    filterBy: Object.keys(inner.filterBy).reduce(reducer, {}),
+  };
+};
+
+const gotoPage = (inner, pageNum) => ({
   ...inner,
-  [key]: {
-    ...inner[key],
-    offset: (pageNum - 1) * inner[key].limit,
-  },
+  offset: (pageNum - 1) * inner.limit,
 });
 
 const [useStore] = create((set) => ({
   inner: {},
-  editing: {},
 
   setQuerySpecification: (key, payload) =>
     set((state) => ({
       inner: setQuerySpecification(state.inner, key, payload),
     })),
 
-  cacheQuerySpecification: (key) =>
-    set((state) => ({
-      inner: cacheQuerySpecification(state.inner, key, state.editing),
-    })),
-
-  nextPage: () =>
+  nextPage: (key) =>
     set((state) => ({
       inner: {
         ...state.inner,
@@ -67,7 +96,7 @@ const [useStore] = create((set) => ({
       },
     })),
 
-  previousPage: () =>
+  previousPage: (key) =>
     set((state) => ({
       inner: {
         ...state.inner,
@@ -77,7 +106,26 @@ const [useStore] = create((set) => ({
 
   gotoPage: (key, pageNum) =>
     set((state) => ({
-      inner: gotoPage(state.inner, key, pageNum),
+      inner: {
+        ...state.inner,
+        [key]: gotoPage(state.inner[key], pageNum),
+      },
+    })),
+
+  initialFilter: (key, columnName, dataType) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: initiateFilter(state.inner[key], columnName, dataType),
+      },
+    })),
+
+  removeFilter: (key, columnName) =>
+    set((state) => ({
+      inner: {
+        ...state.inner,
+        [key]: removeFilter(state.inner[key], columnName),
+      },
     })),
 }));
 

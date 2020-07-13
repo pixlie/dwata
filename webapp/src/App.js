@@ -12,8 +12,8 @@ import Grid from "components/Grid";
 // import Funnel from "components/Funnel";
 // import APIBrowser from "components/APIBrowser";
 import ColumnSelector from "components/QueryEditor/ColumnSelector";
-// import FilterEditor from "components/QueryEditor/FilterEditor";
-// import OrderEditor from "components/QueryEditor/OrderEditor";
+import FilterEditor from "components/QueryEditor/FilterEditor";
+import OrderEditor from "components/QueryEditor/OrderEditor";
 import Paginator from "components/QueryEditor/Paginator";
 // import Notes from "components/Notes";
 // import Actions from "components/Actions";
@@ -35,9 +35,9 @@ export default () => {
         <QueryContext.Provider value={queryContext}>
           <Grid />
           <ColumnSelector />
-          {/* <FilterEditor />
+          <FilterEditor />
           <OrderEditor />
-          <Actions /> */}
+          {/* <Actions /> */}
           <Paginator />
         </QueryContext.Provider>
       ) : null}
