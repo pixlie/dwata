@@ -7,7 +7,6 @@ import {
   useData,
   useQuerySpecification,
 } from "services/store";
-import { toggleColumnSelection } from "services/querySpecification/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 
 export default () => {
@@ -17,6 +16,9 @@ export default () => {
   const isCSVisible = useGlobal((state) => state.isCSVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
+  );
+  const toggleColumnSelection = useQuerySpecification(
+    (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
@@ -40,9 +42,8 @@ export default () => {
     dataColumns.includes(col)
   );
   const BoundInput = ({ head }) => {
-    const handleClick = (event) => {
-      event.preventDefault();
-      toggleColumnSelection(head.name);
+    const handleClick = () => {
+      toggleColumnSelection(queryContext.key, head.name);
     };
 
     return (

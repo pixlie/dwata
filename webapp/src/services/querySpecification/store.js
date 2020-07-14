@@ -133,6 +133,25 @@ const toggleColumnHeadSpecification = (inner, columnName) => ({
       : null,
 });
 
+const toggleColumnSelection = (inner, columnName) => {
+  if (inner.columnsSelected.includes(columnName)) {
+    // This column is currently selected, let's get it removed
+    return {
+      ...inner,
+      columnsSelected: [...inner.columnsSelected].filter(
+        (x) => x !== columnName
+      ),
+    };
+  } else {
+    // This column is not selected, let's add it
+    return {
+      ...inner,
+      columnsSelected: [...inner.columnsSelected, columnName],
+      fetchNeeded: true,
+    };
+  }
+};
+
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
   initiateQuerySpecification: (key, payload) =>
     set((state) => ({
@@ -182,6 +201,11 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
   toggleColumnHeadSpecification: (key, columnName) =>
     set((state) => ({
       [key]: toggleColumnHeadSpecification(state[key], columnName),
+    })),
+
+  toggleColumnSelection: (key, columnName) =>
+    set((state) => ({
+      [key]: toggleColumnSelection(state[key], columnName),
     })),
 }));
 

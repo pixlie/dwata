@@ -36,6 +36,11 @@ const querySpecificationObject = (state, payload) => ({
 });
 
 const getQuerySpecificationPayload = (querySpecification) => ({
+  columns:
+    !!querySpecification.columnsSelected &&
+    querySpecification.columnsSelected.length > 0
+      ? querySpecification.columnsSelected
+      : undefined,
   source_label: querySpecification.sourceLabel,
   table_name: querySpecification.tableName,
   order_by: querySpecification.orderBy,
@@ -77,8 +82,7 @@ const [useStore] = create((set, get) => ({
         }));
 
         const subscriber = async (qs) => {
-          console.log("qs changed", qs.fetchNeeded);
-          if (qs.fetchNeeded) {
+          if (qs.fetchNeeded === true) {
             await fetchInner(qs);
             sub();
           }
