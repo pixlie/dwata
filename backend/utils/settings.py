@@ -10,7 +10,8 @@ def get_all_sources():
         [label, "database", db.scheme, {}] for (label, db) in [
             (label, urlparse(value["db_url"])) for label, value in settings.DATABASES.items()
         ]
-    ]
+    ] + [["dwata_meta", "database", "sqlite", {"is_system_db": True}]]
+
     services = []
     for sname in all_services.keys():
         if hasattr(settings, sname.upper()):
@@ -22,6 +23,11 @@ def get_all_sources():
 
 
 def get_source_settings(source_label):
+    if source_label == "dwata_meta":
+        return {
+            "db_url": "sqlite:///dwata_meta.db"
+        }
+
     requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
     if requested_source[1] == "database":
         return settings.DATABASES[requested_source[0]]

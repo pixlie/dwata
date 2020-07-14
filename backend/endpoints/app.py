@@ -40,6 +40,7 @@ async def app_setup(request):
     app_name = request.path_params["app_name"]
     module = import_module("apps.{}.setup".format(app_name))
     setup_params = {}
+
     if hasattr(module, "required_setup_params"):
         required_setup_params = getattr(module, "required_setup_params")()
         try:
@@ -55,6 +56,7 @@ async def app_setup(request):
                 message="Setting up {} app needs parameters that have not been specified".format(app_name)
             )
 
+    setup_params["source_label"] = "dwata_meta"
     await getattr(module, "setup_app")(**setup_params)
     return RapidJSONResponse({
         "status": "success"

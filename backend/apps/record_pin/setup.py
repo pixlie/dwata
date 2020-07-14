@@ -3,13 +3,6 @@ from utils.settings import get_source_settings
 from utils.database import connect_database
 
 
-def required_setup_params():
-    # Todo: Change source_label to source_label
-    return [
-        "source_label",
-    ]
-
-
 async def setup_app(source_label):
     # Todo: Change source_label to source_label
     settings = get_source_settings(source_label=source_label)
