@@ -1,19 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap");
 
 // Update Bulma's global variables
-$family-sans-serif: "Titillium Web", sans-serif;
+$family-sans-serif: "Quicksand", sans-serif;
 
 // Reduce the size of the default shadow
 $scheme-invert: hsl(0, 0%, 4%);
-$card-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
-$panel-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
-$box-shadow: 0 0 0 1px rgba($scheme-invert,.1), 0 2px 4px 0 rgba(14,30,37,.12);
+$card-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
+$panel-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
+$box-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+  0 2px 4px 0 rgba(14, 30, 37, 0.12);
 $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 
-@import '../../node_modules/bulma';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/solid.css';
-@import '../../node_modules/@fortawesome/fontawesome-free/css/regular.css';
+@import "../../node_modules/bulma";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
 
 html {
   min-width: 100%;
@@ -21,12 +24,13 @@ html {
 }
 
 body {
-  background-image: linear-gradient(141deg, #dfd8d9 0%, whitesmoke 71%, white 100%);
   min-height: 100%;
   min-width: 100%;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   &.title {
     font-weight: 900;
   }
@@ -72,11 +76,6 @@ h1, h2, h3 {
 
 .navbar {
   background-color: #efefef;
-  opacity: 0.3;
-
-  &:hover {
-    opacity: 1;
-  }
 
   button {
     font-weight: bold;
@@ -84,7 +83,6 @@ h1, h2, h3 {
 
   .navbar-brand {
     .navbar-item {
-      font-size: x-large;
       padding: 0 3rem;
     }
   }
@@ -171,6 +169,10 @@ table {
   tbody {
     tr {
       cursor: pointer;
+
+      &.is-pin {
+        background-color: #efefef;
+      }
     }
   }
 }
@@ -180,7 +182,6 @@ table {
     box-shadow: none;
   }
 }
-
 
 #paginator {
   z-index: 80;
@@ -192,7 +193,6 @@ table {
   bottom: 4rem;
   right: 12rem;
 }
-
 
 #detail-modal {
   z-index: 100;
@@ -248,35 +248,9 @@ table {
   }
 
   section {
-    padding: 1rem;
-
-    .button {
-      &.close {
-        position: absolute;
-        top: -1.6rem;
-        right: -2rem;
-      }
-    }
-
-    .container {
-      .columns {
-        .column {
-          &.has-meta-data {
-            min-height: 21rem;
-            background-color: whitesmoke;
-
-            .input {
-              &:disabled {
-                background-color: #efefef;
-              }
-            }
-          }
-        }
-      }
-    }
+    padding: 1.2rem 1.6rem;
   }
 }
-
 
 #filter-editor {
   z-index: 90;
@@ -293,35 +267,9 @@ table {
   }
 
   section {
-    padding: 1rem;
-
-    .button {
-      &.close {
-        position: absolute;
-        top: -1.6rem;
-        right: -2rem;
-      }
-    }
-
-    .container {
-      .columns {
-        .column {
-          &.has-meta-data {
-            min-height: 21rem;
-            background-color: whitesmoke;
-
-            .input {
-              &:disabled {
-                background-color: #efefef;
-              }
-            }
-          }
-        }
-      }
-    }
+    padding: 1.2rem 1.6rem;
   }
 }
-
 
 #order-editor {
   z-index: 90;
@@ -338,35 +286,28 @@ table {
   }
 
   section {
-    padding: 1rem;
-
-    .button {
-      &.close {
-        position: absolute;
-        top: -1.6rem;
-        right: -2rem;
-      }
-    }
-
-    .container {
-      .columns {
-        .column {
-          &.has-meta-data {
-            min-height: 21rem;
-            background-color: whitesmoke;
-
-            .input {
-              &:disabled {
-                background-color: #efefef;
-              }
-            }
-          }
-        }
-      }
-    }
+    padding: 1.2rem 1.6rem;
   }
 }
 
+#actions-modal {
+  z-index: 90;
+  background-color: white;
+  box-shadow: $box-shadow;
+  border-left: 4px solid #efefef;
+  position: fixed;
+  min-width: 16rem;
+  top: 4rem;
+  left: 58rem;
+
+  &:hover {
+    border-left: 4px solid #48c774;
+  }
+
+  section {
+    padding: 1.2rem 1.6rem;
+  }
+}
 
 .col-hd-spec-box {
   z-index: 80;
@@ -379,7 +320,6 @@ table {
   min-width: 12rem;
   display: block;
 }
-
 
 #notes-modal {
   z-index: 100;

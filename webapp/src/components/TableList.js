@@ -1,40 +1,78 @@
 import React, { useEffect, Fragment } from "react";
-import { connect } from "react-redux";
-import { Link } from "react-router-dom";
 
-import { fetchSchema } from "services/schema/actions";
+import {
+  useSchema,
+  useQueryContext,
+  useQuerySpecification,
+} from "services/store";
+import * as globalConstants from "services/global/constants";
 
-
-const TableList = ({sourceIndex, schema, fetchSchema, sourceType}) => {
-  useEffect(() => {
-    fetchSchema(sourceIndex);
-  }, []);
+const BrowserItem = ({ item, sourceLabel, sourceType }) => {
+  const initiateQuerySpecification = useQuerySpecification(
+    (state) => state.initiateQuerySpecification
+  );
+  const setContext = useQueryContext((state) => state.setContext);
   const urlBase = sourceType === "database" ? "/browse" : "/service";
+
+  const handleClick = (event) => {
+    event.preventDefault();
+    initiateQuerySpecification("main", {
+      sourceLabel,
+      tableName: item.table_name,
+      fetchNeeded: true,
+    });
+    setContext("main", {
+      appType: globalConstants.APP_NAME_BROWSER,
+    });
+  };
+
+  return (
+    <a
+      className="panel-block"
+      href={`${urlBase}/${sourceLabel}/${item.table_name}`}
+      onClick={handleClick}
+    >
+      &nbsp;&nbsp;&nbsp;&nbsp; {item.table_name}
+    </a>
+  );
+};
+
+export default ({ sourceLabel, sourceType }) => {
+  const schema = useSchema((state) => state[sourceLabel]);
+  const fetchSchema = useSchema((state) => state.fetchSchema);
+  useEffect(() => {
+    fetchSchema(sourceLabel);
+  }, [sourceLabel, fetchSchema]);
 
   return (
     <Fragment>
-      {schema.isReady ? schema.rows.filter(s => s.properties.is_system_table === false).map((s, i) => (
-        <Link className="panel-block" to={`${urlBase}/${sourceIndex}/${s.table_name}`} key={`sr-${i}`}>
-          &nbsp;&nbsp;&nbsp;&nbsp; {s.table_name}
-        </Link>
-      )) : null}
-      <div className="panel-block"><i>System tables</i></div>
-      {schema.isReady ? schema.rows.filter(s => s.properties.is_system_table === true).map((s, i) => (
-        <Link className="panel-block" to={`${urlBase}/${sourceIndex}/${s.table_name}`} key={`sr-${i}`}>
-          &nbsp;&nbsp;&nbsp;&nbsp; {s.table_name}
-        </Link>
-      )) : null}
+      {!!schema && schema.isReady
+        ? schema.rows
+            .filter((s) => s.properties.is_system_table === false)
+            .map((s, i) => (
+              <BrowserItem
+                key={`sr-${i}`}
+                item={s}
+                sourceLabel={sourceLabel}
+                sourceType={sourceType}
+              />
+            ))
+        : null}
+      <div className="panel-block">
+        <i>System tables</i>
+      </div>
+      {!!schema && schema.isReady
+        ? schema.rows
+            .filter((s) => s.properties.is_system_table === true)
+            .map((s, i) => (
+              <BrowserItem
+                key={`sr-${i}`}
+                item={s}
+                sourceLabel={sourceLabel}
+                sourceType={sourceType}
+              />
+            ))
+        : null}
     </Fragment>
-  )
-}
-
-
-const mapStateToProps = state => ({
-  schema: state.schema,
-});
-
-
-export default connect(
-  mapStateToProps,
-  { fetchSchema }
-)(TableList);
+  );
+};

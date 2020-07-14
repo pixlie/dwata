@@ -1,0 +1,81 @@
+---
+- name: Setup a fresh Debian buster based server to have a system admin user with sudo and harden it
+
+  # Specify the hosts you want to target
+  hosts: all
+
+  # This playbook runs with the default root user that DigitalOcean or other VPS boot into
+  remote_user: root
+
+  vars:
+    system_user: dwata
+    system_packages: [ "ufw" ]
+
+  tasks:
+    - name: Add the system user
+      user:
+        name: "{{ system_user }}"
+        comment: System Admin
+        group: sudo
+        shell: /bin/bash
+
+    - name: Set authorized keys from GitHub URLs
+      authorized_key:
+        user: "{{ system_user }}"
+        state: present
+        key: https://github.com/brainless.keys
+
+    - name: Allow 'sudo' group to have passwordless sudo
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo'
+        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: Harden sshd configuration
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{item.regexp}}"
+        line: "{{item.line}}"
+        state: present
+      with_items:
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^^#?PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^#?AllowAgentForwarding"
+          line: "AllowAgentForwarding yes"
+        - regexp: "^#?AllowTcpForwarding"
+          line: "AllowTcpForwarding no"
+        - regexp: "^#?MaxAuthTries"
+          line: "MaxAuthTries 2"
+        - regexp: "^#?MaxSessions"
+          line: "MaxSessions 2"
+        - regexp: "^#?TCPKeepAlive"
+          line: "TCPKeepAlive no"
+        - regexp: "^#?UseDNS"
+          line: "UseDNS no"
+
+    - name: Update apt
+      apt: update_cache=yes
+
+    - name: Install required system packages
+      apt: name={{ system_packages }} state=latest
+
+    - name: UFW - Allow SSH connections
+      ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: UFW - Deny all other incoming traffic by default
+      ufw:
+        state: enabled
+        policy: deny
+        direction: incoming
+
+    - name: Restart sshd
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: sshd

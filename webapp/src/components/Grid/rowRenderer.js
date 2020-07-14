@@ -24,7 +24,7 @@ export default (schemaColumns, tableColumns, querySpecificationColumns) => {
        )}
     </Fragment>
   ) : <i />}</td>;
-  const JSONCell = ({ data }) => <td>{"{}"}</td>;
+  const JSONCell = () => <td>{"{}"}</td>;
   const TimeStampCell = (({ data }) => {
     try {
       return <td>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</td>;

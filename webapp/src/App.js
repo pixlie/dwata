@@ -1,59 +1,41 @@
-import React from "react";
-import { Switch, Route } from "react-router-dom";
-import { ConnectedRouter } from "connected-react-router";
-import { Provider } from "react-redux";
+import React, { Fragment } from "react";
 
-import configureStore from "services/store";
-import history from "services/history";
+import { QueryContext } from "utils";
+import { useQueryContext } from "services/store";
+import * as globalConstants from "services/global/constants";
 import Navbar from "components/Navbar";
-import Source from "components/Source";
-import Sidebar from "components/Sidebar";
+// import Source from "components/Source";
+// import Sidebar from "components/Sidebar";
 import Home from "components/Home";
-import Browser from "components/Browser";
-import APIBrowser from "components/APIBrowser";
-import ColumnSelector from "components/Browser/ColumnSelector";
-import FilterEditor from "components/Browser/FilterEditor";
-import OrderEditor from "components/Browser/OrderEditor";
-import DetailView from "components/Browser/Detail";
-import Paginator from "components/Browser/Paginator";
-import Notes from "components/Notes";
+import Grid from "components/Grid";
+// import Notes from "components/Notes";
+// import Actions from "components/Actions";
+import Report from "components/Report";
 
+export default () => {
+  const mainApp = useQueryContext((state) => state["main"]);
 
-export default ({ initialState }) => {
   return (
-    <Provider store={configureStore(initialState)}>
-      <ConnectedRouter history={history}>
+    <Fragment>
+      <QueryContext.Provider value={mainApp}>
         <Navbar />
-        <Notes />
+      </QueryContext.Provider>
+      {/* <Notes /> */}
+      {/* <Sidebar><Source /></Sidebar> */}
 
-        <Sidebar>
-          <Source />
-        </Sidebar>
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
+        <QueryContext.Provider value={mainApp}>
+          <Grid />
+        </QueryContext.Provider>
+      ) : null}
 
-        <Switch>
-          <Route path="/browse/:sourceId/:tableName/:pk" exact>
-            <Browser />
-            <DetailView />
-            <Paginator />
-          </Route>
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
+        <Report />
+      ) : null}
 
-          <Route path="/browse/:sourceId/:tableName" exact>
-            <ColumnSelector />
-            <FilterEditor />
-            <OrderEditor />
-            <Browser />
-            <Paginator />
-          </Route>
-
-          <Route path="/service/:sourceId/:resourceName" exact>
-            <APIBrowser />
-          </Route>
-
-          <Route path="/" exact>
-            <Home />
-          </Route>
-        </Switch>
-      </ConnectedRouter>
-    </Provider>
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
+        <Home />
+      ) : null}
+    </Fragment>
   );
-}
+};

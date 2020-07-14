@@ -15,7 +15,7 @@ async def item_get(request: Request):
     This method fetches a single row of data given the source_id, table_name and primary key id.
     There are tables which do not have a primary key and in those case an index might be used.
     """
-    source_index = request.path_params["source_index"]
+    source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     item_pk = None
     try:
@@ -24,7 +24,7 @@ async def item_get(request: Request):
         # We do not have a PK in request, check if we have any filters
         if len(request.query_params.keys()) == 0:
             return Response("", status_code=404)
-    settings = get_source_settings(source_index=source_index)
+    settings = get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
@@ -63,9 +63,9 @@ async def item_get(request: Request):
 
 
 async def item_post(request: Request):
-    source_index = request.path_params["source_index"]
+    source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
-    settings = get_source_settings(source_index=source_index)
+    settings = get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
@@ -106,16 +106,17 @@ async def item_post(request: Request):
             "rowcount": exc.rowcount,
         })
     except IntegrityError as e:
+        # Todo: handle error when required fields are not provided
         if hasattr(e, "args") and "UNIQUE constraint failed" in e.args[0]:
             # Todo: update this response status
             return Response("", status_code=404)
 
 
 async def item_put(request: Request):
-    source_index = request.path_params["source_index"]
+    source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     item_pk = request.path_params["item_pk"]
-    settings = get_source_settings(source_index=source_index)
+    settings = get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)

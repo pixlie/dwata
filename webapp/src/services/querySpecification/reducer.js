@@ -1,10 +1,9 @@
+import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA } from "services/browser/actionTypes";
 import {
-  TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_SORT_EDITOR,
-  TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE,
-  TOGGLE_COLUMN_SELECTION,
-  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER,
+  TOGGLE_ORDER, NEXT_PAGE, CHANGE_LIMIT, PREVIOUS_PAGE, GOTO_PAGE, TOGGLE_COLUMN_SELECTION,
+  INITIATE_QUERY_FILTER, SET_QUERY_FILTER, REMOVE_QUERY_FILTER, LOAD_QS_FROM_CACHE,
+  LAST_QUERY_SPECIFICATION
 } from "./actionTypes";
-import { INITIATE_FETCH_DATA, COMPLETE_FETCH_DATA, LOAD_DATA_FROM_CACHE } from "services/browser/actionTypes";
 
 
 /**
@@ -19,101 +18,68 @@ const initialState = {
   limit: undefined,
   offset: undefined,
 
-  isFEVisible: false,
-  isCSVisible: false,
-  isOEVisible: false,
-
   isReady: false,
-  _cacheKey: null,
-  _cachedData: {},
+  cacheKey: null,
+
+  // This is needed to check if user altered the spec so as to demand new data fetch
+  lastQuerySpecification: {},
 };
 
 
-const keysToCache = ["columnsSelected", "filterBy", "orderBy", "count", "limit", "offset", "_cacheKey"];
-const extractObjectToCache = state => Object.keys(state).reduce((acc, key) => {
-  if (keysToCache.includes(key)) {
-    acc[key] = state[key];
-  }
-  return acc;
-}, {});
-
-
 export default (state = initialState, action) => {
-  const setDeltaAndCache = delta => ({
-    ...state,
-    ...delta,
-    _cachedData: {
-      ...state._cachedData,
-      [state._cacheKey]: extractObjectToCache({
-        ...state,
-        ...delta,
-      }),
-    },
-  });
+  const {cacheKey} = action;
 
   switch (action.type) {
     case INITIATE_FETCH_DATA:
-      if (`${action.sourceId}/${action.tableName}` === state._cacheKey) {
+      if (!cacheKey) {
+        return {
+          ...state,
+        };
+      }
+    
+      if (cacheKey === state.cacheKey) {
         // No need to initiate multiple times
         return {
-          ...state
+          ...state,
         };
       }
       return {
         ...initialState,
-        _cacheKey: `${action.sourceId}/${action.tableName}`,
-        _cachedData: {
-          ...state._cachedData,
-          [`${action.sourceId}/${action.tableName}`]: undefined,
-        }
-      };
-
-    case TOGGLE_FILTER_EDITOR:
-      return {
-        ...state,
-        isFEVisible: !state.isFEVisible,
-        isCSVisible: false,
-        isOEVisible: false,
-      };
-
-    case TOGGLE_COLUMN_SELECTOR_UI:
-      return {
-        ...state,
-        isCSVisible: !state.isCSVisible,
-        isFEVisible: false,
-        isOEVisible: false,
-      };
-
-    case TOGGLE_SORT_EDITOR:
-      return {
-        ...state,
-        isOEVisible: !state.isOEVisible,
-        isFEVisible: false,
-        isCSVisible: false,
+        cacheKey,
       };
 
     case CHANGE_LIMIT:
-      return setDeltaAndCache({
+      return {
+        ...state,
         limit: action.limit,
-      });
+      };
 
     case NEXT_PAGE:
-      return setDeltaAndCache({
+      return {
+        ...state,
         offset: state.offset + state.limit,
-      });
+      };
 
     case PREVIOUS_PAGE:
-      return setDeltaAndCache({
+      return {
+        ...state,
         offset: state.offset - state.limit,
-      });
+      };
 
     case GOTO_PAGE:
-      return setDeltaAndCache({
+      return {
+        ...state,
         offset: (action.pageNum - 1) * state.limit,  // Since pageNum comes from UI, it counts from 1, but API counts from 0
-      });
+      };
 
     case COMPLETE_FETCH_DATA:
-      if (`${action.sourceId}/${action.tableName}` !== state._cacheKey) {
+      if (!cacheKey) {
+        return {
+          ...state,
+        };
+      }
+    
+      if (cacheKey !== state.cacheKey) {
         // We have a problem, some data race perhaps
         // Todo: tackle this issue if it happens
         console.log("This is a huge problem, please check");
@@ -121,34 +87,27 @@ export default (state = initialState, action) => {
           ...state,
         };
       }
-      return setDeltaAndCache({
+      return {
+        ...state,
         count: action.payload.count,
         limit: action.payload.limit,
         offset: action.payload.offset,
         columnsSelected: action.payload.columns,
         isReady: true,
-      });
+      };
 
-    case LOAD_DATA_FROM_CACHE:
-      if (`${action.sourceId}/${action.tableName}` in state._cachedData) {
-        // Data found in cache, let us set that cached data to the main state of this reducer
+    case LOAD_QS_FROM_CACHE:
+      if (!cacheKey) {
         return {
-          ...initialState,
-          ...state._cachedData[`${action.sourceId}/${action.tableName}`],
-          isReady: true,
-          _cachedData: {
-            ...state._cachedData
-          },
+          ...state,
         };
       }
-      // Requested cacheKey is not in cacheData, we simply initiate fresh data in the state of this reducer
+    
       return {
         ...initialState,
-        _cacheKey: `${action.sourceId}/${action.tableName}`,
-        _cachedData: {
-          ...state._cachedData,
-          [`${action.sourceId}/${action.tableName}`]: undefined,
-        }
+        ...action.payload,
+        isReady: true,
+        cacheKey,
       };
 
     case TOGGLE_ORDER:
@@ -160,33 +119,36 @@ export default (state = initialState, action) => {
         newOrder = "desc";
       }
 
-      return setDeltaAndCache({
+      return {
+        ...state,
         orderBy: {
           ...state.orderBy,
           [action.columnName]: newOrder,
         }
-      });
+      };
 
     case TOGGLE_COLUMN_SELECTION:
       if (state.columnsSelected.includes(action.columnName)) {
         // This column is currently selected, let's get it removed
-        return setDeltaAndCache({
+        return {
+          ...state,
           columnsSelected: [...state.columnsSelected].filter(x => x !== action.columnName),
-        });
+        };
       } else {
         // This column is not selected, let's add it
-        return setDeltaAndCache({
+        return {
+          ...state,
           columnsSelected: [
             ...state.columnsSelected,
             action.columnName,
           ],
-        });
+        };
       }
 
     case INITIATE_QUERY_FILTER:
-      if (action.columnName in state.filterBy) {
+      if (Object.keys(state.filterBy).includes(action.columnName)) {
         return {
-          ...state
+          ...state,
         };
       }
 
@@ -197,26 +159,27 @@ export default (state = initialState, action) => {
         };
       } else if (action.dataType.type === "BOOLEAN") {
         initialFilter = {
-          display: "true",
-          value: true,
+          value: null,
         };
       }
-      return setDeltaAndCache({
+      return {
+        ...state,
         filterBy: {
           ...state.filterBy,
           [action.columnName]: {
             ...initialFilter,
           },
         }
-      });
+      };
 
     case SET_QUERY_FILTER:
-      return setDeltaAndCache({
+      return {
+        ...state,
         filterBy: {
           ...state.filterBy,
           [action.columnName]: action.filters,
         }
-      });
+      };
 
     case REMOVE_QUERY_FILTER:
       // We create a reducer that will add any key (and its corresponding value from current filters)
@@ -232,13 +195,22 @@ export default (state = initialState, action) => {
           ...acc,
         };
       };
-      return setDeltaAndCache({
+      return {
+        ...state,
         filterBy: Object.keys(state.filterBy).reduce(reducer, {}),
-      });
+      };
+
+    case LAST_QUERY_SPECIFICATION:
+      return {
+        ...state,
+        lastQuerySpecification: {
+          ...action.payload,
+        },
+      };
 
     default:
       return {
-        ...state
+        ...state,
       };
   }
 }

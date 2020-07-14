@@ -7,7 +7,17 @@ class DwataAppMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
     ) -> Response:
-        if "api/item/0/admin_meta_note" in request.url.path:
+        request.app.state.IS_DWATA_APP = False
+        request.app.state.DWATA_APP_NAME = None
+
+        if "api/item/dwata_meta/dwata_meta_note" in request.url.path:
             request.app.state.IS_DWATA_APP = True
             request.app.state.DWATA_APP_NAME = "note"
+        elif "api/item/dwata_meta/admin_record_pin" in request.url.path:
+            request.app.state.IS_DWATA_APP = True
+            request.app.state.DWATA_APP_NAME = "record_pin"
+        elif "api/item/dwata_meta/dwata_meta_saved_query" in request.url.path:
+            request.app.state.IS_DWATA_APP = True
+            request.app.state.DWATA_APP_NAME = "saved_query"
+
         return await call_next(request)

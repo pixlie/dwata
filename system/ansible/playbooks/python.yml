@@ -1,0 +1,61 @@
+---
+- name: Setup python 3.x, pip, virtualenv on a Debian 10 host
+
+  # Specify the hosts you want to target
+  hosts: all
+
+  remote_user: dwata
+
+  vars:
+    system_packages: [
+      "build-essential", "libssl-dev", "zlib1g-dev", "libncurses5-dev", "libnss3-dev",
+      "libncursesw5-dev", "libreadline-dev", "libsqlite3-dev", "libgdbm-dev",
+      "libdb5.3-dev", "libbz2-dev", "libexpat1-dev", "liblzma-dev", "libffi-dev"
+    ]
+
+  tasks:
+    - name: Update apt
+      become: yes
+      become_user: root
+      apt: update_cache=yes
+
+    - name: Install required system packages
+      become: yes
+      become_user: root
+      apt: name={{ system_packages }} state=latest
+
+    - name: Download python3.8
+      get_url:
+        url: https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz
+        dest: /tmp/
+
+    - name: Extract Python-3.8.2.tar.xz into ./Python
+      unarchive:
+        src: /tmp/Python-3.8.2.tar.xz
+        dest: ./Python
+
+    - name: Check to see if pip is already installed
+      command: "/usr/local/bin/pip3.8 --version"
+      ignore_errors: true
+      register: pip_is_installed
+      changed_when: false
+
+    - block:
+        - name: Download pip
+          get_url:
+            url: https://bootstrap.pypa.io/get-pip.py
+            dest: /tmp/
+
+        - name: Install Python pip
+          become: yes
+          become_user: root
+          command: "python3.8 /tmp/get-pip.py"
+
+        - name: Delete pip installer
+          file:
+            state: absent
+            path: /tmp/get-pip.py
+
+        - name: Install Python pipenv
+          command: "pip3.8 install --user pipenv"
+      when: pip_is_installed.rc != 0

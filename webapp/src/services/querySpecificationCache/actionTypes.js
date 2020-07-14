@@ -1,0 +1,1 @@
+export const SAVE_QS_TO_CACHE = "SAVE_QS_TO_CACHE";

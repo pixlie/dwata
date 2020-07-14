@@ -1,17 +1,31 @@
 import {
-  TOGGLE_SIDEBAR, TOGGLE_FILTER_EDITOR, TOGGLE_COLUMN_HEAD_SPECIFICATION, SHOW_NOTES_FOR,
-  COMPLETE_FETCH_APP
+  TOGGLE_SIDEBAR, TOGGLE_COLUMN_HEAD_SPECIFICATION, SHOW_NOTES_FOR,
+  TOGGLE_ACTIONS, TOGGLE_PINNED_RECORDS, CLOSE_ALL_MODALS,
+  TOGGLE_COLUMN_SELECTOR_UI, TOGGLE_FILTER_EDITOR, TOGGLE_SORT_EDITOR,
 } from './actionTypes';
-import { transformData } from "utils";
 
 
 const initialState = {
-  isSidebarOn: false,
-  isQueryEditorOpen: false,
+  isSidebarVisible: false,  // Is Sidebar modal On
+  isActionsVisible: false,  // Is Actions modal On
+  isFEVisible: false,  // Is FilterEditor modal On
+  isCSVisible: false,  // Is ColumnSeletor modal On
+  isOEVisible: false,  // Is OrderEditor modal On
+  activeColumnHeadSpecification: null,  // Which Table Column is selected to show ordering/filter options
+  showNotesFor: null,  // Any path or identifier to tell the UI how to query notes from API; null means Notes modal is Off
+  showPinnedRecords: false,
+  isUnifiedQuerySpecification: true,  // A view like Kanban may have multiple query specs, one per column, so no buttons on top nav
+};
+
+
+const allModalsClosedState = {
+  isSidebarVisible: false,
+  isActionsVisible: false,
+  isFEVisible: false,
+  isCSVisible: false,
+  isOEVisible: false,
   activeColumnHeadSpecification: null,
-  isNoteAppEnabled: false,  // 
-  noteAppConfig: {},
-  showNotesFor: null,  // any path or identifier to tell the UI how to query notes from API
+  showNotesFor: null,
 };
 
 
@@ -20,46 +34,65 @@ export default (state = initialState, action) => {
     case TOGGLE_SIDEBAR:
       return {
         ...state,
-        isSidebarOn: !state.isSidebarOn,
-      }
-
-    case TOGGLE_FILTER_EDITOR:
-      return {
-        ...state,
-        isQueryEditorOpen: !state.isQueryEditorOpen,
+        isSidebarVisible: !state.isSidebarVisible,
       }
 
     case TOGGLE_COLUMN_HEAD_SPECIFICATION:
-      if (state.activeColumnHeadSpecification === action.columnName) {
-        return {
-          ...state,
-          activeColumnHeadSpecification: null,
-        };
-      }
       return {
         ...state,
-        activeColumnHeadSpecification: action.columnName,
+        ...allModalsClosedState,
+        activeColumnHeadSpecification:
+          (state.activeColumnHeadSpecification === null || state.activeColumnHeadSpecification !== action.columnName)
+            ? action.columnName : null,
+      };
+
+    case TOGGLE_ACTIONS:
+      return {
+        ...state,
+        ...allModalsClosedState,
+        isActionsVisible: !state.isActionsVisible,
       };
 
     case SHOW_NOTES_FOR:
       return {
         ...state,
-        showNotesFor: action.identifier,
+        ...allModalsClosedState,
+        showNotesFor: state.showNotesFor === null ? action.identifier : null,
+      };
+  
+    case TOGGLE_FILTER_EDITOR:
+      return {
+        ...state,
+        ...allModalsClosedState,
+        isFEVisible: !state.isFEVisible,
       };
 
-    case COMPLETE_FETCH_APP:
-      for (const app of action.payload.rows.map(row => transformData(action.payload.columns, row))) {
-        if (app.label === "note") {
-          return {
-            ...state,
-            isNoteAppEnabled: true,
-            noteAppConfig: app.config,
-          };
-        }
-        return {
-          ...state,
-        };
-      }
+    case TOGGLE_COLUMN_SELECTOR_UI:
+      return {
+        ...state,
+        ...allModalsClosedState,
+        isCSVisible: !state.isCSVisible,
+      };
+
+    case TOGGLE_SORT_EDITOR:
+      return {
+        ...state,
+        ...allModalsClosedState,
+        isOEVisible: !state.isOEVisible,
+      };
+  
+    case TOGGLE_PINNED_RECORDS:
+      console.log(state.showPinnedRecords);
+      return {
+        ...state,
+        showPinnedRecords: !state.showPinnedRecords,
+      };
+
+      case CLOSE_ALL_MODALS:
+      return {
+        ...state,
+        ...allModalsClosedState,
+      };
 
     default:
       return state;

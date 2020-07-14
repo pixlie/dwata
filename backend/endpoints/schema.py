@@ -14,9 +14,11 @@ def column_definition(col, col_def):
         hints = []
         if (col_def.primary_key or
                 len(col_def.foreign_keys) > 0 or
-                _type in ["INET", "TIMESTAMP", "DATE"]):
+                _type in ["INET", "TIMESTAMP", "DATE", "JSONB", "JSON"]):
             hints.append("is_meta")
-        elif "_by_id" in col.lower():
+        elif col.lower()[-3:] in ["_id", "_pk", "_fk"]:
+            hints.append("is_meta")
+        elif "uuid" in col.lower():
             hints.append("is_meta")
         else:
             if _type == "VARCHAR" and not col_def.nullable:
@@ -24,7 +26,7 @@ def column_definition(col, col_def):
                 #  then more likely to be a title
                 # Perhaps and import text, like title
                 hints.append("is_title")
-            if _type == "TEXT" or (_type in types_with_length and col_def.type.length > 100):
+            if _type == "TEXT" or (_type in types_with_length and col_def.type.length > 200):
                 # Perhaps and import text, like title
                 hints.append("is_text_lg")
         return hints
@@ -91,9 +93,9 @@ async def get_source_database(source_settings, table_name):
 
 
 async def schema_get(request):
-    source_index = request.path_params["source_index"]
-    requested_source = get_all_sources()[source_index]
-    source_settings = get_source_settings(source_index=source_index)
+    source_label = request.path_params["source_label"]
+    requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
+    source_settings = get_source_settings(source_label=source_label)
 
     if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)

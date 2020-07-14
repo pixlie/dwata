@@ -1,5 +1,4 @@
-import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM, LOAD_ITEM_FROM_CACHE } from "./actionTypes";
-import { act } from "react-dom/test-utils";
+import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "./actionTypes";
 
 
 const initialItemState = {

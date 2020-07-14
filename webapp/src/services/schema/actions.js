@@ -1,8 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-import { schemanURL } from '../urls';
-import { INITIATE_FETCH_SCHEMA, FETCH_SCHEMA, LOAD_SCHEMA_FROM_CACHE } from './actionTypes';
-
+import { schemaURL } from "../urls";
+import {
+  INITIATE_FETCH_SCHEMA,
+  FETCH_SCHEMA,
+  LOAD_SCHEMA_FROM_CACHE,
+} from "./actionTypes";
 
 export const fetchSchema = (sourceId, callback) => (dispatch, getState) => {
   const container = getState().schema;
@@ -21,8 +24,8 @@ export const fetchSchema = (sourceId, callback) => (dispatch, getState) => {
   });
 
   return axios
-    .get(`${schemanURL}/${sourceId}`)
-    .then(res => {
+    .get(`${schemaURL}/${sourceId}`)
+    .then((res) => {
       if (!!callback) {
         callback();
       }
@@ -33,7 +36,7 @@ export const fetchSchema = (sourceId, callback) => (dispatch, getState) => {
         payload: res.data,
       });
     })
-    .catch(err => {
-      console.log('Could not fetch schema. Try again later.');
+    .catch((err) => {
+      console.log("Could not fetch schema. Try again later.");
     });
 };
