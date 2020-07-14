@@ -12,9 +12,6 @@ export default () => {
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  // const setQuerySpecification = useQuerySpecification(
-  //   (state) => state.setQuerySpecification
-  // );
 
   useEffect(() => {
     if (!!querySpecification.sourceLabel) {

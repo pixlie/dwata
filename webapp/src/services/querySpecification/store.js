@@ -16,6 +16,7 @@ const initialState = {
   isReady: false,
   isFetching: false,
   lastDirtyAt: null,
+  fetchNeeded: false,
 };
 
 const initiateQuerySpecification = (payload) => ({
@@ -23,14 +24,6 @@ const initiateQuerySpecification = (payload) => ({
   ...payload,
 
   // We do not set isReady:true implicitly
-});
-
-const setQuerySpecification = (payload) => ({
-  ...payload,
-  columnsSelected: payload.columns,
-
-  isReady: true,
-  isFetching: false,
 });
 
 const initiateFilter = (inner, columnName, dataType) => {
@@ -50,6 +43,7 @@ const initiateFilter = (inner, columnName, dataType) => {
   }
   return {
     filterBy: {
+      ...inner.filterBy,
       [columnName]: {
         ...initialFilter,
       },
@@ -77,21 +71,30 @@ const removeFilter = (inner, columnName) => {
 };
 
 const nextPage = (inner) => ({
+  ...inner,
   offset: inner.offset + inner.limit,
   lastDirtyAt: +new Date(),
+  fetchNeeded: true,
 });
 
 const previousPage = (inner) => ({
+  ...inner,
   offset: inner.offset - inner.limit,
   lastDirtyAt: +new Date(),
+  fetchNeeded: true,
 });
 
 const gotoPage = (inner, pageNum) => ({
+  ...inner,
   offset: (pageNum - 1) * inner.limit,
   lastDirtyAt: +new Date(),
+  fetchNeeded: true,
 });
 
-const changeOrderBy = (inner) => {};
+const changeOrderBy = (inner) => ({
+  ...inner,
+  lastDirtyAt: +new Date(),
+});
 
 const toggleOrderBy = (inner, columnName) => {
   const currentOrder = inner.orderBy[columnName];
@@ -103,7 +106,9 @@ const toggleOrderBy = (inner, columnName) => {
   }
 
   return {
+    ...inner,
     orderBy: {
+      ...inner.orderBy,
       [columnName]: newOrder,
     },
     lastDirtyAt: +new Date(),
@@ -111,12 +116,16 @@ const toggleOrderBy = (inner, columnName) => {
 };
 
 const setFilter = (inner, columnName, filters) => ({
+  ...inner,
   filterBy: {
+    ...inner.filterBy,
     [columnName]: filters,
   },
+  lastDirtyAt: +new Date(),
 });
 
 const toggleColumnHeadSpecification = (inner, columnName) => ({
+  ...inner,
   activeColumnHeadSpecification:
     inner.activeColumnHeadSpecification === null ||
     inner.activeColumnHeadSpecification !== columnName
@@ -128,11 +137,6 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
   initiateQuerySpecification: (key, payload) =>
     set((state) => ({
       [key]: initiateQuerySpecification(payload),
-    })),
-
-  setQuerySpecification: (key, payload) =>
-    set((state) => ({
-      [key]: setQuerySpecification(payload),
     })),
 
   nextPage: (key) =>

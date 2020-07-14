@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useQuerySpecification } from "services/store";
@@ -88,32 +88,11 @@ const PageSlots = () => {
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state[queryContext.key]);
-  // const fetchData = useData((state) => state.fetchData);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);
-  // const setQuerySpecification = useQuerySpecification(
-  //   (state) => state.setQuerySpecification
-  // );
-
-  /*
-  useEffect(() => {
-    if (!querySpecification.isReady || data.isFetching) {
-      return;
-    }
-
-    fetchData(queryContext.key, querySpecification, [setQuerySpecification]);
-  }, [
-    querySpecification.isReady,
-    data.isFetching,
-    querySpecification.offset,
-    queryContext.key,
-    fetchData,
-    setQuerySpecification,
-  ]);
-  */
 
   if (
     !(data && data.isReady && querySpecification && querySpecification.isReady)

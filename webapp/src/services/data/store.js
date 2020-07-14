@@ -16,28 +16,33 @@ const initialState = {
   lastFetchedAt: null,
 };
 
-const initiateFetch = (key) => {
-  return {
-    [key]: {
-      ...initialState,
-      isFetching: true,
-    },
-  };
-};
+const completeFetch = (payload) => ({
+  ...initialState,
+  columns: payload.columns,
+  rows: payload.rows, // Here we do not transform data into maps/dicts
+  querySQL: payload.query_sql,
+  isFetching: false,
+  isReady: true,
+  lastFetchedAt: +new Date(),
+});
 
-const completeFetch = (key, payload) => {
-  return {
-    [key]: {
-      ...initialState,
-      columns: payload.columns,
-      rows: payload.rows, // Here we do not transform data into maps/dicts
-      querySQL: payload.query_sql,
-      isFetching: false,
-      isReady: true,
-      lastFetchedAt: +new Date(),
-    },
-  };
-};
+const querySpecificationObject = (state, payload) => ({
+  ...state,
+  ...payload,
+  columnsSelected: payload.columns,
+  isReady: true,
+  isFetching: false,
+  fetchNeeded: false,
+});
+
+const getQuerySpecificationPayload = (querySpecification) => ({
+  source_label: querySpecification.sourceLabel,
+  table_name: querySpecification.tableName,
+  order_by: querySpecification.orderBy,
+  filter_by: querySpecification.filterBy,
+  offset: querySpecification.offset,
+  limit: querySpecification.limit,
+});
 
 const [useStore] = create((set, get) => ({
   fetchData: async (key, querySpecification) => {
@@ -49,34 +54,46 @@ const [useStore] = create((set, get) => ({
       return;
     }
 
-    set((state) => ({
-      ...initiateFetch(key),
+    set(() => ({
+      [key]: {
+        ...initialState,
+        isFetching: true,
+      },
     }));
 
-    try {
-      const response = await axios.post(dataURL, {
-        source_label: querySpecification.sourceLabel,
-        table_name: querySpecification.tableName,
-      });
-      set((state) => ({
-        ...completeFetch(key, response.data),
-      }));
-      /* if (!!updateElse) {
-        for (const updater of updateElse) {
-          updater(key, response.data);
-        }
-      } */
-    } catch (error) {
-      console.log("Could not fetch schema. Try again later.");
-    }
+    const fetchInner = async (querySpecificationInner) => {
+      try {
+        const response = await axios.post(
+          dataURL,
+          getQuerySpecificationPayload(querySpecificationInner)
+        );
+        set(() => ({
+          [key]: completeFetch(response.data),
+        }));
 
-    const subscriber = () => {
-      querySpecificationStoreAPI.subscribe(
-        (qs) =>
-          console.log("qs changed", qs.lastDirtyAt, get()[key].lastFetchedAt),
-        (state) => state[key]
-      );
+        // We use the Query Specification Store API directly to set this new data
+        querySpecificationStoreAPI.setState((state) => ({
+          [key]: querySpecificationObject(state[key], response.data),
+        }));
+
+        const subscriber = async (qs) => {
+          console.log("qs changed", qs.fetchNeeded);
+          if (qs.fetchNeeded) {
+            await fetchInner(qs);
+            sub();
+          }
+        };
+
+        const sub = querySpecificationStoreAPI.subscribe(
+          subscriber,
+          (state) => state[key]
+        );
+      } catch (error) {
+        console.log("Could not fetch schema. Try again later.");
+      }
     };
+
+    await fetchInner(querySpecification);
   },
 }));
 
