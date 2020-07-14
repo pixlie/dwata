@@ -21,8 +21,7 @@ const ReportItem = ({ item }) => {
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
       tableName: "dwata_meta_report",
-      pk: item.id,
-      isSavedQuery: true,
+      pk: item ? item.id : undefined,
       fetchNeeded: true,
     });
   };

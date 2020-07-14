@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useState, Fragment } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-
-import { showNotes } from "services/global/actions";
-import { fetchNote, saveNote } from "services/apps/actions";
 
 const defaultNote = `# Report
 Reports are a mix of data from different queries and optional notes to either:
@@ -20,30 +15,7 @@ The notes inside reports supports [Markdown](https://github.com/adam-p/markdown-
 syntax, which is automatically converted to HTML.
 `;
 
-const Notes = ({
-  isReady,
-  showNotesFor,
-  isNoteAppEnabled,
-  dataItem,
-  showNotes,
-  fetchNote,
-  saveNote,
-}) => {
-  const handleKey = useCallback(
-    (event) => {
-      if (event.keyCode === 27) {
-        showNotes(null);
-      }
-    },
-    [showNotes]
-  );
-  useEffect(() => {
-    document.addEventListener("keydown", handleKey, false);
-
-    return () => {
-      document.removeEventListener("keydown", handleKey, false);
-    };
-  }, [handleKey]);
+export default () => {
   const doStates = Object.freeze({
     read: "read",
     edit: "edit",
@@ -54,22 +26,7 @@ const Notes = ({
     content: defaultNote,
     existingNote: {},
   });
-  useEffect(() => {
-    fetchNote();
-    setState((state) => ({
-      ...state,
-      content: defaultNote,
-    }));
-  }, [showNotesFor, fetchNote]);
-  useEffect(() => {
-    if (dataItem) {
-      setState((state) => ({
-        ...state,
-        content: dataItem.content,
-        existingNote: dataItem,
-      }));
-    }
-  }, [dataItem]);
+
   const toggleState = (transitionTo) => (event) => {
     event.preventDefault();
     setState((state) => ({
@@ -85,18 +42,14 @@ const Notes = ({
     }));
   };
 
-  if (!isNoteAppEnabled || !isReady) {
-    return null;
-  }
-
   const handleSave = (event) => {
     event.preventDefault();
-    saveNote(
+    /* saveNote(
       {
         content: state.content,
       },
       state.existingNote.id ? state.existingNote.id : null
-    );
+    ); */
   };
 
   return (
@@ -156,6 +109,7 @@ const Notes = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { showNotesFor } = props;
   const { isNoteAppEnabled, noteAppConfig } = state.apps;
@@ -188,3 +142,4 @@ export default withRouter(
     saveNote,
   })(Notes)
 );
+*/

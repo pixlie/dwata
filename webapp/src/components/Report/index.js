@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { Section } from "components/BulmaHelpers";
+import { Section, Hx } from "components/BulmaHelpers";
 import Grid from "components/Grid";
 import NoteEditor from "./NoteEditor";
 
@@ -17,7 +17,7 @@ const SavedQueryContainer = ({ pk }) => {
   initiateQuerySpecification(context.key, {
     sourceLabel: "dwata_meta",
     tableName: "dwata_meta_saved_query",
-    pk: pk,
+    pk,
     isSavedQuery: true,
     fetchNeeded: true,
   });
@@ -37,6 +37,8 @@ export default () => {
 
   return (
     <Section>
+      <Hx x="2">Monthly Report</Hx>
+
       <div className="columns">
         <div className="column is-10">
           <NoteEditor showNotesFor="report/12" />

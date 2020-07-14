@@ -10,7 +10,7 @@ import Home from "components/Home";
 import Grid from "components/Grid";
 // import Notes from "components/Notes";
 // import Actions from "components/Actions";
-// import Report from "components/Report";
+import Report from "components/Report";
 
 export default () => {
   const mainApp = useQueryContext((state) => state["main"]);
@@ -29,14 +29,10 @@ export default () => {
         </QueryContext.Provider>
       ) : null}
 
-      {/*
-          <Route path="/report/create" exact>
-            <Report />
-          </Route>
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
+        <Report />
+      ) : null}
 
-          <Route path="/report/:reportId" exact>
-            <Report />
-        </Route> */}
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
         <Home />
       ) : null}
