@@ -17,6 +17,8 @@ The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wik
 syntax, which is automatically converted to HTML.
 `;
 
+const fetchNote = () => ({});
+
 export default () => {
   const showNotesFor = useGlobal((state) => state.showNotesFor);
   const handleKey = useCallback(
