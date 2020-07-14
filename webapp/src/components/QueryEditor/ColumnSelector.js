@@ -12,15 +12,13 @@ import { Section, Hx } from "components/BulmaHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   const fetchData = useData((state) => state.fetchData);
-  const isCSVisible = useGlobal((state) => state.inner.isCSVisible);
+  const isCSVisible = useGlobal((state) => state.isCSVisible);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
   if (
     !(

@@ -5,7 +5,7 @@ import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 
 export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
-  const mainApp = useQueryContext((state) => state.inner["main"]);
+  const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
   const handleHome = (event) => {
     event.preventDefault();

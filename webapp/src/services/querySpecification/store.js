@@ -25,8 +25,7 @@ const initiateQuerySpecification = (payload) => ({
   // We do not set isReady:true implicitly
 });
 
-const setQuerySpecification = (inner, payload) => ({
-  ...inner,
+const setQuerySpecification = (payload) => ({
   ...payload,
   columnsSelected: payload.columns,
 
@@ -36,9 +35,7 @@ const setQuerySpecification = (inner, payload) => ({
 
 const initiateFilter = (inner, columnName, dataType) => {
   if (Object.keys(inner.filterBy).includes(columnName)) {
-    return {
-      ...inner,
-    };
+    return {};
   }
 
   let initialFilter = {};
@@ -52,9 +49,7 @@ const initiateFilter = (inner, columnName, dataType) => {
     };
   }
   return {
-    ...inner,
     filterBy: {
-      ...inner.filterBy,
       [columnName]: {
         ...initialFilter,
       },
@@ -77,25 +72,21 @@ const removeFilter = (inner, columnName) => {
     };
   };
   return {
-    ...inner,
     filterBy: Object.keys(inner.filterBy).reduce(reducer, {}),
   };
 };
 
 const nextPage = (inner) => ({
-  ...inner,
   offset: inner.offset + inner.limit,
   lastDirtyAt: +new Date(),
 });
 
 const previousPage = (inner) => ({
-  ...inner,
   offset: inner.offset - inner.limit,
   lastDirtyAt: +new Date(),
 });
 
 const gotoPage = (inner, pageNum) => ({
-  ...inner,
   offset: (pageNum - 1) * inner.limit,
   lastDirtyAt: +new Date(),
 });
@@ -112,9 +103,7 @@ const toggleOrderBy = (inner, columnName) => {
   }
 
   return {
-    ...inner,
     orderBy: {
-      ...inner.orderBy,
       [columnName]: newOrder,
     },
     lastDirtyAt: +new Date(),
@@ -122,15 +111,12 @@ const toggleOrderBy = (inner, columnName) => {
 };
 
 const setFilter = (inner, columnName, filters) => ({
-  ...inner,
   filterBy: {
-    ...inner.filterBy,
     [columnName]: filters,
   },
 });
 
 const toggleColumnHeadSpecification = (inner, columnName) => ({
-  ...inner,
   activeColumnHeadSpecification:
     inner.activeColumnHeadSpecification === null ||
     inner.activeColumnHeadSpecification !== columnName
@@ -139,94 +125,59 @@ const toggleColumnHeadSpecification = (inner, columnName) => ({
 });
 
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
-  inner: {},
-
   initiateQuerySpecification: (key, payload) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: initiateQuerySpecification(payload),
-      },
+      [key]: initiateQuerySpecification(payload),
     })),
 
   setQuerySpecification: (key, payload) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: setQuerySpecification(state.inner[key], payload),
-      },
+      [key]: setQuerySpecification(payload),
     })),
 
   nextPage: (key) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: nextPage(state.inner[key]),
-      },
+      [key]: nextPage(state[key]),
     })),
 
   previousPage: (key) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: previousPage(state.inner[key]),
-      },
+      [key]: previousPage(state[key]),
     })),
 
   gotoPage: (key, pageNum) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: gotoPage(state.inner[key], pageNum),
-      },
+      [key]: gotoPage(state[key], pageNum),
     })),
 
   initiateFilter: (key, columnName, dataType) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: initiateFilter(state.inner[key], columnName, dataType),
-      },
+      [key]: initiateFilter(state[key], columnName, dataType),
     })),
 
   removeFilter: (key, columnName) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: removeFilter(state.inner[key], columnName),
-      },
+      [key]: removeFilter(state[key], columnName),
     })),
 
   changeOrderBy: (key) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: changeOrderBy(state.inner[key]),
-      },
+      [key]: changeOrderBy(state[key]),
     })),
 
   toggleOrderBy: (key, columnName) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: toggleOrderBy(state.inner[key], columnName),
-      },
+      [key]: toggleOrderBy(state[key], columnName),
     })),
 
   setFilter: (key, columnName, filters) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: setFilter(state.inner[key], columnName, filters),
-      },
+      [key]: setFilter(state[key], columnName, filters),
     })),
 
   toggleColumnHeadSpecification: (key, columnName) =>
     set((state) => ({
-      inner: {
-        ...state.inner,
-        [key]: toggleColumnHeadSpecification(state.inner[key], columnName),
-      },
+      [key]: toggleColumnHeadSpecification(state[key], columnName),
     })),
 }));
 

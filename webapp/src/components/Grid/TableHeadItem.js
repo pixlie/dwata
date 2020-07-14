@@ -41,11 +41,9 @@ const ColumnHeadSpecification = ({ head }) => {
 export default ({ head }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const toggleColumnHeadSpecification = useQuerySpecification(
     (state) => state.toggleColumnHeadSpecification
   );

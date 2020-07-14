@@ -17,7 +17,7 @@ const initialState = {
   isReady: false,
 };
 
-const completeFetch = (inner, payload) => {
+const completeFetch = (payload) => {
   let apps = {};
   for (const app of payload.rows.map((row) =>
     transformData(payload.columns, row)
@@ -43,22 +43,19 @@ const completeFetch = (inner, payload) => {
     }
   }
   return {
-    ...inner,
     ...apps,
     isReady: true,
   };
 };
 
 const [useApps] = create((set) => ({
-  inner: {
-    ...initialState,
-  },
+  ...initialState,
 
   fetchApps: async () => {
     try {
       const response = await axios.get(appURL);
       set((state) => ({
-        inner: completeFetch(state.inner, response.data),
+        ...completeFetch(response.data),
       }));
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");

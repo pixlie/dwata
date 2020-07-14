@@ -11,12 +11,11 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = (inner) => ({
-  ...inner,
+const initiateFetch = () => ({
   isFetching: true,
 });
 
-const completeFetch = (inner, payload) => ({
+const completeFetch = (payload) => ({
   columns: payload.columns,
   rows: payload.rows.map((row) => transformData(payload.columns, row)),
   isFetching: false,
@@ -24,23 +23,21 @@ const completeFetch = (inner, payload) => ({
 });
 
 const [useStore] = create((set, get) => ({
-  inner: {
-    ...initialState,
-  },
+  ...initialState,
 
   fetchSource: async () => {
-    if (get().inner.isFetching) {
+    if (get().isFetching) {
       return;
     }
 
-    set((state) => ({
-      inner: initiateFetch(state.inner),
+    set(() => ({
+      ...initiateFetch(),
     }));
 
     try {
       const response = await axios.get(sourceURL);
-      set((state) => ({
-        inner: completeFetch(state.inner, response.data),
+      set(() => ({
+        ...completeFetch(response.data),
       }));
     } catch (err) {
       console.log("Could not fetch sources. Try again later.");

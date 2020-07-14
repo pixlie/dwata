@@ -9,7 +9,8 @@ export default () => {
   useEffect(() => {
     fetchSource();
   }, [fetchSource]);
-  const sourceList = useSource((state) => state.inner);
+  const isReady = useSource((state) => state.isReady);
+  const sourceRows = useSource((state) => state.rows);
   const [state, setState] = useState({
     sourceIndex: null,
   });
@@ -44,8 +45,8 @@ export default () => {
   return (
     <Fragment>
       <Panel title="Databases">
-        {sourceList.isReady
-          ? sourceList.rows
+        {isReady
+          ? sourceRows
               .filter((x) => x.type === "database")
               .map((source) => (
                 <SourceItem

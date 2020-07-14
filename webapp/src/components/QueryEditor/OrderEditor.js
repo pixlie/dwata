@@ -11,15 +11,13 @@ import { Section, Hx } from "components/BulmaHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   // const fetchData = useData((state) => state.fetchData);
-  const isOEVisible = useGlobal((state) => state.inner.isOEVisible);
+  const isOEVisible = useGlobal((state) => state.isOEVisible);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const changeOrderBy = useQuerySpecification((state) => state.changeOrderBy);
   const addOrderBy = useQuerySpecification((state) => state.addOrderBy);
 

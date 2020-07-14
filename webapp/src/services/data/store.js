@@ -16,16 +16,8 @@ const initialState = {
   lastFetchedAt: null,
 };
 
-const initiateFetch = (inner, key) => {
-  if (key in inner) {
-    return {
-      // No need to initiate multiple times
-      ...inner,
-    };
-  }
-
+const initiateFetch = (key) => {
   return {
-    ...inner,
     [key]: {
       ...initialState,
       isFetching: true,
@@ -33,9 +25,8 @@ const initiateFetch = (inner, key) => {
   };
 };
 
-const completeFetch = (inner, key, payload) => {
+const completeFetch = (key, payload) => {
   return {
-    ...inner,
     [key]: {
       ...initialState,
       columns: payload.columns,
@@ -49,19 +40,17 @@ const completeFetch = (inner, key, payload) => {
 };
 
 const [useStore] = create((set, get) => ({
-  inner: {},
-
-  fetchData: async (key, querySpecification, updateElse) => {
+  fetchData: async (key, querySpecification) => {
     if (!key) {
       return;
     }
 
-    if (get().inner[key] && get().inner[key].isFetching) {
+    if (get()[key] && get()[key].isFetching) {
       return;
     }
 
     set((state) => ({
-      inner: initiateFetch(state.inner, key),
+      ...initiateFetch(key),
     }));
 
     try {
@@ -70,26 +59,24 @@ const [useStore] = create((set, get) => ({
         table_name: querySpecification.tableName,
       });
       set((state) => ({
-        inner: completeFetch(state.inner, key, response.data),
+        ...completeFetch(key, response.data),
       }));
-      if (!!updateElse) {
+      /* if (!!updateElse) {
         for (const updater of updateElse) {
           updater(key, response.data);
         }
-      }
+      } */
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");
     }
 
-    const subscriber = querySpecificationStoreAPI.subscribe(
-      (qs) =>
-        console.log(
-          "qs changed",
-          qs.lastDirtyAt,
-          get().inner[key].lastFetchedAt
-        ),
-      (state) => state.inner[key]
-    );
+    const subscriber = () => {
+      querySpecificationStoreAPI.subscribe(
+        (qs) =>
+          console.log("qs changed", qs.lastDirtyAt, get()[key].lastFetchedAt),
+        (state) => state[key]
+      );
+    };
   },
 }));
 

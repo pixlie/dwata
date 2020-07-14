@@ -9,30 +9,21 @@ export default () => {
   const fetchSchema = useSchema((state) => state.fetchSchema);
   const fetchData = useData((state) => state.fetchData);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
-  const setQuerySpecification = useQuerySpecification(
-    (state) => state.setQuerySpecification
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  // const setQuerySpecification = useQuerySpecification(
+  //   (state) => state.setQuerySpecification
+  // );
 
   useEffect(() => {
     if (!!querySpecification.sourceLabel) {
       if (!schema) {
         fetchSchema(querySpecification.sourceLabel);
       }
-      fetchData(queryContext.key, querySpecification, [setQuerySpecification]);
+      fetchData(queryContext.key, querySpecification);
     }
-  }, [
-    queryContext,
-    querySpecification,
-    schema,
-    fetchSchema,
-    fetchData,
-    setQuerySpecification,
-  ]);
+  }, [queryContext, querySpecification, schema, fetchSchema, fetchData]);
 
   return <div>Loading data...</div>;
 };

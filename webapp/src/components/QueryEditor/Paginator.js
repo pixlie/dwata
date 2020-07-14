@@ -6,7 +6,7 @@ import { useData, useQuerySpecification } from "services/store";
 const PageItem = ({ number }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
   const gotoPage = useQuerySpecification((state) => state.gotoPage);
 
@@ -39,7 +39,7 @@ const PageItem = ({ number }) => {
 const PageSlots = () => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
 
   if (!(querySpecification && querySpecification.isReady)) {
@@ -87,10 +87,10 @@ const PageSlots = () => {
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   // const fetchData = useData((state) => state.fetchData);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);

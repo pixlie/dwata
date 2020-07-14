@@ -12,15 +12,13 @@ import FilterItem from "./FilterItem";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   const fetchData = useData((state) => state.fetchData);
-  const isFEVisible = useGlobal((state) => state.inner.isFEVisible);
+  const isFEVisible = useGlobal((state) => state.isFEVisible);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
   const removeFilter = useQuerySpecification((state) => state.removeFilter);
   const [state, setState] = useState({

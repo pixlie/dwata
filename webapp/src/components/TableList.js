@@ -8,7 +8,7 @@ import {
 import * as globalConstants from "services/global/constants";
 
 export default ({ sourceLabel, sourceType }) => {
-  const schema = useSchema((state) => state.inner[sourceLabel]);
+  const schema = useSchema((state) => state[sourceLabel]);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   const setContext = useQueryContext((state) => state.setContext);
   useEffect(() => {

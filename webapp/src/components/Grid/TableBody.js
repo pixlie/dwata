@@ -6,13 +6,11 @@ import rowRenderer from "./rowRenderer";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
   // useEffect(() => {
   //   if (isReady && showPinnedRecords) {

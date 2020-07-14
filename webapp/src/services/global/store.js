@@ -22,81 +22,54 @@ const allModalsClosedState = {
   showNotesFor: null,
 };
 
-const toggleSidebar = (inner) => ({
-  ...inner,
-  isSidebarVisible: !inner.isSidebarVisible,
-});
+/*
+case TOGGLE_PINNED_RECORDS:
+  return {
+    showPinnedRecords: !state.showPinnedRecords,
+  };
 
-const toggleActions = (inner) => ({
-  ...inner,
-  ...allModalsClosedState,
-  isActionsVisible: !inner.isActionsVisible,
-});
-
-const showNotesFor = (inner, identifier) => ({
-  ...inner,
-  ...allModalsClosedState,
-  showNotesFor: inner.showNotesFor === null ? identifier : null,
-});
-
-const toggleFilterEditor = (inner) => ({
-  ...inner,
-  ...allModalsClosedState,
-  isFEVisible: !inner.isFEVisible,
-});
-
-const toggleColumnSelector = (inner) => ({
-  ...inner,
-  ...allModalsClosedState,
-  isCSVisible: !inner.isCSVisible,
-});
-
-const toggleOrderEditor = (inner) => ({
-  ...inner,
-  ...allModalsClosedState,
-  isOEVisible: !inner.isOEVisible,
-});
-
-// case TOGGLE_PINNED_RECORDS:
-//   return {
-//     ...inner,
-//     showPinnedRecords: !inner.showPinnedRecords,
-//   };
-
-// case CLOSE_ALL_MODALS:
-//   return {
-//     ...inner,
-//     ...allModalsClosedState,
-//   };
+case CLOSE_ALL_MODALS:
+  return {
+    ...allModalsClosedState,
+  };
+*/
 
 const [useStore] = create((set) => ({
-  inner: {
-    ...initialState,
-  },
+  ...initialState,
 
   toggleSidebar: () =>
     set((state) => ({
-      inner: toggleSidebar(state.inner),
+      isSidebarVisible: !state.isSidebarVisible,
     })),
 
   toggleFilterEditor: () =>
     set((state) => ({
-      inner: toggleFilterEditor(state.inner),
+      ...allModalsClosedState,
+      isFEVisible: !state.isFEVisible,
     })),
 
   toggleColumnSelector: () =>
     set((state) => ({
-      inner: toggleColumnSelector(state.inner),
+      ...allModalsClosedState,
+      isCSVisible: !state.isCSVisible,
     })),
 
   toggleOrderEditor: () =>
     set((state) => ({
-      inner: toggleOrderEditor(state.inner),
+      ...allModalsClosedState,
+      isOEVisible: !state.isOEVisible,
+    })),
+
+  toggleActions: () =>
+    set((state) => ({
+      ...allModalsClosedState,
+      isActionsVisible: !state.isActionsVisible,
     })),
 
   showNotesFor: (identifier) =>
     set((state) => ({
-      inner: showNotesFor(state.inner, identifier),
+      ...allModalsClosedState,
+      showNotesFor: state.showNotesFor === null ? identifier : null,
     })),
 }));
 

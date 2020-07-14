@@ -13,19 +13,18 @@ import Grid from "components/Grid";
 // import Report from "components/Report";
 
 export default () => {
-  const mainApp = useQueryContext((state) => state.inner["main"]);
-  const queryContext = useQueryContext((state) => state.inner["main"]);
+  const mainApp = useQueryContext((state) => state["main"]);
 
   return (
     <Fragment>
-      <QueryContext.Provider value={queryContext}>
+      <QueryContext.Provider value={mainApp}>
         <Navbar />
       </QueryContext.Provider>
       {/* <Notes /> */}
       {/* <Sidebar><Source /></Sidebar> */}
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
-        <QueryContext.Provider value={queryContext}>
+        <QueryContext.Provider value={mainApp}>
           <Grid />
         </QueryContext.Provider>
       ) : null}

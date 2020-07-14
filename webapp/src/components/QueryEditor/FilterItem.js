@@ -14,14 +14,12 @@ import {
  */
 export default ({ columnName }) => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state.inner[queryContext.key]);
-  const isFEVisible = useGlobal((state) => state.inner.isFEVisible);
+  const data = useData((state) => state[queryContext.key]);
+  const isFEVisible = useGlobal((state) => state.isFEVisible);
   const querySpecification = useQuerySpecification(
-    (state) => state.inner[queryContext.key]
+    (state) => state[queryContext.key]
   );
-  const schema = useSchema(
-    (state) => state.inner[querySpecification.sourceLabel]
-  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const setFilter = useQuerySpecification((state) => state.setFilter);
 
   if (

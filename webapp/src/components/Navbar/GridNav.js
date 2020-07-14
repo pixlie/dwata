@@ -13,24 +13,20 @@ export default ({
   togglePinnedRecords,
 }) => {
   const queryContext = useContext(QueryContext);
-  const showPinnedRecords = useGlobal((state) => state.inner.showPinnedRecords);
+  const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleFilterEditor = useGlobal((state) => state.toggleFilterEditor);
   const toggleColumnSelector = useGlobal((state) => state.toggleColumnSelector);
   const toggleOrderEditor = useGlobal((state) => state.toggleOrderEditor);
-  const data = useData((state) => state.inner[queryContext.key]);
+  const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
-  const apps = useApps((state) => state.inner);
+  const isNoteAppEnabled = useApps((state) => state.isNoteAppEnabled);
+  const isRecordPinAppEnabled = useApps((state) => state.isRecordPinAppEnabled);
   useEffect(() => {
     fetchApps();
   }, [fetchApps]);
 
   if (!(data && data.isReady)) {
     return null;
-  }
-  let isNoteAppEnabled = false,
-    isRecordPinAppEnabled = false;
-  if (apps.isReady) {
-    ({ isNoteAppEnabled, isRecordPinAppEnabled } = apps);
   }
   const { selectedRowList } = data;
 

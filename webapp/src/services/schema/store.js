@@ -12,15 +12,12 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = (inner, sourceLabel) => {
-  if (sourceLabel in inner) {
-    return {
-      ...inner,
-    };
+const initiateFetch = (state, sourceLabel) => {
+  if (sourceLabel in state) {
+    return {};
   }
 
   return {
-    ...inner,
     [sourceLabel]: {
       ...initialState,
       isFetching: true,
@@ -28,9 +25,8 @@ const initiateFetch = (inner, sourceLabel) => {
   };
 };
 
-const completeFetch = (inner, sourceLabel, payload) => {
+const completeFetch = (sourceLabel, payload) => {
   return {
-    ...inner,
     [sourceLabel]: {
       columns: payload.columns,
       rows: payload.rows.map((row) => transformData(payload.columns, row)),
@@ -41,24 +37,22 @@ const completeFetch = (inner, sourceLabel, payload) => {
 };
 
 const [useStore] = create((set, get) => ({
-  inner: {},
-
   fetchSchema: async (sourceLabel) => {
     if (!sourceLabel) {
       return;
     }
-    if (get().inner[sourceLabel] && get().inner[sourceLabel].isFetching) {
+    if (get()[sourceLabel] && get()[sourceLabel].isFetching) {
       return;
     }
 
     set((state) => ({
-      inner: initiateFetch(state.inner, sourceLabel),
+      ...initiateFetch(state, sourceLabel),
     }));
 
     try {
       const response = await axios.get(`${schemaURL}/${sourceLabel}`);
       set((state) => ({
-        inner: completeFetch(state.inner, sourceLabel, response.data),
+        ...completeFetch(sourceLabel, response.data),
       }));
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");
