@@ -1,27 +1,22 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { useContext } from "react";
 
-import { getCacheKey } from "utils";
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { getSavedQuery } from "services/apps/getters";
-import {
-  toggleOrderBy,
-  initiateFilter,
-} from "services/querySpecification/actions";
-import { toggleColumnHeadSpecification } from "services/global/actions";
+import { QueryContext } from "utils";
+import { useData, useSchema, useQuerySpecification } from "services/store";
 import FilterItem from "components/QueryEditor/FilterItem";
 
-const ColumnHeadSpecification = ({ toggleOrderBy, head, fetchData }) => {
+const ColumnHeadSpecification = ({ head }) => {
+  const queryContext = useContext(QueryContext);
+  const fetchData = useData((state) => state.fetchData);
+  const toggleOrderBy = useQuerySpecification((state) => state.toggleOrderBy);
+
   const handleClick = (event) => {
     event.preventDefault();
-    toggleOrderBy(head);
+    toggleOrderBy(queryContext.key, head);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    fetchData();
+    fetchData(queryContext.key);
   };
 
   return (
@@ -43,28 +38,33 @@ const ColumnHeadSpecification = ({ toggleOrderBy, head, fetchData }) => {
   );
 };
 
-const TableHeadItem = ({
-  isReady,
-  head,
-  ordering,
-  activeColumnHeadSpecification,
-  schemaColumns,
-  toggleOrderBy,
-  toggleColumnHeadSpecification,
-  initiateFilter,
-  fetchData,
-}) => {
-  if (!isReady) {
+export default ({ head }) => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const toggleColumnHeadSpecification = useQuerySpecification(
+    (state) => state.toggleColumnHeadSpecification
+  );
+  const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
+
+  if (!(querySpecification && querySpecification.isReady)) {
     return null;
   }
-  const handleClick = (event) => {
-    event.preventDefault();
-    toggleColumnHeadSpecification(head);
+
+  const { activeColumnHeadSpecification } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === querySpecification.tableName
+  ).columns;
+
+  const handleClick = () => {
+    toggleColumnHeadSpecification(queryContext.key, head);
     const dataType = schemaColumns.find((x) => x.name === head);
-    initiateFilter(head, dataType);
+    initiateFilter(queryContext.key, head, dataType);
   };
 
-  if (ordering === "asc") {
+  if (querySpecification.orderBy[head] === "asc") {
     return (
       <th>
         <span
@@ -74,15 +74,11 @@ const TableHeadItem = ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
-  } else if (ordering === "desc") {
+  } else if (querySpecification.orderBy[head] === "desc") {
     return (
       <th>
         <span
@@ -92,11 +88,7 @@ const TableHeadItem = ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
@@ -107,47 +99,9 @@ const TableHeadItem = ({
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification
-            toggleOrderBy={toggleOrderBy}
-            head={head}
-            fetchData={fetchData}
-          />
+          <ColumnHeadSpecification head={head} />
         ) : null}
       </th>
     );
   }
 };
-
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      ordering: state.querySpecification.orderBy[props.head],
-      activeColumnHeadSpecification: state.global.activeColumnHeadSpecification,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    toggleOrderBy,
-    initiateFilter,
-    toggleColumnHeadSpecification,
-    fetchData,
-  })(TableHeadItem)
-);

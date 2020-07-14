@@ -6,7 +6,7 @@ metadata = MetaData()
 
 
 note = Table(
-    "admin_meta_note",
+    "dwata_meta_note",
     metadata,
 
     Column("id", Integer, primary_key=True),

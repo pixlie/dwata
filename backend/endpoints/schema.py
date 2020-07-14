@@ -93,9 +93,9 @@ async def get_source_database(source_settings, table_name):
 
 
 async def schema_get(request):
-    source_index = request.path_params["source_index"]
-    requested_source = get_all_sources()[source_index]
-    source_settings = get_source_settings(source_index=source_index)
+    source_label = request.path_params["source_label"]
+    requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
+    source_settings = get_source_settings(source_label=source_label)
 
     if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)

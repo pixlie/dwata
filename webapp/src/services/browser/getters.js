@@ -1,6 +1,7 @@
 import { getCacheKey } from "utils";
 import { getSavedQuery } from "services/apps/getters";
 
+/*
 export const getQueryDetails = (state, props) => {
   // Our Grid can be called either for a particular data source/table or from a saved query
   // First we see if sourceId, tableName, savedQueryId are directly in URL
@@ -36,3 +37,4 @@ export const getQueryDetails = (state, props) => {
     savedQuery,
   };
 };
+*/

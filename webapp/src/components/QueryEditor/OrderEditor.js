@@ -1,24 +1,57 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { addOrderBy, changeOrderBy } from "services/querySpecification/actions";
+import { QueryContext } from "utils";
+import {
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
 import { Section, Hx } from "components/BulmaHelpers";
 
-const OrderEditor = ({
-  isReady,
-  isVisible,
-  schemaColumns,
-  orderBy,
-  addOrderBy,
-  changeOrderBy,
-}) => {
-  if (!isReady || !isVisible) {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state[queryContext.key]);
+  // const fetchData = useData((state) => state.fetchData);
+  const isOEVisible = useGlobal((state) => state.isOEVisible);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const changeOrderBy = useQuerySpecification((state) => state.changeOrderBy);
+  const addOrderBy = useQuerySpecification((state) => state.addOrderBy);
+
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isOEVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
     return null;
   }
 
+  const handleChangeOrderBy = (event) => {
+    event.preventDefault();
+    const { name, value } = event.target;
+    changeOrderBy(queryContext.key, name.substring(6), value);
+  };
+
+  const handleAddOrderBy = (event) => {
+    event.preventDefault();
+    const { value } = event.target;
+    if (value === "") {
+      return;
+    }
+    addOrderBy(queryContext.key, value);
+  };
+
+  const { orderBy } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === querySpecification.tableName
+  ).columns;
   const order_by_options = [
     <option value="" key="ord-hd">
       Order by
@@ -52,7 +85,7 @@ const OrderEditor = ({
                       name={col}
                       value="asc"
                       checked={orderBy[col] === "asc"}
-                      onChange={changeOrderBy}
+                      onChange={handleChangeOrderBy}
                     />
                     &nbsp;asc
                   </label>
@@ -63,7 +96,7 @@ const OrderEditor = ({
                       name={col}
                       value="desc"
                       checked={orderBy[col] === "desc"}
-                      onChange={changeOrderBy}
+                      onChange={handleChangeOrderBy}
                     />
                     &nbsp;desc
                   </label>
@@ -87,7 +120,7 @@ const OrderEditor = ({
 
         <div className="control">
           <div className="select is-fullwidth">
-            <select onChange={addOrderBy}>{order_by_options}</select>
+            <select onChange={handleAddOrderBy}>{order_by_options}</select>
           </div>
         </div>
       </Section>
@@ -95,6 +128,7 @@ const OrderEditor = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
 
@@ -139,3 +173,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default withRouter(
   connect(mapStateToProps, mapDispatchToProps)(OrderEditor)
 );
+*/

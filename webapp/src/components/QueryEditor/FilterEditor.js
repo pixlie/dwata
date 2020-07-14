@@ -1,35 +1,48 @@
-import React, { Fragment, useState } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { Fragment, useState, useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchData } from "services/browser/actions";
-import { saveQuery } from "services/apps/actions";
+import { QueryContext } from "utils";
 import {
-  initiateFilter,
-  removeFilter,
-} from "services/querySpecification/actions";
+  useGlobal,
+  useSchema,
+  useData,
+  useQuerySpecification,
+} from "services/store";
+import { saveQuery } from "services/apps/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
-const FilterEditor = ({
-  isReady,
-  isVisible,
-  schemaColumns,
-  filterBy,
-  initiateFilter,
-  removeFilter,
-  fetchData,
-  saveQuery,
-}) => {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state[queryContext.key]);
+  const isFEVisible = useGlobal((state) => state.isFEVisible);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
+  const removeFilter = useQuerySpecification((state) => state.removeFilter);
   const [state, setState] = useState({
     isSavingQuery: false,
     savedQueryLabel: "",
   });
 
-  if (!isReady || !isVisible) {
+  if (
+    !(
+      data &&
+      data.isReady &&
+      isFEVisible &&
+      querySpecification &&
+      querySpecification.isReady
+    )
+  ) {
     return null;
   }
+
+  const { filterBy } = querySpecification;
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === querySpecification.tableName
+  ).columns;
+
   const addFilter = (event) => {
     event.preventDefault();
     const { value } = event.target;
@@ -37,13 +50,13 @@ const FilterEditor = ({
       return;
     }
     const dataType = schemaColumns.find((x) => x.name === value);
-    initiateFilter(value, dataType);
+    initiateFilter(queryContext.key, value, dataType);
   };
 
   const handleRemoveFilter = (name) => (event) => {
     event.preventDefault();
     if (name in filterBy) {
-      removeFilter(name);
+      removeFilter(queryContext.key, name);
     }
   };
 
@@ -88,14 +101,9 @@ const FilterEditor = ({
     );
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetchData();
-  };
-
-  const handleSaveQuery = (event) => {
+  const handleSaveQuery = async () => {
     if (state.isSavingQuery) {
-      saveQuery(state.savedQueryLabel);
+      await saveQuery(state.savedQueryLabel, querySpecification);
     } else {
       setState((state) => ({
         ...state,
@@ -161,9 +169,6 @@ const FilterEditor = ({
             </Fragment>
           ) : (
             <Fragment>
-              <button className="button is-success" onClick={handleSubmit}>
-                Apply
-              </button>
               <button className="button is-success" onClick={handleSaveQuery}>
                 Save Query
               </button>
@@ -177,39 +182,3 @@ const FilterEditor = ({
     </div>
   );
 };
-
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      sourceId,
-      tableName,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-      filterBy: state.querySpecification.filterBy,
-      isVisible: state.global.isFEVisible,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    initiateFilter,
-    removeFilter,
-    fetchData,
-    saveQuery,
-  })(FilterEditor)
-);

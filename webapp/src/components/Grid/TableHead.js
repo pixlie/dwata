@@ -1,26 +1,26 @@
-import React from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { useContext } from "react";
 
-import { getCacheKey } from "utils";
-import { getQueryDetails } from "services/browser/getters";
-import { getSavedQuery } from "services/apps/getters";
+import { QueryContext } from "utils";
+import useData from "services/data/store";
+import useSchema from "services/schema/store";
+import useQuerySpecification from "services/querySpecification/store";
 import TableHeadItem from "./TableHeadItem";
 
-const TableHead = ({
-  isReady,
-  schemaColumns,
-  tableColumns,
-  querySpecificationColumns,
-}) => {
-  if (!isReady) {
-    return null;
-  }
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state[queryContext.key]);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const schemaColumns = schema.rows.find(
+    (x) => x.table_name === querySpecification.tableName
+  ).columns;
   const headList = [];
   const DefaultCell = ({ data }) => <TableHeadItem head={data} />;
 
-  for (const col of tableColumns) {
-    if (!querySpecificationColumns.includes(col)) {
+  for (const col of data.columns) {
+    if (!querySpecification.columnsSelected.includes(col)) {
       continue;
     }
     const head = schemaColumns.find((x) => x.name === col);
@@ -38,32 +38,3 @@ const TableHead = ({
     </tr>
   );
 };
-
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      sourceId,
-      tableName,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-      tableColumns: state.browser.columns,
-      querySpecificationColumns: state.querySpecification.columnsSelected,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(connect(mapStateToProps, {})(TableHead));

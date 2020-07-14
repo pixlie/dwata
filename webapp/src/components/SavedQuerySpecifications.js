@@ -1,66 +1,79 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
 
-import { transformData } from "utils";
+import { QueryContext, transformData } from "utils";
+import {
+  useApps,
+  useData,
+  useQuerySpecification,
+  useQueryContext,
+} from "services/store";
+import * as globalConstants from "services/global/constants";
 import { Panel } from "components/BulmaHelpers";
-import { fetchSavedQuery } from "services/apps/actions";
-import { getSavedQuery } from "services/apps/getters";
+import QueryLoader from "components/Grid/QueryLoader";
 
-const SavedQuerySpecifications = ({
-  appsIsReady,
-  savedQuerySpecificationList,
-  fetchSavedQuery,
-}) => {
-  useEffect(() => {
-    appsIsReady && fetchSavedQuery();
-  }, [appsIsReady, fetchSavedQuery]);
+const SavedItem = ({ item }) => {
+  const initiateQuerySpecification = useQuerySpecification(
+    (state) => state.initiateQuerySpecification
+  );
+  const setContext = useQueryContext((state) => state.setContext);
 
-  if (!appsIsReady) {
-    return null;
-  }
+  const handleClick = (event) => {
+    event.preventDefault();
+    setContext("main", {
+      appType: globalConstants.APP_NAME_BROWSER,
+    });
+    initiateQuerySpecification("main", {
+      sourceLabel: "dwata_meta",
+      tableName: "dwata_meta_saved_query",
+      pk: item.id,
+      isSavedQuery: true,
+      fetchNeeded: true,
+    });
+  };
 
   return (
-    <Panel title="Saved Queries">
-      {savedQuerySpecificationList.isReady
-        ? savedQuerySpecificationList.rows.map((sQS, i) => (
-            <Link
-              className="panel-block"
-              to={`/saved/${sQS.id}`}
-              key={`sr-${i}`}
-            >
-              <span className="tag is-light is-info">#{sQS.id}</span>&nbsp;
-              {sQS.label}
-            </Link>
-          ))
-        : null}
-    </Panel>
+    <a className="panel-block" href={`/saved/${item.id}`} onClick={handleClick}>
+      <span className="tag is-light is-info">#{item.id}</span>&nbsp;
+      {item.label}
+    </a>
   );
 };
 
-const mapStateToProps = (state) => {
-  const appsIsReady = state.apps.isReady;
-  if (!appsIsReady) {
-    return {
-      appsIsReady,
-    };
+export default ({ context }) => {
+  const appsIsReady = useApps((state) => state.isReady);
+  const initiateQuerySpecification = useQuerySpecification(
+    (state) => state.initiateQuerySpecification
+  );
+  useEffect(() => {
+    initiateQuerySpecification(context.key, {
+      sourceLabel: "dwata_meta",
+      tableName: "dwata_meta_saved_query",
+      fetchNeeded: true,
+    });
+  }, []);
+  const data = useData((state) => state[context.key]);
+  const qs = useQuerySpecification((state) => state[context.key]);
+
+  if (!(appsIsReady && data && data.isReady)) {
+    if (qs && qs.sourceLabel) {
+      return (
+        <QueryContext.Provider value={{ key: context.key }}>
+          <QueryLoader />
+        </QueryContext.Provider>
+      );
+    } else {
+      return null;
+    }
   }
-  const savedQuerySpecificationList = getSavedQuery(state);
+  const rows = [...data.rows].map((row) => transformData(data.columns, row));
 
-  return {
-    appsIsReady,
-    savedQuerySpecificationList:
-      savedQuerySpecificationList.isReady === true
-        ? {
-            ...savedQuerySpecificationList,
-            rows: [...savedQuerySpecificationList.rows].map((row) =>
-              transformData(savedQuerySpecificationList.columns, row)
-            ),
-          }
-        : savedQuerySpecificationList,
-  };
+  return (
+    <QueryContext.Provider value={{ key: context.key }}>
+      <Panel title="Saved Queries">
+        {rows.map((item, i) => (
+          <SavedItem key={`sr-${i}`} item={item} />
+        ))}
+      </Panel>
+    </QueryContext.Provider>
+  );
 };
-
-export default connect(mapStateToProps, { fetchSavedQuery })(
-  SavedQuerySpecifications
-);

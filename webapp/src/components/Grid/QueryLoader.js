@@ -1,34 +1,43 @@
-import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import { withRouter } from "react-router-dom";
+import React, { useEffect, useContext, Fragment } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { fetchSchema } from "services/schema/actions";
-import { fetchData } from "services/browser/actions";
+import { QueryContext } from "utils";
+import { useSchema, useData, useQuerySpecification } from "services/store";
 
-const QueryLoader = ({ sourceId, tableName, fetchSchema, fetchData }) => {
+export default ({ children }) => {
   // We made this small separate component just for the separate useEffect used here
+  const queryContext = useContext(QueryContext);
+  const fetchSchema = useSchema((state) => state.fetchSchema);
+  const fetchData = useData((state) => state.fetchData);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const data = useData((state) => state[queryContext.key]);
+
   useEffect(() => {
-    if (!!sourceId) {
-      fetchSchema(sourceId);
-      fetchData();
+    if (!!querySpecification && !!querySpecification.sourceLabel) {
+      fetchSchema(querySpecification.sourceLabel);
     }
-  }, [sourceId, tableName, fetchSchema, fetchData]);
+  }, [querySpecification.sourceLabel]);
 
-  return <div>Loading data...</div>;
+  useEffect(() => {
+    if (!!querySpecification && !!querySpecification.fetchNeeded) {
+      fetchData(queryContext.key, querySpecification);
+    }
+  }, [queryContext.key, querySpecification.fetchNeeded]);
+
+  if (
+    !(
+      data &&
+      data.isReady &&
+      querySpecification &&
+      querySpecification.isReady &&
+      schema &&
+      schema.isReady
+    )
+  ) {
+    return <div>Loading data...</div>;
+  }
+
+  return <Fragment>{children}</Fragment>;
 };
-
-const mapStateToProps = (state, props) => {
-  const { sourceId } = getQueryDetails(state, props);
-
-  return {
-    sourceId,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    fetchData,
-    fetchSchema,
-  })(QueryLoader)
-);

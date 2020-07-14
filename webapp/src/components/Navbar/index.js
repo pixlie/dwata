@@ -1,23 +1,25 @@
-import React, { useEffect } from "react";
-import { Link, withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React from "react";
 
-import { toggleSidebar } from "services/global/actions";
-import { getApps } from "services/apps/actions";
-import { getSourceFromPath } from "utils";
+import { useQueryContext } from "services/store";
+import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 
-const Navbar = ({ isSourceFetching, toggleSidebar, isInTable, getApps }) => {
-  useEffect(() => {
-    getApps();
-  }, [getApps]);
+export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
+  const mainApp = useQueryContext((state) => state["main"]);
+  const setContext = useQueryContext((state) => state.setContext);
+  const handleHome = (event) => {
+    event.preventDefault();
+    setContext("main", {
+      appType: globalConstants.APP_NAME_HOME,
+    });
+  };
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
       <div className="navbar-brand">
-        <Link className="navbar-item" to="/">
+        <a className="navbar-item" href="/" onClick={handleHome}>
           Home
-        </Link>
+        </a>
 
         <a
           role="button"
@@ -37,7 +39,12 @@ const Navbar = ({ isSourceFetching, toggleSidebar, isInTable, getApps }) => {
           <div className="navbar-item">
             <div className="buttons">
               <button
-                className={`button ${isInTable ? "is-grey" : "is-success"}`}
+                className={`button ${
+                  mainApp &&
+                  mainApp.appType === globalConstants.APP_NAME_BROWSER
+                    ? "is-grey"
+                    : "is-success"
+                }`}
                 onClick={toggleSidebar}
                 disabled={isSourceFetching}
               >
@@ -63,33 +70,12 @@ const Navbar = ({ isSourceFetching, toggleSidebar, isInTable, getApps }) => {
           </div>
         </div>
 
-        <div className="navbar-end">{isInTable ? <GridNav /> : null}</div>
+        <div className="navbar-end">
+          {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
+            <GridNav />
+          ) : null}
+        </div>
       </div>
     </nav>
   );
 };
-
-const mapStateToProps = (state, props) => {
-  const match = getSourceFromPath(props.location.pathname);
-  const { sourceId, tableName } =
-    match != null ? match.params : { sourceId: null, tableName: null };
-  let isInTable = false;
-
-  if (sourceId && tableName) {
-    isInTable = true;
-  }
-
-  return {
-    isSourceFetching: state.source.isFetching,
-    sourceId,
-    tableName,
-    isInTable,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    toggleSidebar,
-    getApps,
-  })(Navbar)
-);

@@ -1,5 +1,6 @@
 import React from "react";
-import { matchPath } from "react-router-dom";
+
+const matchPath = () => ({});
 
 export const transformData = (columns, row) =>
   row.reduce(
@@ -89,11 +90,3 @@ export const createCacheKeyFromParts = (sourceId, tableName) => {
 
 export const QueryContext = React.createContext({});
 QueryContext.displayName = "QueryContext";
-
-export const withQueryDetails = (Component) => {
-  return (props) => (
-    <QueryContext.Consumer>
-      {(context) => <Component {...props} {...context} />}
-    </QueryContext.Consumer>
-  );
-};

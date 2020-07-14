@@ -1,40 +1,35 @@
-import React, { useEffect, Fragment } from "react";
-import { withRouter } from "react-router-dom";
-import { connect } from "react-redux";
+import React, { useEffect, useContext, Fragment } from "react";
 
-import {
-  toggleSidebar,
-  showNotes,
-  toggleFilterEditor,
-  toggleColumnSelector,
-  toggleSortEditor,
-  toggleActions,
-  togglePinnedRecords,
-} from "services/global/actions";
-import { getApps } from "services/apps/actions";
-import { getSourceFromPath, getCacheKey } from "utils";
+import { QueryContext } from "utils";
+import { useGlobal, useApps, useData } from "services/store";
 
-const Navbar = ({
-  isFilterEnabled,
+export default ({
   cacheKey,
-  selectedRowList,
-  showPinnedRecords,
-  toggleFilterEditor,
-  toggleColumnSelector,
-  toggleSortEditor,
-  isNoteAppEnabled,
-  isRecordPinAppEnabled,
   hasColumnsSpecified,
   hasFiltersSpecified,
   hasOrderingSpecified,
   showNotes,
-  getApps,
   toggleActions,
   togglePinnedRecords,
 }) => {
+  const queryContext = useContext(QueryContext);
+  const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
+  const toggleFilterEditor = useGlobal((state) => state.toggleFilterEditor);
+  const toggleColumnSelector = useGlobal((state) => state.toggleColumnSelector);
+  const toggleOrderEditor = useGlobal((state) => state.toggleOrderEditor);
+  const data = useData((state) => state[queryContext.key]);
+  const fetchApps = useApps((state) => state.fetchApps);
+  const isNoteAppEnabled = useApps((state) => state.isNoteAppEnabled);
+  const isRecordPinAppEnabled = useApps((state) => state.isRecordPinAppEnabled);
   useEffect(() => {
-    getApps();
-  }, [getApps]);
+    fetchApps();
+  }, [fetchApps]);
+
+  if (!(data && data.isReady)) {
+    return null;
+  }
+  const { selectedRowList } = data;
+
   const handleNotesClick = (event) => {
     event.preventDefault();
     showNotes(cacheKey);
@@ -93,7 +88,6 @@ const Navbar = ({
         <div className="buttons has-addons">
           <button
             className={`button${hasColumnsSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
             onClick={toggleColumnSelector}
           >
             <i className="fas fa-columns" />
@@ -101,7 +95,6 @@ const Navbar = ({
           </button>
           <button
             className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
             onClick={toggleFilterEditor}
           >
             <i className="fas fa-filter" />
@@ -109,8 +102,7 @@ const Navbar = ({
           </button>
           <button
             className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
-            disabled={!isFilterEnabled}
-            onClick={toggleSortEditor}
+            onClick={toggleOrderEditor}
           >
             <i className="fas fa-sort" />
             &nbsp;Ordering
@@ -121,6 +113,7 @@ const Navbar = ({
   );
 };
 
+/*
 const mapStateToProps = (state, props) => {
   const match = getSourceFromPath(props.location.pathname);
   const { sourceId, tableName } =
@@ -175,10 +168,11 @@ export default withRouter(
     toggleSidebar,
     toggleFilterEditor,
     toggleColumnSelector,
-    toggleSortEditor,
+    toggleOrderEditor,
     showNotes,
     getApps,
     toggleActions,
     togglePinnedRecords,
   })(Navbar)
 );
+*/
