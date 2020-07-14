@@ -25,10 +25,10 @@ handlers = [
 
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:str}", item_get, methods=["GET"]),
-    Route(r"/api/item/{source_label:str}/{table_name:str}", item_get, methods=["GET"]),
-    Route(r"/api/item/{source_label:str}/{table_name:str}", item_post, methods=["POST"]),
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:int}", item_put, methods=["PUT"]),
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:str}", item_put, methods=["PUT"]),
+    Route(r"/api/item/{source_label:str}/{table_name:str}", item_get, methods=["GET"]),
+    Route(r"/api/item/{source_label:str}/{table_name:str}", item_post, methods=["POST"]),
 
     Route(r"/api/service/{source_label:str}/{resource_name:str}", service_fetch, methods=["GET", "POST"]),
 
