@@ -15,7 +15,6 @@ const initialState = {
 
   isReady: false,
   isFetching: false,
-  lastDirtyAt: null,
   fetchNeeded: false,
 };
 
@@ -28,7 +27,9 @@ const initiateQuerySpecification = (payload) => ({
 
 const initiateFilter = (inner, columnName, dataType) => {
   if (Object.keys(inner.filterBy).includes(columnName)) {
-    return {};
+    return {
+      ...inner,
+    };
   }
 
   let initialFilter = {};
@@ -42,6 +43,7 @@ const initiateFilter = (inner, columnName, dataType) => {
     };
   }
   return {
+    ...inner,
     filterBy: {
       ...inner.filterBy,
       [columnName]: {
@@ -66,34 +68,33 @@ const removeFilter = (inner, columnName) => {
     };
   };
   return {
+    ...inner,
     filterBy: Object.keys(inner.filterBy).reduce(reducer, {}),
+    fetchNeeded: true,
   };
 };
 
 const nextPage = (inner) => ({
   ...inner,
   offset: inner.offset + inner.limit,
-  lastDirtyAt: +new Date(),
   fetchNeeded: true,
 });
 
 const previousPage = (inner) => ({
   ...inner,
   offset: inner.offset - inner.limit,
-  lastDirtyAt: +new Date(),
   fetchNeeded: true,
 });
 
 const gotoPage = (inner, pageNum) => ({
   ...inner,
   offset: (pageNum - 1) * inner.limit,
-  lastDirtyAt: +new Date(),
   fetchNeeded: true,
 });
 
 const changeOrderBy = (inner) => ({
   ...inner,
-  lastDirtyAt: +new Date(),
+  fetchNeeded: true,
 });
 
 const toggleOrderBy = (inner, columnName) => {
@@ -111,7 +112,7 @@ const toggleOrderBy = (inner, columnName) => {
       ...inner.orderBy,
       [columnName]: newOrder,
     },
-    lastDirtyAt: +new Date(),
+    fetchNeeded: true,
   };
 };
 
@@ -121,7 +122,7 @@ const setFilter = (inner, columnName, filters) => ({
     ...inner.filterBy,
     [columnName]: filters,
   },
-  lastDirtyAt: +new Date(),
+  fetchNeeded: true,
 });
 
 const toggleColumnHeadSpecification = (inner, columnName) => ({
@@ -154,7 +155,7 @@ const toggleColumnSelection = (inner, columnName) => {
 
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
   initiateQuerySpecification: (key, payload) =>
-    set((state) => ({
+    set(() => ({
       [key]: initiateQuerySpecification(payload),
     })),
 

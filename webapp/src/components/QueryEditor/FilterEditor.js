@@ -7,13 +7,13 @@ import {
   useData,
   useQuerySpecification,
 } from "services/store";
+import { saveQuery } from "services/apps/actions";
 import { Section, Hx } from "components/BulmaHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state[queryContext.key]);
-  const fetchData = useData((state) => state.fetchData);
   const isFEVisible = useGlobal((state) => state.isFEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -25,7 +25,6 @@ export default () => {
     isSavingQuery: false,
     savedQueryLabel: "",
   });
-  const saveQuery = () => ({});
 
   if (
     !(
@@ -102,14 +101,9 @@ export default () => {
     );
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetchData();
-  };
-
-  const handleSaveQuery = (event) => {
+  const handleSaveQuery = async () => {
     if (state.isSavingQuery) {
-      saveQuery(state.savedQueryLabel);
+      await saveQuery(state.savedQueryLabel, querySpecification);
     } else {
       setState((state) => ({
         ...state,
@@ -175,9 +169,6 @@ export default () => {
             </Fragment>
           ) : (
             <Fragment>
-              <button className="button is-success" onClick={handleSubmit}>
-                Apply
-              </button>
               <button className="button is-success" onClick={handleSaveQuery}>
                 Save Query
               </button>
@@ -191,41 +182,3 @@ export default () => {
     </div>
   );
 };
-
-/*
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      sourceId,
-      tableName,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-      filterBy: state.querySpecification.filterBy,
-      isVisible: state.global.isFEVisible,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    initiateFilter,
-    removeFilter,
-    fetchData,
-    saveQuery,
-  })(FilterEditor)
-);
-*/

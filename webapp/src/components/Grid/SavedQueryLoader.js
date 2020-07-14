@@ -1,51 +1,68 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 
-import { getQueryDetails } from "services/browser/getters";
-import { withQueryDetails } from "utils";
-// import { fetchData, toggleRowSelection } from "services/browser/actions";
-import { fetchPins, fetchSavedQuery } from "services/apps/actions";
-import { fetchSchema } from "services/schema/actions";
+import { QueryContext } from "utils";
+import { useData, useQuerySpecification } from "services/store";
+import QueryLoader from "./QueryLoader";
 
-export default ({
-  savedQueryId,
-  savedQuery,
-  fetchSchema,
-  fetchData,
-  fetchSavedQuery,
-}) => {
-  // We made this small separate component just for the separate useEffect used here
-  useEffect(() => {
-    if (!!savedQueryId && !savedQuery) {
-      fetchSavedQuery(savedQueryId);
-    }
-
-    if (!!savedQueryId && !!savedQuery && "source_id" in savedQuery) {
-      fetchSchema(parseInt(savedQuery.source_id));
-      fetchData(savedQuery);
-    }
-  }, [savedQueryId, savedQuery, fetchSchema, fetchData, fetchSavedQuery]);
-
-  return <div>Loading data for Saved Query...</div>;
-};
-
-/*
-const mapStateToProps = (state, props) => {
-  const { savedQueryId, savedQuery } = getQueryDetails(state, props);
+const extractQuerySpecification = (item) => {
+  const innerQS = JSON.parse(item[2]);
 
   return {
-    savedQueryId,
-    savedQuery,
+    sourceLabel: innerQS.source_label,
+    tableName: innerQS.table_name,
+    columnsSelected: innerQS.columns,
+    orderBy: innerQS.order_by,
+    filterBy: innerQS.filter_by,
+    offset: innerQS.offset,
+    limit: innerQS.limit,
+    fetchNeeded: true,
   };
 };
 
-export default withRouter(
-  withQueryDetails(
-    connect(mapStateToProps, {
-      fetchData,
-      fetchSchema,
-      fetchPins,
-      fetchSavedQuery,
-    })(SavedQueryLoader)
-  )
-);
-*/
+const InnerLoader = ({ children }) => {
+  const queryContext = useContext(QueryContext);
+  const data = useData((state) => state[queryContext.key]);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const initiateQuerySpecification = useQuerySpecification(
+    (state) => state.initiateQuerySpecification
+  );
+  const context = {
+    key: `saved-query-${querySpecification.pk}`,
+  };
+  initiateQuerySpecification(
+    context.key,
+    extractQuerySpecification(data.rows[0])
+  );
+
+  return (
+    <QueryContext.Provider value={context}>
+      <QueryLoader>{children}</QueryLoader>
+    </QueryContext.Provider>
+  );
+};
+
+export default ({ children }) => {
+  // We made this small separate component just for the separate useEffect used here
+  const queryContext = useContext(QueryContext);
+  const fetchData = useData((state) => state.fetchData);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const data = useData((state) => state[queryContext.key]);
+
+  useEffect(() => {
+    if (!!querySpecification && !!querySpecification.fetchNeeded) {
+      fetchData(queryContext.key, querySpecification);
+    }
+  }, [queryContext.key, querySpecification.fetchNeeded]);
+
+  if (
+    !(data && data.isReady && querySpecification && querySpecification.isReady)
+  ) {
+    return <div>Loading data for Saved Query...</div>;
+  }
+
+  return <InnerLoader>{children}</InnerLoader>;
+};

@@ -15,6 +15,7 @@
     "react-dom": "^16.13.1",
     "react-markdown": "^4.3.1",
     "react-scripts": "3.4.1",
+    "uuid": "^8.2.0",
     "zustand": "^2.2.3"
   },
   "scripts": {

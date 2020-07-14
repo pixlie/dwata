@@ -54,9 +54,7 @@ const [useApps] = create((set) => ({
   fetchApps: async () => {
     try {
       const response = await axios.get(appURL);
-      set((state) => ({
-        ...completeFetch(response.data),
-      }));
+      set(() => completeFetch(response.data));
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");
     }

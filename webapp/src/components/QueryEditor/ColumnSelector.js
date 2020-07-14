@@ -41,6 +41,7 @@ export default () => {
   const colsAreAvailable = querySpecification.columnsSelected.every((col, i) =>
     dataColumns.includes(col)
   );
+
   const BoundInput = ({ head }) => {
     const handleClick = () => {
       toggleColumnSelection(queryContext.key, head.name);
@@ -59,11 +60,6 @@ export default () => {
     );
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetchData();
-  };
-
   return (
     <div id="column-selector">
       <Section>
@@ -77,54 +73,10 @@ export default () => {
             </div>
           ))}
         </div>
-        {!colsAreAvailable ? (
-          <div className="help">New column data needs to be fetched</div>
-        ) : null}
-        <button
-          className="button is-fullwidth is-success"
-          disabled={colsAreAvailable}
-          onClick={handleSubmit}
-        >
-          Apply
-        </button>
+        <div className="help">
+          New column data, if unavailable, will be fetched automatically
+        </div>
       </Section>
     </div>
   );
 };
-
-/*
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.browser.isReady &&
-    state.browser.cacheKey === cacheKey &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      sourceId,
-      tableName,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-      dataColumns: state.browser.columns,
-      qsColumns: state.querySpecification.columnsSelected,
-      isVisible: state.global.isCSVisible,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    toggleColumnSelection,
-    fetchData,
-  })(ColumnSelector)
-);
-*/

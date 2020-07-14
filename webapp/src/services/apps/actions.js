@@ -2,43 +2,44 @@ import axios from "axios";
 
 import { appURL, dataItemURL } from "services/urls";
 import { getSourceFromPath } from "utils";
-import { INITIATE_FETCH_ITEM, COMPLETE_FETCH_ITEM } from "services/dataItem/actionTypes";
+import {
+  INITIATE_FETCH_ITEM,
+  COMPLETE_FETCH_ITEM,
+} from "services/dataItem/actionTypes";
 import { fetchDataToCache } from "services/listCache/actions";
 import { COMPLETE_FETCH_APP } from "./actionTypes";
 import { getRecordPinAppConfig, getSavedQueryAppConfig } from "./getters";
 import { fetchDataItem } from "services/dataItem/actions";
 
-
-export const getApps = () => dispatch => {
+export const getApps = () => (dispatch) => {
   return axios
     .get(appURL)
-    .then(res => {
+    .then((res) => {
       dispatch({
         type: COMPLETE_FETCH_APP,
         payload: res.data,
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Could not fetch apps. Try again later.");
       console.log(err);
     });
 };
 
-
 export const fetchNote = () => (dispatch, getState) => {
   const state = getState();
   let path = null;
   try {
-    const {params} = getSourceFromPath(state.router.location.pathname);
+    const { params } = getSourceFromPath(state.router.location.pathname);
     path = btoa(`${params.sourceId}/${params.tableName}`);
   } catch (error) {
     return false;
   }
-  const {isNoteAppEnabled, noteAppConfig} = state.apps;
+  const { isNoteAppEnabled, noteAppConfig } = state.apps;
   if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
-  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
+  const { source_id: sourceId, table_name: tableName } = noteAppConfig;
 
   dispatch({
     type: INITIATE_FETCH_ITEM,
@@ -49,7 +50,7 @@ export const fetchNote = () => (dispatch, getState) => {
 
   return axios
     .get(`${dataItemURL}/${sourceId}/${tableName}?path=${path}`)
-    .then(res => {
+    .then((res) => {
       dispatch({
         type: COMPLETE_FETCH_ITEM,
         payload: res.data,
@@ -58,8 +59,11 @@ export const fetchNote = () => (dispatch, getState) => {
         pk: path,
       });
     })
-    .catch(err => {
-      console.log("Could not fetch notes. Try again later.", err.response.status);
+    .catch((err) => {
+      console.log(
+        "Could not fetch notes. Try again later.",
+        err.response.status
+      );
       if (err.response.status === 404) {
         dispatch({
           type: COMPLETE_FETCH_ITEM,
@@ -73,22 +77,24 @@ export const fetchNote = () => (dispatch, getState) => {
     });
 };
 
-
 export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
   const state = getState();
   let path = null;
   try {
-    const {params} = getSourceFromPath(state.router.location.pathname);
+    const { params } = getSourceFromPath(state.router.location.pathname);
     path = btoa(`${params.sourceId}/${params.tableName}`);
   } catch (error) {
     return false;
   }
-  const {isNoteAppEnabled, noteAppConfig} = state.apps;
+  const { isNoteAppEnabled, noteAppConfig } = state.apps;
   if (!isNoteAppEnabled || !noteAppConfig) {
     return false;
   }
-  const {source_id: sourceId, table_name: tableName} = noteAppConfig;
-  const url = pk !== null ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
+  const { source_id: sourceId, table_name: tableName } = noteAppConfig;
+  const url =
+    pk !== null
+      ? `${dataItemURL}/${sourceId}/${tableName}/${pk}`
+      : `${dataItemURL}/${sourceId}/${tableName}`;
 
   return axios({
     method: pk !== null ? "put" : "post",
@@ -96,104 +102,102 @@ export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
     data: {
       path,
       ...payload,
-    }
+    },
   })
-    .then(res => {
+    .then((res) => {
       if (!!callback) {
         callback(res);
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log("Could not fetch notes. Try again later.");
       console.log(err);
     });
 };
 
-
 export const pinRecords = () => (dispatch, getState) => {
   const state = getState();
   let path = null;
   try {
-    const {params} = getSourceFromPath(state.router.location.pathname);
+    const { params } = getSourceFromPath(state.router.location.pathname);
     path = btoa(`${params.sourceId}/${params.tableName}`);
   } catch (error) {
     return false;
   }
-  const {selectedRowList} = state.browser;
-  const {sourceId, tableName} = getRecordPinAppConfig(state);
+  const { selectedRowList } = state.browser;
+  const { sourceId, tableName } = getRecordPinAppConfig(state);
 
   for (const rowId of selectedRowList) {
-    axios
-    .post(`${dataItemURL}/${sourceId}/${tableName}`, {
+    axios.post(`${dataItemURL}/${sourceId}/${tableName}`, {
       path,
       record_id: rowId,
     });
   }
 };
 
-
 export const fetchPins = () => (dispatch, getState) => {
   const state = getState();
-  const {sourceId, tableName, cacheKey} = getRecordPinAppConfig(state);
+  const { sourceId, tableName, cacheKey } = getRecordPinAppConfig(state);
 
-  dispatch(fetchDataToCache(
-    sourceId,
-    tableName,
-    cacheKey, {
+  dispatch(
+    fetchDataToCache(sourceId, tableName, cacheKey, {
       columnsSelected: ["id", "path", "record_id"],
-    }
-  ));
+    })
+  );
 };
 
+const getQuerySpecificationPayload = (querySpecification) => ({
+  columns:
+    !!querySpecification.columnsSelected &&
+    querySpecification.columnsSelected.length > 0
+      ? querySpecification.columnsSelected
+      : undefined,
+  source_label: querySpecification.sourceLabel,
+  table_name: querySpecification.tableName,
+  order_by: querySpecification.orderBy,
+  filter_by: querySpecification.filterBy,
+  offset: querySpecification.offset,
+  limit: querySpecification.limit,
+});
 
-export const saveQuery = (label, pk) => (dispatch, getState) => {
-  const state = getState();
-  const {columnsSelected, orderBy, filterBy, limit, offset} = state.querySpecification;
-  const {sourceId, tableName} = getSavedQueryAppConfig(state);
-  const url = !!pk ? `${dataItemURL}/${sourceId}/${tableName}/${pk}` : `${dataItemURL}/${sourceId}/${tableName}`;
+export const saveQuery = async (label, querySpecification, pk) => {
+  const url = !!pk
+    ? `${dataItemURL}/dwata_meta/dwata_meta_saved_query/${pk}`
+    : `${dataItemURL}/dwata_meta/dwata_meta_saved_query`;
 
   try {
-    const {params} = getSourceFromPath(state.router.location.pathname);
-    return axios({
-      method: !!pk ? "put" : "post",
-      url,
-      data: {
+    if (!!pk) {
+      await axios.put(url, {
         label,
-        source_id: params.sourceId,
-        table_name: params.tableName,
-        query_specification: {
-          columns: columnsSelected.length > 0 ? columnsSelected : undefined,
-          order_by: orderBy,
-          filter_by: filterBy,
-          limit,
-          offset,
-        }
-      }
-    })
-      .then(res => {
-      })
-      .catch(err => {
-        console.log(err);
+        query_specification: getQuerySpecificationPayload(querySpecification),
       });
-  
+    } else {
+      await axios.post(url, {
+        label,
+        query_specification: getQuerySpecificationPayload(querySpecification),
+      });
+    }
   } catch (error) {
     return false;
   }
 };
 
-
-export const fetchSavedQuery = savedQueryId => (dispatch, getState) => {
+export const fetchSavedQuery = (savedQueryId) => (dispatch, getState) => {
   const state = getState();
-  const {sourceId, tableName, cacheKey} = getSavedQueryAppConfig(state);
+  const { sourceId, tableName, cacheKey } = getSavedQueryAppConfig(state);
 
   if (!savedQueryId) {
-    dispatch(fetchDataToCache(
-      sourceId,
-      tableName,
-      cacheKey, {
-        columnsSelected: ["id", "label", "source_id", "table_name", "query_specification"],
-      }
-    ));
+    dispatch(
+      fetchDataToCache(sourceId, tableName, cacheKey, {
+        columnsSelected: [
+          "id",
+          "label",
+          "source_id",
+          "table_name",
+          "query_specification",
+        ],
+      })
+    );
   } else {
     dispatch(fetchDataItem(`/browse/${sourceId}/${tableName}/${savedQueryId}`));
   }

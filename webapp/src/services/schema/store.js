@@ -12,18 +12,10 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = (state, sourceLabel) => {
-  if (sourceLabel in state) {
-    return {};
-  }
-
-  return {
-    [sourceLabel]: {
-      ...initialState,
-      isFetching: true,
-    },
-  };
-};
+const initiateFetch = () => ({
+  ...initialState,
+  isFetching: true,
+});
 
 const completeFetch = (sourceLabel, payload) => {
   return {
@@ -45,9 +37,10 @@ const [useStore] = create((set, get) => ({
       return;
     }
 
-    set((state) => ({
-      ...initiateFetch(state, sourceLabel),
-    }));
+    !get()[sourceLabel] &&
+      set(() => ({
+        [sourceLabel]: initiateFetch(),
+      }));
 
     try {
       const response = await axios.get(`${schemaURL}/${sourceLabel}`);

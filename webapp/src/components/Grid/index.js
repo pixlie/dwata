@@ -14,45 +14,34 @@ import SavedQueryLoader from "./SavedQueryLoader";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
-  if (
-    !(
-      data &&
-      data.isReady &&
-      querySpecification &&
-      querySpecification.isReady &&
-      schema &&
-      schema.isReady
-    )
-  ) {
-    if (!!queryContext.savedQueryId) {
-      return <SavedQueryLoader />;
-    }
-    return <QueryLoader />;
-  }
+  const Loader =
+    !!querySpecification && !!querySpecification.isSavedQuery
+      ? SavedQueryLoader
+      : QueryLoader;
 
   return (
-    <Fragment>
-      <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
-        <thead>
-          <TableHead />
-        </thead>
+    <Loader>
+      <Fragment>
+        <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
+          <thead>
+            <TableHead />
+          </thead>
 
-        <tbody>
-          <TableBody />
-        </tbody>
-      </table>
+          <tbody>
+            <TableBody />
+          </tbody>
+        </table>
 
-      <ColumnSelector />
-      <FilterEditor />
-      <OrderEditor />
-      {/* <Actions /> */}
-      <Paginator />
-    </Fragment>
+        <ColumnSelector />
+        <FilterEditor />
+        <OrderEditor />
+        {/* <Actions /> */}
+        <Paginator />
+      </Fragment>
+    </Loader>
   );
 };
