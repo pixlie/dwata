@@ -2,6 +2,7 @@ import React from "react";
 
 import { useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
+import { Button } from "components/LayoutHelpers";
 import GridNav from "./GridNav";
 
 export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
@@ -15,62 +16,41 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
   };
 
   return (
-    <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="navbar-brand">
-        <a className="navbar-item" href="/" onClick={handleHome}>
-          Home
-        </a>
-
+    <nav
+      className="flex items-center justify-between flex-wrap bg-gray-800"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div className="flex items-center flex-shrink-0 mx-4 px-4">
         <a
-          role="button"
-          className="navbar-burger burger"
-          aria-label="menu"
-          aria-expanded="false"
+          className="font-bold text-2xl text-white"
           href="/"
+          onClick={handleHome}
         >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
+          Home
         </a>
       </div>
 
-      <div className="navbar-menu">
-        <div className="navbar-start">
-          <div className="navbar-item">
-            <div className="buttons">
-              <button
-                className={`button ${
-                  mainApp &&
-                  mainApp.appType === globalConstants.APP_NAME_BROWSER
-                    ? "is-grey"
-                    : "is-success"
-                }`}
-                onClick={toggleSidebar}
-                disabled={isSourceFetching}
-              >
-                <i className="fas fa-database" />
-                &nbsp;Browse
-              </button>
-            </div>
-          </div>
+      <div className="block lg:inline-block lg:mt-0 p-4">&nbsp;</div>
 
-          <div className="navbar-item">
-            <div className="field">
-              <p className="control has-icons-left">
-                <input
-                  className="input"
-                  type="text"
-                  placeholder="Coming soon..."
-                />
-                <span className="icon is-small is-left">
-                  <i className="fas fa-search"></i>
-                </span>
-              </p>
-            </div>
+      <div className="block flex-grow items-center w-auto">
+        <div className="inline-block">
+          <Button
+            attributes={{ onClick: toggleSidebar, disabled: isSourceFetching }}
+          >
+            <i className="fas fa-database" />
+            &nbsp;Browse
+          </Button>
+
+          <div className="inline-block">
+            <input className="input" type="text" placeholder="Coming soon..." />
+            <span className="icon is-small is-left">
+              <i className="fas fa-search"></i>
+            </span>
           </div>
         </div>
 
-        <div className="navbar-end">
+        <div className="inline-block">
           {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
             <GridNav />
           ) : null}

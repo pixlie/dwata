@@ -26,7 +26,7 @@ export default () => {
   return (
     <Loader>
       <Fragment>
-        <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
+        <table>
           <thead>
             <TableHead />
           </thead>

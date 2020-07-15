@@ -8,7 +8,7 @@ import {
   useQuerySpecification,
 } from "services/store";
 import { saveQuery } from "services/apps/actions";
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section, Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {

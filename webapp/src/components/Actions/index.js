@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section, Hx } from "components/LayoutHelpers";
 import { pinRecords } from "services/apps/actions";
 
 export default () => {

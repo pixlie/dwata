@@ -45,70 +45,58 @@ export default ({
 
   return (
     <Fragment>
-      <div className="navbar-item">
-        <div className="field">
-          <p className="control">
-            <button
-              className={`button ${
-                selectedRowList.length > 0 ? " is-success" : ""
-              }`}
-              disabled={selectedRowList.length === 0}
-              onClick={handleActionsClick}
-            >
-              <span className="icon">
-                <i className="far fa-check-square" />
-              </span>
-              &nbsp; Actions
-            </button>
-          </p>
-        </div>
-      </div>
+      <button
+        className={`inline-block button ${
+          selectedRowList.length > 0 ? " is-success" : ""
+        }`}
+        disabled={selectedRowList.length === 0}
+        onClick={handleActionsClick}
+      >
+        <span className="icon">
+          <i className="far fa-check-square" />
+        </span>
+        &nbsp; Actions
+      </button>
 
-      <div className="navbar-item">
-        <div className="buttons has-addons">
-          {isNoteAppEnabled ? (
-            <button className="button" onClick={handleNotesClick}>
-              <i className="far fa-sticky-note" />
-              &nbsp; Notes
-            </button>
-          ) : null}
-          {isRecordPinAppEnabled ? (
-            <button
-              className={`button${showPinnedRecords ? " is-success" : ""}`}
-              onClick={handlePinClick}
-            >
-              <i className="fas fa-thumbtack" />
-              &nbsp; Pins
-            </button>
-          ) : null}
-        </div>
-      </div>
+      {isNoteAppEnabled ? (
+        <button className="inline-block button" onClick={handleNotesClick}>
+          <i className="far fa-sticky-note" />
+          &nbsp; Notes
+        </button>
+      ) : null}
+      {isRecordPinAppEnabled ? (
+        <button
+          className={`button${showPinnedRecords ? " is-success" : ""}`}
+          onClick={handlePinClick}
+        >
+          <i className="fas fa-thumbtack" />
+          &nbsp; Pins
+        </button>
+      ) : null}
 
-      <div className="navbar-item">
-        <div className="buttons has-addons">
-          <button
-            className={`button${hasColumnsSpecified ? " is-spec" : ""}`}
-            onClick={toggleColumnSelector}
-          >
-            <i className="fas fa-columns" />
-            &nbsp;Columns
-          </button>
-          <button
-            className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
-            onClick={toggleFilterEditor}
-          >
-            <i className="fas fa-filter" />
-            &nbsp;Filters
-          </button>
-          <button
-            className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
-            onClick={toggleOrderEditor}
-          >
-            <i className="fas fa-sort" />
-            &nbsp;Ordering
-          </button>
-        </div>
-      </div>
+      <button
+        className={`inline-block button${
+          hasColumnsSpecified ? " is-spec" : ""
+        }`}
+        onClick={toggleColumnSelector}
+      >
+        <i className="fas fa-columns" />
+        &nbsp;Columns
+      </button>
+      <button
+        className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
+        onClick={toggleFilterEditor}
+      >
+        <i className="fas fa-filter" />
+        &nbsp;Filters
+      </button>
+      <button
+        className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
+        onClick={toggleOrderEditor}
+      >
+        <i className="fas fa-sort" />
+        &nbsp;Ordering
+      </button>
     </Fragment>
   );
 };

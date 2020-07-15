@@ -7,7 +7,7 @@ import {
   useData,
   useQuerySpecification,
 } from "services/store";
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section, Hx } from "components/LayoutHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);

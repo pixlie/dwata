@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap");
+@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+@import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
+
+html {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-width: 100%;
+  font-family: Quicksand, sans-serif;
+  font-weight: 400;
+  color: #333333;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Quicksand, sans-serif;
+  font-weight: 700;
+}
+h1.subtitle,
+h2.subtitle,
+h3.subtitle,
+h4.subtitle,
+h5.subtitle,
+h6.subtitle {
+  font-family: Quicksand, sans-serif;
+  font-weight: 400;
+}
+h1 {
+  margin: 1rem 0 2.125rem;
+  letter-spacing: -0.1rem;
+}
+h2 {
+  margin: 1.05rem 0 1.75rem;
+  letter-spacing: -0.08rem;
+}
+h3 {
+  margin: 0.85rem 0 1.55rem;
+}
+h4 {
+  margin: 0.7rem 0 1.25rem;
+}
+
+#paginator {
+  z-index: 80;
+  background-color: #fdf7e3;
+  padding: 0.4rem 0.6rem;
+  position: fixed;
+  bottom: 4rem;
+  right: 12rem;
+}
+
+.col-hd .label::after {
+  border: 2px solid #787878;
+  border-right: 0;
+  border-top: 0;
+  content: " ";
+  display: block;
+  height: 0.4em;
+  width: 0.4em;
+  pointer-events: none;
+  position: absolute;
+  top: 60%;
+  transform-origin: center;
+  right: 0.5rem;
+  margin-top: -0.375em;
+}
+
+.col-hd .label.icn-asc::after {
+  top: 65%;
+  transform: rotate(135deg);
+}
+.col-hd .label.icn-desc::after {
+  transform: rotate(-45deg);
+}

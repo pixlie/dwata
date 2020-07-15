@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 import { useGlobal } from "services/store";
-import { Section } from "components/BulmaHelpers";
+import { Section } from "components/LayoutHelpers";
 
 const defaultNote = `# Notes
 Notes help you and your team save time to understand data in relation to your business.

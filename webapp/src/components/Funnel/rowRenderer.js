@@ -1,60 +1,83 @@
 import React, { Fragment } from "react";
 
-import { Hx } from "components/BulmaHelpers";
-
+import { Hx } from "components/LayoutHelpers";
 
 export default (schemaColumns, tableColumns, querySpecificationColumns) => {
   const rowList = [];
   const date_time_options = {
-    year: "numeric", month: "numeric", day: "numeric",
-    hour: "numeric", minute: "numeric", second: "numeric",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
     hour12: false,
   };
 
   const DefaultCell = ({ data }) => <span>{data}</span>;
-  const PrimaryKeyCell = ({ data }) => <span className="tag"><strong>ID</strong>: {data}</span>;
-  const TitleCell = ({ data }) => <span><Hx x="4">{data}</Hx></span>;
-  const LargeTextCell = ({ data }) => <div className="content"><p>{data}</p></div>;
+  const PrimaryKeyCell = ({ data }) => (
+    <span className="tag">
+      <strong>ID</strong>: {data}
+    </span>
+  );
+  const TitleCell = ({ data }) => (
+    <span>
+      <Hx x="4">{data}</Hx>
+    </span>
+  );
+  const LargeTextCell = ({ data }) => (
+    <div className="content">
+      <p>{data}</p>
+    </div>
+  );
 
   const BooleanCell = (head) => {
     return ({ data }) => (
       <span>
-        {(data === true || data === false) ? (
+        {data === true || data === false ? (
           <Fragment>
             {data === true ? (
               <div className="tag is-light is-success">
                 <strong>{head}</strong>&nbsp;
-                <i className="fas fa-check-circle" />&nbsp;Yes
+                <i className="fas fa-check-circle" />
+                &nbsp;Yes
               </div>
             ) : (
               <div className="tag is-light is-danger">
                 <strong>{head}</strong>&nbsp;
-                <i className="fas fa-times-circle" />&nbsp;No
+                <i className="fas fa-times-circle" />
+                &nbsp;No
               </div>
             )}
           </Fragment>
         ) : null}
       </span>
     );
-  }
+  };
 
   const JSONCell = () => <span>{"{}"}</span>;
-  const TimeStampCell = (({ data }) => {
+  const TimeStampCell = ({ data }) => {
     try {
-      return <span>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</span>;
+      return (
+        <span>
+          {new Intl.DateTimeFormat("en-GB", date_time_options).format(
+            new Date(data * 1000)
+          )}
+        </span>
+      );
     } catch (error) {
       if (error instanceof RangeError) {
-        return <span>{data}</span>
+        return <span>{data}</span>;
       }
     }
-  });
+  };
 
   for (const col of tableColumns) {
     if (!querySpecificationColumns.includes(col)) {
       rowList.push(null);
       continue;
     }
-    const head = schemaColumns.find(x => x.name === col);
+    const head = schemaColumns.find((x) => x.name === col);
     if (head.is_primary_key) {
       rowList.push(PrimaryKeyCell);
     } else if (head.has_foreign_keys) {
@@ -77,4 +100,4 @@ export default (schemaColumns, tableColumns, querySpecificationColumns) => {
   }
 
   return rowList;
-}
+};

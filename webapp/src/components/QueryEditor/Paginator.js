@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useQuerySpecification } from "services/store";
+import { Button } from "components/LayoutHelpers";
 
 const PageItem = ({ number }) => {
   const queryContext = useContext(QueryContext);
@@ -22,17 +23,15 @@ const PageItem = ({ number }) => {
   };
 
   return (
-    <li>
-      <span
-        className={`pagination-link${
-          number === currentPage ? " is-current" : ""
-        }`}
-        aria-label={`Goto page ${number}`}
-        onClick={handleGotoPage}
-      >
-        {number}
-      </span>
-    </li>
+    <Button
+      active={number === currentPage ? true : false}
+      attributes={{
+        "aria-label": `Goto page ${number}`,
+        onClick: handleGotoPage,
+      }}
+    >
+      {number}
+    </Button>
   );
 };
 
@@ -120,22 +119,14 @@ export default () => {
     <div id="paginator">
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
-          <span className="pagination-previous" disabled>
-            Previous
-          </span>
+          <Button disabled>Previous</Button>
         ) : (
-          <span className="pagination-previous" onClick={handlePrevious}>
-            Previous
-          </span>
+          <Button attributes={{ onClick: handlePrevious }}>Previous</Button>
         )}
         {offset + limit >= count ? (
-          <span className="pagination-next" disabled>
-            Next page
-          </span>
+          <Button disabled>Next page</Button>
         ) : (
-          <span className="pagination-next" onClick={handleNext}>
-            Next page
-          </span>
+          <Button attributes={{ onClick: handleNext }}>Next page</Button>
         )}
         <PageSlots />
       </nav>

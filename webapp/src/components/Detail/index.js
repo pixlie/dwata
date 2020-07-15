@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from "react";
 
 import { QueryContext } from "utils";
-import { Section } from "components/BulmaHelpers";
+import { Section } from "components/LayoutHelpers";
 
 const cellRenderer = (column, sourceId) => {
   const date_time_options = {
