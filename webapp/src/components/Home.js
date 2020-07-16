@@ -36,12 +36,9 @@ const ReportItem = ({ item }) => {
 export default () => {
   return (
     <Fragment>
-      <Hero textCentered={true}>
-        <Hx x="2">Welcome to dwata</Hx>
-      </Hero>
-
       <div className="flex items-stretch">
         <div className="flex-1 px-2">
+          <Hx x="2">travlyng</Hx>
           <Source />
         </div>
 

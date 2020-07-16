@@ -17,7 +17,7 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
 
   return (
     <nav
-      className="flex items-center justify-between flex-wrap bg-gray-800"
+      className="fixed top-0 w-screen flex items-center bg-gray-800"
       role="navigation"
       aria-label="main navigation"
     >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 export const Hero = ({
   size = "",
@@ -54,20 +54,64 @@ export const Box = ({ title, message, children }) => {
 export const Button = ({
   label,
   size = "medium",
-  color = "blue",
+  theme = "primary",
   active = false,
   disabled = false,
+  padding = "px-3 py-1",
+  margin = "mr-6",
+  rounded = "rounded",
   attributes,
   children,
-}) => (
-  <button
-    className="inline-block text-md px-3 py-1 rounded bg-blue-500 text-white font-bold hover:bg-blue-800 mr-6"
-    {...attributes}
-    disabled={disabled}
-  >
-    {children}
-  </button>
-);
+}) => {
+  let classes = `inline-block text-md font-bold hover:shadow-md ${rounded} ${padding} ${margin}`;
+  if (theme === "primary") {
+    classes =
+      classes + " bg-blue-400 text-gray-800 hover:bg-blue-800 hover:text-white";
+  } else if (theme === "secondary") {
+    classes = classes + " bg-gray-200 hover:bg-gray-700 hover:text-white";
+  } else if (theme === "info") {
+    classes = classes + " bg-yellow-100 hover:bg-yellow-700 hover:text-white";
+  }
+
+  return (
+    <button className={classes} {...attributes} disabled={disabled}>
+      {label}
+      {children}
+    </button>
+  );
+};
+
+export const ButtonGroup = ({
+  size = "medium",
+  theme = "primary",
+  hasGap = false,
+  attributes,
+  buttons,
+}) => {
+  const rounded = Array(buttons.length).fill("rounded");
+  if (!hasGap) {
+    rounded.fill("");
+    rounded[0] = "rounded-l";
+    rounded[buttons.length - 1] = "rounded-r";
+  }
+
+  return (
+    <Fragment>
+      {buttons.map((button, i) => (
+        <Button
+          key={`btgr-${i}`}
+          rounded={rounded[i]}
+          label={button.label}
+          theme={theme}
+          margin={!hasGap ? "" : "mr-2"}
+          attributes={{ ...attributes, ...button.attributes }}
+        >
+          {button.inner}
+        </Button>
+      ))}
+    </Fragment>
+  );
+};
 
 export const ColumnHead = ({ label, order, group, attributes, children }) => {
   let classes =

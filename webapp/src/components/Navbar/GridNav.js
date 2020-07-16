@@ -2,6 +2,7 @@ import React, { useEffect, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
 import { useGlobal, useApps, useData } from "services/store";
+import { Button, ButtonGroup } from "components/LayoutHelpers";
 
 export default ({
   cacheKey,
@@ -42,61 +43,71 @@ export default ({
     event.preventDefault();
     togglePinnedRecords();
   };
+  const queryButtons = [
+    {
+      active: hasColumnsSpecified === true,
+      attributes: { onClick: toggleColumnSelector },
+      inner: (
+        <Fragment>
+          <i className="fas fa-columns" />
+          &nbsp;Columns
+        </Fragment>
+      ),
+    },
+    {
+      active: hasFiltersSpecified === true,
+      attributes: { onClick: toggleFilterEditor },
+      inner: (
+        <Fragment>
+          <i className="fas fa-filter" />
+          &nbsp;Filters
+        </Fragment>
+      ),
+    },
+    {
+      active: hasOrderingSpecified === true,
+      attributes: { onClick: toggleOrderEditor },
+      inner: (
+        <Fragment>
+          <i className="fas fa-sort" />
+          &nbsp;Ordering
+        </Fragment>
+      ),
+    },
+  ];
 
   return (
     <Fragment>
-      <button
-        className={`inline-block button ${
-          selectedRowList.length > 0 ? " is-success" : ""
-        }`}
+      <Button
+        theme="secondary"
+        active={selectedRowList.length > 0}
         disabled={selectedRowList.length === 0}
-        onClick={handleActionsClick}
+        attributes={{ onClick: handleActionsClick }}
       >
         <span className="icon">
           <i className="far fa-check-square" />
         </span>
         &nbsp; Actions
-      </button>
+      </Button>
 
       {isNoteAppEnabled ? (
-        <button className="inline-block button" onClick={handleNotesClick}>
+        <Button attributes={{ onClick: handleNotesClick }} theme="info">
           <i className="far fa-sticky-note" />
           &nbsp; Notes
-        </button>
+        </Button>
       ) : null}
       {isRecordPinAppEnabled ? (
-        <button
-          className={`button${showPinnedRecords ? " is-success" : ""}`}
-          onClick={handlePinClick}
+        <Button
+          attributes={{ onClick: handlePinClick }}
+          active={showPinnedRecords === true}
+          theme="secondary"
         >
           <i className="fas fa-thumbtack" />
           &nbsp; Pins
-        </button>
+        </Button>
       ) : null}
 
-      <button
-        className={`inline-block button${
-          hasColumnsSpecified ? " is-spec" : ""
-        }`}
-        onClick={toggleColumnSelector}
-      >
-        <i className="fas fa-columns" />
-        &nbsp;Columns
-      </button>
-      <button
-        className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
-        onClick={toggleFilterEditor}
-      >
-        <i className="fas fa-filter" />
-        &nbsp;Filters
-      </button>
-      <button
-        className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
-        onClick={toggleOrderEditor}
-      >
-        <i className="fas fa-sort" />
-        &nbsp;Ordering
-      </button>
+      <ButtonGroup theme="secondary" buttons={queryButtons} />
     </Fragment>
   );
 };
