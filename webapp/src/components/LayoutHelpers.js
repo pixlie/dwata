@@ -66,11 +66,12 @@ export const Button = ({
   let classes = `inline-block text-md font-bold hover:shadow-md ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
-      classes + " bg-blue-400 text-gray-800 hover:bg-blue-800 hover:text-white";
+      classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
   } else if (theme === "secondary") {
-    classes = classes + " bg-gray-200 hover:bg-gray-700 hover:text-white";
+    classes =
+      classes + " bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
   } else if (theme === "info") {
-    classes = classes + " bg-yellow-100 hover:bg-yellow-700 hover:text-white";
+    classes = classes + " bg-yellow-200 hover:bg-yellow-700 hover:text-white";
   }
 
   return (
@@ -153,3 +154,18 @@ export const Panel = ({ title, hasSearch, hasTabs, children }) => (
     {children}
   </div>
 );
+
+export const Modal = ({ callerRef, theme = "white", children }) => {
+  let classes = "fixed z-10 shadow-lg p-4 rounded-md border";
+  if (theme === "light") {
+    classes = classes + " bg-gray-100";
+  } else if (theme === "white") {
+    classes = classes + " bg-white";
+  }
+
+  return (
+    <div className={classes} style={{ top: "70px" }}>
+      {children}
+    </div>
+  );
+};

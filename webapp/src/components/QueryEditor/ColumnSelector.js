@@ -1,19 +1,11 @@
 import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useGlobal,
-  useSchema,
-  useData,
-  useQuerySpecification,
-} from "services/store";
-import { Section, Hx } from "components/LayoutHelpers";
+import { useSchema, useQuerySpecification } from "services/store";
+import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
-  const fetchData = useData((state) => state.fetchData);
-  const isCSVisible = useGlobal((state) => state.isCSVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
@@ -21,18 +13,6 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-
-  if (
-    !(
-      data &&
-      data.isReady &&
-      isCSVisible &&
-      querySpecification &&
-      querySpecification.isReady
-    )
-  ) {
-    return null;
-  }
 
   let dataColumns = [];
   const schemaColumns = schema.rows.find(
@@ -61,22 +41,17 @@ export default () => {
   };
 
   return (
-    <div id="column-selector">
-      <Section>
-        <Hx x="4">Columns</Hx>
-        <div className="field">
-          {schemaColumns.map((head, i) => (
-            <div key={`col-get-${i}`} className="control">
-              <label className="checkbox">
-                <BoundInput head={head} />
-              </label>
-            </div>
-          ))}
-        </div>
-        <div className="help">
-          New column data, if unavailable, will be fetched automatically
-        </div>
-      </Section>
-    </div>
+    <Fragment>
+      <Hx x="5">Columns</Hx>
+      <div className="field">
+        {schemaColumns.map((head, i) => (
+          <div key={`col-get-${i}`} className="block">
+            <label className="checkbox">
+              <BoundInput head={head} />
+            </label>
+          </div>
+        ))}
+      </div>
+    </Fragment>
   );
 };

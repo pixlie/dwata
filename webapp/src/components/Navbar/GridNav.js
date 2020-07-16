@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, Fragment } from "react";
+import React, { useEffect, useContext, Fragment, useRef } from "react";
 
 import { QueryContext } from "utils";
 import { useGlobal, useApps, useData } from "services/store";
@@ -25,6 +25,11 @@ export default ({
   useEffect(() => {
     fetchApps();
   }, [fetchApps]);
+  const buttonRefs = {
+    columns: useRef(null),
+    filters: useRef(null),
+    ordering: useRef(null),
+  };
 
   if (!(data && data.isReady)) {
     return null;
@@ -32,21 +37,18 @@ export default ({
   const { selectedRowList } = data;
 
   const handleNotesClick = (event) => {
-    event.preventDefault();
     showNotes(cacheKey);
   };
   const handleActionsClick = (event) => {
-    event.preventDefault();
     toggleActions();
   };
   const handlePinClick = (event) => {
-    event.preventDefault();
     togglePinnedRecords();
   };
   const queryButtons = [
     {
       active: hasColumnsSpecified === true,
-      attributes: { onClick: toggleColumnSelector },
+      attributes: { onClick: toggleColumnSelector, ref: buttonRefs.columns },
       inner: (
         <Fragment>
           <i className="fas fa-columns" />

@@ -14374,34 +14374,6 @@ h6 {
   font-weight: 700;
 }
 
-h1.subtitle,
-h2.subtitle,
-h3.subtitle,
-h4.subtitle,
-h5.subtitle,
-h6.subtitle {
-  font-family: Quicksand, sans-serif;
-  font-weight: 400;
-}
-
-h1 {
-  margin: 1rem 0 2.125rem;
-  letter-spacing: -0.1rem;
-}
-
-h2 {
-  margin: 1.05rem 0 1.75rem;
-  letter-spacing: -0.08rem;
-}
-
-h3 {
-  margin: 0.85rem 0 1.55rem;
-}
-
-h4 {
-  margin: 0.7rem 0 1.25rem;
-}
-
 #paginator {
   z-index: 80;
   background-color: #fdf7e3;

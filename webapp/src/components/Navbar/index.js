@@ -17,16 +17,12 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
 
   return (
     <nav
-      className="fixed top-0 w-screen flex items-center bg-gray-800"
+      className="fixed top-0 w-screen flex items-center bg-gray-100"
       role="navigation"
       aria-label="main navigation"
     >
       <div className="flex items-center flex-shrink-0 mx-4 px-4">
-        <a
-          className="font-bold text-2xl text-white"
-          href="/"
-          onClick={handleHome}
-        >
+        <a className="font-bold text-2xl" href="/" onClick={handleHome}>
           Home
         </a>
       </div>
