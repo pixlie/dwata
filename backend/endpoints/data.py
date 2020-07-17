@@ -81,7 +81,6 @@ async def data_post(request):
     try:
         query_specification = await request.json()
         source_label = query_specification["source_label"]
-        table_name = query_specification["table_name"]
     except JSONDecodeError:
         return web_error(
             error_code="request.json_decode_error",
@@ -92,54 +91,61 @@ async def data_post(request):
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
-    unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
+    columns = []
 
-    if not table_name or (table_name and table_name not in meta.tables):
-        conn.close()
-        return Response("", status_code=404)
-    table_column_names = meta.tables[table_name].columns.keys()
+    for table_name, column_list in query_specification["select"].items():
+        unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
+        table_column_names = meta.tables[table_name].columns.keys()
+        current_table = meta.tables[table_name]
+        if len(column_list) > 0:
+            # If there is an "id" column then it is always included, the UI hides it as needed
+            columns = [getattr(current_table.c, "id")] if\
+                ("id" not in column_list and "id" in table_column_names) else []
+            columns = columns + [getattr(current_table.c, col) for col in table_column_names
+                                 if col in column_list and col not in unavailable_columns]
+        else:
+            # If we have not been asked to show specific columns then we do not send columns which are
+            # detected to be meta data
+            meta_data_column_names = [col["name"] for col in [
+                column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
+                if col not in unavailable_columns
+            ] if "is_meta" in col["ui_hints"]]
+            columns = [getattr(current_table.c, "id")] +\
+                      [getattr(current_table.c, col) for col in table_column_names
+                       if col not in unavailable_columns and col not in meta_data_column_names]
 
-    current_table = meta.tables[table_name]
-    if len(query_specification.get("columns", [])) > 0:
-        # If there is an "id" column then it is always included, the UI hides it as needed
-        columns = [getattr(current_table.c, "id")] if\
-            ("id" not in query_specification["columns"] and "id" in table_column_names) else []
-        columns = columns + [getattr(current_table.c, col) for col in table_column_names
-                             if col in query_specification["columns"] and col not in unavailable_columns]
-    else:
-        # If we have not been asked to show specific columns then we do not send columns which are
-        # detected to be meta data
-        meta_data_column_names = [col["name"] for col in [
-            column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
-            if col not in unavailable_columns
-        ] if "is_meta" in col["ui_hints"]]
-        columns = [getattr(current_table.c, "id")] +\
-                  [getattr(current_table.c, col) for col in table_column_names
-                   if col not in unavailable_columns and col not in meta_data_column_names]
-
-    sel_obj = select(columns)
+    sel_obj = select(columns + [meta.tables["users"].c.username])
+    sel_obj.join(
+        meta.tables["content"],
+        meta.tables["users"],
+        meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
+    )
+    """
     if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
+    """
     sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
     exc = conn.execute(sel_obj)
     rows = exc.cursor.fetchall()
 
     # We use a separate query to count the total number of rows in the given query
+    """
     count_sel_obj = select([func.count(getattr(current_table.c, "id"))])
     if query_specification.get("filter_by", None):
         count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
                                       unavailable_columns=unavailable_columns)
     count = conn.execute(count_sel_obj).scalar()
+    """
     conn.close()
 
     return RapidJSONResponse(
         dict(
             columns=exc.keys(),
             rows=rows,
-            count=count,
+            count=0,  # count,
             limit=query_specification.get("limit", default_per_page),
             offset=query_specification.get("offset", 0),
             query_sql=str(sel_obj),
