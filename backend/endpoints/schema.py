@@ -1,7 +1,7 @@
 from sqlalchemy import MetaData
 
 from utils.response import RapidJSONResponse
-from utils.database import connect_database, get_unavailable_columns, get_system_tables
+from utils.database import connect_database, get_unavailable_columns, get_system_tables, get_relations_matrix
 from utils.settings import get_all_sources, get_source_settings
 from services import all_services
 
@@ -48,17 +48,20 @@ def column_definition(col, col_def):
     }
 
 
-def get_table_properties(source_settings):
+def get_table_properties(source_settings, meta):
     system_tables = get_system_tables(source_settings=source_settings)
+    relations_matrix = get_relations_matrix(source_settings=source_settings, meta=meta)
 
     def inner(name):
-        if name in system_tables:
-            return {
-                "is_system_table": True
-            }
-        return {
-            "is_system_table": False
+        default = {
+            "is_system_table": False,
+            "related_tables": [],
         }
+        if name in system_tables:
+            default["is_system_table"] = True
+        if name in relations_matrix:
+            default["related_tables"] = relations_matrix[name]
+        return default
     return inner
 
 
@@ -67,7 +70,7 @@ async def get_source_database(source_settings, table_name):
     meta = MetaData(bind=engine)
     meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=source_settings, meta=meta)
-    table_properties = get_table_properties(source_settings=source_settings)
+    table_properties = get_table_properties(source_settings=source_settings, meta=meta)
 
     if table_name and table_name in meta.tables.keys():
         columns = [
