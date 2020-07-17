@@ -2,8 +2,7 @@ import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
-import { saveQuery } from "services/apps/actions";
-import { Hx, Button } from "components/LayoutHelpers";
+import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
@@ -14,10 +13,6 @@ export default () => {
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
   const removeFilter = useQuerySpecification((state) => state.removeFilter);
-  const [state, setState] = useState({
-    isSavingQuery: false,
-    savedQueryLabel: "",
-  });
 
   const { filterBy } = querySpecification;
   const schemaColumns = schema.rows.find(
@@ -82,32 +77,6 @@ export default () => {
     );
   }
 
-  const handleSaveQuery = async () => {
-    if (state.isSavingQuery) {
-      await saveQuery(state.savedQueryLabel, querySpecification);
-    } else {
-      setState((state) => ({
-        ...state,
-        isSavingQuery: true,
-      }));
-    }
-  };
-
-  const cancelSaveQuery = (event) => {
-    setState((state) => ({
-      ...state,
-      isSavingQuery: false,
-    }));
-  };
-
-  const handleSavedFilterLabelChange = (event) => {
-    const { value } = event.target;
-    setState((state) => ({
-      ...state,
-      savedQueryLabel: value,
-    }));
-  };
-
   return (
     <Fragment>
       <Hx x="5">Filters</Hx>
@@ -122,37 +91,6 @@ export default () => {
             </select>
           </div>
         </div>
-      </div>
-
-      {state.isSavingQuery ? (
-        <div className="field">
-          <div className="control">
-            <input
-              className="input"
-              onChange={handleSavedFilterLabelChange}
-              value={state.savedQueryLabel}
-              placeholder="Label for this Query"
-            />
-          </div>
-        </div>
-      ) : null}
-
-      <div className="buttons">
-        {state.isSavingQuery ? (
-          <Fragment>
-            <Button attributes={{ onClick: handleSaveQuery }}>
-              Save Query
-            </Button>
-            <Button attributes={{ onClick: cancelSaveQuery }}>Cancel</Button>
-          </Fragment>
-        ) : (
-          <Fragment>
-            <Button attributes={{ onClick: handleSaveQuery }}>
-              Save Query
-            </Button>
-            <Button attributes={{ onClick: () => {} }}>Start funnel</Button>
-          </Fragment>
-        )}
       </div>
     </Fragment>
   );

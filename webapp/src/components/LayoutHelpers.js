@@ -23,12 +23,12 @@ export const Section = ({ size = "", style = {}, children }) => (
 
 export const Hx = ({ x = "3", titleClass = "title", children }) => {
   const xSizeClass = {
-    1: "text-5xl md:text-6xl",
-    2: "text-4xl md:text-5xl",
-    3: "text-3xl md:text-4xl",
-    4: "text-2xl md:text-3xl",
-    5: "text-xl md:text-2xl",
-    6: "text-xl",
+    1: "text-5xl",
+    2: "text-4xl",
+    3: "text-3xl",
+    4: "text-2xl",
+    5: "text-xl",
+    6: "text-lg",
   };
   return React.createElement(
     `h${x}`,
@@ -63,7 +63,7 @@ export const Button = ({
   attributes,
   children,
 }) => {
-  let classes = `inline-block text-md font-bold hover:shadow-md ${rounded} ${padding} ${margin}`;
+  let classes = `inline-block text-md font-bold shadow hover:shadow-sm ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
       classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
