@@ -32,7 +32,7 @@ export default () => {
   }
 
   return (
-    <tr>
+    <tr className="border-b-2">
       <th>&nbsp;</th>
       {headList}
     </tr>

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { Section, Hx } from "components/BulmaHelpers";
+import { Section, Hx } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 import NoteEditor from "./NoteEditor";
 

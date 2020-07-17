@@ -8,7 +8,7 @@ import {
   useQueryContext,
 } from "services/store";
 import * as globalConstants from "services/global/constants";
-import { Panel } from "components/BulmaHelpers";
+import { Panel } from "components/LayoutHelpers";
 import QueryLoader from "components/Grid/QueryLoader";
 
 const SavedItem = ({ item }) => {

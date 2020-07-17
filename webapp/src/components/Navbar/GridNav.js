@@ -1,7 +1,8 @@
-import React, { useEffect, useContext, Fragment } from "react";
+import React, { useEffect, useContext, Fragment, useRef } from "react";
 
 import { QueryContext } from "utils";
 import { useGlobal, useApps, useData } from "services/store";
+import { Button, ButtonGroup } from "components/LayoutHelpers";
 
 export default ({
   cacheKey,
@@ -24,6 +25,11 @@ export default ({
   useEffect(() => {
     fetchApps();
   }, [fetchApps]);
+  const buttonRefs = {
+    columns: useRef(null),
+    filters: useRef(null),
+    ordering: useRef(null),
+  };
 
   if (!(data && data.isReady)) {
     return null;
@@ -31,84 +37,79 @@ export default ({
   const { selectedRowList } = data;
 
   const handleNotesClick = (event) => {
-    event.preventDefault();
     showNotes(cacheKey);
   };
   const handleActionsClick = (event) => {
-    event.preventDefault();
     toggleActions();
   };
   const handlePinClick = (event) => {
-    event.preventDefault();
     togglePinnedRecords();
   };
+  const queryButtons = [
+    {
+      active: hasColumnsSpecified === true,
+      attributes: { onClick: toggleColumnSelector, ref: buttonRefs.columns },
+      inner: (
+        <Fragment>
+          <i className="fas fa-columns" />
+          &nbsp;Columns
+        </Fragment>
+      ),
+    },
+    {
+      active: hasFiltersSpecified === true,
+      attributes: { onClick: toggleFilterEditor },
+      inner: (
+        <Fragment>
+          <i className="fas fa-filter" />
+          &nbsp;Filters
+        </Fragment>
+      ),
+    },
+    {
+      active: hasOrderingSpecified === true,
+      attributes: { onClick: toggleOrderEditor },
+      inner: (
+        <Fragment>
+          <i className="fas fa-sort" />
+          &nbsp;Ordering
+        </Fragment>
+      ),
+    },
+  ];
 
   return (
     <Fragment>
-      <div className="navbar-item">
-        <div className="field">
-          <p className="control">
-            <button
-              className={`button ${
-                selectedRowList.length > 0 ? " is-success" : ""
-              }`}
-              disabled={selectedRowList.length === 0}
-              onClick={handleActionsClick}
-            >
-              <span className="icon">
-                <i className="far fa-check-square" />
-              </span>
-              &nbsp; Actions
-            </button>
-          </p>
-        </div>
-      </div>
+      <Button
+        theme="secondary"
+        active={selectedRowList.length > 0}
+        disabled={selectedRowList.length === 0}
+        attributes={{ onClick: handleActionsClick }}
+      >
+        <span className="icon">
+          <i className="far fa-check-square" />
+        </span>
+        &nbsp; Actions
+      </Button>
 
-      <div className="navbar-item">
-        <div className="buttons has-addons">
-          {isNoteAppEnabled ? (
-            <button className="button" onClick={handleNotesClick}>
-              <i className="far fa-sticky-note" />
-              &nbsp; Notes
-            </button>
-          ) : null}
-          {isRecordPinAppEnabled ? (
-            <button
-              className={`button${showPinnedRecords ? " is-success" : ""}`}
-              onClick={handlePinClick}
-            >
-              <i className="fas fa-thumbtack" />
-              &nbsp; Pins
-            </button>
-          ) : null}
-        </div>
-      </div>
+      {isNoteAppEnabled ? (
+        <Button attributes={{ onClick: handleNotesClick }} theme="info">
+          <i className="far fa-sticky-note" />
+          &nbsp; Notes
+        </Button>
+      ) : null}
+      {isRecordPinAppEnabled ? (
+        <Button
+          attributes={{ onClick: handlePinClick }}
+          active={showPinnedRecords === true}
+          theme="secondary"
+        >
+          <i className="fas fa-thumbtack" />
+          &nbsp; Pins
+        </Button>
+      ) : null}
 
-      <div className="navbar-item">
-        <div className="buttons has-addons">
-          <button
-            className={`button${hasColumnsSpecified ? " is-spec" : ""}`}
-            onClick={toggleColumnSelector}
-          >
-            <i className="fas fa-columns" />
-            &nbsp;Columns
-          </button>
-          <button
-            className={`button${hasFiltersSpecified ? " is-spec" : ""}`}
-            onClick={toggleFilterEditor}
-          >
-            <i className="fas fa-filter" />
-            &nbsp;Filters
-          </button>
-          <button
-            className={`button${hasOrderingSpecified ? " is-spec" : ""}`}
-            onClick={toggleOrderEditor}
-          >
-            <i className="fas fa-sort" />
-            &nbsp;Ordering
-          </button>
-        </div>
-      </div>
+      <ButtonGroup theme="secondary" buttons={queryButtons} />
     </Fragment>
   );
 };

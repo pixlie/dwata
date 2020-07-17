@@ -1,11 +1,9 @@
 import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import { useQuerySpecification } from "services/store";
 // import DetailView from "components/Detail";
-import ColumnSelector from "components/QueryEditor/ColumnSelector";
-import FilterEditor from "components/QueryEditor/FilterEditor";
-import OrderEditor from "components/QueryEditor/OrderEditor";
+import QueryEditor from "components/QueryEditor";
 import Paginator from "components/QueryEditor/Paginator";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
@@ -26,7 +24,7 @@ export default () => {
   return (
     <Loader>
       <Fragment>
-        <table className="table is-narrow is-fullwidth is-hoverable is-data-table">
+        <table>
           <thead>
             <TableHead />
           </thead>
@@ -36,9 +34,7 @@ export default () => {
           </tbody>
         </table>
 
-        <ColumnSelector />
-        <FilterEditor />
-        <OrderEditor />
+        <QueryEditor />
         {/* <Actions /> */}
         <Paginator />
       </Fragment>

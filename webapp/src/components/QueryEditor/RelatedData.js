@@ -14,40 +14,34 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
-  const schemaColumns = schema.rows.find(
+  const tableProperties = schema.rows.find(
     (x) => x.table_name === querySpecification.tableName
-  ).columns;
+  ).properties;
 
-  const BoundInput = ({ head }) => {
+  const BoundInput = ({ table }) => {
     const handleClick = () => {
-      toggleColumnSelection(queryContext.key, head.name);
+      toggleColumnSelection(queryContext.key, table);
     };
-    const checked = querySpecification.columnsSelected.includes(head.name);
 
     return (
-      <label
-        className={`block font-mono font-normal ${
-          checked ? "text-gray-700" : "text-gray-500"
-        }`}
-      >
+      <label className="block font-mono font-normal text-gray-700">
         <input
           type="checkbox"
-          name={head.name}
-          checked={checked}
+          name={table}
           onChange={handleClick}
           className="mr-1"
         />
-        {head.name}
+        {table}
       </label>
     );
   };
 
   return (
     <Fragment>
-      <Hx x="5">Columns</Hx>
+      <Hx x="5">Related</Hx>
       <div className="field">
-        {schemaColumns.map((head, i) => (
-          <BoundInput key={`col-${i}`} head={head} />
+        {tableProperties.related_tables.map((table, i) => (
+          <BoundInput key={`tb-rl-${i}`} table={table} />
         ))}
       </div>
     </Fragment>

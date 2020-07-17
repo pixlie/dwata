@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
 import FilterItem from "components/QueryEditor/FilterItem";
+import { ColumnHead } from "components/LayoutHelpers";
 
 const ColumnHeadSpecification = ({ head }) => {
   const queryContext = useContext(QueryContext);
@@ -64,11 +65,11 @@ export default ({ head }) => {
     initiateFilter(queryContext.key, head, dataType);
   };
 
-  if (querySpecification.orderBy[head] === "asc") {
+  /* if (querySpecification.orderBy[head] === "asc") {
     return (
-      <th>
+      <div className="flex-auto hd-item">
         <span
-          className="hd-btn has-dropdown hdicn icn-asc"
+          className="inline-block bg-gray-400 px-2 rounded text-md font-bold hdicn icn-asc"
           onClick={handleClick}
         >
           {head}
@@ -76,13 +77,13 @@ export default ({ head }) => {
         {activeColumnHeadSpecification === head ? (
           <ColumnHeadSpecification head={head} />
         ) : null}
-      </th>
+      </div>
     );
   } else if (querySpecification.orderBy[head] === "desc") {
     return (
-      <th>
+      <div className="flex-auto hd-item">
         <span
-          className="hd-btn has-dropdown hdicn icn-desc"
+          className="inline-block bg-gray-400 px-2 rounded text-md font-bold hdicn icn-desc"
           onClick={handleClick}
         >
           {head}
@@ -90,18 +91,32 @@ export default ({ head }) => {
         {activeColumnHeadSpecification === head ? (
           <ColumnHeadSpecification head={head} />
         ) : null}
-      </th>
+      </div>
     );
   } else {
     return (
-      <th>
-        <span className="hd-btn has-dropdown" onClick={handleClick}>
+      <div className="flex-auto hd-item">
+        <span
+          className="inline-block bg-gray-400 px-2 rounded text-md font-bold"
+          onClick={handleClick}
+        >
           {head}
         </span>
         {activeColumnHeadSpecification === head ? (
           <ColumnHeadSpecification head={head} />
         ) : null}
-      </th>
+      </div>
     );
-  }
+  } */
+  return (
+    <ColumnHead
+      label={head}
+      order={querySpecification.orderBy[head]}
+      attributes={{ onClick: handleClick }}
+    >
+      {activeColumnHeadSpecification === head ? (
+        <ColumnHeadSpecification head={head} />
+      ) : null}
+    </ColumnHead>
+  );
 };

@@ -1,42 +1,18 @@
 import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useGlobal,
-  useSchema,
-  useData,
-  useQuerySpecification,
-} from "services/store";
-import { saveQuery } from "services/apps/actions";
-import { Section, Hx } from "components/BulmaHelpers";
+import { useSchema, useQuerySpecification } from "services/store";
+import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
-  const isFEVisible = useGlobal((state) => state.isFEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
   const removeFilter = useQuerySpecification((state) => state.removeFilter);
-  const [state, setState] = useState({
-    isSavingQuery: false,
-    savedQueryLabel: "",
-  });
-
-  if (
-    !(
-      data &&
-      data.isReady &&
-      isFEVisible &&
-      querySpecification &&
-      querySpecification.isReady
-    )
-  ) {
-    return null;
-  }
 
   const { filterBy } = querySpecification;
   const schemaColumns = schema.rows.find(
@@ -101,84 +77,21 @@ export default () => {
     );
   }
 
-  const handleSaveQuery = async () => {
-    if (state.isSavingQuery) {
-      await saveQuery(state.savedQueryLabel, querySpecification);
-    } else {
-      setState((state) => ({
-        ...state,
-        isSavingQuery: true,
-      }));
-    }
-  };
-
-  const cancelSaveQuery = (event) => {
-    setState((state) => ({
-      ...state,
-      isSavingQuery: false,
-    }));
-  };
-
-  const handleSavedFilterLabelChange = (event) => {
-    const { value } = event.target;
-    setState((state) => ({
-      ...state,
-      savedQueryLabel: value,
-    }));
-  };
-
   return (
-    <div id="filter-editor">
-      <Section>
-        <Hx x="4">Filters</Hx>
+    <Fragment>
+      <Hx x="5">Filters</Hx>
 
-        {filters}
+      {filters}
 
-        <div className="field">
-          <div className="control">
-            <div className="select is-fullwidth">
-              <select name="filter_column" onChange={addFilter} value="---">
-                {filterByOptions}
-              </select>
-            </div>
+      <div className="field">
+        <div className="control">
+          <div className="select is-fullwidth">
+            <select name="filter_column" onChange={addFilter} value="---">
+              {filterByOptions}
+            </select>
           </div>
         </div>
-
-        {state.isSavingQuery ? (
-          <div className="field">
-            <div className="control">
-              <input
-                className="input"
-                onChange={handleSavedFilterLabelChange}
-                value={state.savedQueryLabel}
-                placeholder="Label for this Query"
-              />
-            </div>
-          </div>
-        ) : null}
-
-        <div className="buttons">
-          {state.isSavingQuery ? (
-            <Fragment>
-              <button className="button is-success" onClick={handleSaveQuery}>
-                Save Query
-              </button>
-              <button className="button is-white" onClick={cancelSaveQuery}>
-                Cancel
-              </button>
-            </Fragment>
-          ) : (
-            <Fragment>
-              <button className="button is-success" onClick={handleSaveQuery}>
-                Save Query
-              </button>
-              <button className="button is-success" onClick={() => {}}>
-                Start funnel
-              </button>
-            </Fragment>
-          )}
-        </div>
-      </Section>
-    </div>
+      </div>
+    </Fragment>
   );
 };

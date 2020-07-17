@@ -1,37 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useGlobal,
-  useSchema,
-  useData,
-  useQuerySpecification,
-} from "services/store";
-import { Section, Hx } from "components/BulmaHelpers";
+import { useSchema, useQuerySpecification } from "services/store";
+import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
-  // const fetchData = useData((state) => state.fetchData);
-  const isOEVisible = useGlobal((state) => state.isOEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const changeOrderBy = useQuerySpecification((state) => state.changeOrderBy);
   const addOrderBy = useQuerySpecification((state) => state.addOrderBy);
-
-  if (
-    !(
-      data &&
-      data.isReady &&
-      isOEVisible &&
-      querySpecification &&
-      querySpecification.isReady
-    )
-  ) {
-    return null;
-  }
 
   const handleChangeOrderBy = (event) => {
     event.preventDefault();
@@ -66,65 +46,63 @@ export default () => {
   }
 
   return (
-    <div id="order-editor">
-      <Section>
-        <Hx x="4">Ordering</Hx>
+    <Fragment>
+      <Hx x="5">Ordering</Hx>
 
-        {Object.keys(orderBy).map((col) => (
-          <div className="field is-horizontal" key={`or-${col}`}>
-            <div className="field-label">
-              <label className="label">{col}</label>
-            </div>
+      {Object.keys(orderBy).map((col) => (
+        <div className="field is-horizontal" key={`or-${col}`}>
+          <div className="field-label">
+            <label className="label">{col}</label>
+          </div>
 
-            <div className="field-body">
-              <div className="field is-narrow">
-                <div className="control">
-                  <label className="radio">
-                    <input
-                      type="radio"
-                      name={col}
-                      value="asc"
-                      checked={orderBy[col] === "asc"}
-                      onChange={handleChangeOrderBy}
-                    />
-                    &nbsp;asc
-                  </label>
+          <div className="field-body">
+            <div className="field is-narrow">
+              <div className="control">
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name={col}
+                    value="asc"
+                    checked={orderBy[col] === "asc"}
+                    onChange={handleChangeOrderBy}
+                  />
+                  &nbsp;asc
+                </label>
 
-                  <label className="radio">
-                    <input
-                      type="radio"
-                      name={col}
-                      value="desc"
-                      checked={orderBy[col] === "desc"}
-                      onChange={handleChangeOrderBy}
-                    />
-                    &nbsp;desc
-                  </label>
-                </div>
+                <label className="radio">
+                  <input
+                    type="radio"
+                    name={col}
+                    value="desc"
+                    checked={orderBy[col] === "desc"}
+                    onChange={handleChangeOrderBy}
+                  />
+                  &nbsp;desc
+                </label>
               </div>
             </div>
           </div>
-
-          // <div className="multiple-input" key={`or-ch-${col}`}>
-          //   {col}
-          //   <div className="checkbox">
-          //     <label htmlFor="order_type_asc">asc</label>
-          //     <input type="checkbox" name={`order-${col}`} id="order_type_asc" value="asc" checked={orderBy[col] === "asc"} onChange={changeOrderBy} />
-          //   </div>
-          //   <div className="checkbox">
-          //     <label htmlFor="order_type_desc">desc</label>
-          //     <input type="checkbox" name={`order-${col}`} id="order_type_desc" value="desc" checked={orderBy[col] === "desc"} onChange={changeOrderBy} />
-          //   </div>
-          // </div>
-        ))}
-
-        <div className="control">
-          <div className="select is-fullwidth">
-            <select onChange={handleAddOrderBy}>{order_by_options}</select>
-          </div>
         </div>
-      </Section>
-    </div>
+
+        // <div className="multiple-input" key={`or-ch-${col}`}>
+        //   {col}
+        //   <div className="checkbox">
+        //     <label htmlFor="order_type_asc">asc</label>
+        //     <input type="checkbox" name={`order-${col}`} id="order_type_asc" value="asc" checked={orderBy[col] === "asc"} onChange={changeOrderBy} />
+        //   </div>
+        //   <div className="checkbox">
+        //     <label htmlFor="order_type_desc">desc</label>
+        //     <input type="checkbox" name={`order-${col}`} id="order_type_desc" value="desc" checked={orderBy[col] === "desc"} onChange={changeOrderBy} />
+        //   </div>
+        // </div>
+      ))}
+
+      <div className="control">
+        <div className="select is-fullwidth">
+          <select onChange={handleAddOrderBy}>{order_by_options}</select>
+        </div>
+      </div>
+    </Fragment>
   );
 };
 

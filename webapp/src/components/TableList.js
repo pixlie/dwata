@@ -28,11 +28,11 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
 
   return (
     <a
-      className="panel-block"
+      className="block p-1 pl-6 border-b hover:bg-gray-100"
       href={`${urlBase}/${sourceLabel}/${item.table_name}`}
       onClick={handleClick}
     >
-      &nbsp;&nbsp;&nbsp;&nbsp; {item.table_name}
+      {item.table_name}
     </a>
   );
 };
@@ -58,7 +58,7 @@ export default ({ sourceLabel, sourceType }) => {
               />
             ))
         : null}
-      <div className="panel-block">
+      <div className="block p-2 pl-3 border-b">
         <i>System tables</i>
       </div>
       {!!schema && schema.isReady

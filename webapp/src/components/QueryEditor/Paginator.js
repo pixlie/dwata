@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useQuerySpecification } from "services/store";
+import { Button } from "components/LayoutHelpers";
 
 const PageItem = ({ number }) => {
   const queryContext = useContext(QueryContext);
@@ -22,17 +23,17 @@ const PageItem = ({ number }) => {
   };
 
   return (
-    <li>
-      <span
-        className={`pagination-link${
-          number === currentPage ? " is-current" : ""
-        }`}
-        aria-label={`Goto page ${number}`}
-        onClick={handleGotoPage}
-      >
-        {number}
-      </span>
-    </li>
+    <Button
+      active={number === currentPage ? true : false}
+      margin="mr-1"
+      theme="info"
+      attributes={{
+        "aria-label": `Goto page ${number}`,
+        onClick: handleGotoPage,
+      }}
+    >
+      {number}
+    </Button>
   );
 };
 
@@ -56,21 +57,17 @@ const PageSlots = () => {
 
   if (totalPages < slots) {
     return (
-      <ul className="pagination-list">
-        <li>
-          <span className="pagination-ellipsis">{limit}/page</span>
-        </li>
+      <Fragment>
+        <span className="pagination-ellipsis">{limit}/page</span>
         {[...Array(totalPages).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
-      </ul>
+      </Fragment>
     );
   } else {
     return (
-      <ul className="pagination-list">
-        <li>
-          <span className="pagination-ellipsis">{limit}/page</span>
-        </li>
+      <Fragment>
+        <span className="pagination-ellipsis">{limit}/page</span>
         {[...Array(4).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
@@ -80,7 +77,7 @@ const PageSlots = () => {
         {[...Array(4).keys()].reverse().map((x) => (
           <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} />
         ))}
-      </ul>
+      </Fragment>
     );
   }
 };
@@ -120,22 +117,26 @@ export default () => {
     <div id="paginator">
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
-          <span className="pagination-previous" disabled>
+          <Button margin="mr-2" theme="info" disabled>
             Previous
-          </span>
+          </Button>
         ) : (
-          <span className="pagination-previous" onClick={handlePrevious}>
+          <Button
+            margin="mr-2"
+            theme="info"
+            attributes={{ onClick: handlePrevious }}
+          >
             Previous
-          </span>
+          </Button>
         )}
         {offset + limit >= count ? (
-          <span className="pagination-next" disabled>
+          <Button theme="info" disabled>
             Next page
-          </span>
+          </Button>
         ) : (
-          <span className="pagination-next" onClick={handleNext}>
+          <Button theme="info" attributes={{ onClick: handleNext }}>
             Next page
-          </span>
+          </Button>
         )}
         <PageSlots />
       </nav>
