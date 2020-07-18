@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
+import { getColumnSchema } from "services/querySpecification/getters";
 import FilterItem from "components/QueryEditor/FilterItem";
 import { ColumnHead } from "components/LayoutHelpers";
 
@@ -50,18 +51,11 @@ export default ({ head }) => {
   );
   const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
 
-  if (!(querySpecification && querySpecification.isReady)) {
-    return null;
-  }
-
   const { activeColumnHeadSpecification } = querySpecification;
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
 
   const handleClick = () => {
     toggleColumnHeadSpecification(queryContext.key, head);
-    const dataType = schemaColumns.find((x) => x.name === head);
+    const dataType = getColumnSchema(schema, head);
     initiateFilter(queryContext.key, head, dataType);
   };
 

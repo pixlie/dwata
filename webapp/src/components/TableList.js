@@ -18,7 +18,7 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
     event.preventDefault();
     initiateQuerySpecification("main", {
       sourceLabel,
-      tableName: item.table_name,
+      select: [item.table_name],
       fetchNeeded: true,
     });
     setContext("main", {

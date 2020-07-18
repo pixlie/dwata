@@ -20,8 +20,10 @@ const ReportItem = ({ item }) => {
     });
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_report",
-      pk: item ? item.id : undefined,
+      select: ["dwata_meta_report"],
+      where: {
+        "dwata_meta_report.id": item ? item.id : undefined,
+      },
       fetchNeeded: true,
     });
   };

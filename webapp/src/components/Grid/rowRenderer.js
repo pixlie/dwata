@@ -1,6 +1,8 @@
 import React, { Fragment } from "react";
 
-export default (schemaColumns, tableColumns, querySpecificationColumns) => {
+import { getColumnSchema } from "services/querySpecification/getters";
+
+export default (schema, tableColumns, selectedColumns) => {
   const rowList = [];
   const date_time_options = {
     year: "numeric",
@@ -58,11 +60,11 @@ export default (schemaColumns, tableColumns, querySpecificationColumns) => {
   };
 
   for (const col of tableColumns) {
-    if (!querySpecificationColumns.includes(col)) {
+    if (!selectedColumns.includes(col)) {
       rowList.push(null);
       continue;
     }
-    const head = schemaColumns.find((x) => x.name === col);
+    const head = getColumnSchema(schema, col);
     if (head.is_primary_key) {
       rowList.push(PrimaryKeyCell);
     } else if (head.has_foreign_keys) {

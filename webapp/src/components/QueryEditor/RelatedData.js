@@ -24,7 +24,7 @@ export default () => {
     };
 
     return (
-      <label className="block font-mono font-normal text-gray-700">
+      <label className="block font-mono font-normal text-sm text-gray-700">
         <input
           type="checkbox"
           name={table}

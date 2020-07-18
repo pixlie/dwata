@@ -2,6 +2,7 @@ import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
+import { getColumnSchema } from "services/querySpecification/getters";
 import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
@@ -15,9 +16,6 @@ export default () => {
   const removeFilter = useQuerySpecification((state) => state.removeFilter);
 
   const { filterBy } = querySpecification;
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
 
   const addFilter = (event) => {
     event.preventDefault();
@@ -25,7 +23,7 @@ export default () => {
     if (value === "") {
       return;
     }
-    const dataType = schemaColumns.find((x) => x.name === value);
+    const dataType = getColumnSchema(schema.rows, value);
     initiateFilter(queryContext.key, value, dataType);
   };
 
@@ -69,7 +67,7 @@ export default () => {
       Filter by
     </option>,
   ];
-  for (const head of schemaColumns) {
+  for (const head of querySpecification.select) {
     filterByOptions.push(
       <option value={head.name} key={`fl-${head.name}`}>
         {head.name}

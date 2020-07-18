@@ -21,28 +21,7 @@ export const slugify = (text) =>
     .replace(/^-+/, "") // Trim - from start of text
     .replace(/-+$/, ""); // Trim - from end of text
 
-export const getSourceFromPath = (pathname) => {
-  let match = matchPath(pathname, {
-    path: "/browse/:sourceId/:tableName",
-    exact: true,
-    strict: false,
-  });
-  if (match !== null && "params" in match) {
-    return match;
-  }
-
-  match = matchPath(pathname, {
-    path: "/browse/:sourceId/:tableName/:detailId",
-    exact: true,
-    strict: false,
-  });
-  if (match !== null && "params" in match) {
-    return match;
-  }
-
-  return null;
-};
-
+/*
 export const getItemPartsFromPath = (pathname) => {
   const match = matchPath(pathname, {
     path: "/browse/:sourceId/:tableName/:pk",
@@ -87,6 +66,7 @@ export const getCacheKey = (state, savedQuery) => {
 export const createCacheKeyFromParts = (sourceId, tableName) => {
   return `${sourceId}/${tableName}`;
 };
+*/
 
 export const QueryContext = React.createContext({});
 QueryContext.displayName = "QueryContext";

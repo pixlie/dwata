@@ -2,6 +2,7 @@ import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
+import { getColumnSchema } from "services/querySpecification/getters";
 import { Hx } from "components/LayoutHelpers";
 
 export default () => {
@@ -29,15 +30,12 @@ export default () => {
   };
 
   const { orderBy } = querySpecification;
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
   const order_by_options = [
     <option value="" key="ord-hd">
       Order by
     </option>,
   ];
-  for (const head of schemaColumns) {
+  for (const head of querySpecification.select) {
     order_by_options.push(
       <option value={head.name} key={`ord-${head.name}`}>
         {head.name}

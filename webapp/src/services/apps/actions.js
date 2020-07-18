@@ -1,7 +1,6 @@
 import axios from "axios";
 
 import { appURL, dataItemURL } from "services/urls";
-import { getSourceFromPath } from "utils";
 import {
   INITIATE_FETCH_ITEM,
   COMPLETE_FETCH_ITEM,
@@ -26,19 +25,8 @@ export const getApps = () => (dispatch) => {
     });
 };
 
-export const fetchNote = () => (dispatch, getState) => {
-  const state = getState();
-  let path = null;
-  try {
-    const { params } = getSourceFromPath(state.router.location.pathname);
-    path = btoa(`${params.sourceId}/${params.tableName}`);
-  } catch (error) {
-    return false;
-  }
-  const { isNoteAppEnabled, noteAppConfig } = state.apps;
-  if (!isNoteAppEnabled || !noteAppConfig) {
-    return false;
-  }
+/*
+export const fetchNote = (path, noteAppConfig) => {
   const { source_id: sourceId, table_name: tableName } = noteAppConfig;
 
   dispatch({
@@ -77,19 +65,7 @@ export const fetchNote = () => (dispatch, getState) => {
     });
 };
 
-export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
-  const state = getState();
-  let path = null;
-  try {
-    const { params } = getSourceFromPath(state.router.location.pathname);
-    path = btoa(`${params.sourceId}/${params.tableName}`);
-  } catch (error) {
-    return false;
-  }
-  const { isNoteAppEnabled, noteAppConfig } = state.apps;
-  if (!isNoteAppEnabled || !noteAppConfig) {
-    return false;
-  }
+export const saveNote = (payload, pk, callback, noteAppConfig) => {
   const { source_id: sourceId, table_name: tableName } = noteAppConfig;
   const url =
     pk !== null
@@ -115,16 +91,7 @@ export const saveNote = (payload, pk, callback) => (dispatch, getState) => {
     });
 };
 
-export const pinRecords = () => (dispatch, getState) => {
-  const state = getState();
-  let path = null;
-  try {
-    const { params } = getSourceFromPath(state.router.location.pathname);
-    path = btoa(`${params.sourceId}/${params.tableName}`);
-  } catch (error) {
-    return false;
-  }
-  const { selectedRowList } = state.browser;
+export const pinRecords = (path, selectedRowList) => {
   const { sourceId, tableName } = getRecordPinAppConfig(state);
 
   for (const rowId of selectedRowList) {
@@ -202,3 +169,4 @@ export const fetchSavedQuery = (savedQueryId) => (dispatch, getState) => {
     dispatch(fetchDataItem(`/browse/${sourceId}/${tableName}/${savedQueryId}`));
   }
 };
+*/

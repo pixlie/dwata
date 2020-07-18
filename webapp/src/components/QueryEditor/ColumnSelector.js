@@ -14,19 +14,15 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
-
   const BoundInput = ({ head }) => {
     const handleClick = () => {
       toggleColumnSelection(queryContext.key, head.name);
     };
-    const checked = querySpecification.columnsSelected.includes(head.name);
+    const checked = querySpecification.select.includes(head.name);
 
     return (
       <label
-        className={`block font-mono font-normal ${
+        className={`block font-mono font-normal text-sm ${
           checked ? "text-gray-700" : "text-gray-500"
         }`}
       >
@@ -46,7 +42,7 @@ export default () => {
     <Fragment>
       <Hx x="5">Columns</Hx>
       <div className="field">
-        {schemaColumns.map((head, i) => (
+        {querySpecification.select.map((head, i) => (
           <BoundInput key={`col-${i}`} head={head} />
         ))}
       </div>

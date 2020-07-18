@@ -2,9 +2,9 @@ import create from "zustand";
 
 const initialState = {
   sourceLabel: null,
-  tableName: null,
 
-  columnsSelected: [],
+  select: [], // What we are requesting from UI
+  columns: [], // What is coming in API response
   filterBy: {},
   orderBy: {},
 

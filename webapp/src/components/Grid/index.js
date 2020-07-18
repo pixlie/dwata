@@ -3,7 +3,7 @@ import React, { useContext, Fragment } from "react";
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
 // import DetailView from "components/Detail";
-import QueryEditor from "components/QueryEditor";
+// import QueryEditor from "components/QueryEditor";
 import Paginator from "components/QueryEditor/Paginator";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
@@ -34,7 +34,7 @@ export default () => {
           </tbody>
         </table>
 
-        <QueryEditor />
+        {/* <QueryEditor /> */}
         {/* <Actions /> */}
         <Paginator />
       </Fragment>

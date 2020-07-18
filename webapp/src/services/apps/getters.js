@@ -1,15 +1,14 @@
-import { createCacheKeyFromParts, getSourceFromPath } from "utils";
+import { createCacheKeyFromParts } from "utils";
 import { AppException, AppExceptionCodes } from "./exceptions";
 
-
 export const getRecordPinAppConfig = (state) => {
-  const {isRecordPinAppEnabled, recordPinAppConfig} = state.apps;
+  const { isRecordPinAppEnabled, recordPinAppConfig } = state.apps;
   if (!isRecordPinAppEnabled) {
     throw new AppException(AppExceptionCodes.notEnabled, "recordPin");
   } else if (!recordPinAppConfig) {
     throw new AppException(AppExceptionCodes.configNotLoaded, "recordPin");
   }
-  const {source_id: sourceId, table_name: tableName} = recordPinAppConfig;
+  const { source_id: sourceId, table_name: tableName } = recordPinAppConfig;
   const cacheKey = createCacheKeyFromParts(sourceId, tableName);
   return {
     sourceId,
@@ -18,9 +17,8 @@ export const getRecordPinAppConfig = (state) => {
   };
 };
 
-
 export const getPinsFromCache = (state, path = undefined, allPins = false) => {
-  const {cacheKey} = getRecordPinAppConfig(state);
+  const { cacheKey } = getRecordPinAppConfig(state);
 
   if (Object.keys(state.listCache).includes(cacheKey)) {
     if (allPins) {
@@ -30,17 +28,25 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
     }
     if (path !== undefined) {
       // We have a path request, let's return pins for that
-      return state.listCache[cacheKey].filter(x => x[1] === path);
+      return state.listCache[cacheKey].filter((x) => x[1] === path);
     }
     // Check if we get a path from current URL
-    if (state.router && state.router.location && state.router.location.pathname) {
-      const fromPath = getSourceFromPath(state.router.location.pathname);
+    if (
+      state.router &&
+      state.router.location &&
+      state.router.location.pathname
+    ) {
+      const fromPath = null; // getSourceFromPath(state.router.location.pathname);
       if (fromPath) {
-        const {params: {sourceId, tableName}} = fromPath;
+        const {
+          params: { sourceId, tableName },
+        } = fromPath;
         const temp = btoa(`${sourceId}/${tableName}`);
         // Return pins for current URL
         // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
-        return state.listCache[cacheKey].rows.filter(x => x[1] === temp).map(x => [x[0], x[1], parseInt(x[2])]);
+        return state.listCache[cacheKey].rows
+          .filter((x) => x[1] === temp)
+          .map((x) => [x[0], x[1], parseInt(x[2])]);
       }
     }
     // Return all pins
@@ -50,15 +56,14 @@ export const getPinsFromCache = (state, path = undefined, allPins = false) => {
   }
 };
 
-
 export const getSavedQueryAppConfig = (state) => {
-  const {isSavedQueryAppEnabled, savedQueryAppConfig} = state.apps;
+  const { isSavedQueryAppEnabled, savedQueryAppConfig } = state.apps;
   if (!isSavedQueryAppEnabled) {
     throw new AppException(AppExceptionCodes.notEnabled, "savedQuery");
   } else if (!savedQueryAppConfig) {
     throw new AppException(AppExceptionCodes.configNotLoaded, "savedQuery");
   }
-  const {source_id: sourceId, table_name: tableName} = savedQueryAppConfig;
+  const { source_id: sourceId, table_name: tableName } = savedQueryAppConfig;
   const cacheKey = createCacheKeyFromParts(sourceId, tableName);
   return {
     sourceId,
@@ -67,9 +72,8 @@ export const getSavedQueryAppConfig = (state) => {
   };
 };
 
-
 export const getSavedQuery = (state, savedQueryId, sourceId, tableName) => {
-  const {cacheKey} = getSavedQueryAppConfig(state);
+  const { cacheKey } = getSavedQueryAppConfig(state);
 
   if (!!savedQueryId) {
     // We are being asked for a single Saved Query Specification
@@ -84,12 +88,14 @@ export const getSavedQuery = (state, savedQueryId, sourceId, tableName) => {
     if (!!sourceId && !!tableName) {
       // We have a sourceId and tableName, let's return Saved Query Specifications for that
       // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
-      return state.listCache[cacheKey].rows.filter(x => x[2] === sourceId && x[3] === tableName);
+      return state.listCache[cacheKey].rows.filter(
+        (x) => x[2] === sourceId && x[3] === tableName
+      );
     }
     if (!!sourceId) {
       // We have a sourceId, let's return Saved Query Specifications for that
       // Todo: The filters work with fixed index for attributes, this will break soon, need better way to manage
-      return state.listCache[cacheKey].rows.filter(x => x[2] === sourceId);
+      return state.listCache[cacheKey].rows.filter((x) => x[2] === sourceId);
     }
     // Return all Saved Query Specifications
     return state.listCache[cacheKey];

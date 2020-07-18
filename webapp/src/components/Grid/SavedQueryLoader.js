@@ -10,7 +10,7 @@ const extractQuerySpecification = (item) => {
   return {
     sourceLabel: innerQS.source_label,
     tableName: innerQS.table_name,
-    columnsSelected: innerQS.columns,
+    columns: innerQS.columns,
     orderBy: innerQS.order_by,
     filterBy: innerQS.filter_by,
     offset: innerQS.offset,

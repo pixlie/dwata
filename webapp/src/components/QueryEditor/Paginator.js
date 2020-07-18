@@ -114,7 +114,7 @@ export default () => {
   };
 
   return (
-    <div id="paginator">
+    <div className="fixed bottom-0 right-0 mr-16 z-10 bg-gray-300">
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
           <Button margin="mr-2" theme="info" disabled>

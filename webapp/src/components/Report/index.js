@@ -16,8 +16,8 @@ const SavedQueryContainer = ({ pk }) => {
   };
   initiateQuerySpecification(context.key, {
     sourceLabel: "dwata_meta",
-    tableName: "dwata_meta_saved_query",
-    pk,
+    select: ["dwata_meta_saved_query"],
+    where: { "dwata_meta_saved_query.id": pk },
     isSavedQuery: true,
     fetchNeeded: true,
   });

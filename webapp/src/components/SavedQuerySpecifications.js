@@ -24,8 +24,8 @@ const SavedItem = ({ item }) => {
     });
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_saved_query",
-      pk: item.id,
+      select: ["dwata_meta_saved_query"],
+      where: { "dwata_meta_saved_query.id": item.id },
       isSavedQuery: true,
       fetchNeeded: true,
     });
@@ -47,7 +47,7 @@ export default ({ context }) => {
   useEffect(() => {
     initiateQuerySpecification(context.key, {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_saved_query",
+      select: ["dwata_meta_saved_query"],
       fetchNeeded: true,
     });
   }, []);

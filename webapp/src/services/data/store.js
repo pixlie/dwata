@@ -38,20 +38,15 @@ const completeFetchItem = (payload) => ({
 const querySpecificationObject = (state, payload) => ({
   ...state,
   ...payload,
-  columnsSelected: payload.columns,
+  select: payload.columns,
   isReady: true,
   isFetching: false,
   fetchNeeded: false,
 });
 
 const getQuerySpecificationPayload = (querySpecification) => ({
-  columns:
-    !!querySpecification.columnsSelected &&
-    querySpecification.columnsSelected.length > 0
-      ? querySpecification.columnsSelected
-      : undefined,
+  select: querySpecification.select,
   source_label: querySpecification.sourceLabel,
-  table_name: querySpecification.tableName,
   order_by: querySpecification.orderBy,
   filter_by: querySpecification.filterBy,
   offset: querySpecification.offset,

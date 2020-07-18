@@ -7,6 +7,7 @@ import {
   useData,
   useQuerySpecification,
 } from "services/store";
+import { getColumnSchema } from "services/querySpecification/getters";
 
 /**
  * This method renders on the filter controls for a single column.
@@ -35,10 +36,7 @@ export default ({ columnName }) => {
   }
 
   const { filterBy } = querySpecification;
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
-  const dataType = schemaColumns.find((x) => x.name === columnName);
+  const dataType = getColumnSchema(schema.rows, columnName);
 
   const handleChange = (event) => {
     const { name, value, dataset } = event.target;

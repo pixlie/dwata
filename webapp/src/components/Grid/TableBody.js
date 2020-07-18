@@ -27,10 +27,9 @@ export default () => {
   }
 
   const rowRendererList = rowRenderer(
-    schema.rows.find((x) => x.table_name === querySpecification.tableName)
-      .columns,
+    schema.rows,
     columns,
-    querySpecification.columnsSelected
+    querySpecification.select
   );
   const RowSelectorCell = ({ row }) => {
     const handleRowSelect = (event) => {

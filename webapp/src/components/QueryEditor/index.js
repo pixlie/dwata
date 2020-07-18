@@ -2,12 +2,12 @@ import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { saveQuery } from "services/apps/actions";
+// import { saveQuery } from "services/apps/actions";
 import { Modal, Button } from "components/LayoutHelpers";
 import ColumnSelectorInner from "./ColumnSelector";
 import FilterEditorInner from "./FilterEditor";
 import OrderEditorInner from "./OrderEditor";
-import RelatedData from "./RelatedData";
+// import RelatedData from "./RelatedData";
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -22,7 +22,7 @@ export default () => {
 
   const handleSaveQuery = async () => {
     if (state.isSavingQuery) {
-      await saveQuery(state.savedQueryLabel, querySpecification);
+      // await saveQuery(state.savedQueryLabel, querySpecification);
     } else {
       setState((state) => ({
         ...state,
@@ -61,9 +61,7 @@ export default () => {
           <OrderEditorInner />
         </div>
 
-        <div className="flex-1 px-2">
-          <RelatedData />
-        </div>
+        <div className="flex-1 px-2">{/* <RelatedData /> */}</div>
       </div>
 
       {state.isSavingQuery ? (
