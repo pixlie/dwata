@@ -91,13 +91,39 @@ async def data_post(request):
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
+    tables_and_columns = {}
     columns = []
 
-    for table_name, column_list in query_specification["select"].items():
+    for table_column in query_specification["select"]:
+        # We use a list for select so that we can retain the order in which `table.columns` were requested
+        if "." in table_column:
+            (table_name, column_name) = table_column.split(".")
+        else:
+            table_name = table_column
+            column_name = "__auto__"
+        if table_name not in tables_and_columns.keys():
+            # We are encountering this table for the first time in this request, let's add it
+            tables_and_columns[table_name] = [column_name]
+        else:
+            # We have encountered this table in this request already, let's just handle the column
+            # Check if there is a an existing request for `table.*`.
+            # If that was requested then we add no more columns for this table
+            if "*" not in tables_and_columns[table_name]:
+                # `table.*` was not requested earlier, so we add this current column
+                tables_and_columns[table_name].append(column_name)
+
+    for table_name, column_list in tables_and_columns.items():
+        # Unavailable columns are configured due to security or similar reasons
         unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
         table_column_names = meta.tables[table_name].columns.keys()
         current_table = meta.tables[table_name]
-        if len(column_list) > 0:
+
+        if column_list == ["*"]:
+            # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
+            columns = [getattr(current_table.c, "id")] + \
+                      [getattr(current_table.c, col) for col in table_column_names
+                       if col not in unavailable_columns]
+        elif len(column_list) > 0 and column_list != ["__auto__"]:
             # If there is an "id" column then it is always included, the UI hides it as needed
             columns = [getattr(current_table.c, "id")] if\
                 ("id" not in column_list and "id" in table_column_names) else []
@@ -143,7 +169,7 @@ async def data_post(request):
 
     return RapidJSONResponse(
         dict(
-            columns=exc.keys(),
+            columns=["{}.{}".format(x[2][0].name, x[2][0].table.name) for x in exc.context.result_column_struct[0]],
             rows=rows,
             count=0,  # count,
             limit=query_specification.get("limit", default_per_page),
