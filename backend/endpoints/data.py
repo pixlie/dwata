@@ -140,12 +140,15 @@ async def data_post(request):
                       [getattr(current_table.c, col) for col in table_column_names
                        if col not in unavailable_columns and col not in meta_data_column_names]
 
-    sel_obj = select(columns + [meta.tables["users"].c.username])
+    sel_obj = select(columns)
+    # sel_obj = select(columns + [meta.tables["users"].c.username])
+    """
     sel_obj.join(
         meta.tables["content"],
         meta.tables["users"],
         meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
     )
+    """
     """
     if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
@@ -169,7 +172,7 @@ async def data_post(request):
 
     return RapidJSONResponse(
         dict(
-            columns=["{}.{}".format(x[2][0].name, x[2][0].table.name) for x in exc.context.result_column_struct[0]],
+            columns=["{}.{}".format(x[2][0].table.name, x[2][0].name) for x in exc.context.result_column_struct[0]],
             rows=rows,
             count=0,  # count,
             limit=query_specification.get("limit", default_per_page),
