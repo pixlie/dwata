@@ -193,14 +193,9 @@ async def data_post(request):
     # sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     # sel_obj = sel_obj.offset(query_specification.get("offset", 0))
 
-    if len(table_query_order) > 0:
+    if len(table_query_order) > 1:
         # We have more than 1 table in the requested select, we need to apply JOINS
         sel_obj = find_best_join(sel_obj, meta, table_query_order)
-
-        # sel_obj = sel_obj.select_from(meta.tables["content"].join(
-        #     meta.tables["users"],
-        #     meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
-        # ))
 
     exc = conn.execute(sel_obj)
     rows = exc.cursor.fetchall()
