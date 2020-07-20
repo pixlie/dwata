@@ -10,10 +10,45 @@ from utils.settings import get_source_settings
 
 # Example query specification:
 example_spec = {
-    "source_id": 3,  # This is the data source, like a PostgreSQL database
-    "columns": ["client.id", "client.joined_at"],
-    "limit": 300
+    "source_id": "monster_market",  # This is the data source, like a PostgreSQL database
+    "select": ["monster.id", "monster.joined_at"],
+    "limit": 100,
+    "offset": 0
 }
+
+
+def find_best_join(sel_obj, meta, table_query_order):
+    """
+    This is an example Query request where we want to list all content first and also the author information.
+    So `content` table is the first (index 0) table in the `table_query_order`.
+    `user` table is the second table in the request. We try to see if `content` table has a direct FK to `user` table.
+    This would mean `content` <> `user` relation is Many to One.
+
+    sel_obj.join(
+        meta.tables["content"],
+        meta.tables["users"],
+        meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
+    )
+    """
+    for index, table_name in enumerate(table_query_order):
+        if index == 0:
+            continue
+
+        # We start with the second table (index 1)
+        prev_table_name = table_query_order[index - 1]
+        for col, col_def in meta.tables[prev_table_name].columns.items():
+            # Check if the previous table has FK
+            if len(col_def.foreign_keys) > 0:
+                # For each FK, is there a direct FK from the previous table to current table?
+                for x in col_def.foreign_keys:
+                    if x.column.table.name == table_name:
+                        # So previous table has FK to current table, let's use this to JOIN
+                        sel_obj = sel_obj.select_from(meta.tables[prev_table_name].join(
+                            meta.tables[table_name],
+                            getattr(meta.tables[prev_table_name].c, x.parent.name) ==
+                            getattr(meta.tables[table_name].c, x.column.name)
+                        ))
+        return sel_obj
 
 
 def apply_ordering(query_specification, sel_obj, current_table, unavailable_columns):
@@ -92,6 +127,7 @@ async def data_post(request):
     meta = MetaData(bind=engine)
     meta.reflect()
     tables_and_columns = {}
+    table_query_order = []
     columns = []
 
     for table_column in query_specification["select"]:
@@ -104,6 +140,7 @@ async def data_post(request):
         if table_name not in tables_and_columns.keys():
             # We are encountering this table for the first time in this request, let's add it
             tables_and_columns[table_name] = [column_name]
+            table_query_order.append(table_name)
         else:
             # We have encountered this table in this request already, let's just handle the column
             # Check if there is a an existing request for `table.*`.
@@ -112,7 +149,8 @@ async def data_post(request):
                 # `table.*` was not requested earlier, so we add this current column
                 tables_and_columns[table_name].append(column_name)
 
-    for table_name, column_list in tables_and_columns.items():
+    for table_name in table_query_order:
+        column_list = tables_and_columns[table_name]
         # Unavailable columns are configured due to security or similar reasons
         unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
         table_column_names = meta.tables[table_name].columns.keys()
@@ -120,15 +158,18 @@ async def data_post(request):
 
         if column_list == ["*"]:
             # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
-            columns = [getattr(current_table.c, "id")] + \
-                      [getattr(current_table.c, col) for col in table_column_names
-                       if col not in unavailable_columns]
+            columns = columns +\
+                [getattr(current_table.c, "id")] + \
+                [getattr(current_table.c, col) for col in table_column_names
+                 if col not in unavailable_columns]
         elif len(column_list) > 0 and column_list != ["__auto__"]:
             # If there is an "id" column then it is always included, the UI hides it as needed
-            columns = [getattr(current_table.c, "id")] if\
+            columns = columns +\
+                [getattr(current_table.c, "id")] if\
                 ("id" not in column_list and "id" in table_column_names) else []
-            columns = columns + [getattr(current_table.c, col) for col in table_column_names
-                                 if col in column_list and col not in unavailable_columns]
+            columns = columns +\
+                [getattr(current_table.c, col) for col in table_column_names
+                 if col in column_list and col not in unavailable_columns]
         else:
             # If we have not been asked to show specific columns then we do not send columns which are
             # detected to be meta data
@@ -136,27 +177,31 @@ async def data_post(request):
                 column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
                 if col not in unavailable_columns
             ] if "is_meta" in col["ui_hints"]]
-            columns = [getattr(current_table.c, "id")] +\
-                      [getattr(current_table.c, col) for col in table_column_names
-                       if col not in unavailable_columns and col not in meta_data_column_names]
+            columns = columns +\
+                [getattr(current_table.c, "id")] +\
+                [getattr(current_table.c, col) for col in table_column_names
+                    if col not in unavailable_columns and col not in meta_data_column_names]
 
     sel_obj = select(columns)
-    # sel_obj = select(columns + [meta.tables["users"].c.username])
-    """
-    sel_obj.join(
-        meta.tables["content"],
-        meta.tables["users"],
-        meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
-    )
-    """
+
     """
     if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     """
-    sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
-    sel_obj = sel_obj.offset(query_specification.get("offset", 0))
+    # sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
+    # sel_obj = sel_obj.offset(query_specification.get("offset", 0))
+
+    if len(table_query_order) > 0:
+        # We have more than 1 table in the requested select, we need to apply JOINS
+        sel_obj = find_best_join(sel_obj, meta, table_query_order)
+
+        # sel_obj = sel_obj.select_from(meta.tables["content"].join(
+        #     meta.tables["users"],
+        #     meta.tables["content"].c.created_by_id == meta.tables["users"].c.id
+        # ))
+
     exc = conn.execute(sel_obj)
     rows = exc.cursor.fetchall()
 
