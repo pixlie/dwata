@@ -8,20 +8,19 @@ const [useQueryContext] = create((set) => ({
   },
 
   setContext: (appName, context) =>
-    set((state) => ({
-      ...state,
+    set(() => ({
       [appName]: {
         ...context,
         key: appName,
+        toggleQueryUI: false,
       },
     })),
 
-  mergeContext: (appName, context) =>
+  toggleQueryUI: (appName) =>
     set((state) => ({
-      ...state,
       [appName]: {
         ...state[appName],
-        ...context,
+        isQueryUIOpen: !state[appName].isQueryUIOpen,
       },
     })),
 }));

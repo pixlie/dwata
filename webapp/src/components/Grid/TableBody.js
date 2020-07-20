@@ -25,11 +25,12 @@ export default () => {
   if (data) {
     ({ columns, rows, selectedRowList } = data);
   }
+  const selectedColumLabels = querySpecification.select.map((x) => x.label);
 
   const rowRendererList = rowRenderer(
     schema.rows,
     columns,
-    querySpecification.select
+    selectedColumLabels
   );
   const RowSelectorCell = ({ row }) => {
     const handleRowSelect = (event) => {

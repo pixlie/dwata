@@ -1,23 +1,18 @@
 import React, { useEffect, useContext, Fragment, useRef } from "react";
 
 import { QueryContext } from "utils";
-import { useGlobal, useApps, useData } from "services/store";
+import { useGlobal, useApps, useData, useQueryContext } from "services/store";
 import { Button, ButtonGroup } from "components/LayoutHelpers";
 
 export default ({
   cacheKey,
-  hasColumnsSpecified,
-  hasFiltersSpecified,
-  hasOrderingSpecified,
   showNotes,
   toggleActions,
   togglePinnedRecords,
 }) => {
   const queryContext = useContext(QueryContext);
   const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
-  const toggleFilterEditor = useGlobal((state) => state.toggleFilterEditor);
-  const toggleColumnSelector = useGlobal((state) => state.toggleColumnSelector);
-  const toggleOrderEditor = useGlobal((state) => state.toggleOrderEditor);
+  const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
   const isNoteAppEnabled = useApps((state) => state.isNoteAppEnabled);
@@ -36,47 +31,18 @@ export default ({
   }
   const { selectedRowList } = data;
 
-  const handleNotesClick = (event) => {
+  const handleNotesClick = () => {
     showNotes(cacheKey);
   };
-  const handleActionsClick = (event) => {
+  const handleActionsClick = () => {
     toggleActions();
   };
-  const handlePinClick = (event) => {
+  const handlePinClick = () => {
     togglePinnedRecords();
   };
-  const queryButtons = [
-    {
-      active: hasColumnsSpecified === true,
-      attributes: { onClick: toggleColumnSelector, ref: buttonRefs.columns },
-      inner: (
-        <Fragment>
-          <i className="fas fa-columns" />
-          &nbsp;Columns
-        </Fragment>
-      ),
-    },
-    {
-      active: hasFiltersSpecified === true,
-      attributes: { onClick: toggleFilterEditor },
-      inner: (
-        <Fragment>
-          <i className="fas fa-filter" />
-          &nbsp;Filters
-        </Fragment>
-      ),
-    },
-    {
-      active: hasOrderingSpecified === true,
-      attributes: { onClick: toggleOrderEditor },
-      inner: (
-        <Fragment>
-          <i className="fas fa-sort" />
-          &nbsp;Ordering
-        </Fragment>
-      ),
-    },
-  ];
+  const handleQueryClick = () => {
+    toggleQueryUI(queryContext.key);
+  };
 
   return (
     <Fragment>
@@ -109,7 +75,9 @@ export default ({
         </Button>
       ) : null}
 
-      <ButtonGroup theme="secondary" buttons={queryButtons} />
+      <Button theme="primary" attributes={{ onClick: handleQueryClick }}>
+        Query
+      </Button>
     </Fragment>
   );
 };

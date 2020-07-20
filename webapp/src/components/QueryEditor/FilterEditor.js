@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
@@ -69,8 +69,8 @@ export default () => {
   ];
   for (const head of querySpecification.select) {
     filterByOptions.push(
-      <option value={head.name} key={`fl-${head.name}`}>
-        {head.name}
+      <option value={head.label} key={`fl-${head.label}`}>
+        {head.label}
       </option>
     );
   }

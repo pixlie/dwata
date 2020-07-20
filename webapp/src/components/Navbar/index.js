@@ -5,7 +5,7 @@ import * as globalConstants from "services/global/constants";
 import { Button } from "components/LayoutHelpers";
 import GridNav from "./GridNav";
 
-export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
+export default ({ isSourceFetching, toggleSidebar }) => {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
   const handleHome = (event) => {
@@ -32,6 +32,11 @@ export default ({ isSourceFetching, toggleSidebar, isInTable }) => {
       <div className="block flex-grow items-center w-auto">
         <div className="inline-block">
           <Button
+            theme={
+              mainApp && mainApp.appType === globalConstants.APP_NAME_HOME
+                ? "primary"
+                : "secondary"
+            }
             attributes={{ onClick: toggleSidebar, disabled: isSourceFetching }}
           >
             <i className="fas fa-database" />

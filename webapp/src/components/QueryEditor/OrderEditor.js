@@ -37,8 +37,8 @@ export default () => {
   ];
   for (const head of querySpecification.select) {
     order_by_options.push(
-      <option value={head.name} key={`ord-${head.name}`}>
-        {head.name}
+      <option value={head.label} key={`ord-${head.label}`}>
+        {head.label}
       </option>
     );
   }

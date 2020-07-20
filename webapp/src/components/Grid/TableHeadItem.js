@@ -1,24 +1,17 @@
 import React, { useContext } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import FilterItem from "components/QueryEditor/FilterItem";
 import { ColumnHead } from "components/LayoutHelpers";
 
-const ColumnHeadSpecification = ({ head }) => {
+const ColumnHeadSpecification = ({ tableColumnName }) => {
   const queryContext = useContext(QueryContext);
-  const fetchData = useData((state) => state.fetchData);
   const toggleOrderBy = useQuerySpecification((state) => state.toggleOrderBy);
 
-  const handleClick = (event) => {
-    event.preventDefault();
-    toggleOrderBy(queryContext.key, head);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    fetchData(queryContext.key);
+  const handleClick = () => {
+    toggleOrderBy(queryContext.key, tableColumnName);
   };
 
   return (
@@ -29,18 +22,14 @@ const ColumnHeadSpecification = ({ head }) => {
             <i className="fas fa-sort" />
           </button>
         </div>
-        <FilterItem columnName={head} />
-        <div className="control">
-          <button className="button is-success" onClick={handleSubmit}>
-            Apply
-          </button>
-        </div>
+
+        <FilterItem columnName={tableColumnName} singleFilter />
       </div>
     </div>
   );
 };
 
-export default ({ head }) => {
+export default ({ tableColumnName }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -54,62 +43,19 @@ export default ({ head }) => {
   const { activeColumnHeadSpecification } = querySpecification;
 
   const handleClick = () => {
-    toggleColumnHeadSpecification(queryContext.key, head);
-    const dataType = getColumnSchema(schema, head);
-    initiateFilter(queryContext.key, head, dataType);
+    toggleColumnHeadSpecification(queryContext.key, tableColumnName);
+    const dataType = getColumnSchema(schema.rows, tableColumnName);
+    initiateFilter(queryContext.key, tableColumnName, dataType);
   };
 
-  /* if (querySpecification.orderBy[head] === "asc") {
-    return (
-      <div className="flex-auto hd-item">
-        <span
-          className="inline-block bg-gray-400 px-2 rounded text-md font-bold hdicn icn-asc"
-          onClick={handleClick}
-        >
-          {head}
-        </span>
-        {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification head={head} />
-        ) : null}
-      </div>
-    );
-  } else if (querySpecification.orderBy[head] === "desc") {
-    return (
-      <div className="flex-auto hd-item">
-        <span
-          className="inline-block bg-gray-400 px-2 rounded text-md font-bold hdicn icn-desc"
-          onClick={handleClick}
-        >
-          {head}
-        </span>
-        {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification head={head} />
-        ) : null}
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex-auto hd-item">
-        <span
-          className="inline-block bg-gray-400 px-2 rounded text-md font-bold"
-          onClick={handleClick}
-        >
-          {head}
-        </span>
-        {activeColumnHeadSpecification === head ? (
-          <ColumnHeadSpecification head={head} />
-        ) : null}
-      </div>
-    );
-  } */
   return (
     <ColumnHead
-      label={head}
-      order={querySpecification.orderBy[head]}
+      label={tableColumnName}
+      order={querySpecification.orderBy[tableColumnName]}
       attributes={{ onClick: handleClick }}
     >
-      {activeColumnHeadSpecification === head ? (
-        <ColumnHeadSpecification head={head} />
+      {activeColumnHeadSpecification === tableColumnName ? (
+        <ColumnHeadSpecification tableColumnName={tableColumnName} />
       ) : null}
     </ColumnHead>
   );

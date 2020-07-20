@@ -5,7 +5,7 @@ import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
 import SavedQuerySpecifications from "components/SavedQuerySpecifications";
 import * as globalConstants from "services/global/constants";
-import { Hero, Hx, Section, Button } from "components/LayoutHelpers";
+import { Hx, Button } from "components/LayoutHelpers";
 
 const ReportItem = ({ item }) => {
   const initiateQuerySpecification = useQuerySpecification(
@@ -20,7 +20,12 @@ const ReportItem = ({ item }) => {
     });
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
-      select: ["dwata_meta_report"],
+      select: [
+        {
+          label: "dwata_meta_report",
+          tableName: "dwata_meta_report",
+        },
+      ],
       where: {
         "dwata_meta_report.id": item ? item.id : undefined,
       },

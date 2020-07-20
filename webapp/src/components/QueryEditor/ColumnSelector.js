@@ -13,12 +13,18 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedTableNames = querySpecification.select.map((x) => x.tableName);
+  const selectedTables = schema.rows.filter((x) =>
+    selectedTableNames.includes(x.table_name)
+  );
 
-  const BoundInput = ({ head }) => {
+  const BoundInput = ({ tableName, column }) => {
+    const columnLabel = `${tableName}.${column.name}`;
     const handleClick = () => {
-      toggleColumnSelection(queryContext.key, head.name);
+      toggleColumnSelection(queryContext.key, columnLabel);
     };
-    const checked = querySpecification.select.includes(head.name);
+    const checked = selectedColumLabels.includes(columnLabel);
 
     return (
       <label
@@ -28,22 +34,31 @@ export default () => {
       >
         <input
           type="checkbox"
-          name={head.name}
+          name={columnLabel}
           checked={checked}
           onChange={handleClick}
           className="mr-1"
         />
-        {head.name}
+        {column.name}
       </label>
     );
   };
 
   return (
     <Fragment>
-      <Hx x="5">Columns</Hx>
+      <Hx x="4">Columns</Hx>
       <div className="field">
-        {querySpecification.select.map((head, i) => (
-          <BoundInput key={`col-${i}`} head={head} />
+        {selectedTables.map((x) => (
+          <Fragment key={`sel-${x.table_name}`}>
+            <Hx x="5">{x.table_name}</Hx>
+            {x.columns.map((col) => (
+              <BoundInput
+                key={`sel-${x.table_name}-${col.name}`}
+                tableName={x.table_name}
+                column={col}
+              />
+            ))}
+          </Fragment>
         ))}
       </div>
     </Fragment>

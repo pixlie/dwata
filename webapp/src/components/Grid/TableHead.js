@@ -13,16 +13,27 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const headList = [];
+  const selectedTableColumNames = querySpecification.select.map((x) => x.label);
 
-  for (const col of data.columns) {
-    if (!querySpecification.select.includes(col)) {
+  for (const tableColumnName of data.columns) {
+    if (!selectedTableColumNames.includes(tableColumnName)) {
       continue;
     }
-    const head = getColumnSchema(schema.rows, col);
+    const head = getColumnSchema(schema.rows, tableColumnName);
     if (head.is_primary_key) {
-      headList.push(<TableHeadItem head={col} key={`th-${col}`} />);
+      headList.push(
+        <TableHeadItem
+          tableColumnName={tableColumnName}
+          key={`th-${tableColumnName}`}
+        />
+      );
     } else {
-      headList.push(<TableHeadItem head={col} key={`th-${col}`} />);
+      headList.push(
+        <TableHeadItem
+          tableColumnName={tableColumnName}
+          key={`th-${tableColumnName}`}
+        />
+      );
     }
   }
 

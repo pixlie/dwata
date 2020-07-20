@@ -13,10 +13,20 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  let relatedTables = [];
 
-  const tableProperties = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).properties;
+  for (const tableColumn of querySpecification.select) {
+    // tableColumn is an object that has label, tableName, columnName...
+    const tableProperties = schema.rows.find(
+      (x) => x.table_name === tableColumn.tableName
+    ).properties;
+    if (tableProperties.related_tables) {
+      for (const relatedTable of tableProperties.related_tables) {
+        relatedTables.push(relatedTable);
+      }
+    }
+  }
+  relatedTables = [...new Set(relatedTables)];
 
   const BoundInput = ({ table }) => {
     const handleClick = () => {
@@ -40,7 +50,7 @@ export default () => {
     <Fragment>
       <Hx x="5">Related</Hx>
       <div className="field">
-        {tableProperties.related_tables.map((table, i) => (
+        {relatedTables.map((table, i) => (
           <BoundInput key={`tb-rl-${i}`} table={table} />
         ))}
       </div>

@@ -38,14 +38,18 @@ const completeFetchItem = (payload) => ({
 const querySpecificationObject = (state, payload) => ({
   ...state,
   ...payload,
-  select: payload.columns,
+  select: payload.columns.map((tc) => ({
+    label: tc,
+    tableName: tc.split(".")[0],
+    columnName: tc.split(".")[1],
+  })),
   isReady: true,
   isFetching: false,
   fetchNeeded: false,
 });
 
 const getQuerySpecificationPayload = (querySpecification) => ({
-  select: querySpecification.select,
+  select: querySpecification.select.map((x) => x.label),
   source_label: querySpecification.sourceLabel,
   order_by: querySpecification.orderBy,
   filter_by: querySpecification.filterBy,

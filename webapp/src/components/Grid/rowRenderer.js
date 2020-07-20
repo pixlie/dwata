@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 
 import { getColumnSchema } from "services/querySpecification/getters";
 
-export default (schema, tableColumns, selectedColumns) => {
+export default (schema, tableColumns, selectedColumLabels) => {
   const rowList = [];
   const date_time_options = {
     year: "numeric",
@@ -60,7 +60,7 @@ export default (schema, tableColumns, selectedColumns) => {
   };
 
   for (const col of tableColumns) {
-    if (!selectedColumns.includes(col)) {
+    if (!selectedColumLabels.includes(col)) {
       rowList.push(null);
       continue;
     }
