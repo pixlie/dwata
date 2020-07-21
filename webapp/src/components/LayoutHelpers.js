@@ -71,7 +71,9 @@ export const Button = ({
     classes =
       classes + " bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
   } else if (theme === "info") {
-    classes = classes + " bg-yellow-200 hover:bg-yellow-700 hover:text-white";
+    classes =
+      classes +
+      " bg-yellow-200 text-gray-700 hover:bg-yellow-700 hover:text-white";
   }
 
   return (

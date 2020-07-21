@@ -51,13 +51,17 @@ def find_best_join(sel_obj, meta, table_query_order):
         return sel_obj
 
 
-def apply_ordering(query_specification, sel_obj, current_table, unavailable_columns):
-    order_by = query_specification["order_by"]
-    valid_order_by = [
-        (col, ord_type if ord_type in ("asc", "desc") else "asc")
-        for col, ord_type in order_by.items() if col in current_table.columns.keys() and col not in unavailable_columns
-    ]
-    return sel_obj.order_by(*[getattr(sqlalchemy, x[1])(getattr(current_table.c, x[0])) for x in valid_order_by])
+def apply_ordering(sel_obj, query_specification, meta, unavailable_columns):
+    for table_column, order_type in query_specification["order_by"].items():
+        if order_type not in ("asc", "desc"):
+            order_type = "asc"
+        table_name, column_name = table_column.split(".")
+        if column_name not in meta.tables[table_name].columns.keys():
+            continue
+        if column_name in unavailable_columns[table_name]:
+            continue
+        sel_obj = sel_obj.order_by(getattr(sqlalchemy, order_type)(getattr(meta.tables[table_name].c, column_name)))
+    return sel_obj
 
 
 def apply_filters(query_specification, sel_obj, current_table, unavailable_columns):
@@ -129,6 +133,7 @@ async def data_post(request):
     tables_and_columns = {}
     table_query_order = []
     columns = []
+    unavailable_columns = get_unavailable_columns(settings, meta)
 
     for table_column in query_specification["select"]:
         # We use a list for select so that we can retain the order in which `table.columns` were requested
@@ -151,42 +156,39 @@ async def data_post(request):
 
     for table_name in table_query_order:
         column_list = tables_and_columns[table_name]
-        # Unavailable columns are configured due to security or similar reasons
-        unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
-        table_column_names = meta.tables[table_name].columns.keys()
+        # Unavailable columns are configured due to security or similar reasons, we remove them here
+        table_column_names = [column_name for column_name in meta.tables[table_name].columns.keys()
+                              if column_name not in unavailable_columns[table_name]]
         current_table = meta.tables[table_name]
+        current_table_columns = []
+        if "id" in table_column_names:
+            # If there is an "id" column then it is always included, the UI hides it as needed
+            current_table_columns.append(getattr(current_table.c, "id"))
 
         if column_list == ["*"]:
             # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
-            columns = columns +\
-                [getattr(current_table.c, "id")] + \
-                [getattr(current_table.c, col) for col in table_column_names
-                 if col not in unavailable_columns]
-        elif len(column_list) > 0 and column_list != ["__auto__"]:
-            # If there is an "id" column then it is always included, the UI hides it as needed
-            columns = columns +\
-                [getattr(current_table.c, "id")] if\
-                ("id" not in column_list and "id" in table_column_names) else []
-            columns = columns +\
-                [getattr(current_table.c, col) for col in table_column_names
-                 if col in column_list and col not in unavailable_columns]
-        else:
+            current_table_columns = current_table_columns +\
+                [getattr(current_table.c, col) for col in table_column_names]
+        elif column_list == ["__auto__"]:
             # If we have not been asked to show specific columns then we do not send columns which are
             # detected to be meta data
             meta_data_column_names = [col["name"] for col in [
-                column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
-                if col not in unavailable_columns
+                column_definition(col, col_def) for col, col_def in current_table.columns.items()
+                if col not in unavailable_columns[table_name]
             ] if "is_meta" in col["ui_hints"]]
-            columns = columns +\
-                [getattr(current_table.c, "id")] +\
-                [getattr(current_table.c, col) for col in table_column_names
-                    if col not in unavailable_columns and col not in meta_data_column_names]
+            current_table_columns = current_table_columns +\
+                [getattr(current_table.c, col) for col in table_column_names if col not in meta_data_column_names]
+        else:
+            current_table_columns = current_table_columns +\
+                [getattr(current_table.c, col) for col in table_column_names if col in column_list]
+        columns += current_table_columns
 
     sel_obj = select(columns)
+    count_sel_obj = select([func.count()]).select_from(meta.tables[table_query_order[0]])
 
-    """
     if query_specification.get("order_by", {}) != {}:
-        sel_obj = apply_ordering(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
+        sel_obj = apply_ordering(sel_obj, query_specification, meta, unavailable_columns)
+    """
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     """
@@ -196,25 +198,23 @@ async def data_post(request):
     if len(table_query_order) > 1:
         # We have more than 1 table in the requested select, we need to apply JOINS
         sel_obj = find_best_join(sel_obj, meta, table_query_order)
+        count_sel_obj = find_best_join(count_sel_obj, meta, table_query_order)
 
     exc = conn.execute(sel_obj)
     rows = exc.cursor.fetchall()
 
     # We use a separate query to count the total number of rows in the given query
-    """
-    count_sel_obj = select([func.count(getattr(current_table.c, "id"))])
-    if query_specification.get("filter_by", None):
-        count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
-                                      unavailable_columns=unavailable_columns)
+    # if query_specification.get("filter_by", None):
+    #     count_sel_obj = apply_filters(query_specification, count_sel_obj, current_table,
+    #                                   unavailable_columns=unavailable_columns)
     count = conn.execute(count_sel_obj).scalar()
-    """
     conn.close()
 
     return RapidJSONResponse(
         dict(
             columns=["{}.{}".format(x[2][0].table.name, x[2][0].name) for x in exc.context.result_column_struct[0]],
             rows=rows,
-            count=0,  # count,
+            count=count,
             limit=query_specification.get("limit", default_per_page),
             offset=query_specification.get("offset", 0),
             query_sql=str(sel_obj),

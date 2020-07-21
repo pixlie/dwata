@@ -1,7 +1,7 @@
 import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useQuerySpecification } from "services/store";
+import { useQuerySpecification } from "services/store";
 import { Button } from "components/LayoutHelpers";
 
 const PageItem = ({ number }) => {
@@ -10,12 +10,7 @@ const PageItem = ({ number }) => {
     (state) => state[queryContext.key]
   );
   const gotoPage = useQuerySpecification((state) => state.gotoPage);
-
-  let offset = null,
-    limit = null;
-  if (querySpecification) {
-    ({ offset, limit } = querySpecification);
-  }
+  const { offset, limit } = querySpecification;
   const currentPage = Math.floor(offset / limit) + 1;
 
   const handleGotoPage = () => {
@@ -42,16 +37,7 @@ const PageSlots = () => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-
-  if (!(querySpecification && querySpecification.isReady)) {
-    return null;
-  }
-
-  let count = null,
-    limit = null;
-  if (querySpecification) {
-    ({ count, limit } = querySpecification);
-  }
+  const { count, limit } = querySpecification;
   const slots = 9; // Includes all page numbers to be shown and ellipses
   const totalPages = Math.ceil(count / limit);
 
@@ -84,24 +70,12 @@ const PageSlots = () => {
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);
-
-  if (
-    !(data && data.isReady && querySpecification && querySpecification.isReady)
-  ) {
-    return null;
-  }
-  let count = null,
-    offset = null,
-    limit = null;
-  if (querySpecification) {
-    ({ count, offset, limit } = querySpecification);
-  }
+  const { count, offset, limit } = querySpecification;
 
   const handleNext = (event) => {
     event.preventDefault();
@@ -114,7 +88,10 @@ export default () => {
   };
 
   return (
-    <div className="fixed bottom-0 right-0 mr-16 z-10 bg-gray-300">
+    <div
+      className="fixed right-0 mr-16 z-10 bg-gray-700 p-2 p-y-4 shadow-lg text-white"
+      style={{ bottom: "2rem" }}
+    >
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
           <Button margin="mr-2" theme="info" disabled>
