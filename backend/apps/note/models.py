@@ -4,7 +4,7 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Text, DateTime
 
 metadata = MetaData()
 
-
+f
 note = Table(
     "dwata_meta_note",
     metadata,

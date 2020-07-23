@@ -192,8 +192,8 @@ async def data_post(request):
     if query_specification.get("filter_by", None):
         sel_obj = apply_filters(query_specification, sel_obj, current_table, unavailable_columns=unavailable_columns)
     """
-    # sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
-    # sel_obj = sel_obj.offset(query_specification.get("offset", 0))
+    sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
+    sel_obj = sel_obj.offset(query_specification.get("offset", 0))
 
     if len(table_query_order) > 1:
         # We have more than 1 table in the requested select, we need to apply JOINS
