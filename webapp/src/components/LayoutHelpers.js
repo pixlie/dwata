@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useCallback, useEffect } from "react";
 
 export const Hero = ({
   size = "",
@@ -74,6 +74,8 @@ export const Button = ({
     classes =
       classes +
       " bg-yellow-200 text-gray-700 hover:bg-yellow-700 hover:text-white";
+  } else if (theme === "link") {
+    classes = "inline-block font-bold underline";
   }
 
   return (
@@ -157,16 +159,45 @@ export const Panel = ({ title, hasSearch, hasTabs, children }) => (
   </div>
 );
 
-export const Modal = ({ callerRef, theme = "white", children }) => {
-  let classes = "fixed z-10 shadow-lg p-4 rounded-md border";
+export const Modal = ({
+  callerPosition,
+  theme = "white",
+  maxWidth = "lg",
+  toggleModal,
+  children,
+}) => {
+  // Notes is a modal and we handle the Esc key to hide the modal
+  const handleKey = useCallback((event) => {
+    if (event.keyCode === 27) {
+      toggleModal();
+    }
+  }, []);
+  useEffect(() => {
+    document.addEventListener("keydown", handleKey, false);
+
+    return () => {
+      document.removeEventListener("keydown", handleKey, false);
+    };
+  }, [handleKey]);
+
+  let classes = `fixed z-10 shadow-lg p-4 rounded-md border max-w-${maxWidth}`;
   if (theme === "light") {
     classes = classes + " bg-gray-100";
   } else if (theme === "white") {
     classes = classes + " bg-white";
+  } else if (theme === "info") {
+    classes = classes + " bg-yellow-200";
+  }
+  const style = {
+    top: "70px",
+  };
+  if (!!callerPosition) {
+    style.top = callerPosition.top + 36 + "px";
+    style.left = callerPosition.left;
   }
 
   return (
-    <div className={classes} style={{ top: "70px" }}>
+    <div className={classes} style={style}>
       {children}
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
@@ -50,7 +49,7 @@ export default () => {
         </div>
 
         <div className="flex-1 px-2">
-          <SavedQuerySpecifications context={{ key: uuidv4() }} />
+          <SavedQuerySpecifications context={{ key: "saved_queries" }} />
         </div>
 
         <div className="flex-1 px-2">

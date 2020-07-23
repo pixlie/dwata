@@ -97,7 +97,7 @@ const [useStore] = create((set, get) => ({
         }));
       }
     } catch (error) {
-      console.log("Could not fetch schema. Try again later.");
+      console.log("Could not fetch data. Try again later.");
     }
   },
 }));

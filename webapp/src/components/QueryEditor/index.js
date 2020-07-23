@@ -1,6 +1,5 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { Fragment, useState } from "react";
 
-import { QueryContext } from "utils";
 // import { saveQuery } from "services/apps/actions";
 import { Modal, Button } from "components/LayoutHelpers";
 import ColumnSelectorInner from "./ColumnSelector";
@@ -9,8 +8,6 @@ import OrderEditorInner from "./OrderEditor";
 import RelatedData from "./RelatedData";
 
 export default () => {
-  const queryContext = useContext(QueryContext);
-
   const [state, setState] = useState({
     isSavingQuery: false,
     savedQueryLabel: "",
@@ -43,7 +40,7 @@ export default () => {
   };
 
   return (
-    <Modal theme="light">
+    <Modal theme="light" maxWidth="6xl">
       <div className="flex items-stretch">
         <div className="flex-1 px-2">
           <ColumnSelectorInner />

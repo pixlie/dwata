@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
-import { useQueryContext } from "services/store";
+import { useQueryContext, useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
 import { Button } from "components/LayoutHelpers";
 import GridNav from "./GridNav";
@@ -8,11 +8,29 @@ import GridNav from "./GridNav";
 export default ({ isSourceFetching, toggleSidebar }) => {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
+  const showNotes = useGlobal((state) => state.showNotes);
+  const setNavigationButtonMeta = useGlobal(
+    (state) => state.setNavigationButtonMeta
+  );
+  const notesNavRef = useRef(null);
+  useEffect(() => {
+    setNavigationButtonMeta("notes", {
+      position: {
+        top: notesNavRef.current.offsetTop,
+        left: notesNavRef.current.offsetLeft,
+      },
+    });
+  }, []);
+
   const handleHome = (event) => {
     event.preventDefault();
     setContext("main", {
       appType: globalConstants.APP_NAME_HOME,
     });
+  };
+
+  const handleNotesClick = () => {
+    showNotes();
   };
 
   return (
@@ -41,6 +59,14 @@ export default ({ isSourceFetching, toggleSidebar }) => {
           >
             <i className="fas fa-database" />
             &nbsp;Browse
+          </Button>
+
+          <Button
+            attributes={{ onClick: handleNotesClick, ref: notesNavRef }}
+            theme="info"
+          >
+            <i className="far fa-sticky-note" />
+            &nbsp; Notes
           </Button>
 
           <div className="inline-block">

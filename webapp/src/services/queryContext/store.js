@@ -12,7 +12,6 @@ const [useQueryContext] = create((set) => ({
       [appName]: {
         ...context,
         key: appName,
-        toggleQueryUI: false,
       },
     })),
 
