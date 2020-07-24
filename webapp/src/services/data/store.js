@@ -16,23 +16,26 @@ const initialState = {
   lastFetchedAt: null,
 };
 
-const completeFetchList = (payload) => ({
-  ...initialState,
+const completeFetchList = (inner, payload) => ({
   columns: payload.columns,
   rows: payload.rows, // Here we do not transform data into maps/dicts
   querySQL: payload.query_sql,
+  selectedRowList: [...inner.selectedRowList],
+
   isFetching: false,
   isReady: true,
+  lastError: null,
   lastFetchedAt: +new Date(),
 });
 
 const completeFetchItem = (payload) => ({
   item: payload.item,
   querySQL: payload.query_sql,
+  selectedRowList: [], // This is a hack
+
   isFetching: false,
   isReady: true,
   lastFetchedAt: +new Date(),
-  selectedRowList: [], // This is a hack
 });
 
 const querySpecificationObject = (state, payload) => ({
@@ -65,16 +68,25 @@ const [useStore] = create((set, get) => ({
       return;
     }
 
-    if (get()[key] && get()[key].isFetching) {
-      return;
+    if (get()[key]) {
+      if (get()[key].isFetching) {
+        // There is a fetch currently executing, no need to run another one
+        return;
+      }
+      set((state) => ({
+        [key]: {
+          ...state[key],
+          isFetching: true,
+        },
+      }));
+    } else {
+      set(() => ({
+        [key]: {
+          ...initialState,
+          isFetching: true,
+        },
+      }));
     }
-
-    set(() => ({
-      [key]: {
-        ...initialState,
-        isFetching: true,
-      },
-    }));
 
     let response = null;
     try {
@@ -90,12 +102,12 @@ const [useStore] = create((set, get) => ({
           dataURL,
           getQuerySpecificationPayload(querySpecification)
         );
-        set(() => ({
-          [key]: completeFetchList(response.data),
-        }));
         // We use the Query Specification Store API directly to set this new data
         querySpecificationStoreAPI.setState((state) => ({
           [key]: querySpecificationObject(state[key], response.data),
+        }));
+        set((state) => ({
+          [key]: completeFetchList(state[key], response.data),
         }));
       }
     } catch (error) {

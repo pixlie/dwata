@@ -47,6 +47,7 @@ export default () => {
   return (
     <Fragment>
       <Hx x="4">Columns</Hx>
+
       <div className="field">
         {selectedTables.map((x) => (
           <Fragment key={`sel-${x.table_name}`}>

@@ -20,7 +20,7 @@ export default ({ isSourceFetching, toggleSidebar }) => {
         left: notesNavRef.current.offsetLeft,
       },
     });
-  }, []);
+  }, [setNavigationButtonMeta]);
 
   const handleHome = (event) => {
     event.preventDefault();

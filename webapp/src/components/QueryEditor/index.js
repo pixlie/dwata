@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 
 // import { saveQuery } from "services/apps/actions";
-import { Modal, Button } from "components/LayoutHelpers";
+import { Button, Hx } from "components/LayoutHelpers";
 import ColumnSelectorInner from "./ColumnSelector";
 import FilterEditorInner from "./FilterEditor";
 import OrderEditorInner from "./OrderEditor";
@@ -11,6 +11,7 @@ export default () => {
   const [state, setState] = useState({
     isSavingQuery: false,
     savedQueryLabel: "",
+    openEditor: "column",
   });
 
   const handleSaveQuery = async () => {
@@ -24,7 +25,12 @@ export default () => {
     }
   };
 
-  const cancelSaveQuery = (event) => {
+  const handleChangeEditor = (name) => () =>
+    setState({
+      openEditor: name,
+    });
+
+  const cancelSaveQuery = () => {
     setState((state) => ({
       ...state,
       isSavingQuery: false,
@@ -40,23 +46,59 @@ export default () => {
   };
 
   return (
-    <Modal theme="light" maxWidth="6xl">
-      <div className="flex items-stretch">
-        <div className="flex-1 px-2">
-          <ColumnSelectorInner />
-        </div>
+    <div className="fixed bottom-0 right-0 h-screen max-w-4xl bg-gray-700 px-2">
+      <div className="w-full">
+        {state.openEditor === "column" ? (
+          <div className="bg-gray-100 my-1 rounded-md px-2 py-1">
+            <ColumnSelectorInner />
+          </div>
+        ) : (
+          <div
+            className="bg-gray-100 my-1 rounded-md px-2 py-1 cursor-pointer"
+            onClick={handleChangeEditor("column")}
+          >
+            <Hx x="4">Columns</Hx>
+          </div>
+        )}
 
-        <div className="flex-1 px-2">
-          <FilterEditorInner />
-        </div>
+        {state.openEditor === "filter" ? (
+          <div className="bg-gray-100 my-1 rounded-md px-2 py-1">
+            <FilterEditorInner />
+          </div>
+        ) : (
+          <div
+            className="bg-gray-100 my-1 rounded-md px-2 py-1 cursor-pointer"
+            onClick={handleChangeEditor("filter")}
+          >
+            <Hx x="4">Filters</Hx>
+          </div>
+        )}
 
-        <div className="flex-1 px-2">
-          <OrderEditorInner />
-        </div>
+        {state.openEditor === "ordering" ? (
+          <div className="bg-gray-100 my-1 rounded-md px-2 py-1">
+            <OrderEditorInner />
+          </div>
+        ) : (
+          <div
+            className="bg-gray-100 my-1 rounded-md px-2 py-1 cursor-pointer"
+            onClick={handleChangeEditor("ordering")}
+          >
+            <Hx x="4">Ordering</Hx>
+          </div>
+        )}
 
-        <div className="flex-1 px-2">
-          <RelatedData />
-        </div>
+        {state.openEditor === "related" ? (
+          <div className="bg-gray-100 my-1 rounded-md px-2 py-1">
+            <RelatedData />
+          </div>
+        ) : (
+          <div
+            className="bg-gray-100 my-1 rounded-md px-2 py-1 cursor-pointer"
+            onClick={handleChangeEditor("related")}
+          >
+            <Hx x="4">Related</Hx>
+          </div>
+        )}
       </div>
 
       {state.isSavingQuery ? (
@@ -89,6 +131,6 @@ export default () => {
           </Fragment>
         )}
       </div>
-    </Modal>
+    </div>
   );
 };

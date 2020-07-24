@@ -1,12 +1,12 @@
-import React, { useEffect, useContext, Fragment, useRef } from "react";
+import React, { useEffect, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useGlobal, useApps, useData, useQueryContext } from "services/store";
+import { useApps, useData, useQueryContext } from "services/store";
 import { Button } from "components/LayoutHelpers";
 
 export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
-  const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
+  // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
@@ -14,13 +14,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
     fetchApps();
   }, [fetchApps]);
 
-  const buttonRefs = {
-    columns: useRef(null),
-    filters: useRef(null),
-    ordering: useRef(null),
-  };
-
-  if (!(data && data.isReady)) {
+  if (!data || !data.isReady) {
     return null;
   }
   const { selectedRowList } = data;
@@ -28,9 +22,9 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   const handleActionsClick = () => {
     toggleActions();
   };
-  const handlePinClick = () => {
+  /* const handlePinClick = () => {
     togglePinnedRecords();
-  };
+  }; */
   const handleQueryClick = () => {
     toggleQueryUI(queryContext.key);
   };
@@ -48,14 +42,14 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         </span>
         &nbsp; Actions
       </Button>
-      <Button
+      {/* <Button
         attributes={{ onClick: handlePinClick }}
         active={showPinnedRecords === true}
         theme="secondary"
       >
         <i className="fas fa-thumbtack" />
         &nbsp; Pins
-      </Button>
+      </Button> */}
 
       <Button theme="primary" attributes={{ onClick: handleQueryClick }}>
         Query

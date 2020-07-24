@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, Fragment } from "react";
+import React, { useState, useContext, Fragment } from "react";
 import ReactMarkdown from "react-markdown";
 
 import { QueryContext } from "utils";

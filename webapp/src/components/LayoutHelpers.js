@@ -21,18 +21,18 @@ export const Section = ({ size = "", style = {}, children }) => (
   </section>
 );
 
-export const Hx = ({ x = "3", titleClass = "title", children }) => {
+export const Hx = ({ x = "3", children }) => {
   const xSizeClass = {
-    1: "text-5xl",
-    2: "text-4xl",
-    3: "text-3xl",
-    4: "text-2xl",
-    5: "text-xl",
-    6: "text-lg",
+    1: "text-4xl",
+    2: "text-3xl",
+    3: "text-2xl",
+    4: "text-xl",
+    5: "text-lg",
+    6: "text-md",
   };
   return React.createElement(
     `h${x}`,
-    { className: `${titleClass} ${xSizeClass[x]}` },
+    { className: `text-gray-700 ${xSizeClass[x]}` },
     children
   );
 };
@@ -167,11 +167,14 @@ export const Modal = ({
   children,
 }) => {
   // Notes is a modal and we handle the Esc key to hide the modal
-  const handleKey = useCallback((event) => {
-    if (event.keyCode === 27) {
-      toggleModal();
-    }
-  }, []);
+  const handleKey = useCallback(
+    (event) => {
+      if (event.keyCode === 27) {
+        toggleModal();
+      }
+    },
+    [toggleModal]
+  );
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);
 

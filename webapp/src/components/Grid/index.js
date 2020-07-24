@@ -24,19 +24,22 @@ export default () => {
   return (
     <Loader>
       <Fragment>
-        <table>
-          <thead>
-            <TableHead />
-          </thead>
+        <div>
+          <table>
+            <thead>
+              <TableHead />
+            </thead>
 
-          <tbody>
-            <TableBody />
-          </tbody>
-        </table>
+            <tbody>
+              <TableBody />
+            </tbody>
+          </table>
+
+          {/* <Actions /> */}
+          <Paginator />
+        </div>
 
         {queryContext.isQueryUIOpen ? <QueryEditor /> : null}
-        {/* <Actions /> */}
-        <Paginator />
       </Fragment>
     </Loader>
   );

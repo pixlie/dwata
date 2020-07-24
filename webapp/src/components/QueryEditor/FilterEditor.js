@@ -77,7 +77,7 @@ export default () => {
 
   return (
     <Fragment>
-      <Hx x="5">Filters</Hx>
+      <Hx x="4">Filters</Hx>
 
       {filters}
 
