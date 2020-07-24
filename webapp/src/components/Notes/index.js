@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 
 import * as globalConstants from "services/global/constants";
 import {
@@ -41,34 +41,16 @@ export default () => {
         tableName: "dwata_meta_note",
       },
     ],
-    where: {
-      path: {
-        starts_with: null,
-      },
-    },
     fetchNeeded: true,
   };
 
   useEffect(() => {
-    if (
-      !isNotesVisible ||
-      appType !== globalConstants.APP_NAME_BROWSER ||
-      !querySpecification
-    ) {
-      return;
-    }
-    const { select, isReady } = querySpecification;
-    if (!isReady) {
-      return;
-    }
-    notesQS.where.path.starts_with = select.source_label;
     initiateQuerySpecification("notes", notesQS);
-  }, [isNotesVisible, appType, querySpecification]);
+  }, []);
 
   if (
     !isNotesVisible ||
     appType !== globalConstants.APP_NAME_BROWSER ||
-    !querySpecification ||
     !notesQuerySpecification ||
     !notesQuerySpecification.sourceLabel
   ) {
@@ -87,7 +69,9 @@ export default () => {
       toggleModal={handleClose}
     >
       <Hx x="4">Notes</Hx>
-      <QueryContext.Provider value={{ key: "notes" }}>
+      <QueryContext.Provider
+        value={{ key: "notes", currentQS: querySpecification }}
+      >
         <QueryLoader>
           {notesData && notesData.isReady ? <NotesList /> : null}
         </QueryLoader>

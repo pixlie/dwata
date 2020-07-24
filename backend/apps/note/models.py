@@ -4,13 +4,13 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Text, DateTime
 
 metadata = MetaData()
 
-f
+
 note = Table(
     "dwata_meta_note",
     metadata,
 
     Column("id", Integer, primary_key=True),
-    Column("path", String(length=100), nullable=False, unique=True),
+    Column("query_specification", String(length=500), nullable=False),
     Column("content", Text, nullable=False),
 
     Column("created_at", DateTime, nullable=False),

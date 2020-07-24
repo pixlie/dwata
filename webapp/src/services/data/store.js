@@ -37,12 +37,14 @@ const completeFetchItem = (payload) => ({
 
 const querySpecificationObject = (state, payload) => ({
   ...state,
-  ...payload,
   select: payload.columns.map((tc) => ({
     label: tc,
     tableName: tc.split(".")[0],
     columnName: tc.split(".")[1],
   })),
+  count: payload.count,
+  limit: payload.limit,
+  offset: payload.offset,
   isReady: true,
   isFetching: false,
   fetchNeeded: false,

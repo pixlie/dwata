@@ -2,7 +2,7 @@ import axios from "axios";
 
 import { dataItemURL } from "services/urls";
 
-export const saveNote = async (path, payload, pk) => {
+export const saveNote = async (querySpecification, payload, pk) => {
   const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_note`;
   const url = pk !== null ? `${baseURL}/${pk}` : baseURL;
 
@@ -10,8 +10,8 @@ export const saveNote = async (path, payload, pk) => {
     method: pk !== null ? "put" : "post",
     url,
     data: {
-      path,
-      ...payload,
+      query_specification: querySpecification,
+      content: payload,
     },
   });
 };

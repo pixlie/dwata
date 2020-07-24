@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+import { transformData } from "utils";
 import { useData, useQuerySpecification } from "services/store";
 import { Button } from "components/LayoutHelpers";
-import NotesItem from "./Item";
+import NoteItem from "./Item";
 
 const notesHelp = `### What are Notes?
 Notes help you and your team save time to understand data in relation to your business.
@@ -37,6 +38,15 @@ export default () => {
       createNew: false,
     });
   };
+  const transformedRows = [];
+  if (querySpecification.count > 0) {
+    const cols = notesData.columns.map((x) =>
+      x.substring("dwata_meta_note".length + 1)
+    );
+    for (const x of notesData.rows) {
+      transformedRows.push(transformData(cols, x));
+    }
+  }
 
   return (
     <Fragment>
@@ -49,15 +59,24 @@ export default () => {
           <br />
           &nbsp;
           <br />
-          {state.createNew ? (
-            <NotesItem isNew handleCancelCreate={handleCancelCreate} />
-          ) : (
-            <ReactMarkdown source={notesHelp} linkTarget="_blank" />
-          )}
+          <ReactMarkdown source={notesHelp} linkTarget="_blank" />
         </div>
       ) : null}
-      {querySpecification.count > 0 &&
-        notesData.rows.map((x) => <h1>Hello</h1>)}
+      {querySpecification.count > 0 ? (
+        <div>
+          {transformedRows.map((x) => (
+            <NoteItem key={`note-${x.id}`} note={x} />
+          ))}
+          <br />
+          Showing {querySpecification.count} notes.&nbsp;
+          <Button theme="link" attributes={{ onClick: handleClickCreate }}>
+            Add a note
+          </Button>
+        </div>
+      ) : null}
+      {state.createNew ? (
+        <NoteItem isNew handleCancelCreate={handleCancelCreate} />
+      ) : null}
     </Fragment>
   );
 };
