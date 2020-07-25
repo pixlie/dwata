@@ -60,3 +60,22 @@ def get_system_tables(source_settings):
     if "system_tables" in source_settings and len(source_settings.get("system_tables", [])):
         return source_settings["system_tables"]
     return []
+
+
+def get_relations_matrix(source_settings, meta):
+    tables = {}
+
+    for name, schema in meta.tables.items():
+        if name not in tables.keys():
+            tables[name] = []
+
+        for col, col_def in schema.columns.items():
+            if len(col_def.foreign_keys) > 0:
+                for fk in col_def.foreign_keys:
+                    tables[name].append(fk.column.table.name)
+                    if fk.column.table.name not in tables.keys():
+                        tables[fk.column.table.name] = []
+                    tables[fk.column.table.name].append(name)
+        tables[name] = list(set(tables[name]))
+
+    return tables

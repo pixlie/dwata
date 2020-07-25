@@ -1,19 +1,11 @@
 import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useGlobal,
-  useSchema,
-  useData,
-  useQuerySpecification,
-} from "services/store";
-import { Section, Hx } from "components/BulmaHelpers";
+import { useSchema, useQuerySpecification } from "services/store";
+import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
-  const fetchData = useData((state) => state.fetchData);
-  const isCSVisible = useGlobal((state) => state.isCSVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
@@ -21,62 +13,55 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-
-  if (
-    !(
-      data &&
-      data.isReady &&
-      isCSVisible &&
-      querySpecification &&
-      querySpecification.isReady
-    )
-  ) {
-    return null;
-  }
-
-  let dataColumns = [];
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
-  const colsAreAvailable = querySpecification.columnsSelected.every((col, i) =>
-    dataColumns.includes(col)
+  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedTableNames = querySpecification.select.map((x) => x.tableName);
+  const selectedTables = schema.rows.filter((x) =>
+    selectedTableNames.includes(x.table_name)
   );
 
-  const BoundInput = ({ head }) => {
+  const BoundInput = ({ tableName, column }) => {
+    const columnLabel = `${tableName}.${column.name}`;
     const handleClick = () => {
-      toggleColumnSelection(queryContext.key, head.name);
+      toggleColumnSelection(queryContext.key, columnLabel);
     };
+    const checked = selectedColumLabels.includes(columnLabel);
 
     return (
-      <Fragment>
+      <label
+        className={`block font-mono font-normal text-sm ${
+          checked ? "text-gray-700" : "text-gray-500"
+        }`}
+      >
         <input
           type="checkbox"
-          name={head.name}
-          checked={querySpecification.columnsSelected.includes(head.name)}
+          name={columnLabel}
+          checked={checked}
           onChange={handleClick}
+          className="mr-1"
         />
-        &nbsp;{head.name}
-      </Fragment>
+        {column.name}
+      </label>
     );
   };
 
   return (
-    <div id="column-selector">
-      <Section>
-        <Hx x="4">Columns</Hx>
-        <div className="field">
-          {schemaColumns.map((head, i) => (
-            <div key={`col-get-${i}`} className="control">
-              <label className="checkbox">
-                <BoundInput head={head} />
-              </label>
-            </div>
-          ))}
-        </div>
-        <div className="help">
-          New column data, if unavailable, will be fetched automatically
-        </div>
-      </Section>
-    </div>
+    <Fragment>
+      <Hx x="4">Columns</Hx>
+
+      <div className="field">
+        {selectedTables.map((x) => (
+          <Fragment key={`sel-${x.table_name}`}>
+            <Hx x="5">{x.table_name}</Hx>
+            {x.columns.map((col) => (
+              <BoundInput
+                key={`sel-${x.table_name}-${col.name}`}
+                tableName={x.table_name}
+                column={col}
+              />
+            ))}
+          </Fragment>
+        ))}
+      </div>
+    </Fragment>
   );
 };

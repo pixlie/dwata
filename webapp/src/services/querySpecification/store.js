@@ -2,9 +2,8 @@ import create from "zustand";
 
 const initialState = {
   sourceLabel: null,
-  tableName: null,
 
-  columnsSelected: [],
+  select: [],
   filterBy: {},
   orderBy: {},
 
@@ -122,6 +121,11 @@ const setFilter = (inner, columnName, filters) => ({
     ...inner.filterBy,
     [columnName]: filters,
   },
+  // We do not set `fetchNeeded: true` implicitly
+});
+
+const requestRefetch = (inner) => ({
+  ...inner,
   fetchNeeded: true,
 });
 
@@ -134,20 +138,29 @@ const toggleColumnHeadSpecification = (inner, columnName) => ({
       : null,
 });
 
-const toggleColumnSelection = (inner, columnName) => {
-  if (inner.columnsSelected.includes(columnName)) {
+const toggleColumnSelection = (inner, label) => {
+  const selectedColumLabels = inner.select.map((x) => x.label);
+  if (selectedColumLabels.includes(label)) {
     // This column is currently selected, let's get it removed
+    // Find the position of this column
+    const pos = inner.select.findIndex((x) => x.label === label);
     return {
       ...inner,
-      columnsSelected: [...inner.columnsSelected].filter(
-        (x) => x !== columnName
-      ),
+      select: [...inner.select.slice(0, pos), ...inner.select.slice(pos + 1)],
     };
   } else {
     // This column is not selected, let's add it
+    const [tableName, columnName] = label.split(".");
     return {
       ...inner,
-      columnsSelected: [...inner.columnsSelected, columnName],
+      select: [
+        ...inner.select,
+        {
+          label,
+          tableName,
+          columnName,
+        },
+      ],
       fetchNeeded: true,
     };
   }
@@ -197,6 +210,11 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
   setFilter: (key, columnName, filters) =>
     set((state) => ({
       [key]: setFilter(state[key], columnName, filters),
+    })),
+
+  requestRefetch: (key) =>
+    set((state) => ({
+      [key]: requestRefetch(state[key]),
     })),
 
   toggleColumnHeadSpecification: (key, columnName) =>

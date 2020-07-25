@@ -1,11 +1,10 @@
 import React, { Fragment } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
 import SavedQuerySpecifications from "components/SavedQuerySpecifications";
 import * as globalConstants from "services/global/constants";
-import { Hero, Hx, Section } from "components/BulmaHelpers";
+import { Hx, Button } from "components/LayoutHelpers";
 
 const ReportItem = ({ item }) => {
   const initiateQuerySpecification = useQuerySpecification(
@@ -20,45 +19,45 @@ const ReportItem = ({ item }) => {
     });
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_report",
-      pk: item ? item.id : undefined,
+      select: [
+        {
+          label: "dwata_meta_report",
+          tableName: "dwata_meta_report",
+        },
+      ],
+      where: {
+        "dwata_meta_report.id": item ? item.id : undefined,
+      },
       fetchNeeded: true,
     });
   };
 
   return (
-    <a
-      href="/report/create"
-      className="button is-success is-medium"
-      onClick={handleClick}
-    >
+    <Button size="large" attributes={{ onClick: handleClick }}>
       New Report
-    </a>
+    </Button>
   );
 };
 
 export default () => {
   return (
     <Fragment>
-      <Hero textCentered={true}>
-        <Hx x="1">Welcome to dwata</Hx>
-      </Hero>
-
-      <Section>
-        <div className="columns">
-          <div className="column is-4">
-            <Source />
-          </div>
-          <div className="column is-4">
-            <SavedQuerySpecifications context={{ key: uuidv4() }} />
-          </div>
-          <div className="column is-4">
-            <Hx x="3">Reports</Hx>
-
-            <ReportItem />
-          </div>
+      <div className="flex items-stretch">
+        <div className="flex-1 px-2">
+          <Hx x="2">travlyng</Hx>
+          <Source />
         </div>
-      </Section>
+
+        <div className="flex-1 px-2">
+          <SavedQuerySpecifications context={{ key: "saved_queries" }} />
+        </div>
+
+        <div className="flex-1 px-2">
+          <Hx x="3">Reports</Hx>
+
+          <ReportItem />
+        </div>
+      </div>
     </Fragment>
   );
 };

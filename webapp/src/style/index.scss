@@ -1,22 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap");
 
 // Update Bulma's global variables
-$family-sans-serif: "Quicksand", sans-serif;
+// $family-sans-serif: "Quicksand", sans-serif;
 
 // Reduce the size of the default shadow
-$scheme-invert: hsl(0, 0%, 4%);
-$card-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
-  0 2px 4px 0 rgba(14, 30, 37, 0.12);
-$panel-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
-  0 2px 4px 0 rgba(14, 30, 37, 0.12);
-$box-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
-  0 2px 4px 0 rgba(14, 30, 37, 0.12);
-$table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+// $scheme-invert: hsl(0, 0%, 4%);
+// $card-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+//   0 2px 4px 0 rgba(14, 30, 37, 0.12);
+// $panel-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+//   0 2px 4px 0 rgba(14, 30, 37, 0.12);
+// $box-shadow: 0 0 0 1px rgba($scheme-invert, 0.1),
+//   0 2px 4px 0 rgba(14, 30, 37, 0.12);
+// $table-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
 
-@import "../../node_modules/bulma";
-@import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
-@import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
-@import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
+// @import "../../node_modules/bulma";
+// @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+// @import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+// @import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
 
 html {
   min-width: 100%;
@@ -37,7 +37,7 @@ h3 {
 }
 
 .has-box-shadow {
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
 }
 
 #sidebar {
@@ -108,7 +108,7 @@ table {
   &.is-data-table {
     border-top: 4px solid #efefef;
     border-bottom: 4px solid #efefef;
-    box-shadow: $table-shadow;
+    // box-shadow: $table-shadow;
 
     &:hover {
       border-top: 4px solid #48c774;
@@ -187,8 +187,8 @@ table {
   z-index: 80;
   background-color: #fdf7e3;
   padding: 0.4rem 0.6rem;
-  box-shadow: $box-shadow;
-  border-radius: $radius-small;
+  // box-shadow: $box-shadow;
+  // border-radius: $radius-small;
   position: fixed;
   bottom: 4rem;
   right: 12rem;
@@ -197,7 +197,7 @@ table {
 #detail-modal {
   z-index: 100;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   position: fixed;
   top: 4rem;
   left: 12rem;
@@ -236,7 +236,7 @@ table {
 #column-selector {
   z-index: 90;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   border-left: 4px solid #efefef;
   position: fixed;
   min-width: 24rem;
@@ -255,7 +255,7 @@ table {
 #filter-editor {
   z-index: 90;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   border-left: 4px solid #efefef;
   position: fixed;
   min-width: 32rem;
@@ -274,7 +274,7 @@ table {
 #order-editor {
   z-index: 90;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   border-left: 4px solid #efefef;
   position: fixed;
   min-width: 32rem;
@@ -293,7 +293,7 @@ table {
 #actions-modal {
   z-index: 90;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   border-left: 4px solid #efefef;
   position: fixed;
   min-width: 16rem;
@@ -313,8 +313,8 @@ table {
   z-index: 80;
   background-color: #fdf7e3;
   padding: 0.4rem 0.6rem;
-  box-shadow: $box-shadow;
-  border-radius: $radius-small;
+  // box-shadow: $box-shadow;
+  // border-radius: $radius-small;
   position: absolute;
   top: 5.65rem;
   min-width: 12rem;
@@ -324,7 +324,7 @@ table {
 #notes-modal {
   z-index: 100;
   background-color: white;
-  box-shadow: $box-shadow;
+  // box-shadow: $box-shadow;
   position: fixed;
   top: 4rem;
   left: 12rem;

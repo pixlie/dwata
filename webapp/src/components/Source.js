@@ -1,7 +1,7 @@
 import React, { useEffect, Fragment, useState } from "react";
 
 import useSource from "services/source/store";
-import { Panel } from "components/BulmaHelpers";
+import { Panel } from "components/LayoutHelpers";
 import TableList from "components/TableList";
 
 export default () => {
@@ -32,9 +32,11 @@ export default () => {
 
     return (
       <Fragment>
-        <div className="panel-block" onClick={handleClickSource}>
+        <div className="block p-2 pl-3 border-b" onClick={handleClickSource}>
           <strong>{source.label}</strong>&nbsp;
-          <span className="tag is-info is-light">{source.provider}</span>
+          <span className="inline-block bg-green-200 text-sm px-2 rounded">
+            {source.provider}
+          </span>
         </div>
 
         <TableList sourceLabel={source.label} sourceType={sourceType} />

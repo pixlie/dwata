@@ -5,12 +5,12 @@ import { useData, useQuerySpecification } from "services/store";
 import QueryLoader from "./QueryLoader";
 
 const extractQuerySpecification = (item) => {
-  const innerQS = JSON.parse(item[2]);
+  const innerQS = JSON.parse(item.query_specification);
 
   return {
     sourceLabel: innerQS.source_label,
     tableName: innerQS.table_name,
-    columnsSelected: innerQS.columns,
+    columns: innerQS.columns,
     orderBy: innerQS.order_by,
     filterBy: innerQS.filter_by,
     offset: innerQS.offset,
@@ -31,10 +31,7 @@ const InnerLoader = ({ children }) => {
   const context = {
     key: `saved-query-${querySpecification.pk}`,
   };
-  initiateQuerySpecification(
-    context.key,
-    extractQuerySpecification(data.rows[0])
-  );
+  initiateQuerySpecification(context.key, extractQuerySpecification(data.item));
 
   return (
     <QueryContext.Provider value={context}>
@@ -58,9 +55,7 @@ export default ({ children }) => {
     }
   }, [queryContext.key, querySpecification.fetchNeeded]);
 
-  if (
-    !(data && data.isReady && querySpecification && querySpecification.isReady)
-  ) {
+  if (!(data && data.isReady && data.item && querySpecification)) {
     return <div>Loading data for Saved Query...</div>;
   }
 

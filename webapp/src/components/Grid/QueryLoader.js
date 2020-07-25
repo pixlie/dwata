@@ -18,24 +18,24 @@ export default ({ children }) => {
     if (!!querySpecification && !!querySpecification.sourceLabel) {
       fetchSchema(querySpecification.sourceLabel);
     }
-  }, [querySpecification.sourceLabel]);
+  }, [querySpecification, querySpecification.sourceLabel, fetchSchema]);
 
   useEffect(() => {
     if (!!querySpecification && !!querySpecification.fetchNeeded) {
       fetchData(queryContext.key, querySpecification);
     }
-  }, [queryContext.key, querySpecification.fetchNeeded]);
+  }, [
+    querySpecification,
+    querySpecification.fetchNeeded,
+    queryContext.key,
+    fetchData,
+  ]);
 
-  if (
-    !(
-      data &&
-      data.isReady &&
-      querySpecification &&
-      querySpecification.isReady &&
-      schema &&
-      schema.isReady
-    )
-  ) {
+  if (!(data && querySpecification && schema)) {
+    return <div>Loading...</div>;
+  }
+
+  if (!(data.isReady && querySpecification.isReady && schema.isReady)) {
     return <div>Loading data...</div>;
   }
 

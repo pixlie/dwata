@@ -1,47 +1,33 @@
 import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useGlobal,
-  useSchema,
-  useData,
-  useQuerySpecification,
-} from "services/store";
+import { useSchema, useQuerySpecification } from "services/store";
+import { getColumnSchema } from "services/querySpecification/getters";
+import { Button } from "components/LayoutHelpers";
 
 /**
  * This method renders on the filter controls for a single column.
  * It is used in the top (common) filter editor, as well as in the per column head editor.
  */
-export default ({ columnName }) => {
+export default ({ columnName, singleFilter = false }) => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
-  const isFEVisible = useGlobal((state) => state.isFEVisible);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const setFilter = useQuerySpecification((state) => state.setFilter);
+  const requestRefetch = useQuerySpecification((state) => state.requestRefetch);
 
-  if (
-    !(
-      data &&
-      data.isReady &&
-      isFEVisible &&
-      querySpecification &&
-      querySpecification.isReady
-    )
-  ) {
+  const { filterBy } = querySpecification;
+  const dataType = getColumnSchema(schema.rows, columnName);
+
+  if (!(columnName in filterBy)) {
     return null;
   }
 
-  const { filterBy } = querySpecification;
-  const schemaColumns = schema.rows.find(
-    (x) => x.table_name === querySpecification.tableName
-  ).columns;
-  const dataType = schemaColumns.find((x) => x.name === columnName);
-
   const handleChange = (event) => {
     const { name, value, dataset } = event.target;
+    let fetchImmediately = false;
 
     const temp = {};
     if (dataType.type === "INTEGER") {
@@ -77,6 +63,7 @@ export default ({ columnName }) => {
         temp["to"] = value;
       }
     } else if (dataType.type === "BOOLEAN") {
+      fetchImmediately = true;
       temp["value"] = null;
       if (value === "true") {
         temp["value"] = true;
@@ -86,35 +73,52 @@ export default ({ columnName }) => {
     }
 
     setFilter(queryContext.key, name, temp);
+    if (fetchImmediately) {
+      requestRefetch(queryContext.key);
+    }
   };
 
-  if (!Object.keys(filterBy).includes(columnName)) {
-    return null;
-  }
+  const handleSubmit = () => {
+    requestRefetch(queryContext.key);
+  };
 
   if (dataType.type === "INTEGER" || dataType.type === "FLOAT") {
     return (
-      <div className="control">
-        <input
-          className="input"
-          name={columnName}
-          onChange={handleChange}
-          placeholder="range 12,88 or exact 66"
-          value={filterBy[columnName].display}
-        />
-      </div>
+      <Fragment>
+        <div className="control">
+          <input
+            className="input"
+            name={columnName}
+            onChange={handleChange}
+            placeholder="range 12,88 or exact 66"
+            value={filterBy[columnName].display}
+          />
+        </div>
+        {singleFilter ? (
+          <div className="control">
+            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
+          </div>
+        ) : null}
+      </Fragment>
     );
   } else if (dataType.type === "VARCHAR") {
     return (
-      <div className="control">
-        <input
-          className="input"
-          name={columnName}
-          onChange={handleChange}
-          placeholder="text to search"
-          value={filterBy[columnName].display}
-        />
-      </div>
+      <Fragment>
+        <div className="control">
+          <input
+            className="input"
+            name={columnName}
+            onChange={handleChange}
+            placeholder="text to search"
+            value={filterBy[columnName].display}
+          />
+        </div>
+        {singleFilter ? (
+          <div className="control">
+            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
+          </div>
+        ) : null}
+      </Fragment>
     );
   } else if (dataType.type === "DATE") {
     return (
@@ -140,6 +144,12 @@ export default ({ columnName }) => {
             value={filterBy[columnName].display}
           />
         </div>
+
+        {singleFilter ? (
+          <div className="control">
+            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
+          </div>
+        ) : null}
       </Fragment>
     );
   } else if (dataType.type === "TIMESTAMP") {
@@ -166,6 +176,12 @@ export default ({ columnName }) => {
             value={filterBy[columnName].to}
           />
         </div>
+
+        {singleFilter ? (
+          <div className="control">
+            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
+          </div>
+        ) : null}
       </Fragment>
     );
   } else if (dataType.type === "BOOLEAN") {

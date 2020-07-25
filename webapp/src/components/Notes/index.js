@@ -1,197 +1,81 @@
-import React, { useCallback, useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import React, { useEffect } from "react";
 
-import { useGlobal } from "services/store";
-import { Section } from "components/BulmaHelpers";
-
-const defaultNote = `# Notes
-Notes help you and your team save time to understand data in relation to your business.
-Notes are great documentation for onboarding new team members.
-
-You can use notes to:
-- Explain what some tables do
-- Which tables are important at which stage of business
-- Which tables are important for which teams in your business
-
-The notes editor supports [Markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
-syntax, which is automatically converted to HTML.
-`;
+import * as globalConstants from "services/global/constants";
+import {
+  useGlobal,
+  useData,
+  useQueryContext,
+  useQuerySpecification,
+} from "services/store";
+import { QueryContext } from "utils";
+import QueryLoader from "components/Grid/QueryLoader";
+import { Modal, Hx } from "components/LayoutHelpers";
+import NotesList from "./List";
 
 export default () => {
-  const showNotesFor = useGlobal((state) => state.showNotesFor);
-  const handleKey = useCallback(
-    (event) => {
-      if (event.keyCode === 27) {
-        showNotesFor(null);
-      }
-    },
-    [showNotesFor]
+  const mainApp = useQueryContext((state) => state["main"]);
+  const showNotes = useGlobal((state) => state.showNotes);
+  const isNotesVisible = useGlobal((state) => state.isNotesVisible);
+  const navigationButtonMeta = useGlobal(
+    (state) => state.navigationButtonMeta["notes"]
   );
-  useEffect(() => {
-    document.addEventListener("keydown", handleKey, false);
+  // This is data for notes
+  const notesData = useData((state) => state["notes"]);
+  // This is Query Specification for whatever data is in the main app (like table, saved queries, reports, etc.)
+  const querySpecification = useQuerySpecification(
+    (state) => state[mainApp.key]
+  );
+  const notesQuerySpecification = useQuerySpecification(
+    (state) => state["notes"]
+  );
+  const initiateQuerySpecification = useQuerySpecification(
+    (state) => state.initiateQuerySpecification
+  );
 
-    return () => {
-      document.removeEventListener("keydown", handleKey, false);
-    };
-  }, [handleKey]);
-  const doStates = Object.freeze({
-    read: "read",
-    edit: "edit",
-    preview: "preview", // This is like read, but with the save button
-  });
-  const [state, setState] = useState({
-    current: doStates.read,
-    content: defaultNote,
-    existingNote: {},
-  });
-  useEffect(() => {
-    fetchNote();
-    setState((state) => ({
-      ...state,
-      content: defaultNote,
-    }));
-  }, [showNotesFor, fetchNote]);
-  useEffect(() => {
-    if (dataItem) {
-      setState((state) => ({
-        ...state,
-        content: dataItem.content,
-        existingNote: dataItem,
-      }));
-    }
-  }, [dataItem]);
-  const toggleState = (transitionTo) => (event) => {
-    event.preventDefault();
-    setState((state) => ({
-      ...state,
-      current: transitionTo,
-    }));
-  };
-  const handleChange = (event) => {
-    const { value } = event.target;
-    setState((state) => ({
-      ...state,
-      content: value,
-    }));
+  const { appType } = mainApp;
+  const notesQS = {
+    sourceLabel: "dwata_meta",
+    select: [
+      {
+        label: "dwata_meta_note",
+        tableName: "dwata_meta_note",
+      },
+    ],
+    fetchNeeded: true,
   };
 
-  if (!isNoteAppEnabled || !isReady) {
+  useEffect(() => {
+    initiateQuerySpecification("notes", notesQS);
+  }, []);
+
+  if (
+    !isNotesVisible ||
+    appType !== globalConstants.APP_NAME_BROWSER ||
+    !notesQuerySpecification ||
+    !notesQuerySpecification.sourceLabel
+  ) {
     return null;
   }
-  const handleClose = (event) => {
-    event.preventDefault();
-    showNotesFor(null);
-  };
 
-  const handleSave = (event) => {
-    event.preventDefault();
-    saveNote(
-      {
-        content: state.content,
-      },
-      state.existingNote.id ? state.existingNote.id : null
-    );
+  const handleClose = () => {
+    showNotes();
   };
 
   return (
-    <div id="notes-modal">
-      <Section>
-        <button
-          className="button is-rounded is-dark close"
-          onClick={handleClose}
-        >
-          Close&nbsp;<i className="fas fa-times"></i>
-        </button>
-
-        {state.current === doStates.edit ? (
-          <div className="field">
-            <div className="control">
-              <textarea
-                className="textarea"
-                defaultValue={state.content}
-                rows="12"
-                onChange={handleChange}
-              ></textarea>
-            </div>
-          </div>
-        ) : (
-          <div className="content">
-            <ReactMarkdown source={state.content} linkTarget="_blank" />
-          </div>
-        )}
-        <div className="buttons">
-          {[doStates.edit, doStates.preview].includes(state.current) ? (
-            <button
-              className="button is-primary"
-              disabled={defaultNote === state.content}
-              onClick={handleSave}
-            >
-              Save
-            </button>
-          ) : null}
-          {[doStates.read, doStates.preview].includes(state.current) ? (
-            <button
-              className="button is-primary"
-              onClick={toggleState(doStates.edit)}
-            >
-              Edit note
-            </button>
-          ) : null}
-          {state.current === doStates.edit ? (
-            <button
-              className="button is-light"
-              onClick={toggleState(doStates.preview)}
-            >
-              Preview
-            </button>
-          ) : null}
-          {state.current === doStates.edit ? (
-            <button
-              className="button is-light"
-              onClick={toggleState(doStates.read)}
-            >
-              Cancel
-            </button>
-          ) : null}
-        </div>
-      </Section>
-    </div>
+    <Modal
+      callerPosition={navigationButtonMeta.position}
+      theme="light"
+      maxWidth="2xl"
+      toggleModal={handleClose}
+    >
+      <Hx x="4">Notes</Hx>
+      <QueryContext.Provider
+        value={{ key: "notes", currentQS: querySpecification }}
+      >
+        <QueryLoader>
+          {notesData && notesData.isReady ? <NotesList /> : null}
+        </QueryLoader>
+      </QueryContext.Provider>
+    </Modal>
   );
 };
-
-/*
-const mapStateToProps = (state) => {
-  const { showNotesFor } = state.global;
-  const { isNoteAppEnabled, noteAppConfig } = state.apps;
-  const { source_id: sourceId, table_name: tableName } = noteAppConfig;
-  const _cacheKey = `${sourceId}/${tableName}/${btoa(showNotesFor)}`;
-
-  if (
-    showNotesFor !== null &&
-    _cacheKey in state.dataItem &&
-    state.dataItem[_cacheKey].isReady
-  ) {
-    return {
-      isReady: true,
-      isNoteAppEnabled,
-      showNotesFor,
-      cacheKey: _cacheKey,
-      dataItem: state.dataItem[_cacheKey].data,
-    };
-  }
-
-  return {
-    isReady: false,
-    cacheKey: _cacheKey,
-    showNotesFor,
-  };
-};
-
-export default withRouter(
-  connect(mapStateToProps, {
-    showNotesFor,
-    fetchNote,
-    saveNote,
-  })(Notes)
-);
-*/

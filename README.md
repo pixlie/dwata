@@ -1,32 +1,36 @@
 # Dwata
 
-## A powerful, self-hosted, open source admin at a fraction of cost to develop.
+**Software for Business teams to understand, monitor, analyze or manage their own data like Customers, Sales, Shipments, Payments, etc. without knowing SQL, APIs or writing any code.**
 
-**Manage your SQL/API data (MySQL/PgSQL, Stripe, Mailchimp, etc.) & Content in one place with your entire team. Works with any backend.**
+## What is dwata?
 
-## Why would you use Dwata?
-If you are building an admin on say Django, Laravel, Express or any other framework then:
-- Admin is not used by your customer
-- Developers' time is prioritized to customer
-- Your team will need a great admin to manage the business
-- Admin takes time/money to build
+- A complete software to manage Business operations
+- Query complex data without knowing SQL or APIs
+- Share business insights with entire team
+- Onboard team members easily to every moving part of your Business data
+- Keep track of KPIs from any data source, compare Weekly/Monthly/Quarterly growth
+- Directly integrates with Stripe, Mailchimp, PayPal, Shippo, etc. - no code to write
+- Build live Reports and Dashboards from your Business data
+- Build Workflows/Forms like "Verification Steps" or "Support Information" on your data
+- Share Vendor/Seller/Customer specify Workflows with them
 
-Building an admin application is an undifferentiated investment that does not add direct value to your customers.
+## Why would you use dwata?
 
-Dwata provides a feature rich admin that has CMS, visual Data explorer, User management and also integrates with third party service APIs.
+- No need to invest in Django/Laravel/Rails/Express/... based admin
+- Engineers' time stays with your direct customers
+- Your operations team will get a great software that is build with non-technical people in mind
+- Save a lot of time needed to build internal views, reports, dashboards
 
-## Features on roadmap:
-- CRUD admin for databases (MySQL/PostgreSQL)
-- Explore SQL data without any SQL knowledge
-- Highlight important data (rows), add notes, pin them
-- Backend language/framework agnostic
-- Integrates with third party services like Stripe
-- Browse third party API data or merge them with SQL data
-- Create dashboards with data from multiple tables or APIs
-- Call existing backend logic (Mark Order as `Read to Ship`)
-- Content management with Markdown
-- Media management (S3, Dropbox storage)
-- Team wide notes on data points, collaboration tools
-- Invite guests to specific views/dashboards (read only access)
+**Building an admin application is an undifferentiated investment that does not add direct value to your customers.**
 
-We are in alpha development stage.
+## How does dwata work:
+
+**We are in alpha development stage.**
+
+- dwata Backend scans your MySQL/PostgreSQL/MongoDB (coming soon) or more other RDBMS
+- It understands entire data schema - Tables, Columns, Relations, even Stored Procedures (coming soon)
+- It can connect directly with Stripe, PayPal, Mailchimp or any other service you use
+- dwata Frontend then uses all this information to build dynamic UI with Grids, Reports, Dashboards etc.
+- Has Widgets for everything from Numbers to Dates/Timezones, Geographic data...
+- Has internal search server for full search across any of your data sources
+- Has internal cache so Queries are not repeatedly and unnecessarily hitting your databases

@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 
 import { QueryContext } from "utils";
 import { useQueryContext } from "services/store";
@@ -8,7 +8,7 @@ import Navbar from "components/Navbar";
 // import Sidebar from "components/Sidebar";
 import Home from "components/Home";
 import Grid from "components/Grid";
-// import Notes from "components/Notes";
+import Notes from "components/Notes";
 // import Actions from "components/Actions";
 import Report from "components/Report";
 
@@ -16,17 +16,14 @@ export default () => {
   const mainApp = useQueryContext((state) => state["main"]);
 
   return (
-    <Fragment>
-      <QueryContext.Provider value={mainApp}>
-        <Navbar />
-      </QueryContext.Provider>
-      {/* <Notes /> */}
+    <QueryContext.Provider value={mainApp}>
+      <Navbar />
+      <div style={{ display: "block", paddingBottom: "60px", clear: "both" }} />
+      <Notes />
       {/* <Sidebar><Source /></Sidebar> */}
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
-        <QueryContext.Provider value={mainApp}>
-          <Grid />
-        </QueryContext.Provider>
+        <Grid />
       ) : null}
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
@@ -36,6 +33,6 @@ export default () => {
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
         <Home />
       ) : null}
-    </Fragment>
+    </QueryContext.Provider>
   );
 };

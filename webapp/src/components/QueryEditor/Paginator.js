@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useQuerySpecification } from "services/store";
+import { useQuerySpecification } from "services/store";
+import { Button } from "components/LayoutHelpers";
 
 const PageItem = ({ number }) => {
   const queryContext = useContext(QueryContext);
@@ -9,12 +10,7 @@ const PageItem = ({ number }) => {
     (state) => state[queryContext.key]
   );
   const gotoPage = useQuerySpecification((state) => state.gotoPage);
-
-  let offset = null,
-    limit = null;
-  if (querySpecification) {
-    ({ offset, limit } = querySpecification);
-  }
+  const { offset, limit } = querySpecification;
   const currentPage = Math.floor(offset / limit) + 1;
 
   const handleGotoPage = () => {
@@ -22,17 +18,17 @@ const PageItem = ({ number }) => {
   };
 
   return (
-    <li>
-      <span
-        className={`pagination-link${
-          number === currentPage ? " is-current" : ""
-        }`}
-        aria-label={`Goto page ${number}`}
-        onClick={handleGotoPage}
-      >
-        {number}
-      </span>
-    </li>
+    <Button
+      active={number === currentPage ? true : false}
+      margin="mr-1"
+      theme="info"
+      attributes={{
+        "aria-label": `Goto page ${number}`,
+        onClick: handleGotoPage,
+      }}
+    >
+      {number}
+    </Button>
   );
 };
 
@@ -41,36 +37,23 @@ const PageSlots = () => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-
-  if (!(querySpecification && querySpecification.isReady)) {
-    return null;
-  }
-
-  let count = null,
-    limit = null;
-  if (querySpecification) {
-    ({ count, limit } = querySpecification);
-  }
+  const { count, limit } = querySpecification;
   const slots = 9; // Includes all page numbers to be shown and ellipses
   const totalPages = Math.ceil(count / limit);
 
   if (totalPages < slots) {
     return (
-      <ul className="pagination-list">
-        <li>
-          <span className="pagination-ellipsis">{limit}/page</span>
-        </li>
+      <Fragment>
+        <span className="pagination-ellipsis">{limit}/page</span>
         {[...Array(totalPages).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
-      </ul>
+      </Fragment>
     );
   } else {
     return (
-      <ul className="pagination-list">
-        <li>
-          <span className="pagination-ellipsis">{limit}/page</span>
-        </li>
+      <Fragment>
+        <span className="pagination-ellipsis">{limit}/page</span>
         {[...Array(4).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
@@ -80,31 +63,19 @@ const PageSlots = () => {
         {[...Array(4).keys()].reverse().map((x) => (
           <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} />
         ))}
-      </ul>
+      </Fragment>
     );
   }
 };
 
 export default () => {
   const queryContext = useContext(QueryContext);
-  const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const nextPage = useQuerySpecification((state) => state.nextPage);
   const previousPage = useQuerySpecification((state) => state.previousPage);
-
-  if (
-    !(data && data.isReady && querySpecification && querySpecification.isReady)
-  ) {
-    return null;
-  }
-  let count = null,
-    offset = null,
-    limit = null;
-  if (querySpecification) {
-    ({ count, offset, limit } = querySpecification);
-  }
+  const { count, offset, limit } = querySpecification;
 
   const handleNext = (event) => {
     event.preventDefault();
@@ -117,25 +88,32 @@ export default () => {
   };
 
   return (
-    <div id="paginator">
+    <div
+      className="fixed right-0 mr-16 z-10 bg-gray-700 p-2 p-y-4 shadow-lg text-white"
+      style={{ bottom: "2rem" }}
+    >
       <nav className="pagination" role="navigation" aria-label="pagination">
         {offset < limit ? (
-          <span className="pagination-previous" disabled>
+          <Button margin="mr-2" theme="info" disabled>
             Previous
-          </span>
+          </Button>
         ) : (
-          <span className="pagination-previous" onClick={handlePrevious}>
+          <Button
+            margin="mr-2"
+            theme="info"
+            attributes={{ onClick: handlePrevious }}
+          >
             Previous
-          </span>
+          </Button>
         )}
         {offset + limit >= count ? (
-          <span className="pagination-next" disabled>
+          <Button theme="info" disabled>
             Next page
-          </span>
+          </Button>
         ) : (
-          <span className="pagination-next" onClick={handleNext}>
+          <Button theme="info" attributes={{ onClick: handleNext }}>
             Next page
-          </span>
+          </Button>
         )}
         <PageSlots />
       </nav>

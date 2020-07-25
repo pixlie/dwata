@@ -8,7 +8,7 @@ import {
   useQueryContext,
 } from "services/store";
 import * as globalConstants from "services/global/constants";
-import { Panel } from "components/BulmaHelpers";
+import { Panel } from "components/LayoutHelpers";
 import QueryLoader from "components/Grid/QueryLoader";
 
 const SavedItem = ({ item }) => {
@@ -24,8 +24,13 @@ const SavedItem = ({ item }) => {
     });
     initiateQuerySpecification("main", {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_saved_query",
-      pk: item.id,
+      select: [
+        {
+          label: "dwata_meta_saved_query",
+          tableName: "dwata_meta_saved_query",
+        },
+      ],
+      where: { "dwata_meta_saved_query.id": item.id },
       isSavedQuery: true,
       fetchNeeded: true,
     });
@@ -47,7 +52,12 @@ export default ({ context }) => {
   useEffect(() => {
     initiateQuerySpecification(context.key, {
       sourceLabel: "dwata_meta",
-      tableName: "dwata_meta_saved_query",
+      select: [
+        {
+          label: "dwata_meta_saved_query",
+          tableName: "dwata_meta_saved_query",
+        },
+      ],
       fetchNeeded: true,
     });
   }, []);

@@ -1,46 +1,70 @@
 import React, { Fragment } from "react";
 
+import { getColumnSchema } from "services/querySpecification/getters";
 
-export default (schemaColumns, tableColumns, querySpecificationColumns) => {
+export default (schema, tableColumns, selectedColumLabels) => {
   const rowList = [];
   const date_time_options = {
-    year: "numeric", month: "numeric", day: "numeric",
-    hour: "numeric", minute: "numeric", second: "numeric",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
     hour12: false,
   };
+  const classes = "px-1";
 
-  const DefaultCell = ({ data }) => <td>{data}</td>;
-  const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
-  const BooleanCell = ({ data }) => <td>{(data === true || data === false) ? (
-    <Fragment>
-      {data === true ? (
-        <div className="tag is-light is-success">
-          <i className="fas fa-check-circle" />&nbsp;Yes
-        </div>
-       ) : (
-        <div className="tag is-light is-danger">
-          <i className="fas fa-times-circle" />&nbsp;No
-        </div>
-       )}
-    </Fragment>
-  ) : <i />}</td>;
-  const JSONCell = () => <td>{"{}"}</td>;
-  const TimeStampCell = (({ data }) => {
+  const DefaultCell = ({ data }) => <td className={classes}>{data}</td>;
+  const PrimaryKeyCell = ({ data }) => <th className={classes}>{data}</th>;
+  const BooleanCell = ({ data }) => (
+    <td className={classes}>
+      {data === true || data === false ? (
+        <Fragment>
+          {data === true ? (
+            <span className="inline-block bg-green-200 text-sm px-1 rounded">
+              <span className="text-green-600 text-sm">
+                <i className="fas fa-check-circle" />
+              </span>
+              &nbsp;Yes
+            </span>
+          ) : (
+            <span className="inline-block bg-red-200 text-sm px-1 rounded">
+              <span className="text-red-600 text-sm">
+                <i className="fas fa-times-circle" />
+              </span>
+              &nbsp;No
+            </span>
+          )}
+        </Fragment>
+      ) : (
+        <i />
+      )}
+    </td>
+  );
+  const JSONCell = () => <td className={classes}>{"{}"}</td>;
+  const TimeStampCell = ({ data }) => {
     try {
-      return <td>{new Intl.DateTimeFormat("en-GB", date_time_options).format(new Date(data * 1000))}</td>;
+      return (
+        <td className={classes}>
+          {new Intl.DateTimeFormat("en-GB", date_time_options).format(
+            new Date(data * 1000)
+          )}
+        </td>
+      );
     } catch (error) {
       if (error instanceof RangeError) {
-        return <td>{data}</td>
+        return <td className={classes}>{data}</td>;
       }
     }
-  });
+  };
 
   for (const col of tableColumns) {
-    if (!querySpecificationColumns.includes(col)) {
+    if (!selectedColumLabels.includes(col)) {
       rowList.push(null);
       continue;
     }
-    const head = schemaColumns.find(x => x.name === col);
+    const head = getColumnSchema(schema, col);
     if (head.is_primary_key) {
       rowList.push(PrimaryKeyCell);
     } else if (head.has_foreign_keys) {
@@ -59,4 +83,4 @@ export default (schemaColumns, tableColumns, querySpecificationColumns) => {
   }
 
   return rowList;
-}
+};

@@ -25,12 +25,12 @@ export default () => {
   if (data) {
     ({ columns, rows, selectedRowList } = data);
   }
+  const selectedColumLabels = querySpecification.select.map((x) => x.label);
 
   const rowRendererList = rowRenderer(
-    schema.rows.find((x) => x.table_name === querySpecification.tableName)
-      .columns,
+    schema.rows,
     columns,
-    querySpecification.columnsSelected
+    selectedColumLabels
   );
   const RowSelectorCell = ({ row }) => {
     const handleRowSelect = (event) => {
@@ -63,9 +63,11 @@ export default () => {
       // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
       // );
     };
+    let classes = "border-b hover:bg-gray-100";
+    classes = classes + (pinned ? " is-pin" : "");
 
     return (
-      <tr onClick={handleRowClick} className={pinned ? "is-pin" : ""}>
+      <tr onClick={handleRowClick} className={classes}>
         <RowSelectorCell row={row} />
         {row.map((cell, j) => {
           const Cell = rowRendererList[j];
