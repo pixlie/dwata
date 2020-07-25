@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment, useState } from "react";
+import React, { useEffect, Fragment } from "react";
 
 import useSource from "services/source/store";
 import { Panel } from "components/LayoutHelpers";
@@ -11,9 +11,9 @@ export default () => {
   }, [fetchSource]);
   const isReady = useSource((state) => state.isReady);
   const sourceRows = useSource((state) => state.rows);
-  const [state, setState] = useState({
+  /* const [state, setState] = useState({
     sourceIndex: null,
-  });
+  }); */
   // const {sourceIndex} = state;
 
   const SourceItem = ({ source, sourceType }) => {
@@ -22,17 +22,17 @@ export default () => {
       // Todo: Remove this in [ch161] when moving to source label
       return null;
     }
-    const handleClickSource = (event) => {
+    /* const handleClickSource = (event) => {
       event.preventDefault();
       setState((state) => ({
         ...state,
         sourceIndex: source.label,
       }));
-    };
+    }; */
 
     return (
       <Fragment>
-        <div className="block p-2 pl-3 border-b" onClick={handleClickSource}>
+        <div className="block p-2 pl-3 border-b">
           <strong>{source.label}</strong>&nbsp;
           <span className="inline-block bg-green-200 text-sm px-2 rounded">
             {source.provider}

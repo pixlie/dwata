@@ -53,7 +53,7 @@ export default ({ children }) => {
     if (!!querySpecification && !!querySpecification.fetchNeeded) {
       fetchData(queryContext.key, querySpecification);
     }
-  }, [queryContext.key, querySpecification.fetchNeeded]);
+  }, [querySpecification, queryContext.key, fetchData]);
 
   if (!(data && data.isReady && data.item && querySpecification)) {
     return <div>Loading data for Saved Query...</div>;

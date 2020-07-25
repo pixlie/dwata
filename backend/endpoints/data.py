@@ -1,4 +1,3 @@
-from starlette.responses import Response
 import sqlalchemy
 from sqlalchemy import MetaData, select, func, or_
 from json.decoder import JSONDecodeError
@@ -33,9 +32,11 @@ def find_best_join(sel_obj, meta, table_query_order):
     for index, table_name in enumerate(table_query_order):
         if index == 0:
             continue
+        relation_found = False
 
         # We start with the second table (index 1)
         prev_table_name = table_query_order[index - 1]
+        # For every column of the previous table in query order, check if we have a FK to the current table
         for col, col_def in meta.tables[prev_table_name].columns.items():
             # Check if the previous table has FK
             if len(col_def.foreign_keys) > 0:
@@ -48,6 +49,22 @@ def find_best_join(sel_obj, meta, table_query_order):
                             getattr(meta.tables[prev_table_name].c, x.parent.name) ==
                             getattr(meta.tables[table_name].c, x.column.name)
                         ))
+                        relation_found = True
+
+        if not relation_found:
+            # Let us do the same check, but the other way around
+            for col, col_def in meta.tables[table_name].columns.items():
+                # Check if the previous table has FK
+                if len(col_def.foreign_keys) > 0:
+                    # For each FK, is there a direct FK from the previous table to current table?
+                    for x in col_def.foreign_keys:
+                        if x.column.table.name == prev_table_name:
+                            # So previous table has FK to current table, let's use this to JOIN
+                            sel_obj = sel_obj.select_from(meta.tables[table_name].join(
+                                meta.tables[prev_table_name],
+                                getattr(meta.tables[table_name].c, x.parent.name) ==
+                                getattr(meta.tables[prev_table_name].c, x.column.name)
+                            ))
         return sel_obj
 
 
