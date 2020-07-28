@@ -13,6 +13,9 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const headList = [];
+  const selectedTableNames = [
+    ...new Set(querySpecification.select.map((x) => x.tableName)),
+  ];
   const selectedTableColumNames = querySpecification.select.map((x) => x.label);
 
   for (const tableColumnName of data.columns) {
@@ -24,6 +27,7 @@ export default () => {
       headList.push(
         <TableHeadItem
           tableColumnName={tableColumnName}
+          label={selectedTableNames.length === 1 ? head.name : tableColumnName}
           key={`th-${tableColumnName}`}
         />
       );
@@ -31,6 +35,7 @@ export default () => {
       headList.push(
         <TableHeadItem
           tableColumnName={tableColumnName}
+          label={selectedTableNames.length === 1 ? head.name : tableColumnName}
           key={`th-${tableColumnName}`}
         />
       );

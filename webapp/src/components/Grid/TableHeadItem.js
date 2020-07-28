@@ -29,7 +29,7 @@ const ColumnHeadSpecification = ({ tableColumnName }) => {
   );
 };
 
-export default ({ tableColumnName }) => {
+export default ({ tableColumnName, label }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -50,7 +50,7 @@ export default ({ tableColumnName }) => {
 
   return (
     <ColumnHead
-      label={tableColumnName}
+      label={label}
       order={querySpecification.orderBy[tableColumnName]}
       attributes={{ onClick: handleClick }}
     >

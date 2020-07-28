@@ -56,10 +56,11 @@ def find_best_join(sel_obj, meta, table_query_order):
             for col, col_def in meta.tables[table_name].columns.items():
                 # Check if the previous table has FK
                 if len(col_def.foreign_keys) > 0:
-                    # For each FK, is there a direct FK from the previous table to current table?
+                    # For each FK, is there a direct FK from current table to the previous table?
                     for x in col_def.foreign_keys:
                         if x.column.table.name == prev_table_name:
-                            # So previous table has FK to current table, let's use this to JOIN
+                            # So current table has FK to previous table, this usually means a One to Many relationship
+                            # from current table to previous table
                             sel_obj = sel_obj.select_from(meta.tables[table_name].join(
                                 meta.tables[prev_table_name],
                                 getattr(meta.tables[table_name].c, x.parent.name) ==
@@ -132,7 +133,7 @@ async def data_post(request):
     We use JSON (in the POST payload) to specify the query.
     """
     from .schema import column_definition
-    default_per_page = 20
+    default_per_page = 25
 
     try:
         query_specification = await request.json()
@@ -171,7 +172,7 @@ async def data_post(request):
                 # `table.*` was not requested earlier, so we add this current column
                 tables_and_columns[table_name].append(column_name)
 
-    for table_name in table_query_order:
+    for index, table_name in enumerate(table_query_order):
         column_list = tables_and_columns[table_name]
         # Unavailable columns are configured due to security or similar reasons, we remove them here
         table_column_names = [column_name for column_name in meta.tables[table_name].columns.keys()
@@ -189,10 +190,16 @@ async def data_post(request):
         elif column_list == ["__auto__"]:
             # If we have not been asked to show specific columns then we do not send columns which are
             # detected to be meta data
-            meta_data_column_names = [col["name"] for col in [
-                column_definition(col, col_def) for col, col_def in current_table.columns.items()
-                if col not in unavailable_columns[table_name]
-            ] if "is_meta" in col["ui_hints"]]
+            if index == 0:
+                meta_data_column_names = [col["name"] for col in [
+                    column_definition(col, col_def) for col, col_def in current_table.columns.items()
+                    if col not in unavailable_columns[table_name]
+                ] if "is_meta" in col["ui_hints"]]
+            else:
+                meta_data_column_names = [col["name"] for col in [
+                    column_definition(col, col_def) for col, col_def in current_table.columns.items()
+                    if col not in unavailable_columns[table_name]
+                ] if "is_meta" in col["ui_hints"] or col["is_nullable"]]
             current_table_columns = current_table_columns +\
                 [getattr(current_table.c, col) for col in table_column_names if col not in meta_data_column_names]
         else:

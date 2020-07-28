@@ -22,7 +22,12 @@ export default () => {
     ).properties;
     if (tableProperties.related_tables) {
       for (const relatedTable of tableProperties.related_tables) {
-        relatedTables.push(relatedTable);
+        if (
+          !schema.rows.find((x) => x.table_name === relatedTable).properties
+            .is_system_table
+        ) {
+          relatedTables.push(relatedTable);
+        }
       }
     }
   }
