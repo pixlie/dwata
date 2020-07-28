@@ -81,15 +81,13 @@ export default () => {
 
       {filters}
 
-      <div className="field">
-        <div className="control">
-          <div className="select is-fullwidth">
-            <select name="filter_column" onChange={addFilter} value="---">
-              {filterByOptions}
-            </select>
-          </div>
-        </div>
-      </div>
+      <select
+        className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
+        onChange={addFilter}
+        value="---"
+      >
+        {filterByOptions}
+      </select>
     </Fragment>
   );
 };

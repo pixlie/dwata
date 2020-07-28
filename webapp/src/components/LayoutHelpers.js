@@ -130,7 +130,7 @@ export const ColumnHead = ({ label, order, group, attributes, children }) => {
   }
 
   return (
-    <th className="col-hd text-left">
+    <th className="mb-4 text-left">
       <span className={classes} {...attributes}>
         {label}
       </span>

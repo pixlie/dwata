@@ -35,7 +35,7 @@ export default ({ isSourceFetching, toggleSidebar }) => {
 
   return (
     <nav
-      className="fixed top-0 w-screen flex items-center bg-blue-200 border-b border-blue-300"
+      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 shadow-md"
       role="navigation"
       aria-label="main navigation"
     >
