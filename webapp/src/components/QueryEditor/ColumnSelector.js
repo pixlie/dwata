@@ -28,7 +28,7 @@ export default () => {
 
     return (
       <label
-        className={`block font-mono font-normal text-sm ${
+        className={`block font-mono font-normal text-sm bg-gray-200 py-1 px-2 mb-1 border hover:bg-gray-300 ${
           checked ? "text-gray-700" : "text-gray-500"
         }`}
       >
@@ -47,6 +47,13 @@ export default () => {
   return (
     <Fragment>
       <Hx x="4">Columns</Hx>
+      <p className="text-gray-700 my-2">
+        For any table that you select to see, there are a list of{" "}
+        <strong>columns</strong> that you can choose to see or not.{" "}
+        <strong>dwata</strong> figures out all the columns automatically. Even
+        if you do not wish to see certain columns, you can still{" "}
+        <strong>Filter</strong> or <strong>Order</strong> with them.
+      </p>
 
       <div className="field">
         {selectedTables.map((x) => (

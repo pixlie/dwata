@@ -46,7 +46,9 @@ export default () => {
   };
 
   return (
-    <div className="fixed bottom-0 right-0 h-screen max-w-4xl bg-gray-700 px-2">
+    <div className="fixed bottom-0 right-0 h-screen max-w-md bg-gray-700 px-2">
+      <div className="block w-full lg:inline-block lg:mt-0 p-4">&nbsp;</div>
+
       <div className="w-full">
         {state.openEditor === "column" ? (
           <div className="bg-gray-100 my-1 rounded-md px-2 py-1">

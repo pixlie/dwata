@@ -39,7 +39,7 @@ export default () => {
     };
 
     return (
-      <label className="block font-mono font-normal text-sm text-gray-700">
+      <label className="block font-bold text-gray-700 bg-gray-200 py-1 px-2 mb-1 border hover:bg-gray-300">
         <input
           type="checkbox"
           name={table}
@@ -54,11 +54,16 @@ export default () => {
   return (
     <Fragment>
       <Hx x="5">Related</Hx>
-      <div className="field">
-        {relatedTables.map((table, i) => (
-          <BoundInput key={`tb-rl-${i}`} table={table} />
-        ))}
-      </div>
+      <p className="text-gray-700 my-2">
+        You can merge data from other tables which <strong>dwata</strong> finds
+        are related. dwata figures out how the other tables are related and will
+        give you contextual options as they might be needed to extract the right
+        merged data.
+      </p>
+
+      {relatedTables.map((table, i) => (
+        <BoundInput key={`tb-rl-${i}`} table={table} />
+      ))}
     </Fragment>
   );
 };
