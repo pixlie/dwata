@@ -77,7 +77,11 @@ export default () => {
         onChange={handleTableSelect}
       >
         {selectedTables.map((x) => (
-          <option className="py-2 bg-white font-bold" value={x.table_name}>
+          <option
+            key={`opt-${x.table_name}`}
+            className="py-2 bg-white font-bold"
+            value={x.table_name}
+          >
             {x.table_name}
           </option>
         ))}

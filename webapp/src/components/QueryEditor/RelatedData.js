@@ -18,29 +18,6 @@ export default () => {
   ];
   let relatedTables = [];
 
-  for (const tableColumn of querySpecification.select) {
-    // tableColumn is an object that has label, tableName, columnName...
-    const tableProperties = schema.rows.find(
-      (x) => x.table_name === tableColumn.tableName
-    ).properties;
-    if (tableProperties.related_tables) {
-      for (const relatedTableName of Object.keys(
-        tableProperties.related_tables
-      )) {
-        if (selectedTableNames.includes(relatedTableName)) {
-          continue;
-        }
-        if (
-          !schema.rows.find((x) => x.table_name === relatedTableName).properties
-            .is_system_table
-        ) {
-          relatedTables.push(relatedTableName);
-        }
-      }
-    }
-  }
-  relatedTables = [...new Set(relatedTables)];
-
   const BoundInput = ({ tableName }) => {
     const handleClick = () => {
       toggleColumnSelection(queryContext.key, tableName);
@@ -60,6 +37,65 @@ export default () => {
     );
   };
 
+  for (const tableName of selectedTableNames) {
+    // We take out the `properties` value from the schema of this table
+    const tableProperties = schema.rows.find((x) => x.table_name === tableName)
+      .properties;
+
+    // Check if this table has relations
+    if (tableProperties.related_tables) {
+      for (const [relatedTableName, relatedTableProperties] of Object.entries(
+        tableProperties.related_tables
+      )) {
+        if (selectedTableNames.includes(relatedTableName)) {
+          // We already have this related table in the list of selected tables, nothing to do
+          continue;
+        }
+
+        if (selectedTableNames.indexOf(tableName) !== 0) {
+          // We are not at the root table of our Query
+          // If we are not at the root table, then we only want to related to `one-to-one` or `many-to-one` relations
+          if (
+            relatedTableProperties.cardinality !== "many-to-one" ||
+            relatedTableProperties.cardinality !== "one-to-one"
+          ) {
+            continue;
+          }
+        }
+
+        if (
+          schema.rows.find((x) => x.table_name === relatedTableName).properties
+            .is_system_table
+        ) {
+          continue;
+        }
+
+        if (relatedTableProperties.cardinality === "one-to-many") {
+          relatedTables.push(
+            <Fragment key={`tb-rl-${relatedTableName}`}>
+              <BoundInput tableName={relatedTableName} />
+              <p className="pl-4 mb-4 text-gray-600 text-sm">
+                For each record (row of data) in <strong>{tableName}</strong>{" "}
+                there may be more than one record in{" "}
+                <strong>{relatedTableName}</strong>. We will show you all{" "}
+                <strong>{relatedTableName}</strong> records grouped per record
+                of <strong>{tableName}</strong>.
+              </p>
+            </Fragment>
+          );
+        } else {
+          relatedTables.push(
+            <BoundInput
+              key={`tb-rl-${relatedTableName}`}
+              tableName={relatedTableName}
+            />
+          );
+        }
+      }
+    }
+  }
+  relatedTables = [...new Set(relatedTables)];
+
   return (
     <Fragment>
       <Hx x="5">Related</Hx>
@@ -73,9 +109,7 @@ export default () => {
       {selectedTableNames.map((tableName) => (
         <BoundInput key={`tb-rl-${tableName}`} tableName={tableName} />
       ))}
-      {relatedTables.map((tableName) => (
-        <BoundInput key={`tb-rl-${tableName}`} tableName={tableName} />
-      ))}
+      {relatedTables}
     </Fragment>
   );
 };
