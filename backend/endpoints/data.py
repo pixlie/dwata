@@ -5,6 +5,7 @@ from json.decoder import JSONDecodeError
 from utils.response import RapidJSONResponse, web_error
 from utils.database import connect_database, get_unavailable_columns
 from utils.settings import get_source_settings
+from utils.schema import column_definition
 
 
 # Example query specification:
@@ -61,6 +62,7 @@ def find_best_join(sel_obj, meta, table_query_order):
                         if x.column.table.name == prev_table_name:
                             # So current table has FK to previous table, this usually means a One to Many relationship
                             # from current table to previous table
+                            # We do not JOIN One to Many relational data, instead we do a separate query
                             sel_obj = sel_obj.select_from(meta.tables[table_name].join(
                                 meta.tables[prev_table_name],
                                 getattr(meta.tables[table_name].c, x.parent.name) ==
@@ -132,7 +134,6 @@ async def data_post(request):
     etc. This method is a POST method because the query specification can become large.
     We use JSON (in the POST payload) to specify the query.
     """
-    from .schema import column_definition
     default_per_page = 25
 
     try:
@@ -149,7 +150,7 @@ async def data_post(request):
     meta = MetaData(bind=engine)
     meta.reflect()
     tables_and_columns = {}
-    table_query_order = []
+    requested_tables_in_order = []
     columns = []
     unavailable_columns = get_unavailable_columns(settings, meta)
 
@@ -163,7 +164,7 @@ async def data_post(request):
         if table_name not in tables_and_columns.keys():
             # We are encountering this table for the first time in this request, let's add it
             tables_and_columns[table_name] = [column_name]
-            table_query_order.append(table_name)
+            requested_tables_in_order.append(table_name)
         else:
             # We have encountered this table in this request already, let's just handle the column
             # Check if there is a an existing request for `table.*`.
@@ -171,8 +172,9 @@ async def data_post(request):
             if "*" not in tables_and_columns[table_name]:
                 # `table.*` was not requested earlier, so we add this current column
                 tables_and_columns[table_name].append(column_name)
+    root_table_name = requested_tables_in_order[0]
 
-    for index, table_name in enumerate(table_query_order):
+    for table_name in requested_tables_in_order:
         column_list = tables_and_columns[table_name]
         # Unavailable columns are configured due to security or similar reasons, we remove them here
         table_column_names = [column_name for column_name in meta.tables[table_name].columns.keys()
@@ -190,7 +192,7 @@ async def data_post(request):
         elif column_list == ["__auto__"]:
             # If we have not been asked to show specific columns then we do not send columns which are
             # detected to be meta data
-            if index == 0:
+            if table_name == root_table_name:
                 meta_data_column_names = [col["name"] for col in [
                     column_definition(col, col_def) for col, col_def in current_table.columns.items()
                     if col not in unavailable_columns[table_name]
@@ -208,7 +210,7 @@ async def data_post(request):
         columns += current_table_columns
 
     sel_obj = select(columns)
-    count_sel_obj = select([func.count()]).select_from(meta.tables[table_query_order[0]])
+    count_sel_obj = select([func.count()]).select_from(meta.tables[requested_tables_in_order[0]])
 
     if query_specification.get("order_by", {}) != {}:
         sel_obj = apply_ordering(sel_obj, query_specification, meta, unavailable_columns)
@@ -219,10 +221,10 @@ async def data_post(request):
     sel_obj = sel_obj.limit(query_specification.get("limit", default_per_page))
     sel_obj = sel_obj.offset(query_specification.get("offset", 0))
 
-    if len(table_query_order) > 1:
+    if len(requested_tables_in_order) > 1:
         # We have more than 1 table in the requested select, we need to apply JOINS
-        sel_obj = find_best_join(sel_obj, meta, table_query_order)
-        count_sel_obj = find_best_join(count_sel_obj, meta, table_query_order)
+        sel_obj = find_best_join(sel_obj, meta, requested_tables_in_order)
+        count_sel_obj = find_best_join(count_sel_obj, meta, requested_tables_in_order)
 
     exc = conn.execute(sel_obj)
     rows = exc.cursor.fetchall()
