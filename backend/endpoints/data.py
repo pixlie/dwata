@@ -1,5 +1,3 @@
-import sqlalchemy
-from sqlalchemy import MetaData, select, func
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
@@ -21,9 +19,9 @@ async def data_post(request):
             error_code="request.json_decode_error",
             message="We could not handle that request, perhaps something is wrong with the server."
         )
+
     qb = QueryBuilder(query_specification)
     columns, rows, count, query_sql = await qb.results()
-
     return RapidJSONResponse(
         dict(
             columns=columns,

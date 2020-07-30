@@ -100,10 +100,10 @@ export default () => {
     <Fragment>
       <Hx x="5">Related</Hx>
       <p className="text-gray-700 my-2">
-        You can merge data from other tables which <strong>dwata</strong> finds
-        are related. dwata figures out how the other tables are related and will
-        give you contextual options as they might be needed to extract the right
-        merged data.
+        You can merge data from other tables which are related.{" "}
+        <strong>dwata</strong> finds out how the other tables are related and
+        will give you contextual options as they might be needed to gather the
+        right data.
       </p>
 
       {selectedTableNames.map((tableName) => (

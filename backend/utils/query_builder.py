@@ -19,20 +19,21 @@ class QueryBuilder(object):
     query_specification = None
     default_per_page = 25
     merge_one_to_many = False
+    unavailable_columns = None
+    tables_and_columns = None
+    requested_tables_in_order = None
 
     database_engine = None
     database_conn = None
     database_meta = None
 
     root_select = None
-    inner_selects = {}
-    inner_columns = []
-    unavailable_columns = None
-    current_table = None
-    tables_and_columns = {}
-    requested_tables_in_order = []
-    pending_joins = {}
-    columns = []
+    root_table_name = None
+    columns = None
+    pending_joins = None
+    embedded_selects = None
+    pending_embedded_joins = None
+    embedded_columns = None
 
     def __init__(self, query_specification):
         self.query_specification = query_specification
@@ -54,6 +55,8 @@ class QueryBuilder(object):
             return None
         # We have more than 1 table in the requested select, we might need to apply JOINS
 
+        self.pending_joins = {}
+        self.embedded_selects = {}
         for index, table_name in enumerate(self.requested_tables_in_order):
             if index == 0:
                 continue
@@ -94,11 +97,10 @@ class QueryBuilder(object):
                                         getattr(self.database_meta.tables[prev_table_name].c, x.column.name)
                                     )
                                 else:
-                                    self.inner_selects[table_name] = self.database_meta.tables[table_name].join(
-                                            self.database_meta.tables[prev_table_name],
-                                            getattr(self.database_meta.tables[table_name].c, x.parent.name) ==
-                                            getattr(self.database_meta.tables[prev_table_name].c, x.column.name)
-                                        )
+                                    self.pending_embedded_joins[table_name] = self.database_meta.tables[table_name].join(
+                                        self.database_meta.tables[prev_table_name],
+                                        getattr(self.database_meta.tables[table_name].c, x.parent.name) ==
+                                        getattr(self.database_meta.tables[prev_table_name].c, x.column.name)
                                     )
 
     def apply_joins(self):
@@ -172,9 +174,44 @@ class QueryBuilder(object):
         self.database_meta.reflect()
         self.unavailable_columns = get_unavailable_columns(settings, self.database_meta)
 
-    async def results(self):
-        await self.prepare()
+    def columns_to_select(self, table_name):
+        column_list = self.tables_and_columns[table_name]
+        # Unavailable columns are configured due to security or similar reasons, we remove them here
+        table_column_names = [column_name for column_name in self.database_meta.tables[table_name].columns.keys()
+                              if column_name not in self.unavailable_columns[table_name]]
+        current_table = self.database_meta.tables[table_name]
+        current_table_columns = []
+        if "id" in table_column_names:
+            # If there is an "id" column then it is always included, the UI hides it as needed
+            current_table_columns.append(getattr(current_table.c, "id"))
 
+        if column_list == ["*"]:
+            # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
+            current_table_columns = current_table_columns + \
+                                    [getattr(current_table.c, col) for col in table_column_names]
+        elif column_list == ["__auto__"]:
+            # If we have not been asked to show specific columns then we do not send columns which are
+            # detected to be metadata
+            if table_name == self.root_table_name:
+                meta_data_column_names = [col["name"] for col in [
+                    column_definition(col, col_def) for col, col_def in current_table.columns.items()
+                    if col not in self.unavailable_columns[table_name]
+                ] if "is_meta" in col["ui_hints"]]
+            else:
+                meta_data_column_names = [col["name"] for col in [
+                    column_definition(col, col_def) for col, col_def in current_table.columns.items()
+                    if col not in self.unavailable_columns[table_name]
+                ] if "is_meta" in col["ui_hints"] or col["is_nullable"]]
+            current_table_columns = current_table_columns +\
+                [getattr(current_table.c, col) for col in table_column_names if col not in meta_data_column_names]
+        else:
+            current_table_columns = current_table_columns + \
+                [getattr(current_table.c, col) for col in table_column_names if col in column_list]
+        return current_table_columns
+
+    def tables_to_query(self):
+        self.tables_and_columns = {}
+        self.requested_tables_in_order = []
         for table_column in self.query_specification["select"]:
             # We use a list for select so that we can retain the order in which `table.columns` were requested
             if "." in table_column:
@@ -182,7 +219,7 @@ class QueryBuilder(object):
             else:
                 table_name = table_column
                 column_name = "__auto__"
-            if table_name not in self.tables_and_columns.keys():
+            if table_name not in self.tables_and_columns:
                 # We are encountering this table for the first time in this request, let's add it
                 self.tables_and_columns[table_name] = [column_name]
                 self.requested_tables_in_order.append(table_name)
@@ -193,48 +230,24 @@ class QueryBuilder(object):
                 if "*" not in self.tables_and_columns[table_name]:
                     # `table.*` was not requested earlier, so we add this current column
                     self.tables_and_columns[table_name].append(column_name)
-        root_table_name = self.requested_tables_in_order[0]
+        self.root_table_name = self.requested_tables_in_order[0]
 
+    async def results(self):
+        self.columns = []
+        self.embedded_columns = {}
+
+        await self.prepare()
+        self.tables_to_query()
         self.find_joins()
+
         for table_name in self.requested_tables_in_order:
-            if table_name != root_table_name and table_name not in self.pending_joins.keys():
+            if table_name != self.root_table_name and table_name not in self.pending_joins.keys():
+                # Current table is neither the root table nor is it in  JOIN
                 continue
+            self.columns += self.columns_to_select(table_name)
 
-            column_list = self.tables_and_columns[table_name]
-            # Unavailable columns are configured due to security or similar reasons, we remove them here
-            table_column_names = [column_name for column_name in self.database_meta.tables[table_name].columns.keys()
-                                  if column_name not in self.unavailable_columns[table_name]]
-            current_table = self.database_meta.tables[table_name]
-            current_table_columns = []
-            if "id" in table_column_names:
-                # If there is an "id" column then it is always included, the UI hides it as needed
-                current_table_columns.append(getattr(current_table.c, "id"))
-
-            if column_list == ["*"]:
-                # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
-                current_table_columns = current_table_columns + \
-                                        [getattr(current_table.c, col) for col in table_column_names]
-            elif column_list == ["__auto__"]:
-                # If we have not been asked to show specific columns then we do not send columns which are
-                # detected to be metadata
-                if table_name == root_table_name:
-                    meta_data_column_names = [col["name"] for col in [
-                        column_definition(col, col_def) for col, col_def in current_table.columns.items()
-                        if col not in self.unavailable_columns[table_name]
-                    ] if "is_meta" in col["ui_hints"]]
-                else:
-                    meta_data_column_names = [col["name"] for col in [
-                        column_definition(col, col_def) for col, col_def in current_table.columns.items()
-                        if col not in self.unavailable_columns[table_name]
-                    ] if "is_meta" in col["ui_hints"] or col["is_nullable"]]
-                current_table_columns = current_table_columns + \
-                                        [getattr(current_table.c, col) for col in table_column_names if
-                                         col not in meta_data_column_names]
-            else:
-                current_table_columns = current_table_columns + \
-                                        [getattr(current_table.c, col) for col in table_column_names if
-                                         col in column_list]
-            self.columns += current_table_columns
+        for table_name in self.embedded_selects.keys():
+            self.embedded_columns[table_name] = self.columns_to_select(table_name)
 
         self.root_select = select(self.columns)
         count_sel_obj = select([func.count()]).select_from(self.database_meta.tables[self.requested_tables_in_order[0]])
@@ -260,5 +273,16 @@ class QueryBuilder(object):
         count = self.database_conn.execute(count_sel_obj).scalar()
         self.database_conn.close()
 
-        columns = ["{}.{}".format(x[2][0].table.name, x[2][0].name) for x in exc.context.result_column_struct[0]]
-        return columns, rows, count, str(self.root_select)
+        columns = ["{}.{}".format(x.table.name, x.name) for x in self.columns]
+        if self.embedded_selects:
+            for _columns in self.embedded_columns.values():
+                columns += [["{}.{}".format(x.table.name, x.name) for x in _columns]]
+
+        if self.embedded_selects:
+            query_sql = [
+                str(self.root_select),
+                [str(x) for x in self.embedded_selects.values()]
+            ]
+        else:
+            query_sql = str(self.root_select)
+        return columns, rows, count, query_sql
