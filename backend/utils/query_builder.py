@@ -26,11 +26,12 @@ class Select(object):
     tables_and_columns = None
     requested_tables_in_order = None
     pending_joins = None
-    related_selects = None
+    embedded_selects = None
 
-    def __init__(self, qb, table_name=None, parent_select=None):
+    def __init__(self, qb, table_name=None, parent_select=None, parent_join=None):
         self.qb = qb
         self.parent_select = parent_select
+        self.pending_joins = {}
 
         if table_name:
             # This Select is being created as an embedded or related of another Select, so this is not root
@@ -39,11 +40,7 @@ class Select(object):
             self.tables_and_columns = {
                 table_name: []
             }
-            """= dm.tables[table_name].join(
-                dm.tables[self.root_table_name],
-                getattr(dm.tables[table_name].c, x.parent.name) ==
-                getattr(dm.tables[self.root_table_name].c, x.column.name)
-            )"""
+            self.pending_joins[parent_select.table_name] = parent_join
         else:
             self.is_root = True
             self.tables_and_columns = {}
@@ -125,7 +122,7 @@ class Select(object):
                     else:
                         sel_obj = sel_obj.where(~getattr(current_table.c, column_name))
 
-    def find_joins(self, table_name):
+    def find_to_one_join(self, table_name):
         """
         This is an example Query request where we want to list all content first and also the author information.
         So `content` table is the first (index 0) table in the `table_query_order`.
@@ -138,54 +135,83 @@ class Select(object):
             self.database_meta.tables["content"].c.created_by_id == self.database_meta.tables["users"].c.id
         )
         """
-        direct_join = False
-        self.pending_joins = {}
+        # We check only for Many-to-One or One-to-One relations
         dm = self.qb.database_meta
+        to_one_join = False
 
         # For every column of the previous table in query order, check if we have a FK to the current table
         for col, col_def in dm.tables[self.table_name].columns.items():
+            # For each FK, is there a direct FK from the previous table to current table?
+            for x in col_def.foreign_keys:
+                if x.column.table.name == table_name:
+                    # So previous table has FK to current table, let's use this to JOIN
+                    self.pending_joins[table_name] = dm.tables[self.table_name].join(
+                        dm.tables[table_name],
+                        getattr(dm.tables[self.table_name].c, x.parent.name) ==
+                        getattr(dm.tables[table_name].c, x.column.name)
+                    )
+                    to_one_join = True
+                    break
+
+        return to_one_join
+
+    def find_to_many_join(self, table_name):
+        dm = self.qb.database_meta
+        to_many_join = False
+
+        # Let us do the same check, but the other way around
+        for col, col_def in dm.tables[table_name].columns.items():
             # Check if the previous table has FK
             if len(col_def.foreign_keys) > 0:
-                # For each FK, is there a direct FK from the previous table to current table?
+                # For each FK, is there a direct FK from current table to the previous table?
                 for x in col_def.foreign_keys:
-                    if x.column.table.name == table_name:
-                        # So previous table has FK to current table, let's use this to JOIN
-                        self.pending_joins[table_name] = dm.tables[self.table_name].join(
-                            dm.tables[table_name],
-                            getattr(dm.tables[self.table_name].c, x.parent.name) ==
-                            getattr(dm.tables[table_name].c, x.column.name)
-                        )
-                        direct_join = True
+                    if x.column.table.name == self.table_name:
+                        # The current table has FK to previous table,
+                        # this usually means a One to Many relationship from current table to previous table
+                        if self.merge_one_to_many:
+                            self.pending_joins[table_name] = dm.tables[table_name].join(
+                                dm.tables[self.table_name],
+                                getattr(dm.tables[table_name].c, x.parent.name) ==
+                                getattr(dm.tables[self.table_name].c, x.column.name)
+                            )
+                            to_many_join = True
+                            break
 
-        if not direct_join:
-            # Let us do the same check, but the other way around
-            for col, col_def in dm.tables[table_name].columns.items():
-                # Check if the previous table has FK
-                if len(col_def.foreign_keys) > 0:
-                    # For each FK, is there a direct FK from current table to the previous table?
-                    for x in col_def.foreign_keys:
-                        if x.column.table.name == self.table_name:
-                            # The current table has FK to previous table,
-                            # this usually means a One to Many relationship from current table to previous table
-                            # We do not JOIN One to Many relational data, instead we do a separate query
-                            if self.merge_one_to_many:
-                                self.pending_joins[table_name] = dm.tables[table_name].join(
-                                    dm.tables[self.table_name],
-                                    getattr(dm.tables[table_name].c, x.parent.name) ==
-                                    getattr(dm.tables[self.table_name].c, x.column.name)
-                                )
-                                direct_join = True
-                            else:
-                                self.related_selects.append(Select(
-                                    qb=self.qb,
-                                    table_name=table_name,
-                                    parent_select=self
-                                ))
-        return direct_join
+        return to_many_join
 
-    def apply_joins(self):
+    def find_embedded_select(self, table_name):
+        dm = self.qb.database_meta
+        embedded_select = False
+
+        # Let us do the same check, but the other way around
+        for col, col_def in dm.tables[table_name].columns.items():
+            # Check if the previous table has FK
+            if len(col_def.foreign_keys) > 0:
+                # For each FK, is there a direct FK from current table to the previous table?
+                for x in col_def.foreign_keys:
+                    if x.column.table.name == self.table_name:
+                        # The current table has FK to previous table,
+                        # this usually means a One to Many relationship from current table to previous table
+                        # We do not JOIN One to Many relational data, instead we do a separate query
+                        self.embedded_selects.append(Select(
+                            qb=self.qb,
+                            table_name=table_name,
+                            parent_select=self,
+                            parent_join=dm.tables[table_name].join(
+                                dm.tables[self.table_name],
+                                getattr(dm.tables[table_name].c, x.parent.name) ==
+                                getattr(dm.tables[self.table_name].c, x.column.name)
+                            )
+                        ))
+                        embedded_select = True
+                        break
+
+        return embedded_select
+
+    def apply_joins(self, select_object):
         for table_name, join_ in self.pending_joins.items():
-            self._select = self._select.select_from(join_)
+            select_object = select_object.select_from(join_)
+        return select_object
 
     def columns_to_select(self, table_name):
         dm = self.qb.database_meta
@@ -227,7 +253,7 @@ class Select(object):
 
     def tables_to_select(self):
         qs = self.qb.query_specification
-        self.related_selects = []
+        self.embedded_selects = []
 
         for table_column in qs["select"]:
             # We use a list for select so that we can retain the order in which `table.columns` were requested
@@ -240,14 +266,22 @@ class Select(object):
             if table_name not in self.tables_and_columns:
                 # We are encountering this table for the first time in this request
                 if len(self.tables_and_columns) == 0:
-                    # We have not parse any table yet, so this is the first table
+                    # We have not parsed any tables yet, so this is the first table
                     self.tables_and_columns[table_name] = [column_name]
                 else:
                     # This is not the first table to be queried
+                    if not self.is_root:
+                        # We are not a root Select
+                        # So we will not select tables that have already been selected
+                        if table_name in self.parent_select.tables_and_columns:
+                            continue
+
                     # Let us check if this table can be directly JOINed
-                    if self.find_joins(table_name):
+                    if self.find_to_one_join(table_name):
                         # Yes we can join this table, so add it to our list of tables and columns to select
                         self.tables_and_columns[table_name] = [column_name]
+                    else:
+                        self.find_embedded_select(table_name)
             else:
                 # We have encountered this table in this request already, let's just handle the column
                 # Check if there is a an existing request for `table.*`.
@@ -267,7 +301,9 @@ class Select(object):
             columns += self.columns_to_select(table_name)
 
         self._select = select(columns)
-        self.apply_joins()
+        self._select = self.apply_joins(self._select)
+        if not self.is_root:
+            self._select = self.parent_select.apply_joins(self._select)
 
         if qs.get("order_by", {}) != {}:
             self.apply_ordering()
@@ -312,9 +348,14 @@ class QueryBuilder(object):
         root_select = Select(qb=self)
 
         columns, rows, count, query_sql = root_select.execute()
-        for rs in root_select.related_selects:
-            _columns, _rows, _count, _query_sql = rs.execute()
+        embedded_rows = []
+
+        query_sql = [query_sql]
+        for rs in root_select.embedded_selects:
+            _columns, _rows, _, _query_sql = rs.execute()
             columns += [_columns]
+            query_sql += [_query_sql]
+            embedded_rows += [_rows]
 
         self.database_conn.close()
-        return columns, rows, count, query_sql
+        return columns, rows, count, query_sql, embedded_rows
