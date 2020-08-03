@@ -20,7 +20,6 @@ const PageItem = ({ number }) => {
   return (
     <Button
       active={number === currentPage ? true : false}
-      margin="mr-1"
       theme="info"
       attributes={{
         "aria-label": `Goto page ${number}`,
@@ -44,7 +43,7 @@ const PageSlots = () => {
   if (totalPages < slots) {
     return (
       <Fragment>
-        <span className="pagination-ellipsis">{limit}/page</span>
+        <span className="inline-block mx-2">{limit}/page</span>
         {[...Array(totalPages).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
@@ -53,13 +52,11 @@ const PageSlots = () => {
   } else {
     return (
       <Fragment>
-        <span className="pagination-ellipsis">{limit}/page</span>
+        <span className="inline-block mx-2">{limit}/page</span>
         {[...Array(4).keys()].map((x) => (
           <PageItem key={`pg-sl-${x + 1}`} number={x + 1} />
         ))}
-        <li>
-          <span className="pagination-ellipsis">&hellip;</span>
-        </li>
+        <span className="inline-block mx-2">&hellip;</span>
         {[...Array(4).keys()].reverse().map((x) => (
           <PageItem key={`pg-sl-${totalPages - x}`} number={totalPages - x} />
         ))}
@@ -89,7 +86,7 @@ export default () => {
 
   return (
     <div
-      className="fixed right-0 mr-16 z-10 bg-gray-700 p-2 p-y-4 shadow-lg text-white"
+      className="fixed right-0 mr-16 z-10 bg-gray-700 p-2 shadow-lg text-white"
       style={{ bottom: "2rem" }}
     >
       <nav className="pagination" role="navigation" aria-label="pagination">
@@ -108,11 +105,11 @@ export default () => {
         )}
         {offset + limit >= count ? (
           <Button theme="info" disabled>
-            Next page
+            Next
           </Button>
         ) : (
           <Button theme="info" attributes={{ onClick: handleNext }}>
-            Next page
+            Next
           </Button>
         )}
         <PageSlots />

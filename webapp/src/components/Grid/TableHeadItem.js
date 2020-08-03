@@ -15,16 +15,12 @@ const ColumnHeadSpecification = ({ tableColumnName }) => {
   };
 
   return (
-    <div className="col-hd-spec-box">
-      <div className="field is-grouped">
-        <div className="control">
-          <button className="button is-white" onClick={handleClick}>
-            <i className="fas fa-sort" />
-          </button>
-        </div>
+    <div className="absolute z-10 mt-1 p-2 bg-white border rounded shadow-md">
+      <button className="mx-2" onClick={handleClick}>
+        <i className="fas fa-sort" />
+      </button>
 
-        <FilterItem columnName={tableColumnName} singleFilter />
-      </div>
+      <FilterItem columnName={tableColumnName} singleFilter />
     </div>
   );
 };

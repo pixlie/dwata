@@ -58,7 +58,7 @@ export const Button = ({
   active = false,
   disabled = false,
   padding = "px-3 py-1",
-  margin = "mr-6",
+  margin = "mx-1",
   rounded = "rounded",
   attributes,
   children,
@@ -120,7 +120,7 @@ export const ButtonGroup = ({
 
 export const ColumnHead = ({ label, order, group, attributes, children }) => {
   let classes =
-    "label inline-block bg-gray-200 px-2 rounded font-bold cursor-pointer hover:bg-gray-400";
+    "relative label inline-block bg-gray-200 px-2 rounded font-bold cursor-pointer hover:bg-gray-400";
   if (order) {
     if (order === "asc") {
       classes = classes + " ord-asc";

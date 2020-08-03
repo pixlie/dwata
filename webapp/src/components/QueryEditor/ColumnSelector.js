@@ -21,8 +21,8 @@ export default () => {
   const selectedTableNames = [
     ...new Set(querySpecification.select.map((x) => x.tableName)),
   ];
-  const selectedTables = schema.rows.filter((x) =>
-    selectedTableNames.includes(x.table_name)
+  const selectedTables = selectedTableNames.map((x) =>
+    schema.rows.find((y) => y.table_name === x)
   );
   const currentTable = state.userSelectedTableName
     ? selectedTables.find((x) => x.table_name === state.userSelectedTableName)

@@ -45,19 +45,15 @@ export default () => {
 
   for (const [columnName] of Object.entries(filterBy)) {
     filters.push(
-      <div key={`fl-${columnName}`} className="field is-horizontal">
-        <div className="field-label">
-          <label
-            className="label"
-            onDoubleClick={handleRemoveFilter(columnName)}
-          >
-            {columnName}
-          </label>
-        </div>
+      <div key={`fl-${columnName}`}>
+        <label
+          className="block font-bold"
+          onDoubleClick={handleRemoveFilter(columnName)}
+        >
+          {columnName}
+        </label>
 
-        <div className="field-body">
-          <FilterItem key={`fl-${columnName}`} columnName={columnName} />
-        </div>
+        <FilterItem key={`fl-${columnName}`} columnName={columnName} />
       </div>
     );
   }
