@@ -5,7 +5,6 @@ import { Button, Hx } from "components/LayoutHelpers";
 import ColumnSelectorInner from "./ColumnSelector";
 import FilterEditorInner from "./FilterEditor";
 import OrderEditorInner from "./OrderEditor";
-import RelatedData from "./RelatedData";
 
 export default () => {
   const [state, setState] = useState({
@@ -89,7 +88,7 @@ export default () => {
           </div>
         )}
 
-        {state.openEditor === "related" ? (
+        {/* {state.openEditor === "related" ? (
           <div className="bg-white border my-1 rounded-md px-2 py-1">
             <RelatedData />
           </div>
@@ -100,7 +99,7 @@ export default () => {
           >
             <Hx x="4">Related</Hx>
           </div>
-        )}
+        )} */}
       </div>
 
       {state.isSavingQuery ? (

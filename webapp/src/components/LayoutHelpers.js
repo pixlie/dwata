@@ -120,7 +120,7 @@ export const ButtonGroup = ({
 
 export const ColumnHead = ({ label, order, group, attributes, children }) => {
   let classes =
-    "relative label inline-block bg-gray-200 px-2 rounded font-bold cursor-pointer hover:bg-gray-400";
+    "label inline-block bg-gray-200 px-2 rounded font-bold cursor-pointer hover:bg-gray-400";
   if (order) {
     if (order === "asc") {
       classes = classes + " ord-asc";

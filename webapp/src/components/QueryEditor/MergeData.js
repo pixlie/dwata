@@ -16,29 +16,47 @@ export default () => {
   const selectedTableNames = [
     ...new Set(querySpecification.select.map((x) => x.tableName)),
   ];
-  let relatedTables = [];
+  const startingTableName = querySpecification.select[0].tableName;
+  let adjacentRelated = [];
 
-  const BoundInput = ({ tableName }) => {
+  const RelatedItem = ({ tableName, innerRelated }) => {
     const handleClick = () => {
       toggleColumnSelection(queryContext.key, tableName);
     };
 
     return (
-      <label className="block font-bold text-gray-700 bg-gray-200 py-1 px-2 mb-1 border hover:bg-gray-300">
-        <input
-          type="checkbox"
-          name={tableName}
-          checked={selectedTableNames.includes(tableName)}
-          onChange={handleClick}
-          className="mr-1"
-        />
-        {tableName}
-      </label>
+      <div className="flex-1">
+        <label className="block font-bold text-gray-700 bg-gray-200 py-1 px-2 mb-1 border hover:bg-gray-300">
+          <input
+            type="checkbox"
+            name={tableName}
+            checked={selectedTableNames.includes(tableName)}
+            onChange={handleClick}
+            className="mr-1"
+          />
+          {tableName}
+        </label>
+
+        {innerRelated.map((x) => (
+          <Fragment>
+            <RelatedItem
+              tableName={x.tableName}
+              innerRelated={x.innerRelated}
+            />
+
+            <p className="pl-4 mb-4 text-gray-600 text-sm">
+              For each record of <strong>{tableName}</strong> there may be more
+              than one record of <strong>{x.tableName}</strong>
+            </p>
+          </Fragment>
+        ))}
+      </div>
     );
   };
 
-  for (const tableName of selectedTableNames) {
-    // We take out the `properties` value from the schema of this table
+  const addRelatedItem = (tableName) => {
+    const innerRelated = [];
+    const others = [];
     const tableProperties = schema.rows.find((x) => x.table_name === tableName)
       .properties;
 
@@ -52,9 +70,9 @@ export default () => {
           continue;
         }
 
-        if (selectedTableNames.indexOf(tableName) !== 0) {
+        if (selectedTableNames.indexOf(startingTableName) !== 0) {
           // We are not at the root table of our Query
-          // If we are not at the root table, then we only want to related to `one-to-one` or `many-to-one` relations
+          // If we are not at the root table, then we only want to related to `X-to-one` relations
           if (
             relatedTableProperties.cardinality !== "many-to-one" ||
             relatedTableProperties.cardinality !== "one-to-one"
@@ -67,38 +85,38 @@ export default () => {
           schema.rows.find((x) => x.table_name === relatedTableName).properties
             .is_system_table
         ) {
+          // We do not show related system tables
           continue;
         }
 
         if (relatedTableProperties.cardinality === "one-to-many") {
-          relatedTables.push(
-            <Fragment key={`tb-rl-${relatedTableName}`}>
-              <BoundInput tableName={relatedTableName} />
-              <p className="pl-4 mb-4 text-gray-600 text-sm">
-                For each record (row of data) in <strong>{tableName}</strong>{" "}
-                there may be more than one record in{" "}
-                <strong>{relatedTableName}</strong>. We will show you all{" "}
-                <strong>{relatedTableName}</strong> records grouped per record
-                of <strong>{tableName}</strong>.
-              </p>
-            </Fragment>
-          );
+          /* innerRelated.push(
+            <RelatedItem tableName={relatedTableName} />
+          ); */
         } else {
-          relatedTables.push(
-            <BoundInput
-              key={`tb-rl-${relatedTableName}`}
-              tableName={relatedTableName}
-            />
-          );
+          others.push(relatedTableName);
         }
       }
     }
-  }
-  relatedTables = [...new Set(relatedTables)];
+
+    adjacentRelated.push({
+      tableName: tableName,
+      innerRelated,
+    });
+
+    for (const x of others) {
+      addRelatedItem(x);
+    }
+  };
+
+  addRelatedItem(startingTableName);
 
   return (
-    <Fragment>
-      <Hx x="5">Related</Hx>
+    <div
+      className="fixed bg-white border rounded p-2 shadow-md"
+      style={{ top: "8rem" }}
+    >
+      <Hx x="5">Merge data</Hx>
       <p className="text-gray-700 my-2">
         You can merge data from other tables which are related.{" "}
         <strong>dwata</strong> finds out how the other tables are related and
@@ -106,10 +124,13 @@ export default () => {
         right data.
       </p>
 
-      {selectedTableNames.map((tableName) => (
-        <BoundInput key={`tb-rl-${tableName}`} tableName={tableName} />
+      {adjacentRelated.map((x) => (
+        <RelatedItem
+          key={`tb-rl-${x.tableName}`}
+          tableName={x.tableName}
+          innerRelated={x.innerRelated}
+        />
       ))}
-      {relatedTables}
-    </Fragment>
+    </div>
   );
 };

@@ -8,6 +8,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
+  const toggleMergeUI = useQueryContext((state) => state.toggleMergeUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
   useEffect(() => {
@@ -27,6 +28,9 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   }; */
   const handleQueryClick = () => {
     toggleQueryUI(queryContext.key);
+  };
+  const handleMergeClick = () => {
+    toggleMergeUI(queryContext.key);
   };
 
   return (
@@ -50,6 +54,10 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         <i className="fas fa-thumbtack" />
         &nbsp; Pins
       </Button> */}
+
+      <Button theme="primary" attributes={{ onClick: handleMergeClick }}>
+        Merge
+      </Button>
 
       <Button theme="primary" attributes={{ onClick: handleQueryClick }}>
         Query

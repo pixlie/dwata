@@ -3,12 +3,13 @@ import React, { useContext, Fragment } from "react";
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
 // import DetailView from "components/Detail";
+import QueryLoader from "./QueryLoader";
+import SavedQueryLoader from "./SavedQueryLoader";
 import QueryEditor from "components/QueryEditor";
+import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
-import QueryLoader from "./QueryLoader";
-import SavedQueryLoader from "./SavedQueryLoader";
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -40,6 +41,7 @@ export default () => {
         </div>
 
         {queryContext.isQueryUIOpen ? <QueryEditor /> : null}
+        {queryContext.isMergeUIOpen ? <MergeData /> : null}
       </Fragment>
     </Loader>
   );

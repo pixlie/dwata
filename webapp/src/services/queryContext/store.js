@@ -22,6 +22,14 @@ const [useQueryContext] = create((set) => ({
         isQueryUIOpen: !state[appName].isQueryUIOpen,
       },
     })),
+
+  toggleMergeUI: (appName) =>
+    set((state) => ({
+      [appName]: {
+        ...state[appName],
+        isMergeUIOpen: !state[appName].isMergeUIOpen,
+      },
+    })),
 }));
 
 export default useQueryContext;
