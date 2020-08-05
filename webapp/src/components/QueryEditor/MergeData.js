@@ -9,8 +9,8 @@ export default () => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-  const toggleColumnSelection = useQuerySpecification(
-    (state) => state.toggleColumnSelection
+  const toggleRelatedTable = useQuerySpecification(
+    (state) => state.toggleRelatedTable
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const selectedTableNames = [
@@ -24,7 +24,7 @@ export default () => {
     }
 
     const handleClick = () => {
-      toggleColumnSelection(queryContext.key, tableName);
+      toggleRelatedTable(queryContext.key, tableName);
     };
 
     const innerItems = innerRelated.map((x) => (
@@ -93,12 +93,15 @@ export default () => {
         for (const [relatedTableName, relatedTableProperties] of Object.entries(
           tableProperties.related_tables
         )) {
-          if (selectedTableNames.includes(relatedTableName)) {
+          /* if (selectedTableNames.includes(relatedTableName)) {
             // We already have this related table in the list of selected tables, nothing to do
             continue;
-          }
+          } */
 
-          if (selectedTableNames.indexOf(startingTableName) !== 0) {
+          if (
+            tableName !== startingTableName &&
+            !selectedTableNames.includes(tableName)
+          ) {
             // We are not at the root table of our Query
             // If we are not at the root table, then we only want to related to `X-to-one` relations
             if (

@@ -166,6 +166,31 @@ const toggleColumnSelection = (inner, label) => {
   }
 };
 
+const toggleRelatedTable = (inner, label) => {
+  const selectedTableNames = [...new Set(inner.select.map((x) => x.tableName))];
+  if (selectedTableNames.includes(label)) {
+    // This table is currently selected, let's get all of its columns removed
+    return {
+      ...inner,
+      select: inner.select.filter((x) => x.tableName !== label),
+      fetchNeeded: true,
+    };
+  } else {
+    // This column is not selected, let's add it
+    return {
+      ...inner,
+      select: [
+        ...inner.select,
+        {
+          label,
+          tableName: label,
+        },
+      ],
+      fetchNeeded: true,
+    };
+  }
+};
+
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
   initiateQuerySpecification: (key, payload) =>
     set(() => ({
@@ -225,6 +250,11 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
   toggleColumnSelection: (key, columnName) =>
     set((state) => ({
       [key]: toggleColumnSelection(state[key], columnName),
+    })),
+
+  toggleRelatedTable: (key, relatedLabel) =>
+    set((state) => ({
+      [key]: toggleRelatedTable(state[key], relatedLabel),
     })),
 }));
 
