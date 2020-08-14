@@ -7,6 +7,7 @@ import { querySpecificationStoreAPI } from "services/querySpecification/store";
 const initialState = {
   columns: [],
   rows: [],
+  embeddedRows: [],
   querySQL: null,
   selectedRowList: [],
 
@@ -19,6 +20,7 @@ const initialState = {
 const completeFetchList = (inner, payload) => ({
   columns: payload.columns,
   rows: payload.rows, // Here we do not transform data into maps/dicts
+  embeddedRows: "embedded_rows" in payload ? payload.embedded_rows : [],
   querySQL: payload.query_sql,
   selectedRowList: [...inner.selectedRowList],
 
@@ -38,13 +40,25 @@ const completeFetchItem = (payload) => ({
   lastFetchedAt: +new Date(),
 });
 
+const processColumns = (columns) => {
+  const acc = [];
+  for (const el of columns) {
+    if (typeof el === "string") {
+      acc.push({
+        label: el,
+        tableName: el.split(".")[0],
+        columnName: el.split(".")[1],
+      });
+    } else if (typeof el === "object" && Array.isArray(el)) {
+      acc.push(processColumns(el));
+    }
+  }
+  return acc;
+};
+
 const querySpecificationObject = (state, payload) => ({
   ...state,
-  select: payload.columns.map((tc) => ({
-    label: tc,
-    tableName: tc.split(".")[0],
-    columnName: tc.split(".")[1],
-  })),
+  select: processColumns(payload.columns),
   count: payload.count,
   limit: payload.limit,
   offset: payload.offset,
@@ -53,8 +67,20 @@ const querySpecificationObject = (state, payload) => ({
   fetchNeeded: false,
 });
 
+const processSelect = (select) => {
+  const acc = [];
+  for (const el of select) {
+    if (typeof el === "object" && !Array.isArray(el)) {
+      acc.push(el.label);
+    } else if (typeof el === "object" && Array.isArray(el)) {
+      acc.push(processSelect(el));
+    }
+  }
+  return acc;
+};
+
 const getQuerySpecificationPayload = (querySpecification) => ({
-  select: querySpecification.select.map((x) => x.label),
+  select: processSelect(querySpecification.select),
   source_label: querySpecification.sourceLabel,
   order_by: querySpecification.orderBy,
   filter_by: querySpecification.filterBy,

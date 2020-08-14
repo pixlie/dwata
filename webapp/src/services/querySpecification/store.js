@@ -167,12 +167,33 @@ const toggleColumnSelection = (inner, label) => {
 };
 
 const toggleRelatedTable = (inner, label) => {
-  const selectedTableNames = [...new Set(inner.select.map((x) => x.tableName))];
+  const allSelected = inner.select.reduce((acc, x) => {
+    if (typeof x === "object" && !Array.isArray(x)) {
+      return [...acc, x];
+    } else if (typeof x === "object" && Array.isArray(x)) {
+      return [...acc, ...x];
+    }
+  }, []);
+  const selectedTableNames = [...new Set(allSelected.map((x) => x.tableName))];
   if (selectedTableNames.includes(label)) {
     // This table is currently selected, let's get all of its columns removed
+
+    // First we select all the table/columns which are not inside embedded data and do not match
+    //  the un-selected table name
+    // Then for each embedded table, we select it only if it is not un-selected
+    const _select = [];
+    for (const x of inner.select) {
+      if (!Array.isArray(x) && x.tableName !== label) {
+        _select.push(x);
+      } else if (Array.isArray(x)) {
+        if (x[0].tableName !== label) {
+          _select.push(x);
+        }
+      }
+    }
     return {
       ...inner,
-      select: inner.select.filter((x) => x.tableName !== label),
+      select: _select,
       fetchNeeded: true,
     };
   } else {

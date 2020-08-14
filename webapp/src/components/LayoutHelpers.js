@@ -73,7 +73,8 @@ export const Button = ({
   } else if (theme === "info") {
     classes =
       classes +
-      " bg-yellow-200 text-gray-700 hover:bg-yellow-700 hover:text-white";
+      (active ? " bg-yellow-400" : " bg-yellow-200") +
+      " text-gray-700 hover:bg-yellow-700 hover:text-white";
   } else if (theme === "link") {
     classes = "inline-block font-bold underline";
   }

@@ -13,9 +13,14 @@ export default () => {
     (state) => state.toggleRelatedTable
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const selectedTableNames = [
-    ...new Set(querySpecification.select.map((x) => x.tableName)),
-  ];
+  const allSelected = querySpecification.select.reduce((acc, x) => {
+    if (typeof x === "object" && !Array.isArray(x)) {
+      return [...acc, x];
+    } else if (typeof x === "object" && Array.isArray(x)) {
+      return [...acc, ...x];
+    }
+  }, []);
+  const selectedTableNames = [...new Set(allSelected.map((x) => x.tableName))];
   const startingTableName = querySpecification.select[0].tableName;
 
   const RelatedItem = ({ tableName, innerRelated }) => {
@@ -65,16 +70,18 @@ export default () => {
       );
     } else {
       return (
-        <label className="block font-bold bg-gray-200 text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300 max-w-sm">
-          <input
-            type="checkbox"
-            name={tableName}
-            checked={selectedTableNames.includes(tableName)}
-            onChange={handleClick}
-            className="mr-1"
-          />
-          {tableName}
-        </label>
+        <div>
+          <label className="block font-bold bg-gray-200 text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300 w-64">
+            <input
+              type="checkbox"
+              name={tableName}
+              checked={selectedTableNames.includes(tableName)}
+              onChange={handleClick}
+              className="mr-1"
+            />
+            {tableName}
+          </label>
+        </div>
       );
     }
   };
@@ -147,11 +154,11 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded p-2 shadow-md"
+      className="fixed bg-white border rounded p-4 shadow-md"
       style={{ top: "8rem" }}
     >
-      <Hx x="5">Merge data</Hx>
-      <p className="text-gray-700 my-2">
+      <Hx x="3">Merge data</Hx>
+      <p className="text-gray-700 my-2 max-w-lg">
         You can merge data from other tables which are related.{" "}
         <strong>dwata</strong> finds out how the other tables are related and
         will give you contextual options as they might be needed to gather the

@@ -17,16 +17,13 @@ const initiateFetch = () => ({
   isFetching: true,
 });
 
-const completeFetch = (sourceLabel, payload) => {
-  return {
-    [sourceLabel]: {
-      columns: payload.columns,
-      rows: payload.rows.map((row) => transformData(payload.columns, row)),
-      isFetching: false,
-      isReady: true,
-    },
-  };
-};
+const completeFetch = (payload) => ({
+  columns: payload.columns,
+  rows: payload.rows.map((row) => transformData(payload.columns, row)),
+  isFetching: false,
+  isReady: true,
+  fetchedAt: Math.round(new Date().getTime() / 1000),
+});
 
 const [useStore] = create((set, get) => ({
   fetchSchema: async (sourceLabel) => {
@@ -34,6 +31,13 @@ const [useStore] = create((set, get) => ({
       return;
     }
     if (get()[sourceLabel] && get()[sourceLabel].isFetching) {
+      return;
+    }
+    if (
+      get()[sourceLabel] &&
+      Math.round(new Date().getTime() / 1000) - get()[sourceLabel].fetchedAt <
+        600
+    ) {
       return;
     }
 
@@ -44,8 +48,8 @@ const [useStore] = create((set, get) => ({
 
     try {
       const response = await axios.get(`${schemaURL}/${sourceLabel}`);
-      set((state) => ({
-        ...completeFetch(sourceLabel, response.data),
+      set(() => ({
+        [sourceLabel]: completeFetch(response.data),
       }));
     } catch (error) {
       console.log("Could not fetch schema. Try again later.");

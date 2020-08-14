@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment, useContext } from "react";
+import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
@@ -19,11 +19,12 @@ export default () => {
   // }, [isReady, showPinnedRecords, fetchPins]);
   let columns = null,
     rows = null,
+    embeddedRows = null,
     selectedRowList = null,
     pins = [],
     showPinnedRecords = false;
   if (data) {
-    ({ columns, rows, selectedRowList } = data);
+    ({ columns, rows, selectedRowList, embeddedRows } = data);
   }
   const selectedColumLabels = querySpecification.select.map((x) => x.label);
 
@@ -63,10 +64,11 @@ export default () => {
       // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
       // );
     };
-    let classes = "border-b hover:bg-gray-100";
+    let classes =
+      (embeddedRows.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
-    return (
+    const mainRow = (
       <tr onClick={handleRowClick} className={classes}>
         <RowSelectorCell row={row} />
         {row.map((cell, j) => {
@@ -77,6 +79,19 @@ export default () => {
         })}
       </tr>
     );
+
+    if (embeddedRows.length === 0) {
+      return mainRow;
+    } else {
+      return (
+        <Fragment>
+          {mainRow}
+          <tr className={`border-b ${classes}`}>
+            <td colSpan={row.length + 1}>Inner stuff</td>
+          </tr>
+        </Fragment>
+      );
+    }
   };
   const pinnedRowIds = pins && pins.length > 0 ? pins.map((x) => x[2]) : null;
 
