@@ -31,16 +31,16 @@ class Select(object):
     def __init__(self, qb, table_name=None, parent_select=None, parent_join=None):
         self.qb = qb
         self.parent_select = parent_select
-        self.pending_joins = []
+        self.pending_joins = {}
 
         if table_name:
             # This Select is being created as an embedded or related of another Select, so this is not root
             self.is_root = False
             self.select_root_table_name = table_name
             self.tables_and_columns = {
-                table_name: []
+                table_name: set()
             }
-            self.pending_joins.append(parent_join)
+            self.pending_joins[table_name] = parent_join
             self.parent_join = parent_join
         else:
             self.is_root = True
@@ -146,12 +146,12 @@ class Select(object):
             for x in col_def.foreign_keys:
                 if x.column.table.name == table_name:
                     # So root table has FK to current table, let's use this to JOIN
-                    self.pending_joins.append({
+                    self.pending_joins[table_name] = {
                         "left": dm.tables[self.select_root_table_name],
                         "right": dm.tables[table_name],
                         "onclause": getattr(dm.tables[self.select_root_table_name].c, x.parent.name) ==
                         getattr(dm.tables[table_name].c, x.column.name)
-                    })
+                    }
                     to_one_join = True
                     break
 
@@ -171,12 +171,12 @@ class Select(object):
                         # The current table has FK to previous table,
                         # this usually means a One to Many relationship from current table to previous table
                         if self.merge_one_to_many:
-                            self.pending_joins.append({
+                            self.pending_joins[table_name] = {
                                 "left": dm.tables[table_name],
                                 "right": dm.tables[self.select_root_table_name],
                                 "onclause": getattr(dm.tables[table_name].c, x.parent.name) ==
                                 getattr(dm.tables[self.select_root_table_name].c, x.column.name)
-                            })
+                            }
                             to_many_join = True
                             break
 
@@ -213,8 +213,9 @@ class Select(object):
         return embedded_select
 
     def get_joins(self):
-        _joins = join(**self.pending_joins[0])
-        for _join in self.pending_joins[1:]:
+        _pending_joins = list(self.pending_joins.values())
+        _joins = join(**_pending_joins[0])
+        for _join in _pending_joins[1:]:
             _joins = _joins.join(**{
                 "right": _join["right"],
                 "onclause": _join["onclause"]
@@ -222,7 +223,7 @@ class Select(object):
         return _joins
 
     def get_root_joins(self, _joins):
-        for _join in self.pending_joins:
+        for _join in self.pending_joins.values():
             _joins = _joins.join(**{
                 "right": _join["right"],
                 "onclause": _join["onclause"]
@@ -250,11 +251,11 @@ class Select(object):
                 # This is the column that enables the join to be done on client side
                 current_table_columns.append(getattr(current_table.c, join_column_name))
 
-        if column_list == ["*"]:
+        if column_list == {"*"}:
             # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
             current_table_columns = current_table_columns + \
                                     [getattr(current_table.c, col) for col in table_column_names]
-        elif column_list == ["__auto__"]:
+        elif column_list == {"__auto__"}:
             # If we have not been asked to show specific columns then we do not send columns which are
             # detected to be metadata
             if table_name == self.select_root_table_name:
@@ -274,25 +275,42 @@ class Select(object):
                 [getattr(current_table.c, col) for col in table_column_names if col in column_list]
         return current_table_columns
 
-    def tables_to_select(self):
-        qs = self.qb.query_specification
-        self.embedded_selects = []
+    def tables_to_select(self, embedded_select=None):
+        _select = []
+        _process_later = []
+        if embedded_select:
+            _select = embedded_select
+        else:
+            _select = self.qb.query_specification["select"]
 
-        for table_column in qs["select"]:
-            # We use a list for select so that we can retain the order in which `table.columns` were requested
+        # We use a list for select so that we can retain the order in which `table.columns` were requested
+        for table_column in _select:
+            if not table_column:
+                continue
+            if isinstance(table_column, list):
+                # This is a list of column names for embedded data
+                _process_later.append(table_column)
+                continue
             if "." in table_column:
                 (table_name, column_name) = table_column.split(".")
             else:
                 table_name = table_column
                 column_name = "__auto__"
 
-            if table_name not in self.tables_and_columns:
+            if table_name in self.tables_and_columns:
+                # We have encountered this table in this request already, let's just handle the column
+                # Check if there is a an existing request for `table.*`.
+                # If that was requested then we add no more columns for this table
+                if "*" not in self.tables_and_columns[table_name]:
+                    # `table.*` was not requested earlier, so we add this current column
+                    self.tables_and_columns[table_name].add(column_name)
+            else:
                 # We are encountering this table for the first time in this request
                 if len(self.tables_and_columns) == 0:
-                    # We have not parsed any tables yet, so this is the first table
-                    self.tables_and_columns[table_name] = [column_name]
+                    # We have not parsed any tables yet, so this is the first table, we have nothing more to do
+                    self.tables_and_columns[table_name] = {column_name, }
                 else:
-                    # This is not the first table to be queried
+                    # This is not the first table to be queried, we have to check for JOINs or parent tables
                     if not self.is_root:
                         # We are not a root Select
                         # So we will not select tables that have already been selected
@@ -302,16 +320,12 @@ class Select(object):
                     # Let us check if this table can be directly JOINed
                     if self.find_to_one_join(table_name):
                         # Yes we can join this table, so add it to our list of tables and columns to select
-                        self.tables_and_columns[table_name] = [column_name]
-                    else:
-                        self.find_embedded_select(table_name)
-            else:
-                # We have encountered this table in this request already, let's just handle the column
-                # Check if there is a an existing request for `table.*`.
-                # If that was requested then we add no more columns for this table
-                if "*" not in self.tables_and_columns[table_name]:
-                    # `table.*` was not requested earlier, so we add this current column
-                    self.tables_and_columns[table_name].append(column_name)
+                        self.tables_and_columns[table_name] = {column_name, }
+                    elif self.find_embedded_select(table_name):
+                        self.tables_and_columns[table_name] = {column_name, }
+
+        for table_column in _process_later:
+            self.tables_to_select(embedded_select=table_column)
 
     def execute(self):
         dm = self.qb.database_meta
@@ -319,12 +333,16 @@ class Select(object):
         qs = self.qb.query_specification
         columns = []
 
+        self.embedded_selects = []
         self.tables_to_select()
         for table_name in self.tables_and_columns.keys():
-            columns += self.columns_to_select(table_name)
+            if table_name == self.select_root_table_name:
+                columns += self.columns_to_select(table_name)
+            elif table_name in self.pending_joins:
+                columns += self.columns_to_select(table_name)
 
         self._select = select(columns)
-        if self.is_root and self.pending_joins:
+        if self.is_root and self.pending_joins.keys():
             self._select = self._select.select_from(self.get_joins())
         if not self.is_root:
             # We are inside an embedded Select, we surely have a JOIN to the parent Select's root table
