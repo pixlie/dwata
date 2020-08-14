@@ -5,7 +5,6 @@ from utils.database import connect_database, get_unavailable_columns
 from utils.settings import get_source_settings
 from utils.schema import column_definition
 
-
 # Example query specification:
 example_spec = {
     "source_id": "monster_market",  # This is the data source, like a PostgreSQL database
@@ -22,6 +21,7 @@ class Select(object):
     _select = None
     is_root = False
     parent_select = None
+    parent_join = None
     select_root_table_name = None
     tables_and_columns = None
     requested_tables_in_order = None
@@ -41,6 +41,7 @@ class Select(object):
                 table_name: []
             }
             self.pending_joins.append(parent_join)
+            self.parent_join = parent_join
         else:
             self.is_root = True
             self.tables_and_columns = {}
@@ -242,6 +243,13 @@ class Select(object):
             # If there is an "id" column then it is always included, the UI hides it as needed
             current_table_columns.append(getattr(current_table.c, "id"))
 
+        if self.parent_join:
+            # This current table is an embedded table, and that means we need a way to join to the root table data
+            join_column_name = self.parent_join["onclause"].left.name
+            if join_column_name in table_column_names and join_column_name not in column_list:
+                # This is the column that enables the join to be done on client side
+                current_table_columns.append(getattr(current_table.c, join_column_name))
+
         if column_list == ["*"]:
             # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
             current_table_columns = current_table_columns + \
@@ -342,6 +350,9 @@ class Select(object):
 
         return columns, rows, count, query_sql
 
+    def get_parent_join(self):
+        return str(self.parent_join["onclause"].left), str(self.parent_join["onclause"].right)
+
 
 class QueryBuilder(object):
     query_specification = None
@@ -368,13 +379,15 @@ class QueryBuilder(object):
 
         columns, rows, count, query_sql = root_select.execute()
         embedded_rows = []
+        parent_join = []
 
         query_sql = [query_sql]
-        for rs in root_select.embedded_selects:
-            _columns, _rows, _, _query_sql = rs.execute()
+        for embedded_select in root_select.embedded_selects:
+            _columns, _rows, _, _query_sql = embedded_select.execute()
             columns += [_columns]
             query_sql += [_query_sql]
             embedded_rows += [_rows]
+            parent_join += [embedded_select.get_parent_join()]
 
         self.database_conn.close()
-        return columns, rows, count, query_sql, embedded_rows
+        return columns, rows, count, query_sql, embedded_rows, parent_join
