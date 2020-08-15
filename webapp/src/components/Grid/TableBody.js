@@ -3,6 +3,7 @@ import React, { Fragment, useContext } from "react";
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
 import rowRenderer from "./rowRenderer";
+import EmbeddedTable from "./EmbeddedTable";
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -26,7 +27,12 @@ export default () => {
   if (data) {
     ({ columns, rows, selectedRowList, embeddedRows } = data);
   }
-  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedColumLabels = querySpecification.select
+    .filter((x) => typeof x === "object" && !Array.isArray(x))
+    .map((x) => x.label);
+  const embeddedTableNames = querySpecification.select
+    .filter((x) => typeof x === "object" && Array.isArray(x))
+    .map((x) => x[0].tableName);
 
   const rowRendererList = rowRenderer(
     schema.rows,
@@ -87,7 +93,17 @@ export default () => {
         <Fragment>
           {mainRow}
           <tr className={`border-b ${classes}`}>
-            <td colSpan={row.length + 1}>Inner stuff</td>
+            <td colSpan={row.length + 1} className="py-1 px-4">
+              {embeddedTableNames.map((x) => (
+                <span
+                  key={`ex-mr-tb-${x}`}
+                  className="inline-block bg-gray-200 px-2 rounded"
+                >
+                  Expand {x}
+                </span>
+              ))}
+              {/* <EmbeddedTable embedContext={{ tableName: "content_slice" }} /> */}
+            </td>
           </tr>
         </Fragment>
       );

@@ -212,8 +212,31 @@ const toggleRelatedTable = (inner, label) => {
   }
 };
 
+const loadFromLocalStorage = () => {
+  const temp = window.localStorage.getItem("querySpecification");
+  if (!!temp) {
+    return JSON.parse(temp);
+  }
+  return {};
+};
+
+const saveToLocalStorage = (key, payload) => {
+  if (key === "main") {
+    window.localStorage.setItem(
+      "querySpecification",
+      JSON.stringify({
+        [key]: initiateQuerySpecification(payload),
+      })
+    );
+  }
+  return true;
+};
+
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
+  ...loadFromLocalStorage(),
+
   initiateQuerySpecification: (key, payload) =>
+    saveToLocalStorage(key, payload) &&
     set(() => ({
       [key]: initiateQuerySpecification(payload),
     })),

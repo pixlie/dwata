@@ -2,16 +2,42 @@ import create from "zustand";
 
 import * as globalConstants from "services/global/constants";
 
+const loadFromLocalStorage = () => {
+  const temp = window.localStorage.getItem("queryContext");
+  if (!!temp) {
+    return JSON.parse(temp);
+  }
+  return {
+    main: {
+      appType: globalConstants.APP_NAME_HOME,
+    },
+  };
+};
+
+const saveToLocalStorage = (appName, context) => {
+  if (appName === "main") {
+    window.localStorage.setItem(
+      "queryContext",
+      JSON.stringify({
+        [appName]: {
+          key: appName,
+          ...context,
+        },
+      })
+    );
+  }
+  return true;
+};
+
 const [useQueryContext] = create((set) => ({
-  main: {
-    appType: globalConstants.APP_NAME_HOME,
-  },
+  ...loadFromLocalStorage(),
 
   setContext: (appName, context) =>
+    saveToLocalStorage(appName, context) &&
     set(() => ({
       [appName]: {
-        ...context,
         key: appName,
+        ...context,
       },
     })),
 

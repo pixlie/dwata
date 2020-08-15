@@ -13,15 +13,18 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const headList = [];
-  const selectedTableNames = [
-    ...new Set(
-      querySpecification.select
-        .filter((x) => typeof x === "object" && "tableName" in x)
-        .map((x) => x.tableName)
-    ),
-  ];
+  const selectedTableNames =
+    "isEmbedded" in queryContext && queryContext.isEmbedded
+      ? queryContext.tableName
+      : [
+          ...new Set(
+            querySpecification.select
+              .filter((x) => typeof x === "object" && !Array.isArray(x))
+              .map((x) => x.tableName)
+          ),
+        ];
   const selectedTableColumNames = querySpecification.select
-    .filter((x) => typeof x === "object" && "tableName" in x)
+    .filter((x) => typeof x === "object" && !Array.isArray(x))
     .map((x) => x.label);
 
   for (const tableColumnName of data.columns) {
