@@ -21,16 +21,15 @@ async def data_post(request):
         )
 
     qb = QueryBuilder(query_specification)
-    columns, rows, count, query_sql, embedded_rows, parent_join = await qb.results()
+    columns, rows, count, query_sql, embedded = await qb.results()
     return RapidJSONResponse(
         dict(
             columns=columns,
             rows=rows,
-            embedded_rows=embedded_rows,
-            parent_join=parent_join,
             count=count,
+            query_sql=query_sql,
+            embedded=embedded,
             limit=query_specification.get("limit", default_per_page),
             offset=query_specification.get("offset", 0),
-            query_sql=query_sql,
         )
     )

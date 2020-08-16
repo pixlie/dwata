@@ -396,16 +396,16 @@ class QueryBuilder(object):
         root_select = Select(qb=self)
 
         columns, rows, count, query_sql = root_select.execute()
-        embedded_rows = []
-        parent_join = []
+        embedded = []
 
-        query_sql = [query_sql]
+        query_sql = query_sql
         for embedded_select in root_select.embedded_selects:
             _columns, _rows, _, _query_sql = embedded_select.execute()
-            columns += [_columns]
-            query_sql += [_query_sql]
-            embedded_rows += [_rows]
-            parent_join += [embedded_select.get_parent_join()]
-
+            embedded.append({
+                "columns": _columns,
+                "rows": _rows,
+                "query_sql": _query_sql,
+                "parent_join": embedded_select.get_parent_join()
+            })
         self.database_conn.close()
-        return columns, rows, count, query_sql, embedded_rows, parent_join
+        return columns, rows, count, query_sql, embedded
