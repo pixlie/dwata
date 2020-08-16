@@ -65,11 +65,9 @@ export default () => {
       <Hx x="4">Columns</Hx>
 
       <p className="text-gray-700 my-2">
-        For any table that you want to see, there are a list of{" "}
-        <strong>columns</strong> that you can choose to see or not.{" "}
-        <strong>dwata</strong> figures out all the columns automatically. Even
-        if you do not wish to see certain columns, you can still{" "}
-        <strong>Filter</strong> or <strong>Order</strong> with them.
+        For any selected table, you can choose which columns you want to see. If
+        you do not wish to see certain columns, you can still{" "}
+        <strong>Filter</strong> or <strong>Order</strong> them.
       </p>
 
       <select

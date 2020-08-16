@@ -44,7 +44,9 @@ const GridHead = ({ querySpecification }) => {
     <div className="p-2 pl-6 bg-gray-200 border-b">
       <Hx x="3">Showing: {mainTableNames.join(", ")}</Hx>
       {embeddedTableNames.length ? (
-        <Hx x="5">Multiple (possibly): {embeddedTableNames.join(", ")}</Hx>
+        <Hx x="5">
+          Merged inside (multiple records): {embeddedTableNames.join(", ")}
+        </Hx>
       ) : null}
     </div>
   );

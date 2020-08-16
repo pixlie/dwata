@@ -17,6 +17,25 @@ const initialState = {
   fetchNeeded: false,
 };
 
+const loadFromLocalStorage = () => {
+  const temp = window.localStorage.getItem("querySpecification");
+  if (!!temp) {
+    return JSON.parse(temp);
+  }
+  return {};
+};
+
+const saveToLocalStorage = (key, payload) => {
+  if (key === "main") {
+    window.localStorage.setItem(
+      "querySpecification",
+      JSON.stringify({
+        [key]: payload,
+      })
+    );
+  }
+};
+
 const initiateQuerySpecification = (payload) => ({
   ...initialState,
   ...payload,
@@ -212,34 +231,17 @@ const toggleRelatedTable = (inner, label) => {
   }
 };
 
-const loadFromLocalStorage = () => {
-  const temp = window.localStorage.getItem("querySpecification");
-  if (!!temp) {
-    return JSON.parse(temp);
-  }
-  return {};
-};
-
-const saveToLocalStorage = (key, payload) => {
-  if (key === "main") {
-    window.localStorage.setItem(
-      "querySpecification",
-      JSON.stringify({
-        [key]: initiateQuerySpecification(payload),
-      })
-    );
-  }
-  return true;
-};
-
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
   ...loadFromLocalStorage(),
 
   initiateQuerySpecification: (key, payload) =>
-    saveToLocalStorage(key, payload) &&
-    set(() => ({
-      [key]: initiateQuerySpecification(payload),
-    })),
+    set(() => {
+      const _temp = initiateQuerySpecification(payload);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
 
   nextPage: (key) =>
     set((state) => ({
@@ -292,14 +294,22 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
     })),
 
   toggleColumnSelection: (key, columnName) =>
-    set((state) => ({
-      [key]: toggleColumnSelection(state[key], columnName),
-    })),
+    set((state) => {
+      const _temp = toggleColumnSelection(state[key], columnName);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
 
   toggleRelatedTable: (key, relatedLabel) =>
-    set((state) => ({
-      [key]: toggleRelatedTable(state[key], relatedLabel),
-    })),
+    set((state) => {
+      const _temp = toggleRelatedTable(state[key], relatedLabel);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
 }));
 
 export { querySpecificationStoreAPI };
