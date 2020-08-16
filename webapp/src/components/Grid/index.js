@@ -14,28 +14,12 @@ import TableBody from "./TableBody";
 
 const GridHead = ({ querySpecification }) => {
   const mainTableNames = [
-    ...new Set(
-      querySpecification.select
-        .reduce((acc, x) => {
-          if (typeof x === "object" && !Array.isArray(x)) {
-            return [...acc, x];
-          } else {
-            return acc;
-          }
-        }, [])
-        .map((x) => x.tableName)
-    ),
+    ...new Set(querySpecification.select.map((x) => x.tableName)),
   ];
   const embeddedTableNames = [
     ...new Set(
-      querySpecification.select
-        .reduce((acc, x) => {
-          if (typeof x === "object" && Array.isArray(x)) {
-            return [...acc, ...x];
-          } else {
-            return acc;
-          }
-        }, [])
+      querySpecification.embedded
+        .reduce((acc, x) => [...acc, ...x], [])
         .map((x) => x.tableName)
     ),
   ];
@@ -45,7 +29,7 @@ const GridHead = ({ querySpecification }) => {
       <Hx x="3">Showing: {mainTableNames.join(", ")}</Hx>
       {embeddedTableNames.length ? (
         <Hx x="5">
-          Merged inside (multiple records): {embeddedTableNames.join(", ")}
+          Merged (multiple) records: {embeddedTableNames.join(", ")}
         </Hx>
       ) : null}
     </div>

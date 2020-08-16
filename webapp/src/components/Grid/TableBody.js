@@ -20,19 +20,17 @@ export default () => {
   // }, [isReady, showPinnedRecords, fetchPins]);
   let columns = null,
     rows = null,
-    embeddedRows = null,
+    embedded = null,
     selectedRowList = null,
     pins = [],
     showPinnedRecords = false;
   if (data) {
-    ({ columns, rows, selectedRowList, embeddedRows } = data);
+    ({ columns, rows, selectedRowList, embedded } = data);
   }
-  const selectedColumLabels = querySpecification.select
-    .filter((x) => typeof x === "object" && !Array.isArray(x))
-    .map((x) => x.label);
-  const embeddedTableNames = querySpecification.select
-    .filter((x) => typeof x === "object" && Array.isArray(x))
-    .map((x) => x[0].tableName);
+  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const embeddedTableNames = querySpecification.embedded.map(
+    (x) => x.tableName
+  );
 
   const rowRendererList = rowRenderer(
     schema.rows,
@@ -71,7 +69,7 @@ export default () => {
       // );
     };
     let classes =
-      (embeddedRows.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
+      (embedded.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
     const mainRow = (
@@ -86,7 +84,7 @@ export default () => {
       </tr>
     );
 
-    if (embeddedRows.length === 0) {
+    if (embedded.length === 0) {
       return mainRow;
     } else {
       return (
@@ -102,7 +100,9 @@ export default () => {
                   Expand {x}
                 </span>
               ))}
-              {/* <EmbeddedTable embedContext={{ tableName: "content_slice" }} /> */}
+              {index === 0 ? (
+                <EmbeddedTable embedContext={{ tableName: "content_slice" }} />
+              ) : null}
             </td>
           </tr>
         </Fragment>

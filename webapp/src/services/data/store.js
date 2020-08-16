@@ -7,8 +7,8 @@ import { querySpecificationStoreAPI } from "services/querySpecification/store";
 const initialState = {
   columns: [],
   rows: [],
-  embeddedRows: [],
   querySQL: null,
+  embedded: [],
   selectedRowList: [],
 
   isFetching: false,
@@ -20,8 +20,8 @@ const initialState = {
 const completeFetchList = (inner, payload) => ({
   columns: payload.columns,
   rows: payload.rows, // Here we do not transform data into maps/dicts
-  embeddedRows: "embedded_rows" in payload ? payload.embedded_rows : [],
   querySQL: payload.query_sql,
+  embedded: payload.embedded,
   selectedRowList: [...inner.selectedRowList],
 
   isFetching: false,
@@ -40,25 +40,29 @@ const completeFetchItem = (payload) => ({
   lastFetchedAt: +new Date(),
 });
 
-const processColumns = (columns) => {
-  const acc = [];
-  for (const el of columns) {
-    if (typeof el === "string") {
-      acc.push({
+const processColumns = (columns, embeddedColumns) => {
+  return {
+    select: columns.map((el) => ({
+      label: el,
+      tableName: el.split(".")[0],
+      columnName: el.split(".")[1],
+    })),
+    embedded: embeddedColumns.map((em) =>
+      em.map((el) => ({
         label: el,
         tableName: el.split(".")[0],
         columnName: el.split(".")[1],
-      });
-    } else if (typeof el === "object" && Array.isArray(el)) {
-      acc.push(processColumns(el));
-    }
-  }
-  return acc;
+      }))
+    ),
+  };
 };
 
 const querySpecificationObject = (state, payload) => ({
   ...state,
-  select: processColumns(payload.columns),
+  ...processColumns(
+    payload.columns,
+    payload.embedded.reduce((acc, cur) => [...acc, cur.columns], [])
+  ),
   count: payload.count,
   limit: payload.limit,
   offset: payload.offset,
@@ -67,20 +71,15 @@ const querySpecificationObject = (state, payload) => ({
   fetchNeeded: false,
 });
 
-const processSelect = (select) => {
-  const acc = [];
-  for (const el of select) {
-    if (typeof el === "object" && !Array.isArray(el)) {
-      acc.push(el.label);
-    } else if (typeof el === "object" && Array.isArray(el)) {
-      acc.push(processSelect(el));
-    }
-  }
-  return acc;
+const processSelect = (qs) => {
+  return [
+    ...qs.select.map((x) => x.label),
+    ...qs.embedded.reduce((acc, x) => [...acc, ...x], []),
+  ];
 };
 
 const getQuerySpecificationPayload = (querySpecification) => ({
-  select: processSelect(querySpecification.select),
+  select: processSelect(querySpecification),
   source_label: querySpecification.sourceLabel,
   order_by: querySpecification.orderBy,
   filter_by: querySpecification.filterBy,

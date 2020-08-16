@@ -13,13 +13,10 @@ export default () => {
     (state) => state.toggleRelatedTable
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const allSelected = querySpecification.select.reduce((acc, x) => {
-    if (typeof x === "object" && !Array.isArray(x)) {
-      return [...acc, x];
-    } else if (typeof x === "object" && Array.isArray(x)) {
-      return [...acc, ...x];
-    }
-  }, []);
+  const allSelected = [
+    ...querySpecification.select,
+    ...querySpecification.embedded.reduce((acc, cur) => [...acc, ...cur], []),
+  ];
   const selectedTableNames = [...new Set(allSelected.map((x) => x.tableName))];
   const startingTableName = querySpecification.select[0].tableName;
 

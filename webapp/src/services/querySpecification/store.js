@@ -4,6 +4,7 @@ const initialState = {
   sourceLabel: null,
 
   select: [],
+  embedded: [],
   filterBy: {},
   orderBy: {},
 
@@ -186,13 +187,10 @@ const toggleColumnSelection = (inner, label) => {
 };
 
 const toggleRelatedTable = (inner, label) => {
-  const allSelected = inner.select.reduce((acc, x) => {
-    if (typeof x === "object" && !Array.isArray(x)) {
-      return [...acc, x];
-    } else if (typeof x === "object" && Array.isArray(x)) {
-      return [...acc, ...x];
-    }
-  }, []);
+  const allSelected = [
+    ...inner.select,
+    ...inner.embedded.reduce((acc, cur) => [...acc, ...cur], []),
+  ];
   const selectedTableNames = [...new Set(allSelected.map((x) => x.tableName))];
   if (selectedTableNames.includes(label)) {
     // This table is currently selected, let's get all of its columns removed

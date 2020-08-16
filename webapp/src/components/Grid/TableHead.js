@@ -16,16 +16,8 @@ export default () => {
   const selectedTableNames =
     "isEmbedded" in queryContext && queryContext.isEmbedded
       ? queryContext.tableName
-      : [
-          ...new Set(
-            querySpecification.select
-              .filter((x) => typeof x === "object" && !Array.isArray(x))
-              .map((x) => x.tableName)
-          ),
-        ];
-  const selectedTableColumNames = querySpecification.select
-    .filter((x) => typeof x === "object" && !Array.isArray(x))
-    .map((x) => x.label);
+      : [...new Set(querySpecification.select.map((x) => x.tableName))];
+  const selectedTableColumNames = querySpecification.select.map((x) => x.label);
 
   for (const tableColumnName of data.columns) {
     if (!selectedTableColumNames.includes(tableColumnName)) {
