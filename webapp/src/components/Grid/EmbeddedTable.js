@@ -1,8 +1,8 @@
 import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
-import TableHead from "./TableHead";
-// import TableBody from "./TableBody";
+import EmbeddedTableHead from "./EmbeddedTableHead";
+import EmbeddedTableBody from "./EmbeddedTableBody";
 
 export default ({ embedContext }) => {
   const queryContext = useContext(QueryContext);
@@ -18,10 +18,12 @@ export default ({ embedContext }) => {
         <div>
           <table>
             <thead>
-              <TableHead />
+              <EmbeddedTableHead />
             </thead>
 
-            <tbody>{/* <TableBody /> */}</tbody>
+            <tbody>
+              <EmbeddedTableBody />
+            </tbody>
           </table>
         </div>
       </Fragment>

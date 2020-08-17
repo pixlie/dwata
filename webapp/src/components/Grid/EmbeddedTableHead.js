@@ -12,29 +12,18 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const headList = [];
-  let selectedTableNames = [],
-    selectedTableColumNames = [],
-    _columns = [];
-  if ("isEmbedded" in queryContext && queryContext.isEmbedded) {
-    selectedTableNames = [
-      ...new Set(
-        querySpecification.embeddedColumns[queryContext.embeddedDataIndex].map(
-          (x) => x.tableName
-        )
-      ),
-    ];
-    selectedTableColumNames = querySpecification.embeddedColumns[
-      queryContext.embeddedDataIndex
-    ].map((x) => x.label);
-    _columns =
-      querySpecification.embeddedColumns[queryContext.embeddedDataIndex];
-  } else {
-    selectedTableNames = [
-      ...new Set(querySpecification.columns.map((x) => x.tableName)),
-    ];
-    selectedTableColumNames = querySpecification.columns.map((x) => x.label);
-    _columns = querySpecification.columns;
-  }
+  const _columns =
+    querySpecification.embeddedColumns[queryContext.embeddedDataIndex];
+  const selectedTableNames = [
+    ...new Set(
+      querySpecification.embeddedColumns[queryContext.embeddedDataIndex].map(
+        (x) => x.tableName
+      )
+    ),
+  ];
+  const selectedTableColumNames = querySpecification.embeddedColumns[
+    queryContext.embeddedDataIndex
+  ].map((x) => x.label);
 
   for (const col of _columns) {
     const tableColumnName = col.label;
@@ -61,10 +50,5 @@ export default () => {
     }
   }
 
-  return (
-    <tr className="border-b-4 h-10">
-      <th>&nbsp;</th>
-      {headList}
-    </tr>
-  );
+  return <tr className="border-b-4 h-10">{headList}</tr>;
 };

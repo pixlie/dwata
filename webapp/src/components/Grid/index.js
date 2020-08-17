@@ -14,11 +14,11 @@ import TableBody from "./TableBody";
 
 const GridHead = ({ querySpecification }) => {
   const mainTableNames = [
-    ...new Set(querySpecification.select.map((x) => x.tableName)),
+    ...new Set(querySpecification.columns.map((x) => x.tableName)),
   ];
   const embeddedTableNames = [
     ...new Set(
-      querySpecification.embedded
+      querySpecification.embeddedColumns
         .reduce((acc, x) => [...acc, ...x], [])
         .map((x) => x.tableName)
     ),

@@ -27,10 +27,14 @@ export default () => {
   if (data) {
     ({ columns, rows, selectedRowList, embedded } = data);
   }
-  const selectedColumLabels = querySpecification.select.map((x) => x.label);
-  const embeddedTableNames = querySpecification.embedded.map(
-    (x) => x.tableName
-  );
+  const selectedColumLabels = querySpecification.columns.map((x) => x.label);
+  const embeddedTableNames = [
+    ...new Set(
+      querySpecification.embeddedColumns
+        .reduce((acc, x) => [...acc, ...x], [])
+        .map((x) => x.tableName)
+    ),
+  ];
 
   const rowRendererList = rowRenderer(
     schema.rows,
@@ -101,7 +105,10 @@ export default () => {
                 </span>
               ))}
               {index === 0 ? (
-                <EmbeddedTable embedContext={{ tableName: "content_slice" }} />
+                <EmbeddedTable
+                  parentRecordIndex={index}
+                  embedContext={{ embeddedDataIndex: 0 }}
+                />
               ) : null}
             </td>
           </tr>

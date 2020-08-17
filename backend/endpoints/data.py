@@ -24,6 +24,7 @@ async def data_post(request):
     columns, rows, count, query_sql, embedded = await qb.results()
     return RapidJSONResponse(
         dict(
+            select=query_specification["select"],
             columns=columns,
             rows=rows,
             count=count,

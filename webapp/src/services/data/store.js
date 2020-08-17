@@ -40,28 +40,19 @@ const completeFetchItem = (payload) => ({
   lastFetchedAt: +new Date(),
 });
 
-const processColumns = (columns, embeddedColumns) => {
-  return {
-    select: columns.map((el) => ({
-      label: el,
-      tableName: el.split(".")[0],
-      columnName: el.split(".")[1],
-    })),
-    embedded: embeddedColumns.map((em) =>
-      em.map((el) => ({
-        label: el,
-        tableName: el.split(".")[0],
-        columnName: el.split(".")[1],
-      }))
-    ),
-  };
-};
+const expandTableColumn = (el) => ({
+  label: el,
+  tableName: el.split(".")[0],
+  columnName: el.split(".")[1],
+});
 
 const querySpecificationObject = (state, payload) => ({
   ...state,
-  ...processColumns(
-    payload.columns,
-    payload.embedded.reduce((acc, cur) => [...acc, cur.columns], [])
+  select: payload.select.map((x) => expandTableColumn(x)),
+  columns: payload.columns.map((x) => expandTableColumn(x)),
+  embeddedColumns: payload.embedded.reduce(
+    (acc, x) => [...acc, x.columns.map((xy) => expandTableColumn(xy))],
+    []
   ),
   count: payload.count,
   limit: payload.limit,
@@ -71,15 +62,8 @@ const querySpecificationObject = (state, payload) => ({
   fetchNeeded: false,
 });
 
-const processSelect = (qs) => {
-  return [
-    ...qs.select.map((x) => x.label),
-    ...qs.embedded.reduce((acc, x) => [...acc, ...x], []),
-  ];
-};
-
 const getQuerySpecificationPayload = (querySpecification) => ({
-  select: processSelect(querySpecification),
+  select: querySpecification.select.map((x) => x.label),
   source_label: querySpecification.sourceLabel,
   order_by: querySpecification.orderBy,
   filter_by: querySpecification.filterBy,
