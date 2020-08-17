@@ -24,8 +24,19 @@ const GridHead = ({ querySpecification }) => {
     ),
   ];
 
+  const colors = [
+    "orange",
+    "teal",
+    "pink",
+    "purple",
+    "indigo",
+    "blue",
+    "red",
+    "yellow",
+  ];
+  const color = colors[Math.floor(Math.random() * colors.length)];
   return (
-    <div className="p-2 pl-6 bg-gray-200 border-b">
+    <div className={`p-2 pl-6 bg-${color}-200 border-${color}-300 border-b`}>
       <Hx x="3">Showing: {mainTableNames.join(", ")}</Hx>
       {embeddedTableNames.length ? (
         <Hx x="5">
