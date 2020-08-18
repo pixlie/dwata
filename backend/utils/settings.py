@@ -5,7 +5,6 @@ from sqlalchemy import MetaData
 from utils.schema import get_table_properties, column_definition
 from utils.config import settings
 from utils.database import connect_database, get_unavailable_columns
-from utils.response import RapidJSONResponse
 
 
 def get_all_sources():
@@ -53,7 +52,7 @@ async def get_source_database(source_settings, table_name):
             if col not in unavailable_columns.get(table_name, [])
         ]
         conn.close()
-        return RapidJSONResponse(columns)
+        return columns
     else:
         tables = sorted([
             (
@@ -64,7 +63,7 @@ async def get_source_database(source_settings, table_name):
             ) for name, schema in meta.tables.items()
         ], key=lambda x: x[0])
         conn.close()
-        return RapidJSONResponse({
+        return {
             "columns": ["table_name", "properties", "columns"],
             "rows": tables
-        })
+        }
