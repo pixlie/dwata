@@ -17,6 +17,7 @@ export default () => {
     ...new Set(querySpecification.select.map((x) => x.tableName)),
   ];
   const startingTableName = querySpecification.select[0].tableName;
+  const addedTableNames = [startingTableName];
 
   const RelatedItem = ({ tableName, innerRelated }) => {
     if (tableName === undefined || innerRelated === undefined) {
@@ -100,6 +101,14 @@ export default () => {
             continue;
           } */
 
+          if (addedTableNames.includes(relatedTableName)) {
+            continue;
+          }
+
+          if (relatedTableName === tableName) {
+            continue;
+          }
+
           if (
             tableName !== startingTableName &&
             !selectedTableNames.includes(tableName)
@@ -124,8 +133,10 @@ export default () => {
 
           if (relatedTableProperties.cardinality === "one-to-many") {
             _inner.push(relatedTableName);
+            addedTableNames.push(relatedTableName);
           } else {
             _adjacent.push(relatedTableName);
+            addedTableNames.push(relatedTableName);
           }
         }
       }
