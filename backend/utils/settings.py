@@ -39,10 +39,11 @@ def get_source_settings(source_label):
         return getattr(settings, requested_source[2].upper())[requested_source[0]]
 
 
-async def get_source_database(source_settings, table_name):
+async def get_source_database(source_settings, table_name=None, meta=None):
     engine, conn = await connect_database(db_url=source_settings["db_url"])
-    meta = MetaData(bind=engine)
-    meta.reflect()
+    if meta is None:
+        meta = MetaData(bind=engine)
+        meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=source_settings, meta=meta)
     table_properties = get_table_properties(source_settings=source_settings, meta=meta)
 

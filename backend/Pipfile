@@ -17,6 +17,7 @@ aioredis = "*"
 rapidjson = "*"
 toml = "*"
 psycopg2 = "*"
+faker = "*"
 
 [requires]
 python_version = "3.8"
