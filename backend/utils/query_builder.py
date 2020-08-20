@@ -354,8 +354,12 @@ class Select(object):
             self.apply_ordering()
         if qs.get("filter_by", {}) != {}:
             self.apply_filters()
-        self._select = self._select.limit(qs.get("limit", self.default_per_page))
-        self._select = self._select.offset(qs.get("offset", 0))
+
+        if self.is_root:
+            # For embedded Queries, we return all results for now
+            # TODO: Please implement pagination or separate HTTP request for this
+            self._select = self._select.limit(qs.get("limit", self.default_per_page))
+            self._select = self._select.offset(qs.get("offset", 0))
 
         # We use a separate query to count the total number of rows in the given query
         count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])

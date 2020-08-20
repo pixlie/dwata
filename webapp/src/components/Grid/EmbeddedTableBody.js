@@ -4,6 +4,36 @@ import { QueryContext, transformData } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
 import rowRenderer from "./rowRenderer";
 
+const generateFilter = (
+  mainColumns,
+  parentRow,
+  parentJoin,
+  embeddedColumns
+) => {
+  const parentRowT = transformData(
+    mainColumns.map((x) => x.label),
+    parentRow
+  );
+  const embeddedTableColumn = parentJoin[0].split(".");
+  if (!(parentJoin[1] in parentRowT)) {
+    return () => false;
+  }
+
+  return (row) => {
+    const rowT = transformData(
+      embeddedColumns.map((x) => x.label),
+      row
+    );
+
+    if (parentJoin[0] in rowT) {
+      if (rowT[parentJoin[0]] === parentRowT[parentJoin[1]]) {
+        return true;
+      }
+    }
+    return false;
+  };
+};
+
 export default () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state[queryContext.key]);
@@ -19,24 +49,13 @@ export default () => {
   const selectedColumLabels = querySpecification.embeddedColumns[
     queryContext.embeddedDataIndex
   ].map((x) => x.label);
-  const parentRow = transformData(
-    querySpecification.columns.map((x) => x.label),
-    queryContext.parentRow
-  );
   const parentJoin = embedded[queryContext.embeddedDataIndex].parent_join;
-  let filterByParent = () => true;
-  if (parentJoin[1] in Object.keys(parentRow)) {
-    const parentValue = parentRow[parentJoin[1]];
-    filterByParent = (row) => {
-      const _row = transformData(selectedColumLabels, row);
-      if (parentJoin[0] in Object.keys(_row)) {
-        if (_row[parentJoin[0]] === parentValue) {
-          return true;
-        }
-      }
-      return false;
-    };
-  }
+  let filterByParent = generateFilter(
+    querySpecification.columns,
+    queryContext.parentRow,
+    parentJoin,
+    querySpecification.embeddedColumns[queryContext.embeddedDataIndex]
+  );
 
   const rowRendererList = rowRenderer(
     schema.rows,

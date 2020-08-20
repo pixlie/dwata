@@ -34,15 +34,13 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
 
   return (
     <div
-      className="m-1 p-1 border rounded  hover:bg-gray-100"
+      className="inline-block m-2 w-32 cursor-pointer hover:bg-gray-200"
       onClick={handleClick}
     >
-      <a
-        className="block pl-6 font-bold"
-        href={`${urlBase}/${sourceLabel}/${item.table_name}`}
-      >
-        {item.table_name}
-      </a>
+      <span className="block text-2xl text-gray-700 text-center mr-1">
+        <i className="fas fa-table" />
+      </span>
+      <span className="block text-center break-all">{item.table_name}</span>
     </div>
   );
 };
