@@ -95,6 +95,12 @@ export default () => {
         </span>
         <strong>Content/Marketing</strong>
       </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>All Reports</strong>
+      </div>
 
       {sourceRows
         .filter((x) => x.type === "database")

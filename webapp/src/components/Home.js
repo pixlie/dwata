@@ -34,7 +34,7 @@ const ReportItem = ({ item }) => {
 
   return (
     <Button size="large" attributes={{ onClick: handleClick }}>
-      New Report
+      Add KPI
     </Button>
   );
 };
@@ -54,8 +54,31 @@ export default () => {
         </div>
 
         <div className="flex-1 max-w-sm bg-gray-100">
-          <Hx x="3">Saved queries, reports</Hx>
-          <ReportItem />
+          <Hx x="3">KPIs</Hx>
+          <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
+            <span className="text-4xl font-bold mr-4">39</span>
+            <span className="text-gray-600">New Orders</span>&nbsp;
+            <span className="inline-block bg-green-200 text-xs px-2 rounded">
+              last 24 hours
+            </span>
+          </div>
+
+          <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
+            <span className="text-4xl font-bold mr-4">3128</span>
+            <span className="text-gray-600">Product views</span>&nbsp;
+            <span className="inline-block bg-green-200 text-xs px-2 rounded">
+              last 24 hours
+            </span>
+          </div>
+
+          <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
+            <span className="text-4xl font-bold mr-4">84</span>
+            <span className="text-gray-600">Abandoned carts</span>&nbsp;
+            <span className="inline-block bg-green-200 text-xs px-2 rounded">
+              last 24 hours
+            </span>
+          </div>
+          <Button size="large">Add KPI</Button>
         </div>
       </div>
     </Fragment>

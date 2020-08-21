@@ -32,7 +32,7 @@ export const Hx = ({ x = "3", children }) => {
   };
   return React.createElement(
     `h${x}`,
-    { className: `text-gray-700 ${xSizeClass[x]}` },
+    { className: `text-gray-700 pl-3 ${xSizeClass[x]}` },
     children
   );
 };
