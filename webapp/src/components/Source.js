@@ -1,31 +1,42 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import useSource from "services/source/store";
-import { Panel } from "components/LayoutHelpers";
 import TableList from "components/TableList";
 
 const SourceItem = ({ source, sourceType }) => {
+  const [state, setState] = useState({
+    isOpen: true,
+  });
   if (source.properties["is_system_db"]) {
     return null;
   }
-  /* const handleClickSource = (event) => {
-      event.preventDefault();
-      setState((state) => ({
-        ...state,
-        sourceIndex: source.label,
-      }));
-    }; */
+  const handleClickSource = () => {
+    setState((state) => ({
+      ...state,
+      isOpen: !state.isOpen,
+    }));
+  };
 
   return (
     <Fragment>
-      <div className="block p-2 pl-3 border-b">
+      <div
+        className="block p-2 pl-3 border-b cursor-default"
+        onClick={handleClickSource}
+      >
+        {sourceType === "database" ? (
+          <span className="text-lg text-gray-600 text-center mr-3">
+            <i className="fas fa-database" />
+          </span>
+        ) : null}
         <strong>{source.label}</strong>&nbsp;
         <span className="inline-block bg-green-200 text-sm px-2 rounded">
           {source.provider}
         </span>
       </div>
 
-      <TableList sourceLabel={source.label} sourceType={sourceType} />
+      {state.isOpen ? (
+        <TableList sourceLabel={source.label} sourceType={sourceType} />
+      ) : null}
     </Fragment>
   );
 };
@@ -48,6 +59,43 @@ export default () => {
 
   return (
     <Fragment>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-yellow-500 text-center mr-3">
+          <i className="fas fa-star" />
+        </span>
+        <strong>Starred</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-orange-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Orders</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Customers</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Staging</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-blue-700 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Shipment</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Content/Marketing</strong>
+      </div>
+
       {sourceRows
         .filter((x) => x.type === "database")
         .map((source) => (

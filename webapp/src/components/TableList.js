@@ -37,7 +37,7 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
       className="block w-full cursor-pointer hover:bg-gray-200"
       onClick={handleClick}
     >
-      <span className="text-xl text-gray-600 text-center mx-3">
+      <span className="text-lg text-gray-600 text-center ml-6 mr-3">
         <i className="fas fa-table" />
       </span>
       <span className="break-all text-sm font-bold text-blue-700">
