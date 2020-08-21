@@ -35,11 +35,11 @@ export default ({ isSourceFetching, toggleSidebar }) => {
 
   return (
     <nav
-      className="fixed top-0 w-screen flex items-center bg-gray-100"
+      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300"
       role="navigation"
       aria-label="main navigation"
     >
-      <div className="flex items-center flex-shrink-0 mx-4 px-4">
+      <div className="mx-4 px-4">
         <a className="font-bold text-2xl" href="/" onClick={handleHome}>
           Home
         </a>

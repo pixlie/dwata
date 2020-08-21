@@ -1,8 +1,9 @@
-import React, { useEffect, Fragment, useContext } from "react";
+import React, { Fragment, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
 import rowRenderer from "./rowRenderer";
+import EmbeddedTable from "./EmbeddedTable";
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -19,13 +20,21 @@ export default () => {
   // }, [isReady, showPinnedRecords, fetchPins]);
   let columns = null,
     rows = null,
+    embedded = null,
     selectedRowList = null,
     pins = [],
     showPinnedRecords = false;
   if (data) {
-    ({ columns, rows, selectedRowList } = data);
+    ({ columns, rows, selectedRowList, embedded } = data);
   }
-  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedColumLabels = querySpecification.columns.map((x) => x.label);
+  const embeddedTableNames = [
+    ...new Set(
+      querySpecification.embeddedColumns
+        .reduce((acc, x) => [...acc, ...x], [])
+        .map((x) => x.tableName)
+    ),
+  ];
 
   const rowRendererList = rowRenderer(
     schema.rows,
@@ -56,7 +65,7 @@ export default () => {
     );
   };
 
-  const Row = ({ row, index, pinned = false }) => {
+  const RowWithoutEmbed = ({ row, index, pinned = false }) => {
     const handleRowClick = (event) => {
       event.preventDefault();
       // history.push(
@@ -78,8 +87,56 @@ export default () => {
       </tr>
     );
   };
+  const RowWithEmbed = ({ row, index, pinned = false }) => {
+    const handleRowClick = (event) => {
+      event.preventDefault();
+      // history.push(
+      // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
+      // );
+    };
+    let classes =
+      (embedded.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
+    classes = classes + (pinned ? " is-pin" : "");
+
+    const mainRow = (
+      <tr onClick={handleRowClick} className={classes}>
+        <RowSelectorCell row={row} />
+        {row.map((cell, j) => {
+          const Cell = rowRendererList[j];
+          return Cell !== null ? (
+            <Cell key={`td-${index}-${j}`} data={cell} />
+          ) : null;
+        })}
+      </tr>
+    );
+
+    return (
+      <Fragment>
+        {mainRow}
+        <tr className={`border-b ${classes}`}>
+          <td colSpan={row.length + 1} className="py-1 px-4">
+            {embeddedTableNames.map((x) => (
+              <span
+                key={`ex-mr-tb-${x}`}
+                className="inline-block bg-gray-200 px-2 rounded"
+              >
+                Expand {x}
+              </span>
+            ))}
+            {index === 0 ? (
+              <EmbeddedTable
+                parentRecordIndex={index}
+                embedContext={{ embeddedDataIndex: 0, parentRow: row }}
+              />
+            ) : null}
+          </td>
+        </tr>
+      </Fragment>
+    );
+  };
   const pinnedRowIds = pins && pins.length > 0 ? pins.map((x) => x[2]) : null;
 
+  const Row = embedded.length === 0 ? RowWithoutEmbed : RowWithEmbed;
   return (
     <Fragment>
       {pinnedRowIds && showPinnedRecords ? (

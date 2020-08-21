@@ -43,18 +43,18 @@ export default () => {
   return (
     <Fragment>
       <div className="flex items-stretch">
-        <div className="flex-1 px-2">
-          <Hx x="2">travlyng</Hx>
+        <div className="flex-1 max-w-sm border-r border-gray-300">
+          <Hx x="3">Browse</Hx>
           <Source />
         </div>
 
-        <div className="flex-1 px-2">
-          <SavedQuerySpecifications context={{ key: "saved_queries" }} />
+        <div className="flex-1 bg-gray-100">
+          <Hx x="3">Recent activity</Hx>
+          {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
         </div>
 
-        <div className="flex-1 px-2">
-          <Hx x="3">Reports</Hx>
-
+        <div className="flex-1 max-w-sm bg-gray-100">
+          <Hx x="3">Saved queries, reports</Hx>
           <ReportItem />
         </div>
       </div>

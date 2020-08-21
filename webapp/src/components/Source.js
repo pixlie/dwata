@@ -1,64 +1,110 @@
-import React, { useEffect, Fragment, useState } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import useSource from "services/source/store";
-import { Panel } from "components/LayoutHelpers";
 import TableList from "components/TableList";
 
-export default () => {
-  const fetchSource = useSource((state) => state.fetchSource);
-  useEffect(() => {
-    fetchSource();
-  }, [fetchSource]);
-  const isReady = useSource((state) => state.isReady);
-  const sourceRows = useSource((state) => state.rows);
+const SourceItem = ({ source, sourceType }) => {
   const [state, setState] = useState({
-    sourceIndex: null,
+    isOpen: true,
   });
-  // const {sourceIndex} = state;
-
-  const SourceItem = ({ source, sourceType }) => {
-    if (source.properties["is_system_db"]) {
-      // This is hackish, we need this since we use the index of source as in response from API
-      // Todo: Remove this in [ch161] when moving to source label
-      return null;
-    }
-    const handleClickSource = (event) => {
-      event.preventDefault();
-      setState((state) => ({
-        ...state,
-        sourceIndex: source.label,
-      }));
-    };
-
-    return (
-      <Fragment>
-        <div className="block p-2 pl-3 border-b" onClick={handleClickSource}>
-          <strong>{source.label}</strong>&nbsp;
-          <span className="inline-block bg-green-200 text-sm px-2 rounded">
-            {source.provider}
-          </span>
-        </div>
-
-        <TableList sourceLabel={source.label} sourceType={sourceType} />
-      </Fragment>
-    );
+  if (source.properties["is_system_db"]) {
+    return null;
+  }
+  const handleClickSource = () => {
+    setState((state) => ({
+      ...state,
+      isOpen: !state.isOpen,
+    }));
   };
 
   return (
     <Fragment>
-      <Panel title="Databases">
-        {isReady
-          ? sourceRows
-              .filter((x) => x.type === "database")
-              .map((source) => (
-                <SourceItem
-                  source={source}
-                  sourceType="database"
-                  key={`sr-${source.label}`}
-                />
-              ))
-          : null}
-      </Panel>
+      <div
+        className="block p-2 pl-3 border-b cursor-default"
+        onClick={handleClickSource}
+      >
+        {sourceType === "database" ? (
+          <span className="text-lg text-gray-600 text-center mr-3">
+            <i className="fas fa-database" />
+          </span>
+        ) : null}
+        <strong>{source.label}</strong>&nbsp;
+        <span className="inline-block bg-green-200 text-sm px-2 rounded">
+          {source.provider}
+        </span>
+      </div>
+
+      {state.isOpen ? (
+        <TableList sourceLabel={source.label} sourceType={sourceType} />
+      ) : null}
+    </Fragment>
+  );
+};
+
+export default () => {
+  const isReady = useSource((state) => state.isReady);
+  const sourceRows = useSource((state) => state.rows);
+  const fetchSource = useSource((state) => state.fetchSource);
+  useEffect(() => {
+    fetchSource();
+  }, []);
+  /* const [state, setState] = useState({
+    sourceIndex: null,
+  }); */
+  // const {sourceIndex} = state;
+
+  if (!isReady) {
+    return null;
+  }
+
+  return (
+    <Fragment>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-yellow-500 text-center mr-3">
+          <i className="fas fa-star" />
+        </span>
+        <strong>Starred</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-orange-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Orders</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Customers</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Staging</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-blue-700 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Shipment</strong>
+      </div>
+      <div className="block p-2 pl-3 border-b">
+        <span className="text-lg text-gray-600 text-center mr-3">
+          <i className="fas fa-folder" />
+        </span>
+        <strong>Content/Marketing</strong>
+      </div>
+
+      {sourceRows
+        .filter((x) => x.type === "database")
+        .map((source) => (
+          <SourceItem
+            source={source}
+            sourceType="database"
+            key={`sr-${source.label}`}
+          />
+        ))}
 
       {/* <Panel title="Services">
         {sourceList.isReady ? sourceList.rows.filter(x => x.type === "service").map((s, i) => (
@@ -68,9 +114,3 @@ export default () => {
     </Fragment>
   );
 };
-
-// const mapStateToProps = (state) => ({
-//   sourceList: state.source,
-// });
-
-// export default connect(mapStateToProps, { fetchSource })(Source);

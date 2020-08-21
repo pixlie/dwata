@@ -85,132 +85,110 @@ export default ({ columnName, singleFilter = false }) => {
   if (dataType.type === "INTEGER" || dataType.type === "FLOAT") {
     return (
       <Fragment>
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            onChange={handleChange}
-            placeholder="range 12,88 or exact 66"
-            value={filterBy[columnName].display}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          onChange={handleChange}
+          placeholder="range 12,88 or exact 66"
+          value={filterBy[columnName].display}
+        />
         {singleFilter ? (
-          <div className="control">
-            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
-          </div>
+          <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}
       </Fragment>
     );
   } else if (dataType.type === "VARCHAR") {
     return (
       <Fragment>
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            onChange={handleChange}
-            placeholder="text to search"
-            value={filterBy[columnName].display}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          onChange={handleChange}
+          placeholder="text to search"
+          value={filterBy[columnName].display}
+        />
         {singleFilter ? (
-          <div className="control">
-            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
-          </div>
+          <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}
       </Fragment>
     );
   } else if (dataType.type === "DATE") {
     return (
       <Fragment>
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            data-meta="from"
-            type="date"
-            onChange={handleChange}
-            value={filterBy[columnName].display}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          data-meta="from"
+          type="date"
+          onChange={handleChange}
+          value={filterBy[columnName].display}
+        />
 
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            data-meta="to"
-            type="date"
-            onChange={handleChange}
-            value={filterBy[columnName].display}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          data-meta="to"
+          type="date"
+          onChange={handleChange}
+          value={filterBy[columnName].display}
+        />
 
         {singleFilter ? (
-          <div className="control">
-            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
-          </div>
+          <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}
       </Fragment>
     );
   } else if (dataType.type === "TIMESTAMP") {
     return (
       <Fragment>
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            data-meta="from"
-            type="datetime-local"
-            onChange={handleChange}
-            value={filterBy[columnName].from}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          data-meta="from"
+          type="datetime-local"
+          onChange={handleChange}
+          value={filterBy[columnName].from}
+        />
 
-        <div className="control">
-          <input
-            className="input"
-            name={columnName}
-            data-meta="to"
-            type="datetime-local"
-            onChange={handleChange}
-            value={filterBy[columnName].to}
-          />
-        </div>
+        <input
+          className="border px-2 py-1"
+          name={columnName}
+          data-meta="to"
+          type="datetime-local"
+          onChange={handleChange}
+          value={filterBy[columnName].to}
+        />
 
         {singleFilter ? (
-          <div className="control">
-            <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
-          </div>
+          <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}
       </Fragment>
     );
   } else if (dataType.type === "BOOLEAN") {
     return (
-      <div className="control is-narrow">
-        <div className="control">
-          <label className="radio">
-            <input
-              type="radio"
-              name={columnName}
-              value="true"
-              checked={filterBy[columnName].value === true}
-              onChange={handleChange}
-            />
-            &nbsp;Yes
-          </label>
+      <Fragment>
+        <label className="mx-2">
+          <input
+            type="radio"
+            name={columnName}
+            value="true"
+            checked={filterBy[columnName].value === true}
+            onChange={handleChange}
+          />
+          &nbsp;Yes
+        </label>
 
-          <label className="radio">
-            <input
-              type="radio"
-              name={columnName}
-              value="false"
-              checked={filterBy[columnName].value === false}
-              onChange={handleChange}
-            />
-            &nbsp;No
-          </label>
-        </div>
-      </div>
+        <label className="mx-2">
+          <input
+            type="radio"
+            name={columnName}
+            value="false"
+            checked={filterBy[columnName].value === false}
+            onChange={handleChange}
+          />
+          &nbsp;No
+        </label>
+      </Fragment>
     );
   }
   return (

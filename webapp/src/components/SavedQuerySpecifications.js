@@ -50,6 +50,9 @@ export default ({ context }) => {
     (state) => state.initiateQuerySpecification
   );
   useEffect(() => {
+    if (!appsIsReady) {
+      return;
+    }
     initiateQuerySpecification(context.key, {
       sourceLabel: "dwata_meta",
       select: [
@@ -60,7 +63,7 @@ export default ({ context }) => {
       ],
       fetchNeeded: true,
     });
-  }, []);
+  }, [appsIsReady, context.key, initiateQuerySpecification]);
   const data = useData((state) => state[context.key]);
   const qs = useQuerySpecification((state) => state[context.key]);
 

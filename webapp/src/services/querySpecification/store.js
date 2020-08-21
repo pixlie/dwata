@@ -4,6 +4,8 @@ const initialState = {
   sourceLabel: null,
 
   select: [],
+  columns: [],
+  embeddedColumns: [],
   filterBy: {},
   orderBy: {},
 
@@ -15,6 +17,25 @@ const initialState = {
   isReady: false,
   isFetching: false,
   fetchNeeded: false,
+};
+
+const loadFromLocalStorage = () => {
+  const temp = window.localStorage.getItem("querySpecification");
+  if (!!temp) {
+    return JSON.parse(temp);
+  }
+  return {};
+};
+
+const saveToLocalStorage = (key, payload) => {
+  if (key === "main") {
+    window.localStorage.setItem(
+      "querySpecification",
+      JSON.stringify({
+        [key]: payload,
+      })
+    );
+  }
 };
 
 const initiateQuerySpecification = (payload) => ({
@@ -166,11 +187,42 @@ const toggleColumnSelection = (inner, label) => {
   }
 };
 
+const toggleRelatedTable = (inner, label) => {
+  const selectedTableNames = [...new Set(inner.select.map((x) => x.tableName))];
+  if (selectedTableNames.includes(label)) {
+    // This table is currently selected, let's get it (or all of its columns) removed
+    return {
+      ...inner,
+      select: inner.select.filter((x) => x.tableName !== label),
+      fetchNeeded: true,
+    };
+  } else {
+    // This column is not selected, let's add it
+    return {
+      ...inner,
+      select: [
+        ...inner.select,
+        {
+          label,
+          tableName: label,
+        },
+      ],
+      fetchNeeded: true,
+    };
+  }
+};
+
 const [useStore, querySpecificationStoreAPI] = create((set) => ({
+  ...loadFromLocalStorage(),
+
   initiateQuerySpecification: (key, payload) =>
-    set(() => ({
-      [key]: initiateQuerySpecification(payload),
-    })),
+    set(() => {
+      const _temp = initiateQuerySpecification(payload);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
 
   nextPage: (key) =>
     set((state) => ({
@@ -223,9 +275,22 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
     })),
 
   toggleColumnSelection: (key, columnName) =>
-    set((state) => ({
-      [key]: toggleColumnSelection(state[key], columnName),
-    })),
+    set((state) => {
+      const _temp = toggleColumnSelection(state[key], columnName);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
+
+  toggleRelatedTable: (key, relatedLabel) =>
+    set((state) => {
+      const _temp = toggleRelatedTable(state[key], relatedLabel);
+      saveToLocalStorage(key, _temp);
+      return {
+        [key]: _temp,
+      };
+    }),
 }));
 
 export { querySpecificationStoreAPI };

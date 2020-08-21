@@ -58,7 +58,7 @@ export const Button = ({
   active = false,
   disabled = false,
   padding = "px-3 py-1",
-  margin = "mr-6",
+  margin = "mx-1",
   rounded = "rounded",
   attributes,
   children,
@@ -73,7 +73,8 @@ export const Button = ({
   } else if (theme === "info") {
     classes =
       classes +
-      " bg-yellow-200 text-gray-700 hover:bg-yellow-700 hover:text-white";
+      (active ? " bg-yellow-400" : " bg-yellow-200") +
+      " text-gray-700 hover:bg-yellow-700 hover:text-white";
   } else if (theme === "link") {
     classes = "inline-block font-bold underline";
   }
@@ -130,7 +131,7 @@ export const ColumnHead = ({ label, order, group, attributes, children }) => {
   }
 
   return (
-    <th className="col-hd text-left">
+    <th className="mb-4 text-left">
       <span className={classes} {...attributes}>
         {label}
       </span>

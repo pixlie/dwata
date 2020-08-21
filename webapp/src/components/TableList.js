@@ -6,6 +6,7 @@ import {
   useQuerySpecification,
 } from "services/store";
 import * as globalConstants from "services/global/constants";
+import { Hx } from "components/LayoutHelpers";
 
 const BrowserItem = ({ item, sourceLabel, sourceType }) => {
   const initiateQuerySpecification = useQuerySpecification(
@@ -32,13 +33,17 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
   };
 
   return (
-    <a
-      className="block p-1 pl-6 border-b hover:bg-gray-100"
-      href={`${urlBase}/${sourceLabel}/${item.table_name}`}
+    <div
+      className="block w-full cursor-pointer hover:bg-gray-200"
       onClick={handleClick}
     >
-      {item.table_name}
-    </a>
+      <span className="text-lg text-gray-600 text-center ml-6 mr-3">
+        <i className="fas fa-table" />
+      </span>
+      <span className="break-all text-sm font-bold text-blue-700">
+        {item.table_name}
+      </span>
+    </div>
   );
 };
 
@@ -47,37 +52,38 @@ export default ({ sourceLabel, sourceType }) => {
   const fetchSchema = useSchema((state) => state.fetchSchema);
   useEffect(() => {
     fetchSchema(sourceLabel);
-  }, [sourceLabel, fetchSchema]);
+  }, [sourceLabel]);
+
+  if (!schema || !schema.isReady) {
+    return null;
+  }
 
   return (
     <Fragment>
-      {!!schema && schema.isReady
-        ? schema.rows
-            .filter((s) => s.properties.is_system_table === false)
-            .map((s, i) => (
-              <BrowserItem
-                key={`sr-${i}`}
-                item={s}
-                sourceLabel={sourceLabel}
-                sourceType={sourceType}
-              />
-            ))
-        : null}
-      <div className="block p-2 pl-3 border-b">
-        <i>System tables</i>
+      {schema.rows
+        .filter((s) => s.properties.is_system_table === false)
+        .map((s, i) => (
+          <BrowserItem
+            key={`sr-${i}`}
+            item={s}
+            sourceLabel={sourceLabel}
+            sourceType={sourceType}
+          />
+        ))}
+
+      <div className="bg-gray-100 pt-4 py-1">
+        <Hx x="6">System tables</Hx>
+        {schema.rows
+          .filter((s) => s.properties.is_system_table === true)
+          .map((s, i) => (
+            <BrowserItem
+              key={`sr-${i}`}
+              item={s}
+              sourceLabel={sourceLabel}
+              sourceType={sourceType}
+            />
+          ))}
       </div>
-      {!!schema && schema.isReady
-        ? schema.rows
-            .filter((s) => s.properties.is_system_table === true)
-            .map((s, i) => (
-              <BrowserItem
-                key={`sr-${i}`}
-                item={s}
-                sourceLabel={sourceLabel}
-                sourceType={sourceType}
-              />
-            ))
-        : null}
     </Fragment>
   );
 };

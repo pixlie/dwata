@@ -8,6 +8,7 @@ const initialState = {
   columns: [],
   rows: [],
   querySQL: null,
+  embedded: [],
   selectedRowList: [],
 
   isFetching: false,
@@ -20,6 +21,7 @@ const completeFetchList = (inner, payload) => ({
   columns: payload.columns,
   rows: payload.rows, // Here we do not transform data into maps/dicts
   querySQL: payload.query_sql,
+  embedded: payload.embedded,
   selectedRowList: [...inner.selectedRowList],
 
   isFetching: false,
@@ -38,13 +40,20 @@ const completeFetchItem = (payload) => ({
   lastFetchedAt: +new Date(),
 });
 
+const expandTableColumn = (el) => ({
+  label: el,
+  tableName: el.split(".")[0],
+  columnName: el.split(".")[1],
+});
+
 const querySpecificationObject = (state, payload) => ({
   ...state,
-  select: payload.columns.map((tc) => ({
-    label: tc,
-    tableName: tc.split(".")[0],
-    columnName: tc.split(".")[1],
-  })),
+  select: payload.select.map((x) => expandTableColumn(x)),
+  columns: payload.columns.map((x) => expandTableColumn(x)),
+  embeddedColumns: payload.embedded.reduce(
+    (acc, x) => [...acc, x.columns.map((xy) => expandTableColumn(xy))],
+    []
+  ),
   count: payload.count,
   limit: payload.limit,
   offset: payload.offset,

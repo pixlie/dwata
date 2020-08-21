@@ -67,15 +67,23 @@ def get_relations_matrix(source_settings, meta):
 
     for name, schema in meta.tables.items():
         if name not in tables.keys():
-            tables[name] = []
+            tables[name] = {}
 
         for col, col_def in schema.columns.items():
             if len(col_def.foreign_keys) > 0:
                 for fk in col_def.foreign_keys:
-                    tables[name].append(fk.column.table.name)
+                    # We found a FK in `table`, we do not check if this FK is unique constrained
+                    # Thus each record in `table` has a many-to-one relation to the other table
+                    # Todo: Check for unique constraint here
+                    tables[name][fk.column.table.name] = {
+                        "cardinality": "many-to-one",
+                    }
+
                     if fk.column.table.name not in tables.keys():
-                        tables[fk.column.table.name] = []
-                    tables[fk.column.table.name].append(name)
-        tables[name] = list(set(tables[name]))
+                        tables[fk.column.table.name] = {}
+                    # Here the cardinality is reversed, again we are not checking uniques
+                    tables[fk.column.table.name][name] = {
+                        "cardinality": "one-to-many",
+                    }
 
     return tables

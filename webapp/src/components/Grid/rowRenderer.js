@@ -13,12 +13,11 @@ export default (schema, tableColumns, selectedColumLabels) => {
     second: "numeric",
     hour12: false,
   };
-  const classes = "px-1";
 
-  const DefaultCell = ({ data }) => <td className={classes}>{data}</td>;
-  const PrimaryKeyCell = ({ data }) => <th className={classes}>{data}</th>;
+  const DefaultCell = ({ data }) => <td>{data}</td>;
+  const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
   const BooleanCell = ({ data }) => (
-    <td className={classes}>
+    <td>
       {data === true || data === false ? (
         <Fragment>
           {data === true ? (
@@ -42,11 +41,11 @@ export default (schema, tableColumns, selectedColumLabels) => {
       )}
     </td>
   );
-  const JSONCell = () => <td className={classes}>{"{}"}</td>;
+  const JSONCell = () => <td>{"{}"}</td>;
   const TimeStampCell = ({ data }) => {
     try {
       return (
-        <td className={classes}>
+        <td>
           {new Intl.DateTimeFormat("en-GB", date_time_options).format(
             new Date(data * 1000)
           )}
@@ -54,8 +53,27 @@ export default (schema, tableColumns, selectedColumLabels) => {
       );
     } catch (error) {
       if (error instanceof RangeError) {
-        return <td className={classes}>{data}</td>;
+        return <td>{data}</td>;
       }
+    }
+  };
+  const CharCell = ({ data }) => {
+    const maxLengthToShow = 40;
+    const handleClick = () => {};
+
+    if (data && data.length > maxLengthToShow) {
+      return (
+        <td>
+          <span
+            className="max-w-sm overflow-hidden h-12 inline-block"
+            onClick={handleClick}
+          >
+            {data}
+          </span>
+        </td>
+      );
+    } else {
+      return <td>{data}</td>;
     }
   };
 
@@ -77,6 +95,8 @@ export default (schema, tableColumns, selectedColumLabels) => {
       rowList.push(BooleanCell);
     } else if (head.type === "TIMESTAMP") {
       rowList.push(TimeStampCell);
+    } else if (head.type === "VARCHAR") {
+      rowList.push(CharCell);
     } else {
       rowList.push(DefaultCell);
     }
