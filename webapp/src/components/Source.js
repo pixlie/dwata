@@ -42,21 +42,21 @@ export default () => {
   }); */
   // const {sourceIndex} = state;
 
+  if (!isReady) {
+    return null;
+  }
+
   return (
     <Fragment>
-      <Panel title="Databases">
-        {isReady
-          ? sourceRows
-              .filter((x) => x.type === "database")
-              .map((source) => (
-                <SourceItem
-                  source={source}
-                  sourceType="database"
-                  key={`sr-${source.label}`}
-                />
-              ))
-          : null}
-      </Panel>
+      {sourceRows
+        .filter((x) => x.type === "database")
+        .map((source) => (
+          <SourceItem
+            source={source}
+            sourceType="database"
+            key={`sr-${source.label}`}
+          />
+        ))}
 
       {/* <Panel title="Services">
         {sourceList.isReady ? sourceList.rows.filter(x => x.type === "service").map((s, i) => (
