@@ -17,9 +17,9 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedColumLabels = querySpecification.columns.map((x) => x.label);
   const selectedTableNames = [
-    ...new Set(querySpecification.select.map((x) => x.tableName)),
+    ...new Set(querySpecification.columns.map((x) => x.tableName)),
   ];
   const selectedTables = selectedTableNames.map((x) =>
     schema.rows.find((y) => y.table_name === x)
@@ -70,20 +70,22 @@ export default () => {
         <strong>Filter</strong> or <strong>Order</strong> them.
       </p>
 
-      <select
-        className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-        onChange={handleTableSelect}
-      >
-        {selectedTables.map((x) => (
-          <option
-            key={`opt-${x.table_name}`}
-            className="py-2 bg-white font-bold"
-            value={x.table_name}
-          >
-            {x.table_name}
-          </option>
-        ))}
-      </select>
+      {selectedTables.length > 1 ? (
+        <select
+          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
+          onChange={handleTableSelect}
+        >
+          {selectedTables.map((x) => (
+            <option
+              key={`opt-${x.table_name}`}
+              className="py-2 bg-white font-bold"
+              value={x.table_name}
+            >
+              {x.table_name}
+            </option>
+          ))}
+        </select>
+      ) : null}
 
       {currentTable.columns.map((col) => (
         <BoundInput

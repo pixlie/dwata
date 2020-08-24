@@ -160,14 +160,15 @@ const toggleColumnHeadSpecification = (inner, columnName) => ({
 });
 
 const toggleColumnSelection = (inner, label) => {
-  const selectedColumLabels = inner.select.map((x) => x.label);
+  const selectedColumLabels = inner.columns.map((x) => x.label);
   if (selectedColumLabels.includes(label)) {
     // This column is currently selected, let's get it removed
     // Find the position of this column
-    const pos = inner.select.findIndex((x) => x.label === label);
+    const pos = inner.columns.findIndex((x) => x.label === label);
     return {
       ...inner,
-      select: [...inner.select.slice(0, pos), ...inner.select.slice(pos + 1)],
+      select: [...inner.columns.slice(0, pos), ...inner.columns.slice(pos + 1)],
+      fetchNeeded: true,
     };
   } else {
     // This column is not selected, let's add it
@@ -175,7 +176,7 @@ const toggleColumnSelection = (inner, label) => {
     return {
       ...inner,
       select: [
-        ...inner.select,
+        ...inner.columns,
         {
           label,
           tableName,
