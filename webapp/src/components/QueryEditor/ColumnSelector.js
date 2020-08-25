@@ -65,9 +65,7 @@ export default () => {
       <Hx x="4">Columns</Hx>
 
       <p className="text-gray-700 my-2">
-        For any selected table, you can choose which columns you want to see. If
-        you do not wish to see certain columns, you can still{" "}
-        <strong>Filter</strong> or <strong>Order</strong> them.
+        For any selected table, you can choose which columns you want to see.
       </p>
 
       {selectedTables.length > 1 ? (

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useContext, useState } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
@@ -7,6 +7,10 @@ import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
+  const [state, setState] = useState({
+    userSelectedTableName: null,
+  });
+
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -16,6 +20,15 @@ export default () => {
   const removeFilter = useQuerySpecification((state) => state.removeFilter);
 
   const { filterBy } = querySpecification;
+  const selectedTableNames = [
+    ...new Set(querySpecification.columns.map((x) => x.tableName)),
+  ];
+  const selectedTables = selectedTableNames.map((x) =>
+    schema.rows.find((y) => y.table_name === x)
+  );
+  const currentTable = state.userSelectedTableName
+    ? selectedTables.find((x) => x.table_name === state.userSelectedTableName)
+    : selectedTables[0];
 
   const addFilter = (event) => {
     event.preventDefault();
@@ -27,63 +40,104 @@ export default () => {
     initiateFilter(queryContext.key, value, dataType);
   };
 
-  const handleRemoveFilter = (name) => (event) => {
-    event.preventDefault();
-    if (name in filterBy) {
-      removeFilter(queryContext.key, name);
-    }
+  const handleTableSelect = (event) => {
+    const { value } = event.target;
+    setState({
+      userSelectedTableName: value,
+    });
   };
 
-  const filters = [];
-  if (Object.keys(filterBy).length > 0) {
-    filters.push(
-      <p className="tip" key="fl-rm-hd">
-        Double click column name to remove filter
-      </p>
-    );
-  }
+  const PerTable = () => {
+    const handleRemoveFilter = (name) => (event) => {
+      event.preventDefault();
+      if (name in filterBy) {
+        removeFilter(queryContext.key, name);
+      }
+    };
 
-  for (const [columnName] of Object.entries(filterBy)) {
-    filters.push(
-      <div key={`fl-${columnName}`}>
-        <label
-          className="block font-bold"
-          onDoubleClick={handleRemoveFilter(columnName)}
+    const filters = [];
+    if (Object.keys(filterBy).length > 0) {
+      filters.push(
+        <p className="tip" key="fl-rm-hd">
+          Double click column name to remove filter
+        </p>
+      );
+    }
+
+    for (const [columnName] of Object.entries(filterBy)) {
+      const [tn, cn] = columnName.split(".");
+
+      filters.push(
+        <div key={`fl-${columnName}`} className="my-2">
+          <label
+            className="font-bold mr-2"
+            onDoubleClick={handleRemoveFilter(columnName)}
+          >
+            {cn}
+          </label>
+
+          <FilterItem columnName={columnName} />
+        </div>
+      );
+    }
+
+    const filterByOptions = [
+      <option value="---" key="fl-hd">
+        Add a filter
+      </option>,
+    ];
+    for (const col of currentTable.columns) {
+      filterByOptions.push(
+        <option
+          value={`${currentTable.table_name}.${col.name}`}
+          key={`fl-${col.name}`}
         >
-          {columnName}
-        </label>
+          {col.name}
+        </option>
+      );
+    }
 
-        <FilterItem key={`fl-${columnName}`} columnName={columnName} />
-      </div>
-    );
-  }
+    return (
+      <Fragment>
+        {filters}
 
-  const filterByOptions = [
-    <option value="---" key="fl-hd">
-      Filter by
-    </option>,
-  ];
-  for (const head of querySpecification.select) {
-    filterByOptions.push(
-      <option value={head.label} key={`fl-${head.label}`}>
-        {head.label}
-      </option>
+        <select
+          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
+          onChange={addFilter}
+          value="---"
+        >
+          {filterByOptions}
+        </select>
+      </Fragment>
     );
-  }
+  };
 
   return (
     <Fragment>
       <Hx x="4">Filters</Hx>
 
-      {filters}
+      <p className="text-gray-700 my-2">
+        You can filter by any column, even the ones that are not visible.
+      </p>
 
-      <select
-        className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-        onChange={addFilter}
-        value="---"
-      >
-        {filterByOptions}
-      </select>
+      {selectedTables.length > 1 ? (
+        <select
+          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
+          onChange={handleTableSelect}
+        >
+          {selectedTables.map((x) => (
+            <option
+              key={`opt-${x.table_name}`}
+              className="py-2 bg-white font-bold"
+              value={x.table_name}
+            >
+              {x.table_name}
+            </option>
+          ))}
+        </select>
+      ) : null}
+
+      <PerTable />
     </Fragment>
   );
 };

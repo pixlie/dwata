@@ -75,7 +75,7 @@ export default () => {
           </div>
         )}
 
-        {state.openEditor === "ordering" ? (
+        {/* {state.openEditor === "ordering" ? (
           <div className="bg-white border my-1 rounded-md px-2 py-1">
             <OrderEditorInner />
           </div>
@@ -85,19 +85,6 @@ export default () => {
             onClick={handleChangeEditor("ordering")}
           >
             <Hx x="4">Ordering</Hx>
-          </div>
-        )}
-
-        {/* {state.openEditor === "related" ? (
-          <div className="bg-white border my-1 rounded-md px-2 py-1">
-            <RelatedData />
-          </div>
-        ) : (
-          <div
-            className="bg-white border my-1 rounded-md px-2 py-1 cursor-pointer"
-            onClick={handleChangeEditor("related")}
-          >
-            <Hx x="4">Related</Hx>
           </div>
         )} */}
       </div>
