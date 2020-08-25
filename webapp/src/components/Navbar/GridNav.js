@@ -35,7 +35,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
 
   return (
     <Fragment>
-      <Button
+      {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
         disabled={selectedRowList.length === 0}
@@ -45,7 +45,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
           <i className="far fa-check-square" />
         </span>
         &nbsp; Actions
-      </Button>
+      </Button> */}
       {/* <Button
         attributes={{ onClick: handlePinClick }}
         active={showPinnedRecords === true}

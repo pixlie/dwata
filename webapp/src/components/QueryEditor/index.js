@@ -1,10 +1,12 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useContext } from "react";
 
 // import { saveQuery } from "services/apps/actions";
+import { QueryContext } from "utils";
+import { useQueryContext } from "services/store";
 import { Button, Hx } from "components/LayoutHelpers";
 import ColumnSelectorInner from "./ColumnSelector";
 import FilterEditorInner from "./FilterEditor";
-import OrderEditorInner from "./OrderEditor";
+// import OrderEditorInner from "./OrderEditor";
 
 export default () => {
   const [state, setState] = useState({
@@ -12,6 +14,8 @@ export default () => {
     savedQueryLabel: "",
     openEditor: "column",
   });
+  const queryContext = useContext(QueryContext);
+  const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
 
   const handleSaveQuery = async () => {
     if (state.isSavingQuery) {
@@ -44,9 +48,17 @@ export default () => {
     }));
   };
 
+  const handleClose = () => {
+    toggleQueryUI(queryContext.key);
+  };
+
   return (
     <div className="fixed bottom-0 right-0 h-screen max-w-sm bg-gray-200 border-l-4 px-2 shadow-lg">
-      <div className="block w-full lg:inline-block lg:mt-0 p-4">&nbsp;</div>
+      <div className="block w-full lg:inline-block lg:mt-0 p-4">
+        <Button theme="primary" attributes={{ onClick: handleClose }}>
+          Close
+        </Button>
+      </div>
 
       <div className="w-full">
         {state.openEditor === "column" ? (
