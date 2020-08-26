@@ -48,6 +48,52 @@ const NumericFilter = ({ columnName }) => {
   );
 };
 
+const DateTimeFilter = ({ columnName }) => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const setFilter = useQuerySpecification((state) => state.setFilter);
+  const { filterBy } = querySpecification;
+
+  const handleChange = (event) => {
+    const { name, value, dataset } = event.target;
+
+    const temp = {
+      ...filterBy[columnName],
+    };
+    if (dataset.meta === "from") {
+      temp["from"] = value;
+    } else if (dataset.meta === "to") {
+      temp["to"] = value;
+    }
+
+    setFilter(queryContext.key, name, temp);
+  };
+
+  return (
+    <Fragment>
+      <input
+        className="border px-2 py-1"
+        name={columnName}
+        data-meta="from"
+        type="datetime-local"
+        onChange={handleChange}
+        value={filterBy[columnName].from}
+      />
+
+      <input
+        className="border px-2 py-1"
+        name={columnName}
+        data-meta="to"
+        type="datetime-local"
+        onChange={handleChange}
+        value={filterBy[columnName].to}
+      />
+    </Fragment>
+  );
+};
+
 export default ({ columnName, singleFilter = false }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
@@ -73,12 +119,6 @@ export default ({ columnName, singleFilter = false }) => {
       temp["like"] = value;
       temp["display"] = value;
     } else if (dataType.type === "DATE") {
-      if (dataset.meta === "from") {
-        temp["from"] = value;
-      } else if (dataset.meta === "to") {
-        temp["to"] = value;
-      }
-    } else if (dataType.type === "TIMESTAMP") {
       if (dataset.meta === "from") {
         temp["from"] = value;
       } else if (dataset.meta === "to") {
@@ -157,24 +197,7 @@ export default ({ columnName, singleFilter = false }) => {
   } else if (dataType.type === "TIMESTAMP") {
     return (
       <Fragment>
-        <input
-          className="border px-2 py-1"
-          name={columnName}
-          data-meta="from"
-          type="datetime-local"
-          onChange={handleChange}
-          value={filterBy[columnName].from}
-        />
-
-        <input
-          className="border px-2 py-1"
-          name={columnName}
-          data-meta="to"
-          type="datetime-local"
-          onChange={handleChange}
-          value={filterBy[columnName].to}
-        />
-
+        <DateTimeFilter columnName={columnName} />
         {singleFilter ? (
           <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}

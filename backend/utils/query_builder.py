@@ -71,11 +71,12 @@ class Select(object):
                 getattr(sqlalchemy, order_type)(getattr(dm.tables[table_name].c, column_name))
             )
 
-    def apply_filters(self):
+    def apply_filters(self, sel_obj=None):
         qs = self.qb.query_specification
         uc = self.qb.unavailable_columns
         dm = self.qb.database_meta
-        sel_obj = self._select
+        if sel_obj is None:
+            sel_obj = self._select
 
         filter_by = qs["filter_by"]
         for table_column, filter_spec in filter_by.items():
@@ -122,6 +123,7 @@ class Select(object):
                         sel_obj = sel_obj.where(getattr(current_table.c, column_name))
                     else:
                         sel_obj = sel_obj.where(~getattr(current_table.c, column_name))
+        return sel_obj
 
     def find_to_one_join(self, table_name):
         """
@@ -342,8 +344,11 @@ class Select(object):
                 columns += self.columns_to_select(table_name)
 
         self._select = select(columns)
-        if self.is_root and self.pending_joins.keys():
-            self._select = self._select.select_from(self.get_joins())
+        if self.is_root:
+            count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])
+            if self.pending_joins.keys():
+                self._select = self._select.select_from(self.get_joins())
+                count_sel_obj = count_sel_obj.select_from(self.get_joins())
         if not self.is_root:
             # We are inside an embedded Select, we surely have a JOIN to the parent Select's root table
             _joins = self.get_joins()
@@ -353,7 +358,9 @@ class Select(object):
         if qs.get("order_by", {}) != {}:
             self.apply_ordering()
         if qs.get("filter_by", {}) != {}:
-            self.apply_filters()
+            self._select = self.apply_filters()
+            if self.is_root:
+                count_sel_obj = self.apply_filters(sel_obj=count_sel_obj)
 
         if self.is_root:
             # For embedded Queries, we return all results for now
@@ -362,12 +369,16 @@ class Select(object):
             self._select = self._select.offset(qs.get("offset", 0))
 
         # We use a separate query to count the total number of rows in the given query
-        count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])
+        # count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])
         exc = conn.execute(self._select)
 
         columns = ["{}.{}".format(x.table.name, x.name) for x in columns]
         rows = exc.cursor.fetchall()
-        count = conn.execute(count_sel_obj).scalar()
+
+        if self.is_root:
+            count = conn.execute(count_sel_obj).scalar()
+        else:
+            count = 0
         query_sql = str(self._select)
 
         return columns, rows, count, query_sql

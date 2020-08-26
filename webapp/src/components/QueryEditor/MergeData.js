@@ -160,8 +160,8 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded p-4 shadow-md"
-      style={{ top: "8rem" }}
+      className="fixed right-0 bg-white border rounded p-4 shadow-md"
+      style={{ top: "4rem" }}
     >
       <Hx x="3">Merge data</Hx>
       <p className="text-gray-700 my-2 max-w-lg">
