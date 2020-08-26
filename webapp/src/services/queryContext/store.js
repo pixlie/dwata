@@ -1,4 +1,5 @@
 import create from "zustand";
+import _ from "lodash";
 
 import * as globalConstants from "services/global/constants";
 
@@ -40,6 +41,35 @@ const [useQueryContext] = create((set) => ({
         ...context,
       },
     })),
+
+  toggleDetailItem: (item) =>
+    set((state) => {
+      if ("detailItemList" in state.main) {
+        const _index = state.main.detailItemList.findIndex((x) =>
+          _.isEqual(x, item)
+        );
+
+        return {
+          main: {
+            ...state.main,
+            detailItemList:
+              _index === -1
+                ? [...state.main.detailItemList, item]
+                : [
+                    ...state.main.detailItemList.slice(0, _index),
+                    ...state.main.detailItemList.slice(_index + 1),
+                  ],
+          },
+        };
+      } else {
+        return {
+          main: {
+            ...state.main,
+            detailItemList: [item],
+          },
+        };
+      }
+    }),
 
   toggleQueryUI: (appName) =>
     set((state) => ({

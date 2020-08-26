@@ -3,14 +3,13 @@ import React, { useContext, Fragment } from "react";
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
-// import DetailView from "components/Detail";
 import QueryLoader from "./QueryLoader";
 import SavedQueryLoader from "./SavedQueryLoader";
+import TableHead from "./TableHead";
+import TableBody from "./TableBody";
 import QueryEditor from "components/QueryEditor";
 import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
-import TableHead from "./TableHead";
-import TableBody from "./TableBody";
 
 const GridHead = ({ querySpecification }) => {
   const mainTableNames = [

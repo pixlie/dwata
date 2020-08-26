@@ -1,7 +1,12 @@
 import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import {
+  useData,
+  useSchema,
+  useQuerySpecification,
+  useQueryContext,
+} from "services/store";
 import rowRenderer from "./rowRenderer";
 import EmbeddedTable from "./EmbeddedTable";
 
@@ -16,6 +21,7 @@ export default () => {
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
 
   // useEffect(() => {
   //   if (isReady && showPinnedRecords) {
@@ -71,11 +77,12 @@ export default () => {
 
   const RowWithoutEmbed = ({ row, index, pinned = false }) => {
     // This is a normal grid row that does not show embedded grid inside it.
-    const handleRowClick = (event) => {
-      event.preventDefault();
-      // history.push(
-      // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
-      // );
+    const handleRowClick = () => {
+      toggleDetailItem({
+        sourceLabel: querySpecification.sourceLabel,
+        tableName: querySpecification.select[0].tableName,
+        pk: row[0],
+      });
     };
     let classes = "border-b hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
@@ -95,11 +102,12 @@ export default () => {
 
   const RowWithEmbed = ({ row, index, pinned = false }) => {
     // This is a grid row that expands the merged (embedded) data that is related to this row.
-    const handleRowClick = (event) => {
-      event.preventDefault();
-      // history.push(
-      // `/browse/${querySpecification.sourceLabel}/${querySpecification.tableName}/${row[0]}`
-      // );
+    const handleRowClick = () => {
+      toggleDetailItem({
+        sourceLabel: querySpecification.sourceLabel,
+        tableName: querySpecification.tableName,
+        pk: row[0],
+      });
     };
     let classes =
       (embedded.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
