@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment, useState, useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useData, useSchema, useQuerySpecification } from "services/store";
@@ -6,6 +6,10 @@ import rowRenderer from "./rowRenderer";
 import EmbeddedTable from "./EmbeddedTable";
 
 export default () => {
+  const [state, setState] = useState({
+    selectedRowIndex: null,
+    selectedEmbeddedDataIndex: null,
+  });
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
@@ -66,6 +70,7 @@ export default () => {
   };
 
   const RowWithoutEmbed = ({ row, index, pinned = false }) => {
+    // This is a normal grid row that does not show embedded grid inside it.
     const handleRowClick = (event) => {
       event.preventDefault();
       // history.push(
@@ -87,7 +92,9 @@ export default () => {
       </tr>
     );
   };
+
   const RowWithEmbed = ({ row, index, pinned = false }) => {
+    // This is a grid row that expands the merged (embedded) data that is related to this row.
     const handleRowClick = (event) => {
       event.preventDefault();
       // history.push(
@@ -110,23 +117,43 @@ export default () => {
       </tr>
     );
 
+    const ExpandableTable = ({ embeddedDataIndex, tableName }) => {
+      const handleExpandClick = () => {
+        setState((state) => ({
+          selectedRowIndex: state.selectedRowIndex === index ? null : index,
+          selectedEmbeddedDataIndex:
+            state.selectedEmbeddedDataIndex === embeddedDataIndex
+              ? null
+              : embeddedDataIndex,
+        }));
+      };
+
+      return (
+        <span
+          className="inline-block bg-gray-200 px-2 rounded cursor-pointer"
+          onClick={handleExpandClick}
+        >
+          Expand {tableName}
+        </span>
+      );
+    };
+
     return (
       <Fragment>
         {mainRow}
         <tr className={`border-b ${classes}`}>
           <td colSpan={row.length + 1} className="py-1 px-4">
-            {embeddedTableNames.map((x) => (
-              <span
-                key={`ex-mr-tb-${x}`}
-                className="inline-block bg-gray-200 px-2 rounded"
-              >
-                Expand {x}
-              </span>
+            {embeddedTableNames.map((x, j) => (
+              <ExpandableTable embeddedDataIndex={j} tableName={x} />
             ))}
-            {index === 0 ? (
+            {index === state.selectedRowIndex &&
+            state.selectedEmbeddedDataIndex !== null ? (
               <EmbeddedTable
                 parentRecordIndex={index}
-                embedContext={{ embeddedDataIndex: 0, parentRow: row }}
+                embedContext={{
+                  embeddedDataIndex: state.selectedEmbeddedDataIndex,
+                  parentRow: row,
+                }}
               />
             ) : null}
           </td>
@@ -137,6 +164,7 @@ export default () => {
   const pinnedRowIds = pins && pins.length > 0 ? pins.map((x) => x[2]) : null;
 
   const Row = embedded.length === 0 ? RowWithoutEmbed : RowWithEmbed;
+
   return (
     <Fragment>
       {pinnedRowIds && showPinnedRecords ? (
