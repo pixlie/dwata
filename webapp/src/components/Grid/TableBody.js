@@ -51,6 +51,7 @@ export default () => {
     columns,
     selectedColumLabels
   );
+
   const RowSelectorCell = ({ row }) => {
     const handleRowSelect = (event) => {
       event.preventDefault();
@@ -89,7 +90,7 @@ export default () => {
 
     return (
       <tr onClick={handleRowClick} className={classes}>
-        <RowSelectorCell row={row} />
+        {/* <RowSelectorCell row={row} /> */}
         {row.map((cell, j) => {
           const Cell = rowRendererList[j];
           return Cell !== null ? (
@@ -115,7 +116,7 @@ export default () => {
 
     const mainRow = (
       <tr onClick={handleRowClick} className={classes}>
-        <RowSelectorCell row={row} />
+        {/* <RowSelectorCell row={row} /> */}
         {row.map((cell, j) => {
           const Cell = rowRendererList[j];
           return Cell !== null ? (

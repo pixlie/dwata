@@ -165,7 +165,7 @@ export default ({ item, index }) => {
   const schema = useSchema((state) => state[item.sourceLabel]);
   useEffect(() => {
     fetchData(key, item);
-  }, [item.sourceLabel, item.tableName, item.pk]);
+  }, [key, item, fetchData]);
   const dataItem = useData((state) => state[key]);
 
   const handleKey = useCallback(
@@ -174,7 +174,7 @@ export default ({ item, index }) => {
         toggleDetailItem(item);
       }
     },
-    [item.sourceLabel, item.tableName, item.pk]
+    [item, toggleDetailItem]
   );
   useEffect(() => {
     document.addEventListener("keydown", handleKey, false);

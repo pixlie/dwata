@@ -44,4 +44,4 @@
 - Full search for across all of your data sources (coming soon)
 - Internal cache so Queries are not repeated unnecessarily
 
-**dwata is in alpha development stage.**
+**dwata is in early development stage.**

@@ -61,10 +61,5 @@ export default () => {
     }
   }
 
-  return (
-    <tr className="border-b-4 h-10">
-      <th>&nbsp;</th>
-      {headList}
-    </tr>
-  );
+  return <tr className="border-b-4 h-10">{headList}</tr>;
 };

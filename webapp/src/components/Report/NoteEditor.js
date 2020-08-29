@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 import ReactMarkdown from "react-markdown";
 
 const defaultNote = `# Report

@@ -18,11 +18,11 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   if (!data || !data.isReady) {
     return null;
   }
-  const { selectedRowList } = data;
+  // const { selectedRowList } = data;
 
-  const handleActionsClick = () => {
-    toggleActions();
-  };
+  // const handleActionsClick = () => {
+  //   toggleActions();
+  // };
   /* const handlePinClick = () => {
     togglePinnedRecords();
   }; */

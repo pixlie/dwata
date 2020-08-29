@@ -13,7 +13,7 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
     (state) => state.initiateQuerySpecification
   );
   const setContext = useQueryContext((state) => state.setContext);
-  const urlBase = sourceType === "database" ? "/browse" : "/service";
+  // const urlBase = sourceType === "database" ? "/browse" : "/service";
 
   const handleClick = (event) => {
     event.preventDefault();
