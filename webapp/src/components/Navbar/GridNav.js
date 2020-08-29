@@ -7,7 +7,12 @@ import { Button } from "components/LayoutHelpers";
 export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
-  const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
+  const toggleColumnSelector = useQueryContext(
+    (state) => state.toggleColumnSelector
+  );
+  const toggleFilterEditor = useQueryContext(
+    (state) => state.toggleFilterEditor
+  );
   const toggleMergeUI = useQueryContext((state) => state.toggleMergeUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
@@ -26,8 +31,11 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   /* const handlePinClick = () => {
     togglePinnedRecords();
   }; */
-  const handleQueryClick = () => {
-    toggleQueryUI(queryContext.key);
+  const handleColumnsClick = () => {
+    toggleColumnSelector(queryContext.key);
+  };
+  const handleFiltersClick = () => {
+    toggleFilterEditor(queryContext.key);
   };
   const handleMergeClick = () => {
     toggleMergeUI(queryContext.key);
@@ -56,11 +64,15 @@ export default ({ toggleActions, togglePinnedRecords }) => {
       </Button> */}
 
       <Button theme="primary" attributes={{ onClick: handleMergeClick }}>
-        Merge
+        Related
       </Button>
 
-      <Button theme="primary" attributes={{ onClick: handleQueryClick }}>
-        Query
+      <Button theme="primary" attributes={{ onClick: handleColumnsClick }}>
+        Columns
+      </Button>
+
+      <Button theme="primary" attributes={{ onClick: handleFiltersClick }}>
+        Filters
       </Button>
     </Fragment>
   );

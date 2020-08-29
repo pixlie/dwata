@@ -7,7 +7,8 @@ import QueryLoader from "./QueryLoader";
 import SavedQueryLoader from "./SavedQueryLoader";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
-import QueryEditor from "components/QueryEditor";
+import ColumnSelector from "components/QueryEditor/ColumnSelector";
+import FilterEditor from "components/QueryEditor/FilterEditor";
 import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
 
@@ -76,7 +77,8 @@ export default () => {
           <Paginator />
         </div>
 
-        {queryContext.isQueryUIOpen ? <QueryEditor /> : null}
+        {queryContext.isColumnSelectorOpen ? <ColumnSelector /> : null}
+        {queryContext.isFilterEditorOpen ? <FilterEditor /> : null}
         {queryContext.isMergeUIOpen ? <MergeData /> : null}
       </Fragment>
     </Loader>

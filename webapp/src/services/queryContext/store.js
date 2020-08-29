@@ -71,11 +71,19 @@ const useStore = create((set) => ({
       }
     }),
 
-  toggleQueryUI: (appName) =>
+  toggleColumnSelector: (appName) =>
     set((state) => ({
       [appName]: {
         ...state[appName],
-        isQueryUIOpen: !state[appName].isQueryUIOpen,
+        isColumnSelectorOpen: !state[appName].isColumnSelectorOpen,
+      },
+    })),
+
+  toggleFilterEditor: (appName) =>
+    set((state) => ({
+      [appName]: {
+        ...state[appName],
+        isFilterEditorOpen: !state[appName].isFilterEditorOpen,
       },
     })),
 

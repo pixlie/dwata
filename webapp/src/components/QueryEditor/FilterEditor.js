@@ -113,7 +113,10 @@ export default () => {
   };
 
   return (
-    <Fragment>
+    <div
+      className="fixed bg-white border rounded p-4 shadow-md"
+      style={{ top: "4rem", right: "1rem" }}
+    >
       <Hx x="4">Filters</Hx>
 
       <p className="text-gray-700 my-2">
@@ -138,6 +141,6 @@ export default () => {
       ) : null}
 
       <PerTable />
-    </Fragment>
+    </div>
   );
 };

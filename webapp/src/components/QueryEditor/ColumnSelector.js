@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
@@ -61,7 +61,10 @@ export default () => {
   };
 
   return (
-    <Fragment>
+    <div
+      className="fixed bg-white border rounded p-4 shadow-md"
+      style={{ top: "4rem", right: "1rem" }}
+    >
       <Hx x="4">Columns</Hx>
 
       <p className="text-gray-700 my-2">
@@ -92,6 +95,6 @@ export default () => {
           column={col}
         />
       ))}
-    </Fragment>
+    </div>
   );
 };
