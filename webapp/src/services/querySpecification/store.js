@@ -213,7 +213,7 @@ const toggleRelatedTable = (inner, label) => {
   }
 };
 
-const [useStore, querySpecificationStoreAPI] = create((set) => ({
+const useStore = create((set) => ({
   ...loadFromLocalStorage(),
 
   initiateQuerySpecification: (key, payload) =>
@@ -294,5 +294,4 @@ const [useStore, querySpecificationStoreAPI] = create((set) => ({
     }),
 }));
 
-export { querySpecificationStoreAPI };
 export default useStore;

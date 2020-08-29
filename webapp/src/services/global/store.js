@@ -6,7 +6,7 @@ const initialState = {
   navigationButtonMeta: {},
 };
 
-const [useStore] = create((set) => ({
+const useStore = create((set) => ({
   ...initialState,
 
   toggleSidebar: () =>

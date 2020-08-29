@@ -16,7 +16,7 @@
     "react-scripts": "3.4.1",
     "tailwindcss": "^1.4.6",
     "uuid": "^8.2.0",
-    "zustand": "^2.2.3"
+    "zustand": "^3.0.2"
   },
   "scripts": {
     "build:tailwind": "postcss src/style/index.tailwind.css -o src/style/index.css",

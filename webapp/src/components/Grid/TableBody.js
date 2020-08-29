@@ -153,7 +153,11 @@ export default () => {
         <tr className={`border-b ${classes}`}>
           <td colSpan={row.length + 1} className="py-1 px-4">
             {embeddedTableNames.map((x, j) => (
-              <ExpandableTable embeddedDataIndex={j} tableName={x} />
+              <ExpandableTable
+                key={`em-tb-${x}-${j}`}
+                embeddedDataIndex={j}
+                tableName={x}
+              />
             ))}
             {index === state.selectedRowIndex &&
             state.selectedEmbeddedDataIndex !== null ? (

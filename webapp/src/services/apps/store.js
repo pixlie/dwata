@@ -48,7 +48,7 @@ const completeFetch = (payload) => {
   };
 };
 
-const [useApps] = create((set) => ({
+const useApps = create((set) => ({
   ...initialState,
 
   fetchApps: async () => {

@@ -7,11 +7,10 @@ import { Button } from "components/LayoutHelpers";
 
 const NumericFilter = ({ columnName }) => {
   const queryContext = useContext(QueryContext);
-  const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
+  const filterBy = useQuerySpecification(
+    (state) => state[queryContext.key].filterBy[columnName]
   );
   const setFilter = useQuerySpecification((state) => state.setFilter);
-  const { filterBy } = querySpecification;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,7 +42,7 @@ const NumericFilter = ({ columnName }) => {
       name={columnName}
       onChange={handleChange}
       placeholder="range 12,88 or exact 66"
-      value={filterBy[columnName].display}
+      value={filterBy.display}
     />
   );
 };

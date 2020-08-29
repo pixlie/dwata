@@ -25,7 +25,7 @@ const completeFetch = (payload) => ({
   fetchedAt: Math.round(new Date().getTime() / 1000),
 });
 
-const [useStore] = create((set, get) => ({
+const useStore = create((set, get) => ({
   fetchSchema: async (sourceLabel) => {
     if (!sourceLabel) {
       return;

@@ -18,7 +18,7 @@ export default ({ children }) => {
     if (!!querySpecification && !!querySpecification.sourceLabel) {
       fetchSchema(querySpecification.sourceLabel);
     }
-  }, [querySpecification, querySpecification.sourceLabel, fetchSchema]);
+  }, [querySpecification, fetchSchema]);
 
   useEffect(() => {
     if (!!querySpecification && !!querySpecification.fetchNeeded) {

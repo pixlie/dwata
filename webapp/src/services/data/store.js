@@ -2,7 +2,7 @@ import create from "zustand";
 import axios from "axios";
 
 import { dataURL, dataItemURL } from "services/urls";
-import { querySpecificationStoreAPI } from "services/querySpecification/store";
+import useQuerySpecification from "services/querySpecification/store";
 
 const initialState = {
   columns: [],
@@ -71,7 +71,7 @@ const getQuerySpecificationPayload = (querySpecification) => ({
   limit: querySpecification.limit,
 });
 
-const [useStore] = create((set, get) => ({
+const useStore = create((set, get) => ({
   fetchData: async (key, querySpecification) => {
     if (!key) {
       return;
@@ -112,7 +112,7 @@ const [useStore] = create((set, get) => ({
           getQuerySpecificationPayload(querySpecification)
         );
         // We use the Query Specification Store API directly to set this new data
-        querySpecificationStoreAPI.setState((state) => ({
+        useQuerySpecification.setState((state) => ({
           [key]: querySpecificationObject(state[key], response.data),
         }));
         set((state) => ({
