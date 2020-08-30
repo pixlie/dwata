@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 
 import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
-import SavedQuerySpecifications from "components/SavedQuerySpecifications";
+// import SavedQuerySpecifications from "components/SavedQuerySpecifications";
 import * as globalConstants from "services/global/constants";
 import { Hx, Button } from "components/LayoutHelpers";
 
@@ -95,6 +95,9 @@ export default () => {
 
         <div className="flex-1 px-2 bg-gray-100">
           <Hx x="3">Recent activity</Hx>
+          <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
+            Coming soon
+          </div>
           {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
           {sampleActivityList.map((x, i) => (
             <ActivityBox key={`ac-${i}`} {...x} />
@@ -103,6 +106,9 @@ export default () => {
 
         <div className="flex-1 max-w-sm bg-gray-100">
           <Hx x="3">KPIs</Hx>
+          <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
+            Coming soon
+          </div>
           <KPIBox value={39} metric="New Orders" tags={["last 24 hours"]} />
           <KPIBox
             value={3128}

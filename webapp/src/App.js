@@ -12,6 +12,7 @@ import Notes from "components/Notes";
 // import Actions from "components/Actions";
 import Report from "components/Report";
 import Detail from "components/Detail";
+import ProductGuide from "components/ProductGuide";
 
 export default () => {
   const mainApp = useQueryContext((state) => state["main"]);
@@ -19,6 +20,7 @@ export default () => {
   return (
     <QueryContext.Provider value={mainApp}>
       <Navbar />
+      <ProductGuide />
       <div className="block clear-both" style={{ paddingBottom: "57px" }} />
       <Detail />
       <Notes />

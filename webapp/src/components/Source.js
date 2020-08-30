@@ -1,12 +1,13 @@
 import React, { useState, useEffect, Fragment } from "react";
 
-import useSource from "services/source/store";
+import { useSource, useProductGuide } from "services/store";
 import TableList from "components/TableList";
 
-const SourceItem = ({ source, sourceType }) => {
+const SourceItem = ({ source, sourceType, index }) => {
   const [state, setState] = useState({
     isOpen: true,
   });
+  const setPGPosition = useProductGuide((state) => state.setPGPosition);
   if (source.properties["is_system_db"]) {
     return null;
   }
@@ -22,6 +23,11 @@ const SourceItem = ({ source, sourceType }) => {
       <div
         className="block p-2 pl-3 border-b cursor-default"
         onClick={handleClickSource}
+        ref={(el) => {
+          index === 0 &&
+            el &&
+            setPGPosition("source", el.getBoundingClientRect());
+        }}
       >
         {sourceType === "database" ? (
           <span className="text-lg text-gray-600 text-center mr-3">
@@ -104,11 +110,12 @@ export default () => {
 
       {sourceRows
         .filter((x) => x.type === "database")
-        .map((source) => (
+        .map((source, i) => (
           <SourceItem
+            key={`sr-${source.label}`}
+            index={i}
             source={source}
             sourceType="database"
-            key={`sr-${source.label}`}
           />
         ))}
 
