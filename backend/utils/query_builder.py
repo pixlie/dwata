@@ -18,7 +18,6 @@ class Select(object):
     qb = None
     merge_one_to_many = False
     default_per_page = 25
-    _select = None
     is_root = False
     parent_select = None
     parent_join = None
@@ -40,7 +39,6 @@ class Select(object):
             self.tables_and_columns = {
                 table_name: set()
             }
-            self.pending_joins[table_name] = parent_join
             self.parent_join = parent_join
         else:
             self.is_root = True
@@ -50,8 +48,10 @@ class Select(object):
                 (self.select_root_table_name, _) = table_column.split(".")
             else:
                 self.select_root_table_name = table_column
+        self.embedded_selects = []
+        self.tables_to_select()
 
-    def apply_ordering(self):
+    def apply_ordering(self, sel_obj):
         qs = self.qb.query_specification
         uc = self.qb.unavailable_columns
         dm = self.qb.database_meta
@@ -67,16 +67,15 @@ class Select(object):
                 continue
             if column_name in uc[table_name]:
                 continue
-            self._select = self._select.order_by(
+            sel_obj = sel_obj.order_by(
                 getattr(sqlalchemy, order_type)(getattr(dm.tables[table_name].c, column_name))
             )
+        return sel_obj
 
-    def apply_filters(self, sel_obj=None):
+    def apply_filters(self, sel_obj):
         qs = self.qb.query_specification
         uc = self.qb.unavailable_columns
         dm = self.qb.database_meta
-        if sel_obj is None:
-            sel_obj = self._select
 
         filter_by = qs["filter_by"]
         for table_column, filter_spec in filter_by.items():
@@ -188,13 +187,12 @@ class Select(object):
         dm = self.qb.database_meta
         embedded_select = False
 
-        # Let us do the same check, but the other way around
+        # Let us check each FK of this table and see if there is a relation to the root table(s)
         for col, col_def in dm.tables[table_name].columns.items():
-            # Check if the previous table has FK
             if len(col_def.foreign_keys) > 0:
-                # For each FK, is there a direct FK from current table to the previous table?
+                # Is there a direct FK from current table to the previous table?
                 for x in col_def.foreign_keys:
-                    if x.column.table.name == self.select_root_table_name:
+                    if x.column.table.name in self.tables_and_columns.keys():
                         # The current table has FK to previous table,
                         # this usually means a One to Many relationship from current table to previous table
                         # We do not JOIN One to Many relational data, instead we do a separate query
@@ -203,14 +201,14 @@ class Select(object):
                             table_name=table_name,
                             parent_select=self,
                             parent_join={
-                                "left": dm.tables[table_name],
-                                "right": dm.tables[self.select_root_table_name],
-                                "onclause": getattr(dm.tables[table_name].c, x.parent.name) ==
-                                getattr(dm.tables[self.select_root_table_name].c, x.column.name)
+                                "embedded": getattr(dm.tables[table_name].c, x.parent.name),
+                                "parent": getattr(dm.tables[x.column.table.name].c, x.column.name)
                             }
                         ))
                         embedded_select = True
                         break
+            if embedded_select:
+                break
 
         return embedded_select
 
@@ -232,6 +230,11 @@ class Select(object):
             })
         return _joins
 
+    def filter_parent(self):
+        sel_obj = select(self.parent_join["parent"])
+        # sel_obj = sel_obj.where(self.parent_select.get_root_joins())
+        return sel_obj
+
     def columns_to_select(self, table_name):
         dm = self.qb.database_meta
         uc = self.qb.unavailable_columns
@@ -247,11 +250,12 @@ class Select(object):
             current_table_columns.append(getattr(current_table.c, "id"))
 
         if self.parent_join:
-            # This current table is an embedded table, and that means we need a way to join to the root table data
-            join_column_name = self.parent_join["onclause"].left.name
-            if join_column_name in table_column_names and join_column_name not in column_list:
+            # This current table is an embedded table (subquery), so we need to extract the corresponding column
+            # This column data is used by frontend to actually show the corresponding embedded data for each parent row
+            if self.parent_join["embedded"].name in table_column_names and\
+                    self.parent_join["embedded"].name not in column_list:
                 # This is the column that enables the join to be done on client side
-                current_table_columns.append(getattr(current_table.c, join_column_name))
+                current_table_columns.append(self.parent_join["embedded"])
 
         if column_list == {"*"}:
             # If the request is explicitly for `table.*` then we return all columns, except the unavailable ones
@@ -329,62 +333,86 @@ class Select(object):
         for table_column in _process_later:
             self.tables_to_select(embedded_select=table_column)
 
-    def execute(self):
-        dm = self.qb.database_meta
-        conn = self.qb.database_conn
-        qs = self.qb.query_specification
+    def get_columns(self):
         columns = []
-
-        self.embedded_selects = []
-        self.tables_to_select()
         for table_name in self.tables_and_columns.keys():
             if table_name == self.select_root_table_name:
                 columns += self.columns_to_select(table_name)
             elif table_name in self.pending_joins:
                 columns += self.columns_to_select(table_name)
+        return columns
 
-        self._select = select(columns)
-        if self.is_root:
-            count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])
-            if self.pending_joins.keys():
-                self._select = self._select.select_from(self.get_joins())
-                count_sel_obj = count_sel_obj.select_from(self.get_joins())
-        if not self.is_root:
-            # We are inside an embedded Select, we surely have a JOIN to the parent Select's root table
-            _joins = self.get_joins()
-            # Now we apply all the JOINs of the parent Select too
-            self._select = self._select.select_from(self.parent_select.get_root_joins(_joins))
+    def prepare(self, override_columns=None):
+        qs = self.qb.query_specification
+
+        columns = override_columns if override_columns is not None else self.get_columns()
+        _select = select(columns)
+        if self.pending_joins:
+            _select = _select.select_from(self.get_joins())
 
         if qs.get("order_by", {}) != {}:
-            self.apply_ordering()
+            _select = self.apply_ordering(sel_obj=_select)
         if qs.get("filter_by", {}) != {}:
-            self._select = self.apply_filters()
-            if self.is_root:
-                count_sel_obj = self.apply_filters(sel_obj=count_sel_obj)
+            _select = self.apply_filters(sel_obj=_select)
+
+        _select = _select.limit(qs.get("limit", self.default_per_page))
+        _select = _select.offset(qs.get("offset", 0))
+
+        return columns, _select
+
+    def prepare_embedded(self):
+        qs = self.qb.query_specification
+
+        columns = self.get_columns()
+        _select = select(columns)
+
+        if self.pending_joins:
+            _select = _select.select_from(self.get_joins())
+        _select = self.get_subquery_parent_id_list(sel_obj=_select)
+
+        if qs.get("order_by", {}) != {}:
+            _select = self.apply_ordering(sel_obj=_select)
+        if qs.get("filter_by", {}) != {}:
+            _select = self.apply_filters(sel_obj=_select)
+
+        # For embedded Queries, we return all results for now, no support for pagination
+        return columns, _select
+
+    def execute(self):
+        conn = self.qb.database_conn
 
         if self.is_root:
-            # For embedded Queries, we return all results for now
-            # TODO: Please implement pagination or separate HTTP request for this
-            self._select = self._select.limit(qs.get("limit", self.default_per_page))
-            self._select = self._select.offset(qs.get("offset", 0))
-
-        # We use a separate query to count the total number of rows in the given query
-        # count_sel_obj = select([func.count()]).select_from(dm.tables[self.select_root_table_name])
-        exc = conn.execute(self._select)
+            columns, _select = self.prepare()
+        else:
+            columns, _select = self.prepare_embedded()
+        exc = conn.execute(_select)
 
         columns = ["{}.{}".format(x.table.name, x.name) for x in columns]
         rows = exc.cursor.fetchall()
+        query_sql = str(_select)
+        return columns, rows, query_sql
 
-        if self.is_root:
-            count = conn.execute(count_sel_obj).scalar()
-        else:
-            count = 0
-        query_sql = str(self._select)
+    def get_count(self):
+        dm = self.qb.database_meta
+        conn = self.qb.database_conn
 
-        return columns, rows, count, query_sql
+        # We use a separate query to count the total number of rows in the given query
+        columns, _select = self.prepare(override_columns=[
+            func.count(getattr(dm.tables[self.select_root_table_name].c, "id"))
+        ])
+        return conn.execute(_select).scalar()
+
+    def get_subquery_parent_id_list(self, sel_obj):
+        # return str(self.parent_join["onclause"].left), str(self.parent_join["onclause"].right)
+        dm = self.qb.database_meta
+        conn = self.qb.database_conn
+
+        # We use a separate query to count the total number of rows in the given query
+        columns, _select = self.parent_select.prepare(override_columns=[self.parent_join["parent"]])
+        return sel_obj.where(self.parent_join["embedded"].in_(_select))
 
     def get_parent_join(self):
-        return str(self.parent_join["onclause"].left), str(self.parent_join["onclause"].right)
+        return str(self.parent_join["embedded"]), str(self.parent_join["parent"])
 
 
 class QueryBuilder(object):
@@ -410,12 +438,13 @@ class QueryBuilder(object):
         await self.prepare()
         root_select = Select(qb=self)
 
-        columns, rows, count, query_sql = root_select.execute()
+        columns, rows, query_sql = root_select.execute()
+        count = root_select.get_count()
         embedded = []
 
         query_sql = query_sql
         for embedded_select in root_select.embedded_selects:
-            _columns, _rows, _, _query_sql = embedded_select.execute()
+            _columns, _rows, _query_sql = embedded_select.execute()
             embedded.append({
                 "columns": _columns,
                 "rows": _rows,

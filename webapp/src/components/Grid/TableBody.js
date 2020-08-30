@@ -110,8 +110,7 @@ export default () => {
         pk: row[0],
       });
     };
-    let classes =
-      (embedded.length === 0 ? "border-b " : "") + "hover:bg-gray-100";
+    let classes = "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
     const mainRow = (
@@ -137,20 +136,34 @@ export default () => {
         }));
       };
 
-      return (
-        <span
-          className="inline-block bg-gray-200 px-2 rounded cursor-pointer"
-          onClick={handleExpandClick}
-        >
-          Expand {tableName}
-        </span>
-      );
+      if (
+        state.selectedRowIndex === index &&
+        state.selectedEmbeddedDataIndex === embeddedDataIndex
+      ) {
+        return (
+          <span
+            className="inline-block bg-gray-700 text-white px-2 mr-2 rounded cursor-pointer"
+            onClick={handleExpandClick}
+          >
+            Collapse {tableName}
+          </span>
+        );
+      } else {
+        return (
+          <span
+            className="inline-block bg-gray-200 hover:bg-gray-400 px-2 mr-2 rounded cursor-pointer"
+            onClick={handleExpandClick}
+          >
+            Expand {tableName}
+          </span>
+        );
+      }
     };
 
     return (
       <Fragment>
         {mainRow}
-        <tr className={`border-b ${classes}`}>
+        <tr className="border-b">
           <td colSpan={row.length + 1} className="py-1 px-4">
             {embeddedTableNames.map((x, j) => (
               <ExpandableTable

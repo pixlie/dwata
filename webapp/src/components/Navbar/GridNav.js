@@ -63,15 +63,15 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         &nbsp; Pins
       </Button> */}
 
-      <Button theme="primary" attributes={{ onClick: handleMergeClick }}>
+      <Button theme="secondary" attributes={{ onClick: handleMergeClick }}>
         Related
       </Button>
 
-      <Button theme="primary" attributes={{ onClick: handleColumnsClick }}>
+      <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
         Columns
       </Button>
 
-      <Button theme="primary" attributes={{ onClick: handleFiltersClick }}>
+      <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
         Filters
       </Button>
     </Fragment>

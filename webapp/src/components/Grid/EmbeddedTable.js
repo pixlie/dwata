@@ -16,7 +16,7 @@ export default ({ embedContext }) => {
     <QueryContext.Provider value={ctx}>
       <Fragment>
         <div>
-          <table>
+          <table className="border">
             <thead>
               <EmbeddedTableHead />
             </thead>

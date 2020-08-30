@@ -3,6 +3,12 @@ import _ from "lodash";
 
 import * as globalConstants from "services/global/constants";
 
+const allEditorsDefault = {
+  isColumnSelectorOpen: false,
+  isFilterEditorOpen: false,
+  isMergeUIOpen: false,
+};
+
 const loadFromLocalStorage = () => {
   const temp = window.localStorage.getItem("queryContext");
   if (!!temp) {
@@ -75,6 +81,7 @@ const useStore = create((set) => ({
     set((state) => ({
       [appName]: {
         ...state[appName],
+        ...allEditorsDefault,
         isColumnSelectorOpen: !state[appName].isColumnSelectorOpen,
       },
     })),
@@ -83,6 +90,7 @@ const useStore = create((set) => ({
     set((state) => ({
       [appName]: {
         ...state[appName],
+        ...allEditorsDefault,
         isFilterEditorOpen: !state[appName].isFilterEditorOpen,
       },
     })),
@@ -91,6 +99,7 @@ const useStore = create((set) => ({
     set((state) => ({
       [appName]: {
         ...state[appName],
+        ...allEditorsDefault,
         isMergeUIOpen: !state[appName].isMergeUIOpen,
       },
     })),
