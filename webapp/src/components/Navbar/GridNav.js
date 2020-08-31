@@ -1,13 +1,9 @@
 import React, { useEffect, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useApps,
-  useData,
-  useQueryContext,
-  useProductGuide,
-} from "services/store";
+import { useApps, useData, useQueryContext } from "services/store";
 import { Button } from "components/LayoutHelpers";
+import ProductGuide from "components/ProductGuide";
 
 export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
@@ -21,7 +17,6 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   const toggleMergeUI = useQueryContext((state) => state.toggleMergeUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
-  const setPGPosition = useProductGuide((state) => state.setPGPosition);
   useEffect(() => {
     fetchApps();
   }, [fetchApps]);
@@ -69,17 +64,17 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         &nbsp; Pins
       </Button> */}
 
-      <Button
-        theme="secondary"
-        attributes={{
-          onClick: handleMergeClick,
-          ref: (el) => {
-            el && setPGPosition("relatedButton", el.getBoundingClientRect());
-          },
-        }}
-      >
-        Related
-      </Button>
+      <span className="relative">
+        <Button
+          theme="secondary"
+          attributes={{
+            onClick: handleMergeClick,
+          }}
+        >
+          Related
+        </Button>
+        <ProductGuide guideFor="relatedButton" />
+      </span>
 
       <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
         Columns

@@ -4,6 +4,7 @@ const initialState = {
   isSidebarVisible: false, // Is Sidebar modal On
   isNotesVisible: false,
   navigationButtonMeta: {},
+  showProductGuideFor: null,
 };
 
 const useStore = create((set) => ({
@@ -26,6 +27,11 @@ const useStore = create((set) => ({
         [name]: meta,
       },
     })),
+
+  setActiveProductGuideFor: (guideFor) =>
+    set({
+      showProductGuideFor: guideFor,
+    }),
 }));
 
 export default useStore;

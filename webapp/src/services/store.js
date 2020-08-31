@@ -5,7 +5,6 @@ import useSchema from "./schema/store";
 import useData from "./data/store";
 import useQuerySpecification from "./querySpecification/store";
 import useApps from "./apps/store";
-import useProductGuide from "./productGuide/store";
 
 export {
   useGlobal,
@@ -15,5 +14,4 @@ export {
   useData,
   useQuerySpecification,
   useApps,
-  useProductGuide,
 };

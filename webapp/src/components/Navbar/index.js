@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import { useQueryContext, useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
 import { Button } from "components/LayoutHelpers";
+import ProductGuide from "components/ProductGuide";
 import GridNav from "./GridNav";
 
 export default ({ isSourceFetching, toggleSidebar }) => {
@@ -12,15 +13,16 @@ export default ({ isSourceFetching, toggleSidebar }) => {
   const setNavigationButtonMeta = useGlobal(
     (state) => state.setNavigationButtonMeta
   );
-  const notesNavRef = useRef(null);
+  const notesButtonRef = useRef(null);
   useEffect(() => {
-    setNavigationButtonMeta("notes", {
-      position: {
-        top: notesNavRef.current.offsetTop,
-        left: notesNavRef.current.offsetLeft,
-      },
-    });
-  }, [setNavigationButtonMeta]);
+    notesButtonRef.current &&
+      setNavigationButtonMeta("notes", {
+        position: {
+          top: notesButtonRef.current.getBoundingClientRect().top,
+          left: notesButtonRef.current.getBoundingClientRect().left,
+        },
+      });
+  }, []);
 
   const handleHome = (event) => {
     event.preventDefault();
@@ -61,13 +63,16 @@ export default ({ isSourceFetching, toggleSidebar }) => {
             &nbsp;Browse
           </Button> */}
 
-          <Button
-            attributes={{ onClick: handleNotesClick, ref: notesNavRef }}
-            theme="info"
-          >
-            <i className="far fa-sticky-note" />
-            &nbsp; Notes
-          </Button>
+          <span className="relative">
+            <Button
+              attributes={{ onClick: handleNotesClick, ref: notesButtonRef }}
+              theme="info"
+            >
+              <i className="far fa-sticky-note" />
+              &nbsp; Notes
+            </Button>
+            <ProductGuide guideFor="notesButton" />
+          </span>
 
           {/* <div className="inline-block">
             <input className="input" type="text" placeholder="Coming soon..." />

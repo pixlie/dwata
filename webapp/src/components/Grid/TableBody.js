@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useContext } from "react";
+import React, { useState, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
 import {
@@ -7,6 +7,7 @@ import {
   useQuerySpecification,
   useQueryContext,
 } from "services/store";
+import ProductGuide from "components/ProductGuide";
 import rowRenderer from "./rowRenderer";
 import EmbeddedTable from "./EmbeddedTable";
 
@@ -150,12 +151,19 @@ export default () => {
         );
       } else {
         return (
-          <span
-            className="inline-block bg-gray-200 hover:bg-gray-400 px-2 mr-2 rounded cursor-pointer"
-            onClick={handleExpandClick}
-          >
-            Expand {tableName}
-          </span>
+          <Fragment>
+            <span
+              className="inline-block bg-gray-200 hover:bg-gray-400 px-2 mr-2 rounded cursor-pointer"
+              onClick={handleExpandClick}
+            >
+              Expand {tableName}
+            </span>
+            {index === 0 ? (
+              <span className="relative">
+                <ProductGuide guideFor="expandButton" />
+              </span>
+            ) : null}
+          </Fragment>
         );
       }
     };
