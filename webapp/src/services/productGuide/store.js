@@ -2,7 +2,9 @@ import create from "zustand";
 
 const useProductGuide = create((set) => ({
   source: {},
-  mergeButton: {},
+  gridHead: {},
+  relatedButton: {},
+  notesButton: {},
   tableHead: {},
   tableRow: {},
   expandButton: {},
@@ -12,7 +14,9 @@ const useProductGuide = create((set) => ({
     if (
       [
         "source",
-        "mergeButton",
+        "gridHead",
+        "relatedButton",
+        "notesButton",
         "tableHead",
         "tableRow",
         "expandButton",

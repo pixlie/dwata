@@ -32,11 +32,7 @@ const ReportItem = ({ item }) => {
     });
   };
 
-  return (
-    <Button size="large" attributes={{ onClick: handleClick }}>
-      Add KPI
-    </Button>
-  );
+  return <Button attributes={{ onClick: handleClick }}>Add KPI</Button>;
 };
 
 const sampleActivityList = [

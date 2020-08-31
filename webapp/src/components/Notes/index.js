@@ -31,6 +31,7 @@ export default () => {
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
   );
+  console.log(navigationButtonMeta);
 
   const { appType } = mainApp;
   const notesQS = {

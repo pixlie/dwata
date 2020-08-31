@@ -226,7 +226,8 @@ export default ({ item, index }) => {
       style={{ top: `${4 + index * 0.4}rem`, left: `${20 + index * 2}%` }}
     >
       <Button
-        className="button is-rounded is-dark close"
+        size="sm"
+        theme="secondary"
         attributes={{ onClick: () => toggleDetailItem(item) }}
       >
         Close&nbsp;<i className="fas fa-times"></i>
