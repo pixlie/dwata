@@ -32,7 +32,7 @@ export const Hx = ({ x = "3", children }) => {
   };
   return React.createElement(
     `h${x}`,
-    { className: `text-gray-700 ${xSizeClass[x]}` },
+    { className: `text-gray-700 pl-3 ${xSizeClass[x]}` },
     children
   );
 };
@@ -53,7 +53,7 @@ export const Box = ({ title, message, children }) => {
 
 export const Button = ({
   label,
-  size = "medium",
+  size = "md",
   theme = "primary",
   active = false,
   disabled = false,
@@ -63,7 +63,7 @@ export const Button = ({
   attributes,
   children,
 }) => {
-  let classes = `inline-block text-md font-bold shadow hover:shadow-sm ${rounded} ${padding} ${margin}`;
+  let classes = `inline-block font-bold shadow hover:shadow-sm ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
       classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
@@ -77,6 +77,12 @@ export const Button = ({
       " text-gray-700 hover:bg-yellow-700 hover:text-white";
   } else if (theme === "link") {
     classes = "inline-block font-bold underline";
+  }
+
+  if (["sm", "md", "lg"].includes(size)) {
+    classes = classes + ` text-${size}`;
+  } else {
+    classes = classes + " text-md";
   }
 
   return (

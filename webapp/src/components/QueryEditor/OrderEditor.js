@@ -47,6 +47,10 @@ export default () => {
     <Fragment>
       <Hx x="4">Ordering</Hx>
 
+      <p className="text-gray-700 my-2">
+        You can filter by any column, even the ones that are not visible.
+      </p>
+
       {Object.keys(orderBy).map((col) => (
         <div className="field is-horizontal" key={`or-${col}`}>
           <div className="field-label">
@@ -103,50 +107,3 @@ export default () => {
     </Fragment>
   );
 };
-
-/*
-const mapStateToProps = (state, props) => {
-  const { cacheKey, sourceId, tableName } = getQueryDetails(state, props);
-
-  if (
-    state.schema.isReady &&
-    state.schema.sourceId === sourceId &&
-    state.querySpecification.isReady &&
-    state.querySpecification.cacheKey === cacheKey
-  ) {
-    return {
-      isReady: true,
-      schemaColumns: state.schema.rows.find((x) => x.table_name === tableName)
-        .columns,
-      orderBy: state.querySpecification.orderBy,
-      isVisible: state.global.isOEVisible,
-    };
-  }
-
-  return {
-    isReady: false,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => ({
-  addOrderBy: (event) => {
-    event.preventDefault();
-    const { value } = event.target;
-    if (value === "") {
-      return;
-    }
-    dispatch(addOrderBy(value));
-  },
-
-  changeOrderBy: (event) => {
-    event.preventDefault();
-    const { name, value } = event.target;
-    dispatch(changeOrderBy(name.substring(6), value));
-  },
-  fetchData,
-});
-
-export default withRouter(
-  connect(mapStateToProps, mapDispatchToProps)(OrderEditor)
-);
-*/

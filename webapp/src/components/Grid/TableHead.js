@@ -36,6 +36,7 @@ export default () => {
     _columns = querySpecification.columns;
   }
 
+  let i = 0;
   for (const col of _columns) {
     const tableColumnName = col.label;
     if (!selectedTableColumNames.includes(tableColumnName)) {
@@ -45,26 +46,24 @@ export default () => {
     if (head.is_primary_key) {
       headList.push(
         <TableHeadItem
+          key={`th-${tableColumnName}`}
+          index={i}
           tableColumnName={tableColumnName}
           label={selectedTableNames.length === 1 ? head.name : tableColumnName}
-          key={`th-${tableColumnName}`}
         />
       );
     } else {
       headList.push(
         <TableHeadItem
+          key={`th-${tableColumnName}`}
+          index={i}
           tableColumnName={tableColumnName}
           label={selectedTableNames.length === 1 ? head.name : tableColumnName}
-          key={`th-${tableColumnName}`}
         />
       );
     }
+    i++;
   }
 
-  return (
-    <tr className="border-b-4 h-10">
-      <th>&nbsp;</th>
-      {headList}
-    </tr>
-  );
+  return <tr className="border-b-4 h-10">{headList}</tr>;
 };

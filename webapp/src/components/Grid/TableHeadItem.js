@@ -1,10 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import FilterItem from "components/QueryEditor/FilterItem";
 import { ColumnHead } from "components/LayoutHelpers";
+import ProductGuide from "components/ProductGuide";
 
 const ColumnHeadSpecification = ({ tableColumnName }) => {
   const queryContext = useContext(QueryContext);
@@ -25,7 +26,7 @@ const ColumnHeadSpecification = ({ tableColumnName }) => {
   );
 };
 
-export default ({ tableColumnName, label }) => {
+export default ({ tableColumnName, label, index }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -35,7 +36,6 @@ export default ({ tableColumnName, label }) => {
     (state) => state.toggleColumnHeadSpecification
   );
   const initiateFilter = useQuerySpecification((state) => state.initiateFilter);
-
   const { activeColumnHeadSpecification } = querySpecification;
 
   const handleClick = () => {
@@ -48,11 +48,20 @@ export default ({ tableColumnName, label }) => {
     <ColumnHead
       label={label}
       order={querySpecification.orderBy[tableColumnName]}
-      attributes={{ onClick: handleClick }}
+      attributes={{
+        onClick: handleClick,
+      }}
     >
-      {activeColumnHeadSpecification === tableColumnName ? (
-        <ColumnHeadSpecification tableColumnName={tableColumnName} />
-      ) : null}
+      <Fragment>
+        {activeColumnHeadSpecification === tableColumnName ? (
+          <ColumnHeadSpecification tableColumnName={tableColumnName} />
+        ) : null}
+        {index === 1 ? (
+          <span className="relative ml-2">
+            <ProductGuide guideFor="tableHead" />
+          </span>
+        ) : null}
+      </Fragment>
     </ColumnHead>
   );
 };

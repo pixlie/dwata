@@ -14,7 +14,7 @@ const generateFilter = (
     mainColumns.map((x) => x.label),
     parentRow
   );
-  const embeddedTableColumn = parentJoin[0].split(".");
+  // const embeddedTableColumn = parentJoin[0].split(".");
   if (!(parentJoin[1] in parentRowT)) {
     return () => false;
   }

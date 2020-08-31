@@ -22,7 +22,7 @@ const completeFetch = (payload) => ({
   isReady: true,
 });
 
-const [useStore] = create((set, get) => ({
+const useStore = create((set, get) => ({
   ...initialState,
 
   fetchSource: async () => {

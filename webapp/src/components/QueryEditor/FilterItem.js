@@ -5,10 +5,94 @@ import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { Button } from "components/LayoutHelpers";
 
-/**
- * This method renders on the filter controls for a single column.
- * It is used in the top (common) filter editor, as well as in the per column head editor.
- */
+const NumericFilter = ({ columnName }) => {
+  const queryContext = useContext(QueryContext);
+  const filterBy = useQuerySpecification(
+    (state) => state[queryContext.key].filterBy[columnName]
+  );
+  const setFilter = useQuerySpecification((state) => state.setFilter);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    const temp = {};
+    if (value.indexOf(",") !== -1) {
+      // This is a range provided
+      if (value.substring(0, value.indexOf(",")).trim() !== "") {
+        temp["from"] = parseInt(
+          value.substring(0, value.indexOf(",")).trim(),
+          10
+        );
+      }
+      if (value.substring(value.indexOf(",") + 1).trim() !== "") {
+        temp["to"] = parseInt(value.substring(value.indexOf(",") + 1));
+      }
+      temp["display"] = value;
+    } else {
+      temp["equal"] = parseInt(value, 10);
+      temp["display"] = value;
+    }
+
+    setFilter(queryContext.key, name, temp);
+  };
+
+  return (
+    <input
+      className="border px-2 py-1"
+      name={columnName}
+      onChange={handleChange}
+      placeholder="range 12,88 or exact 66"
+      value={filterBy.display}
+    />
+  );
+};
+
+const DateTimeFilter = ({ columnName }) => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const setFilter = useQuerySpecification((state) => state.setFilter);
+  const { filterBy } = querySpecification;
+
+  const handleChange = (event) => {
+    const { name, value, dataset } = event.target;
+
+    const temp = {
+      ...filterBy[columnName],
+    };
+    if (dataset.meta === "from") {
+      temp["from"] = value;
+    } else if (dataset.meta === "to") {
+      temp["to"] = value;
+    }
+
+    setFilter(queryContext.key, name, temp);
+  };
+
+  return (
+    <Fragment>
+      <input
+        className="border px-2 py-1"
+        name={columnName}
+        data-meta="from"
+        type="datetime-local"
+        onChange={handleChange}
+        value={filterBy[columnName].from}
+      />
+
+      <input
+        className="border px-2 py-1"
+        name={columnName}
+        data-meta="to"
+        type="datetime-local"
+        onChange={handleChange}
+        value={filterBy[columnName].to}
+      />
+    </Fragment>
+  );
+};
+
 export default ({ columnName, singleFilter = false }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
@@ -30,33 +114,10 @@ export default ({ columnName, singleFilter = false }) => {
     let fetchImmediately = false;
 
     const temp = {};
-    if (dataType.type === "INTEGER") {
-      if (value.indexOf(",") !== -1) {
-        // This is a range provided
-        if (value.substring(0, value.indexOf(",")).trim() !== "") {
-          temp["from"] = parseInt(
-            value.substring(0, value.indexOf(",")).trim(),
-            10
-          );
-        }
-        if (value.substring(value.indexOf(",") + 1).trim() !== "") {
-          temp["to"] = parseInt(value.substring(value.indexOf(",") + 1));
-        }
-        temp["display"] = value;
-      } else {
-        temp["equal"] = parseInt(value, 10);
-        temp["display"] = value;
-      }
-    } else if (dataType.type === "VARCHAR") {
+    if (dataType.type === "VARCHAR") {
       temp["like"] = value;
       temp["display"] = value;
     } else if (dataType.type === "DATE") {
-      if (dataset.meta === "from") {
-        temp["from"] = value;
-      } else if (dataset.meta === "to") {
-        temp["to"] = value;
-      }
-    } else if (dataType.type === "TIMESTAMP") {
       if (dataset.meta === "from") {
         temp["from"] = value;
       } else if (dataset.meta === "to") {
@@ -85,13 +146,7 @@ export default ({ columnName, singleFilter = false }) => {
   if (dataType.type === "INTEGER" || dataType.type === "FLOAT") {
     return (
       <Fragment>
-        <input
-          className="border px-2 py-1"
-          name={columnName}
-          onChange={handleChange}
-          placeholder="range 12,88 or exact 66"
-          value={filterBy[columnName].display}
-        />
+        <NumericFilter columnName={columnName} />
         {singleFilter ? (
           <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}
@@ -141,24 +196,7 @@ export default ({ columnName, singleFilter = false }) => {
   } else if (dataType.type === "TIMESTAMP") {
     return (
       <Fragment>
-        <input
-          className="border px-2 py-1"
-          name={columnName}
-          data-meta="from"
-          type="datetime-local"
-          onChange={handleChange}
-          value={filterBy[columnName].from}
-        />
-
-        <input
-          className="border px-2 py-1"
-          name={columnName}
-          data-meta="to"
-          type="datetime-local"
-          onChange={handleChange}
-          value={filterBy[columnName].to}
-        />
-
+        <DateTimeFilter columnName={columnName} />
         {singleFilter ? (
           <Button attributes={{ onClick: handleSubmit }}>Apply</Button>
         ) : null}

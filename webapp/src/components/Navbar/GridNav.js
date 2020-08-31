@@ -3,11 +3,17 @@ import React, { useEffect, useContext, Fragment } from "react";
 import { QueryContext } from "utils";
 import { useApps, useData, useQueryContext } from "services/store";
 import { Button } from "components/LayoutHelpers";
+import ProductGuide from "components/ProductGuide";
 
 export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
-  const toggleQueryUI = useQueryContext((state) => state.toggleQueryUI);
+  const toggleColumnSelector = useQueryContext(
+    (state) => state.toggleColumnSelector
+  );
+  const toggleFilterEditor = useQueryContext(
+    (state) => state.toggleFilterEditor
+  );
   const toggleMergeUI = useQueryContext((state) => state.toggleMergeUI);
   const data = useData((state) => state[queryContext.key]);
   const fetchApps = useApps((state) => state.fetchApps);
@@ -18,16 +24,19 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   if (!data || !data.isReady) {
     return null;
   }
-  const { selectedRowList } = data;
+  // const { selectedRowList } = data;
 
-  const handleActionsClick = () => {
-    toggleActions();
-  };
+  // const handleActionsClick = () => {
+  //   toggleActions();
+  // };
   /* const handlePinClick = () => {
     togglePinnedRecords();
   }; */
-  const handleQueryClick = () => {
-    toggleQueryUI(queryContext.key);
+  const handleColumnsClick = () => {
+    toggleColumnSelector(queryContext.key);
+  };
+  const handleFiltersClick = () => {
+    toggleFilterEditor(queryContext.key);
   };
   const handleMergeClick = () => {
     toggleMergeUI(queryContext.key);
@@ -35,7 +44,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
 
   return (
     <Fragment>
-      <Button
+      {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
         disabled={selectedRowList.length === 0}
@@ -45,7 +54,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
           <i className="far fa-check-square" />
         </span>
         &nbsp; Actions
-      </Button>
+      </Button> */}
       {/* <Button
         attributes={{ onClick: handlePinClick }}
         active={showPinnedRecords === true}
@@ -55,12 +64,24 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         &nbsp; Pins
       </Button> */}
 
-      <Button theme="primary" attributes={{ onClick: handleMergeClick }}>
-        Merge
+      <span className="relative">
+        <Button
+          theme="secondary"
+          attributes={{
+            onClick: handleMergeClick,
+          }}
+        >
+          Related
+        </Button>
+        <ProductGuide guideFor="relatedButton" />
+      </span>
+
+      <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
+        Columns
       </Button>
 
-      <Button theme="primary" attributes={{ onClick: handleQueryClick }}>
-        Query
+      <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
+        Filters
       </Button>
     </Fragment>
   );

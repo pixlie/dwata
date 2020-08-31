@@ -1,6 +1,13 @@
 import create from "zustand";
+import _ from "lodash";
 
 import * as globalConstants from "services/global/constants";
+
+const allEditorsDefault = {
+  isColumnSelectorOpen: false,
+  isFilterEditorOpen: false,
+  isMergeUIOpen: false,
+};
 
 const loadFromLocalStorage = () => {
   const temp = window.localStorage.getItem("queryContext");
@@ -29,7 +36,7 @@ const saveToLocalStorage = (appName, context) => {
   return true;
 };
 
-const [useQueryContext] = create((set) => ({
+const useQueryContext = create((set) => ({
   ...loadFromLocalStorage(),
 
   setContext: (appName, context) =>
@@ -41,11 +48,50 @@ const [useQueryContext] = create((set) => ({
       },
     })),
 
-  toggleQueryUI: (appName) =>
+  toggleDetailItem: (item) =>
+    set((state) => {
+      if ("detailItemList" in state.main) {
+        const _index = state.main.detailItemList.findIndex((x) =>
+          _.isEqual(x, item)
+        );
+
+        return {
+          main: {
+            ...state.main,
+            detailItemList:
+              _index === -1
+                ? [...state.main.detailItemList, item]
+                : [
+                    ...state.main.detailItemList.slice(0, _index),
+                    ...state.main.detailItemList.slice(_index + 1),
+                  ],
+          },
+        };
+      } else {
+        return {
+          main: {
+            ...state.main,
+            detailItemList: [item],
+          },
+        };
+      }
+    }),
+
+  toggleColumnSelector: (appName) =>
     set((state) => ({
       [appName]: {
         ...state[appName],
-        isQueryUIOpen: !state[appName].isQueryUIOpen,
+        ...allEditorsDefault,
+        isColumnSelectorOpen: !state[appName].isColumnSelectorOpen,
+      },
+    })),
+
+  toggleFilterEditor: (appName) =>
+    set((state) => ({
+      [appName]: {
+        ...state[appName],
+        ...allEditorsDefault,
+        isFilterEditorOpen: !state[appName].isFilterEditorOpen,
       },
     })),
 
@@ -53,6 +99,7 @@ const [useQueryContext] = create((set) => ({
     set((state) => ({
       [appName]: {
         ...state[appName],
+        ...allEditorsDefault,
         isMergeUIOpen: !state[appName].isMergeUIOpen,
       },
     })),

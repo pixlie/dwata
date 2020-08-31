@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from "react";
 import { useQueryContext, useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
 import { Button } from "components/LayoutHelpers";
+import ProductGuide from "components/ProductGuide";
 import GridNav from "./GridNav";
 
 export default ({ isSourceFetching, toggleSidebar }) => {
@@ -12,15 +13,16 @@ export default ({ isSourceFetching, toggleSidebar }) => {
   const setNavigationButtonMeta = useGlobal(
     (state) => state.setNavigationButtonMeta
   );
-  const notesNavRef = useRef(null);
+  const notesButtonRef = useRef(null);
   useEffect(() => {
-    setNavigationButtonMeta("notes", {
-      position: {
-        top: notesNavRef.current.offsetTop,
-        left: notesNavRef.current.offsetLeft,
-      },
-    });
-  }, [setNavigationButtonMeta]);
+    notesButtonRef.current &&
+      setNavigationButtonMeta("notes", {
+        position: {
+          top: notesButtonRef.current.getBoundingClientRect().top,
+          left: notesButtonRef.current.getBoundingClientRect().left,
+        },
+      });
+  }, []);
 
   const handleHome = (event) => {
     event.preventDefault();
@@ -35,11 +37,11 @@ export default ({ isSourceFetching, toggleSidebar }) => {
 
   return (
     <nav
-      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300"
+      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 px-6"
       role="navigation"
       aria-label="main navigation"
     >
-      <div className="mx-4 px-4">
+      <div className="mx-4">
         <a className="font-bold text-2xl" href="/" onClick={handleHome}>
           Home
         </a>
@@ -47,9 +49,9 @@ export default ({ isSourceFetching, toggleSidebar }) => {
 
       <div className="block lg:inline-block lg:mt-0 p-4">&nbsp;</div>
 
-      <div className="block flex-grow items-center w-auto">
+      <div className="block lg:inline-block flex-grow items-center w-auto">
         <div className="inline-block">
-          <Button
+          {/* <Button
             theme={
               mainApp && mainApp.appType === globalConstants.APP_NAME_HOME
                 ? "primary"
@@ -59,29 +61,32 @@ export default ({ isSourceFetching, toggleSidebar }) => {
           >
             <i className="fas fa-database" />
             &nbsp;Browse
-          </Button>
+          </Button> */}
 
-          <Button
-            attributes={{ onClick: handleNotesClick, ref: notesNavRef }}
-            theme="info"
-          >
-            <i className="far fa-sticky-note" />
-            &nbsp; Notes
-          </Button>
+          <span className="relative">
+            <Button
+              attributes={{ onClick: handleNotesClick, ref: notesButtonRef }}
+              theme="info"
+            >
+              <i className="far fa-sticky-note" />
+              &nbsp; Notes
+            </Button>
+            <ProductGuide guideFor="notesButton" />
+          </span>
 
-          <div className="inline-block">
+          {/* <div className="inline-block">
             <input className="input" type="text" placeholder="Coming soon..." />
             <span className="icon is-small is-left">
               <i className="fas fa-search"></i>
             </span>
-          </div>
+          </div> */}
         </div>
+      </div>
 
-        <div className="inline-block">
-          {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
-            <GridNav />
-          ) : null}
-        </div>
+      <div className="block lg:inline-block">
+        {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
+          <GridNav />
+        ) : null}
       </div>
     </nav>
   );

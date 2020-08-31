@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
@@ -17,9 +17,9 @@ export default () => {
     (state) => state.toggleColumnSelection
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const selectedColumLabels = querySpecification.select.map((x) => x.label);
+  const selectedColumLabels = querySpecification.columns.map((x) => x.label);
   const selectedTableNames = [
-    ...new Set(querySpecification.select.map((x) => x.tableName)),
+    ...new Set(querySpecification.columns.map((x) => x.tableName)),
   ];
   const selectedTables = selectedTableNames.map((x) =>
     schema.rows.find((y) => y.table_name === x)
@@ -61,29 +61,32 @@ export default () => {
   };
 
   return (
-    <Fragment>
+    <div
+      className="fixed bg-white border rounded p-4 shadow-md"
+      style={{ top: "4rem", right: "1rem" }}
+    >
       <Hx x="4">Columns</Hx>
 
       <p className="text-gray-700 my-2">
-        For any selected table, you can choose which columns you want to see. If
-        you do not wish to see certain columns, you can still{" "}
-        <strong>Filter</strong> or <strong>Order</strong> them.
+        For any selected table, you can choose which columns you want to see.
       </p>
 
-      <select
-        className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-        onChange={handleTableSelect}
-      >
-        {selectedTables.map((x) => (
-          <option
-            key={`opt-${x.table_name}`}
-            className="py-2 bg-white font-bold"
-            value={x.table_name}
-          >
-            {x.table_name}
-          </option>
-        ))}
-      </select>
+      {selectedTables.length > 1 ? (
+        <select
+          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
+          onChange={handleTableSelect}
+        >
+          {selectedTables.map((x) => (
+            <option
+              key={`opt-${x.table_name}`}
+              className="py-2 bg-white font-bold"
+              value={x.table_name}
+            >
+              {x.table_name}
+            </option>
+          ))}
+        </select>
+      ) : null}
 
       {currentTable.columns.map((col) => (
         <BoundInput
@@ -92,6 +95,6 @@ export default () => {
           column={col}
         />
       ))}
-    </Fragment>
+    </div>
   );
 };
