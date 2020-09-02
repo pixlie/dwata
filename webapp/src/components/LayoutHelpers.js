@@ -125,9 +125,15 @@ export const ButtonGroup = ({
   );
 };
 
-export const ColumnHead = ({ label, order, group, attributes, children }) => {
-  let classes =
-    "label inline-block bg-gray-200 px-2 rounded font-bold cursor-pointer hover:bg-gray-400";
+export const ColumnHead = ({
+  label,
+  order,
+  tableColor,
+  attributes,
+  children,
+}) => {
+  let classes = "label inline-block px-2 rounded font-bold cursor-pointer";
+  classes = classes + ` bg-${tableColor}-200 hover:bg-${tableColor}-400`;
   if (order) {
     if (order === "asc") {
       classes = classes + " ord-asc";

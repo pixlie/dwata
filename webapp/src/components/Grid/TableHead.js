@@ -11,6 +11,7 @@ export default () => {
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const tableColors = querySpecification.tableColors;
   const headList = [];
   let selectedTableNames = [],
     selectedTableColumNames = [],
@@ -49,7 +50,8 @@ export default () => {
           key={`th-${tableColumnName}`}
           index={i}
           tableColumnName={tableColumnName}
-          label={selectedTableNames.length === 1 ? head.name : tableColumnName}
+          label={head.name}
+          tableColor={tableColors[col.tableName]}
         />
       );
     } else {
@@ -58,7 +60,8 @@ export default () => {
           key={`th-${tableColumnName}`}
           index={i}
           tableColumnName={tableColumnName}
-          label={selectedTableNames.length === 1 ? head.name : tableColumnName}
+          label={head.name}
+          tableColor={tableColors[col.tableName]}
         />
       );
     }
