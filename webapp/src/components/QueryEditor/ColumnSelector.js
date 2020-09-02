@@ -95,12 +95,12 @@ export default () => {
     >
       <Hx x="4">Columns</Hx>
 
-      <p className="text-gray-700 my-2 max-w-sm">
-        For any selected table, you can choose which columns you want to see.
+      <p className="text-sm text-gray-700 my-2 max-w-sm">
+        Please select the columns you want to see in the grid.
       </p>
 
       {selectedTables.map((x) => (
-        <TableItem tableName={x.table_name} />
+        <TableItem key={`col-tbl-${x.table_name}`} tableName={x.table_name} />
       ))}
     </div>
   );

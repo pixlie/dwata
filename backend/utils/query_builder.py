@@ -336,7 +336,7 @@ class Select(object):
                 columns += self.columns_to_select(table_name)
         return columns
 
-    def prepare(self, override_columns=None):
+    def prepare(self, override_columns=None, apply_order=True):
         qs = self.qb.query_specification
 
         columns = override_columns if override_columns is not None else self.get_columns()
@@ -344,7 +344,7 @@ class Select(object):
         if self.pending_joins:
             _select = _select.select_from(self.get_joins())
 
-        if qs.get("order_by", {}) != {}:
+        if apply_order and qs.get("order_by", {}) != {}:
             _select = self.apply_ordering(sel_obj=_select)
         if qs.get("filter_by", {}) != {}:
             _select = self.apply_filters(sel_obj=_select)
@@ -395,7 +395,7 @@ class Select(object):
         # We use a separate query to count the total number of rows in the given query
         columns, _select = self.prepare(override_columns=[
             func.count(getattr(dm.tables[self.select_root_table_name].c, "id"))
-        ])
+        ], apply_order=False)
         return conn.execute(_select).scalar()
 
     def get_subquery_parent_id_list(self, sel_obj):

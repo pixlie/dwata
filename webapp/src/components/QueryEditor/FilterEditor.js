@@ -137,12 +137,13 @@ export default () => {
     >
       <Hx x="4">Filters</Hx>
 
-      <p className="text-gray-700 my-2 max-w-sm">
-        You can filter by any column, even the ones that are not visible.
+      <p className="text-sm text-gray-700 my-2 max-w-sm">
+        You can filter by any column, even the ones that are not visible in the
+        grid.
       </p>
 
       {selectedTables.map((x) => (
-        <TableItem tableName={x.table_name} />
+        <TableItem key={`fl-tbl-${x.table_name}`} tableName={x.table_name} />
       ))}
     </div>
   );
