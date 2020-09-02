@@ -37,7 +37,7 @@ export default () => {
 
     return (
       <label
-        className={`block font-mono font-normal text-sm bg-gray-200 py-1 px-2 mb-1 border hover:bg-gray-300 ${
+        className={`block font-mono font-normal text-sm py-1 px-2 ml-6 hover:bg-gray-200 ${
           checked ? "text-gray-700" : "text-gray-500"
         }`}
       >
@@ -53,11 +53,39 @@ export default () => {
     );
   };
 
-  const handleTableSelect = (event) => {
-    const { value } = event.target;
-    setState({
-      userSelectedTableName: value,
-    });
+  const TableItem = ({ tableName }) => {
+    const handleTableSelect = () => {
+      setState({
+        userSelectedTableName: tableName,
+      });
+    };
+
+    return (
+      <div className="bg-gray-100 mb-2">
+        <div
+          key={`opt-${tableName}`}
+          className="w-full cursor-pointer hover:bg-gray-200"
+          onClick={handleTableSelect}
+        >
+          <span className="text-lg text-gray-600 text-center ml-2 mr-3">
+            <i className="fas fa-table" />
+          </span>
+          <span className="break-all text-sm font-bold text-blue-700">
+            {tableName}
+          </span>
+        </div>
+
+        {currentTable.table_name === tableName
+          ? currentTable.columns.map((col) => (
+              <BoundInput
+                key={`sel-${currentTable.table_name}-${col.name}`}
+                tableName={currentTable.table_name}
+                column={col}
+              />
+            ))
+          : null}
+      </div>
+    );
   };
 
   return (
@@ -67,33 +95,12 @@ export default () => {
     >
       <Hx x="4">Columns</Hx>
 
-      <p className="text-gray-700 my-2">
+      <p className="text-gray-700 my-2 max-w-sm">
         For any selected table, you can choose which columns you want to see.
       </p>
 
-      {selectedTables.length > 1 ? (
-        <select
-          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-          onChange={handleTableSelect}
-        >
-          {selectedTables.map((x) => (
-            <option
-              key={`opt-${x.table_name}`}
-              className="py-2 bg-white font-bold"
-              value={x.table_name}
-            >
-              {x.table_name}
-            </option>
-          ))}
-        </select>
-      ) : null}
-
-      {currentTable.columns.map((col) => (
-        <BoundInput
-          key={`sel-${currentTable.table_name}-${col.name}`}
-          tableName={currentTable.table_name}
-          column={col}
-        />
+      {selectedTables.map((x) => (
+        <TableItem tableName={x.table_name} />
       ))}
     </div>
   );
