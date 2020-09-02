@@ -40,14 +40,13 @@ export default () => {
     initiateFilter(queryContext.key, value, dataType);
   };
 
-  const handleTableSelect = (event) => {
-    const { value } = event.target;
-    setState({
-      userSelectedTableName: value,
-    });
-  };
+  const TableItem = ({ tableName }) => {
+    const handleTableSelect = () => {
+      setState({
+        userSelectedTableName: tableName,
+      });
+    };
 
-  const PerTable = () => {
     const handleRemoveFilter = (name) => (event) => {
       event.preventDefault();
       if (name in filterBy) {
@@ -58,7 +57,7 @@ export default () => {
     const filters = [];
     if (Object.keys(filterBy).length > 0) {
       filters.push(
-        <p className="tip" key="fl-rm-hd">
+        <p className="text-sm px-4 text-gray-700" key="fl-rm-hd">
           Double click column name to remove filter
         </p>
       );
@@ -68,9 +67,9 @@ export default () => {
       const [tn, cn] = columnName.split(".");
 
       filters.push(
-        <div key={`fl-${columnName}`} className="my-2">
+        <div key={`fl-${columnName}`} className="my-2 ml-6">
           <label
-            className="font-bold mr-2"
+            className="text-sm mr-2"
             onDoubleClick={handleRemoveFilter(columnName)}
           >
             {cn}
@@ -98,17 +97,36 @@ export default () => {
     }
 
     return (
-      <Fragment>
-        {filters}
-
-        <select
-          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-          onChange={addFilter}
-          value="---"
+      <div className="bg-gray-100 mb-2">
+        <div
+          key={`opt-${tableName}`}
+          className="w-full cursor-pointer hover:bg-gray-200"
+          onClick={handleTableSelect}
         >
-          {filterByOptions}
-        </select>
-      </Fragment>
+          <span className="text-lg text-gray-600 text-center ml-2 mr-3">
+            <i className="fas fa-table" />
+          </span>
+          <span className="break-all text-sm font-bold text-blue-700">
+            {tableName}
+          </span>
+        </div>
+
+        {currentTable.table_name === tableName ? (
+          <Fragment>
+            {filters}
+
+            <div className="ml-6 mr-4">
+              <select
+                className="w-full pl-1 py-1 mb-2 bg-white border rounded"
+                onChange={addFilter}
+                value="---"
+              >
+                {filterByOptions}
+              </select>
+            </div>
+          </Fragment>
+        ) : null}
+      </div>
     );
   };
 
@@ -119,28 +137,13 @@ export default () => {
     >
       <Hx x="4">Filters</Hx>
 
-      <p className="text-gray-700 my-2">
+      <p className="text-gray-700 my-2 max-w-sm">
         You can filter by any column, even the ones that are not visible.
       </p>
 
-      {selectedTables.length > 1 ? (
-        <select
-          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-          onChange={handleTableSelect}
-        >
-          {selectedTables.map((x) => (
-            <option
-              key={`opt-${x.table_name}`}
-              className="py-2 bg-white font-bold"
-              value={x.table_name}
-            >
-              {x.table_name}
-            </option>
-          ))}
-        </select>
-      ) : null}
-
-      <PerTable />
+      {selectedTables.map((x) => (
+        <TableItem tableName={x.table_name} />
+      ))}
     </div>
   );
 };

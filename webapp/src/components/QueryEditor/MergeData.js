@@ -161,9 +161,9 @@ export default () => {
   return (
     <div
       className="fixed right-0 bg-white border rounded p-4 shadow-md"
-      style={{ top: "4rem" }}
+      style={{ top: "4rem", right: "1rem" }}
     >
-      <Hx x="3">Merge data</Hx>
+      <Hx x="4">Merge related data</Hx>
       <p className="text-gray-700 my-2 max-w-lg">
         You can merge data from other tables which are related.{" "}
         <strong>dwata</strong> finds out how the other tables are related and
