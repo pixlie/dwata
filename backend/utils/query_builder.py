@@ -36,9 +36,7 @@ class Select(object):
             # This Select is being created as an embedded or related of another Select, so this is not root
             self.is_root = False
             self.select_root_table_name = table_name
-            self.tables_and_columns = {
-                table_name: set()
-            }
+            self.tables_and_columns = {}
             self.parent_join = parent_join
         else:
             self.is_root = True
@@ -48,8 +46,6 @@ class Select(object):
                 (self.select_root_table_name, _) = table_column.split(".")
             else:
                 self.select_root_table_name = table_column
-        self.embedded_selects = []
-        self.tables_to_select()
 
     def apply_ordering(self, sel_obj):
         qs = self.qb.query_specification
@@ -302,6 +298,9 @@ class Select(object):
             else:
                 table_name = table_column
                 column_name = "__auto__"
+            if not self.is_root and table_name in self.parent_select.tables_and_columns:
+                # We are not a root Select and we will not select tables that have already been selected
+                continue
 
             if table_name in self.tables_and_columns:
                 # We have encountered this table in this request already, let's just handle the column
@@ -317,18 +316,13 @@ class Select(object):
                     self.tables_and_columns[table_name] = {column_name, }
                 else:
                     # This is not the first table to be queried, we have to check for JOINs or parent tables
-                    if not self.is_root:
-                        # We are not a root Select
-                        # So we will not select tables that have already been selected
-                        if table_name in self.parent_select.tables_and_columns:
-                            continue
-
                     # Let us check if this table can be directly JOINed
                     if self.find_to_one_join(table_name):
                         # Yes we can join this table, so add it to our list of tables and columns to select
                         self.tables_and_columns[table_name] = {column_name, }
-                    elif self.find_embedded_select(table_name):
-                        self.tables_and_columns[table_name] = {column_name, }
+                    else:
+                        # We can not join this table directly, let us check if we can embed One-Many data
+                        self.find_embedded_select(table_name)
 
         for table_column in _process_later:
             self.tables_to_select(embedded_select=table_column)
@@ -380,6 +374,8 @@ class Select(object):
 
     def execute(self):
         conn = self.qb.database_conn
+        self.embedded_selects = []
+        self.tables_to_select()
 
         if self.is_root:
             columns, _select = self.prepare()
@@ -437,12 +433,9 @@ class QueryBuilder(object):
     async def results(self):
         await self.prepare()
         root_select = Select(qb=self)
-
         columns, rows, query_sql = root_select.execute()
-        count = root_select.get_count()
-        embedded = []
 
-        query_sql = query_sql
+        embedded = []
         for embedded_select in root_select.embedded_selects:
             _columns, _rows, _query_sql = embedded_select.execute()
             embedded.append({
@@ -451,5 +444,7 @@ class QueryBuilder(object):
                 "query_sql": _query_sql,
                 "parent_join": embedded_select.get_parent_join()
             })
+
+        count = root_select.get_count()
         self.database_conn.close()
         return columns, rows, count, query_sql, embedded
