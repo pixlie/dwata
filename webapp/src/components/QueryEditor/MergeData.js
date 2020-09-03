@@ -28,22 +28,9 @@ export default () => {
       toggleRelatedTable(queryContext.key, tableName);
     };
 
-    const innerItems = innerRelated.map((x) => (
-      <Fragment key={`tb-rl-${x.tableName}`}>
-        <RelatedItem tableName={x.tableName} innerRelated={x.innerRelated} />
-
-        {innerRelated.length === 1 ? (
-          <p className="pl-4 mb-4 text-gray-600 text-sm max-w-sm">
-            For each record of <strong>{tableName}</strong> there may be more
-            than one record of <strong>{x.tableName}</strong>
-          </p>
-        ) : null}
-      </Fragment>
-    ));
-
     if (innerRelated.length > 0) {
       return (
-        <div className="py-1 px-2 bg-gray-200 border mx-2">
+        <div className="bg-gray-200 border mx-2">
           <label className="block font-bold text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300">
             <input
               type="checkbox"
@@ -55,13 +42,19 @@ export default () => {
             {tableName}
           </label>
 
-          {innerRelated.length > 1 ? (
-            <p className="pl-4 mb-4 text-gray-600 text-sm max-w-sm">
-              For each record of <strong>{tableName}</strong> there may be more
-              than one record of any of the following.
-            </p>
-          ) : null}
-          <div className="pl-6">{innerItems}</div>
+          <p className="px-2 mb-4 text-gray-600 text-sm max-w-xs">
+            For each record of <strong>{tableName}</strong> there may be more
+            than one record of any of the following.
+          </p>
+          <div className="pl-6">
+            {innerRelated.map((x) => (
+              <RelatedItem
+                key={`tb-rl-${x.tableName}`}
+                tableName={x.tableName}
+                innerRelated={x.innerRelated}
+              />
+            ))}
+          </div>
         </div>
       );
     } else {

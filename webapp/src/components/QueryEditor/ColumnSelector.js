@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 
@@ -27,6 +27,7 @@ export default () => {
   const currentTable = state.userSelectedTableName
     ? selectedTables.find((x) => x.table_name === state.userSelectedTableName)
     : selectedTables[0];
+  const tableColors = querySpecification.tableColors;
 
   const BoundInput = ({ tableName, column }) => {
     const columnLabel = `${tableName}.${column.name}`;
@@ -64,15 +65,15 @@ export default () => {
       <div className="bg-gray-100 mb-2">
         <div
           key={`opt-${tableName}`}
-          className="w-full cursor-pointer hover:bg-gray-200"
+          className={`w-full px-2 ${tableColorWhiteOnMedium(
+            tableColors[tableName]
+          )} cursor-pointer rounded rounded-b-none`}
           onClick={handleTableSelect}
         >
-          <span className="text-lg text-gray-600 text-center ml-2 mr-3">
+          <span className="text-lg text-white ml-2 mr-3">
             <i className="fas fa-table" />
           </span>
-          <span className="break-all text-sm font-bold text-blue-700">
-            {tableName}
-          </span>
+          <span className="inline-block font-bold text-white">{tableName}</span>
         </div>
 
         {currentTable.table_name === tableName

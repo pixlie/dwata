@@ -1,6 +1,6 @@
 import React, { useContext, Fragment } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 import QueryLoader from "./QueryLoader";
@@ -33,7 +33,9 @@ const GridHead = ({ querySpecification }) => {
         {mainTableNames.map((x) => (
           <span
             key={`grd-hd-tbl-${x}`}
-            className={`px-2 mr-2 rounded bg-${tableColors[x]}-500 text-white`}
+            className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              tableColors[x]
+            )} text-white`}
           >
             {x}
           </span>
@@ -49,7 +51,9 @@ const GridHead = ({ querySpecification }) => {
           {embeddedTableNames.map((x) => (
             <span
               key={`grd-hd-tbl-${x}`}
-              className={`px-2 mr-2 rounded bg-${tableColors[x]}-500 text-white`}
+              className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+                tableColors[x]
+              )} text-white`}
             >
               {x}
             </span>

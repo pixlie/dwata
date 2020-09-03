@@ -1,5 +1,7 @@
 import React, { Fragment, useCallback, useEffect } from "react";
 
+import { tableColorWhiteOnMedium, tableColorBlackOnLight } from "utils";
+
 export const Hero = ({
   size = "",
   textCentered = false,
@@ -132,8 +134,9 @@ export const ColumnHead = ({
   attributes,
   children,
 }) => {
-  let classes = "label inline-block px-2 rounded font-bold cursor-pointer";
-  classes = classes + ` bg-${tableColor}-200 hover:bg-${tableColor}-400`;
+  let classes =
+    "label inline-block px-2 rounded font-bold cursor-pointer text-gray-700 hover:text-gray-900";
+  classes = classes + ` ${tableColorBlackOnLight(tableColor)}`;
   if (order) {
     if (order === "asc") {
       classes = classes + " ord-asc";
