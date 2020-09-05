@@ -1,6 +1,6 @@
 # Dwata
 
-**No-code Software to understand, analyze or manage Business data. Understand Customer or Product insights without SQL.**
+**Understand, monitor or manage Business data without SQL or code. Track User growth, find Sales insights or bottlenecks, share KPIs without engineering.**
 
 ![Home Screen](docs/assets/Home_view_v3.png?raw=true "Home Screen")
 
@@ -29,17 +29,17 @@
 - **Automatically understands** data schema - Tables, Columns, Relations
 - Builds dynamic UI automatically with Grids, Widgets, Column view, etc.
 
-![Grid showing columns](docs/assets/Grid_view_v3.png?raw=true "Grid showing columns")
+![Grid showing columns](docs/assets/Grid_view_v4.png?raw=true "Grid showing columns")
 
 - Visually allows you to **Merge** related data, generates SQL for you!
 
-![Merge related data](docs/assets/Grid_Merge_view_v3.png?raw=true "Merge related data")
+![Merge related data](docs/assets/Grid_Merge_view_v4.png?raw=true "Merge related data")
 
 - Visually apply Aggregates, Averages, Grouping and many other functions (coming soon)
 - Can connect directly with Stripe, PayPal, Mailchimp, etc. (coming soon)
 - Has Widgets for everything from Numbers, Booleans, Large text, Dates, Geographic data...
 
-![Boolean and large text fields](docs/assets/Detail_view_v3.png?raw=true "Boolean and large text fields")
+![Boolean and large text fields](docs/assets/Detail_view_v4.png?raw=true "Boolean and large text fields")
 
 - Full search for across all of your data sources (coming soon)
 - Internal cache so Queries are not repeated unnecessarily
