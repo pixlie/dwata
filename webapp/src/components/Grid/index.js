@@ -1,6 +1,6 @@
 import React, { useContext, Fragment } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 import QueryLoader from "./QueryLoader";
@@ -24,29 +24,40 @@ const GridHead = ({ querySpecification }) => {
         .map((x) => x.tableName)
     ),
   ];
+  const tableColors = querySpecification.tableColors;
 
-  const colors = [
-    "orange",
-    "teal",
-    "pink",
-    "purple",
-    "indigo",
-    "blue",
-    "red",
-    "yellow",
-  ];
-  const color = colors[Math.floor(Math.random() * colors.length)];
   return (
-    <div className={`p-2 pl-6 bg-${color}-200 border-${color}-300 border-b`}>
+    <div className={`p-2 pl-6 bg-gray-100 border-gray-300 border-b`}>
       <Hx x="3">
-        Showing: {mainTableNames.join(", ")}&nbsp;&nbsp;
+        Showing:{" "}
+        {mainTableNames.map((x) => (
+          <span
+            key={`grd-hd-tbl-${x}`}
+            className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              tableColors[x]
+            )} text-white`}
+          >
+            {x}
+          </span>
+        ))}
+        &nbsp;&nbsp;
         <span className="relative">
           <ProductGuide guideFor="gridHead" />
         </span>
       </Hx>
       {embeddedTableNames.length ? (
         <Hx x="5">
-          Merged (multiple) records: {embeddedTableNames.join(", ")}
+          Merged (multiple) records:{" "}
+          {embeddedTableNames.map((x) => (
+            <span
+              key={`grd-hd-tbl-${x}`}
+              className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+                tableColors[x]
+              )} text-white`}
+            >
+              {x}
+            </span>
+          ))}
         </Hx>
       ) : null}
     </div>

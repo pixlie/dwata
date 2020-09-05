@@ -1,6 +1,6 @@
 import React, { Fragment, useContext } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 
@@ -18,6 +18,7 @@ export default () => {
   ];
   const startingTableName = querySpecification.select[0].tableName;
   const addedTableNames = [startingTableName];
+  const tableColors = querySpecification.tableColors;
 
   const RelatedItem = ({ tableName, innerRelated }) => {
     if (tableName === undefined || innerRelated === undefined) {
@@ -28,58 +29,59 @@ export default () => {
       toggleRelatedTable(queryContext.key, tableName);
     };
 
-    const innerItems = innerRelated.map((x) => (
-      <Fragment key={`tb-rl-${x.tableName}`}>
-        <RelatedItem tableName={x.tableName} innerRelated={x.innerRelated} />
+    return (
+      <div
+        className={`max-w-xs mr-4 ${
+          innerRelated.length > 0 ? "bg-gray-100 pb-4" : ""
+        }`}
+      >
+        <label
+          className={`block px-2 font-bold cursor-pointer rounded
+            ${
+              selectedTableNames.includes(tableName)
+                ? `${tableColorWhiteOnMedium(
+                    tableColors[tableName]
+                  )} text-white`
+                : "bg-gray-100 text-gray-600"
+            }
+            ${innerRelated.length > 0 ? " rounded-b-none" : ""}`}
+        >
+          <span
+            className={`text-lg ml-2 mr-3 ${
+              selectedTableNames.includes(tableName)
+                ? "text-white"
+                : "text-gray-600"
+            }`}
+          >
+            <i className="fas fa-table" />
+          </span>
+          <input
+            type="checkbox"
+            name={tableName}
+            checked={selectedTableNames.includes(tableName)}
+            onChange={handleClick}
+            className="mr-1"
+          />
+          {tableName}
+        </label>
 
-        {innerRelated.length === 1 ? (
-          <p className="pl-4 mb-4 text-gray-600 text-sm max-w-sm">
-            For each record of <strong>{tableName}</strong> there may be more
-            than one record of <strong>{x.tableName}</strong>
+        {innerRelated.length > 0 ? (
+          <p className="mx-2 my-4 text-gray-600 text-sm">
+            Each record of <strong>{tableName}</strong> may have more than one
+            record of any of the following.
           </p>
         ) : null}
-      </Fragment>
-    ));
-
-    if (innerRelated.length > 0) {
-      return (
-        <div className="py-1 px-2 bg-gray-200 border mx-2">
-          <label className="block font-bold text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300">
-            <input
-              type="checkbox"
-              name={tableName}
-              checked={selectedTableNames.includes(tableName)}
-              onChange={handleClick}
-              className="mr-1"
+        <div className="ml-6">
+          {innerRelated.map((x) => (
+            <RelatedItem
+              key={`tb-rl-${x.tableName}`}
+              tableName={x.tableName}
+              innerRelated={x.innerRelated}
             />
-            {tableName}
-          </label>
-
-          {innerRelated.length > 1 ? (
-            <p className="pl-4 mb-4 text-gray-600 text-sm max-w-sm">
-              For each record of <strong>{tableName}</strong> there may be more
-              than one record of any of the following.
-            </p>
-          ) : null}
-          <div className="pl-6">{innerItems}</div>
+          ))}
         </div>
-      );
-    } else {
-      return (
-        <div>
-          <label className="block font-bold bg-gray-200 text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300 w-64">
-            <input
-              type="checkbox"
-              name={tableName}
-              checked={selectedTableNames.includes(tableName)}
-              onChange={handleClick}
-              className="mr-1"
-            />
-            {tableName}
-          </label>
-        </div>
-      );
-    }
+      </div>
+    );
   };
 
   const addRelatedItem = (tableName, level) => {
@@ -161,10 +163,11 @@ export default () => {
   return (
     <div
       className="fixed right-0 bg-white border rounded p-4 shadow-md"
-      style={{ top: "4rem" }}
+      style={{ top: "4rem", right: "1rem" }}
     >
-      <Hx x="3">Merge data</Hx>
-      <p className="text-gray-700 my-2 max-w-lg">
+      <Hx x="4">Merge related data</Hx>
+
+      <p className="text-sm text-gray-700 my-2 max-w-2xl">
         You can merge data from other tables which are related.{" "}
         <strong>dwata</strong> finds out how the other tables are related and
         will give you contextual options as they might be needed to gather the

@@ -2,7 +2,10 @@ import create from "zustand";
 import axios from "axios";
 
 import { dataURL, dataItemURL } from "services/urls";
-import useQuerySpecification from "services/querySpecification/store";
+import useQuerySpecification, {
+  querySpecificationObject,
+  getQuerySpecificationPayload,
+} from "services/querySpecification/store";
 
 const initialState = {
   columns: [],
@@ -38,37 +41,6 @@ const completeFetchItem = (payload) => ({
   isFetching: false,
   isReady: true,
   lastFetchedAt: +new Date(),
-});
-
-const expandTableColumn = (el) => ({
-  label: el,
-  tableName: el.split(".")[0],
-  columnName: el.split(".")[1],
-});
-
-const querySpecificationObject = (state, payload) => ({
-  ...state,
-  select: payload.select.map((x) => expandTableColumn(x)),
-  columns: payload.columns.map((x) => expandTableColumn(x)),
-  embeddedColumns: payload.embedded.reduce(
-    (acc, x) => [...acc, x.columns.map((xy) => expandTableColumn(xy))],
-    []
-  ),
-  count: payload.count,
-  limit: payload.limit,
-  offset: payload.offset,
-  isReady: true,
-  isFetching: false,
-  fetchNeeded: false,
-});
-
-const getQuerySpecificationPayload = (querySpecification) => ({
-  select: querySpecification.select.map((x) => x.label),
-  source_label: querySpecification.sourceLabel,
-  order_by: querySpecification.orderBy,
-  filter_by: querySpecification.filterBy,
-  offset: querySpecification.offset,
-  limit: querySpecification.limit,
 });
 
 const useStore = create((set, get) => ({

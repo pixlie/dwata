@@ -26,7 +26,7 @@ const ColumnHeadSpecification = ({ tableColumnName }) => {
   );
 };
 
-export default ({ tableColumnName, label, index }) => {
+export default ({ tableColumnName, label, tableColor, index }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -51,6 +51,7 @@ export default ({ tableColumnName, label, index }) => {
       attributes={{
         onClick: handleClick,
       }}
+      tableColor={tableColor}
     >
       <Fragment>
         {activeColumnHeadSpecification === tableColumnName ? (

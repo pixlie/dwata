@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from "react";
+import React, { useRef, Fragment } from "react";
 
 import { useGlobal } from "services/store";
 import { Button } from "components/LayoutHelpers";
@@ -57,16 +57,16 @@ export default ({ guideFor }) => {
 
   const Ping = () => (
     <span
-      className="absolute z-50"
+      className="absolute"
       style={{
         top: "2px",
         right: "12px",
       }}
       ref={pingRef}
     >
-      <span className="absolute block animate-ping bg-blue-500 rounded-lg w-4 h-4"></span>
+      <span className="absolute block animate-ping bg-blue-500 rounded-lg w-3 h-3"></span>
       <span
-        className="absolute block bg-blue-500 rounded-lg shadow-lg w-4 h-4 cursor-pointer"
+        className="absolute block bg-blue-500 rounded-lg shadow-lg w-3 h-3 cursor-pointer"
         onClick={handleClick}
       ></span>
     </span>

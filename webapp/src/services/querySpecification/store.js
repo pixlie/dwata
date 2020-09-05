@@ -1,4 +1,5 @@
 import create from "zustand";
+import _ from "lodash";
 
 const initialState = {
   sourceLabel: null,
@@ -13,6 +14,8 @@ const initialState = {
   limit: undefined,
   offset: undefined,
   activeColumnHeadSpecification: null,
+
+  tableColors: {},
 
   isReady: false,
   isFetching: false,
@@ -38,9 +41,45 @@ const saveToLocalStorage = (key, payload) => {
   }
 };
 
+const colors = [
+  "orange",
+  "teal",
+  "pink",
+  "purple",
+  "indigo",
+  "blue",
+  "red",
+  "yellow",
+];
+
+const selectColor = (tableColumnName, existingColors = {}) => {
+  const tableName =
+    tableColumnName.indexOf(".") === -1
+      ? tableColumnName
+      : tableColumnName.split(".")[0];
+
+  if (Object.keys(existingColors).includes(tableName)) {
+    return existingColors;
+  } else {
+    let rc = colors[_.random(0, colors.length - 1)];
+    while (
+      colors.length > Object.keys(existingColors).length &&
+      Object.values(existingColors).includes(rc)
+    ) {
+      rc = colors[_.random(0, colors.length - 1)];
+    }
+    return {
+      ...existingColors,
+      [tableName]: rc,
+    };
+  }
+};
+
 const initiateQuerySpecification = (payload) => ({
   ...initialState,
   ...payload,
+
+  tableColors: selectColor(payload.select[0].tableName),
 
   // We do not set isReady:true implicitly
 });
@@ -195,6 +234,7 @@ const toggleRelatedTable = (inner, label) => {
     return {
       ...inner,
       select: inner.select.filter((x) => x.tableName !== label),
+      tableColors: _.omit(inner.tableColors, [label]),
       fetchNeeded: true,
     };
   } else {
@@ -208,10 +248,42 @@ const toggleRelatedTable = (inner, label) => {
           tableName: label,
         },
       ],
+      tableColors: selectColor(label, inner.tableColors),
       fetchNeeded: true,
     };
   }
 };
+
+const expandTableColumn = (el) => ({
+  label: el,
+  tableName: el.split(".")[0],
+  columnName: el.split(".")[1],
+});
+
+export const querySpecificationObject = (state, payload) => ({
+  ...state,
+  select: payload.select.map((x) => expandTableColumn(x)),
+  columns: payload.columns.map((x) => expandTableColumn(x)),
+  embeddedColumns: payload.embedded.reduce(
+    (acc, x) => [...acc, x.columns.map((xy) => expandTableColumn(xy))],
+    []
+  ),
+  count: payload.count,
+  limit: payload.limit,
+  offset: payload.offset,
+  isReady: true,
+  isFetching: false,
+  fetchNeeded: false,
+});
+
+export const getQuerySpecificationPayload = (querySpecification) => ({
+  select: querySpecification.select.map((x) => x.label),
+  source_label: querySpecification.sourceLabel,
+  order_by: querySpecification.orderBy,
+  filter_by: querySpecification.filterBy,
+  offset: querySpecification.offset,
+  limit: querySpecification.limit,
+});
 
 const useStore = create((set) => ({
   ...loadFromLocalStorage(),

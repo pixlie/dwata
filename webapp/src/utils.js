@@ -21,52 +21,45 @@ export const slugify = (text) =>
     .replace(/^-+/, "") // Trim - from start of text
     .replace(/-+$/, ""); // Trim - from end of text
 
-/*
-export const getItemPartsFromPath = (pathname) => {
-  const match = matchPath(pathname, {
-    path: "/browse/:sourceId/:tableName/:pk",
-    exact: true,
-    strict: false,
-  });
-  if (match !== null && "params" in match) {
-    return match;
-  }
-
-  return null;
-};
-
-export const getCacheKey = (state, savedQuery) => {
-  if (
-    !!state &&
-    state.router &&
-    state.router.location &&
-    state.router.location.pathname
-  ) {
-    const fromPath = getSourceFromPath(state.router.location.pathname);
-    if (fromPath) {
-      const {
-        params: { sourceId, tableName },
-      } = fromPath;
-      return `${sourceId}/${tableName}`;
-    }
-  } else if (!!savedQuery) {
-    const sourceId = savedQuery.source_id;
-    const tableName = savedQuery.table_name;
-    const fromPath = getSourceFromPath(`/browse/${sourceId}/${tableName}`);
-    if (fromPath) {
-      const {
-        params: { sourceId, tableName },
-      } = fromPath;
-      return `${sourceId}/${tableName}`;
-    }
-  }
-  return null;
-};
-
-export const createCacheKeyFromParts = (sourceId, tableName) => {
-  return `${sourceId}/${tableName}`;
-};
-*/
-
 export const QueryContext = React.createContext({});
 QueryContext.displayName = "QueryContext";
+
+export const tableColorWhiteOnMedium = (color) => {
+  if (color === "orange") {
+    return "bg-orange-400";
+  } else if (color === "teal") {
+    return "bg-teal-400";
+  } else if (color === "pink") {
+    return "bg-pink-400";
+  } else if (color === "purple") {
+    return "bg-purple-400";
+  } else if (color === "indigo") {
+    return "bg-indigo-400";
+  } else if (color === "blue") {
+    return "bg-blue-400";
+  } else if (color === "red") {
+    return "bg-red-400";
+  } else if (color === "yellow") {
+    return "bg-yellow-400";
+  }
+};
+
+export const tableColorBlackOnLight = (color) => {
+  if (color === "orange") {
+    return "bg-orange-200";
+  } else if (color === "teal") {
+    return "bg-teal-200";
+  } else if (color === "pink") {
+    return "bg-pink-200";
+  } else if (color === "purple") {
+    return "bg-purple-200";
+  } else if (color === "indigo") {
+    return "bg-indigo-200";
+  } else if (color === "blue") {
+    return "bg-blue-200";
+  } else if (color === "red") {
+    return "bg-red-200";
+  } else if (color === "yellow") {
+    return "bg-yellow-200";
+  }
+};

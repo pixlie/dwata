@@ -1,6 +1,6 @@
 import React, { Fragment, useContext, useState } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { Hx } from "components/LayoutHelpers";
@@ -29,6 +29,7 @@ export default () => {
   const currentTable = state.userSelectedTableName
     ? selectedTables.find((x) => x.table_name === state.userSelectedTableName)
     : selectedTables[0];
+  const tableColors = querySpecification.tableColors;
 
   const addFilter = (event) => {
     event.preventDefault();
@@ -40,14 +41,13 @@ export default () => {
     initiateFilter(queryContext.key, value, dataType);
   };
 
-  const handleTableSelect = (event) => {
-    const { value } = event.target;
-    setState({
-      userSelectedTableName: value,
-    });
-  };
+  const TableItem = ({ tableName }) => {
+    const handleTableSelect = () => {
+      setState({
+        userSelectedTableName: tableName,
+      });
+    };
 
-  const PerTable = () => {
     const handleRemoveFilter = (name) => (event) => {
       event.preventDefault();
       if (name in filterBy) {
@@ -58,7 +58,7 @@ export default () => {
     const filters = [];
     if (Object.keys(filterBy).length > 0) {
       filters.push(
-        <p className="tip" key="fl-rm-hd">
+        <p className="text-sm px-4 text-gray-700" key="fl-rm-hd">
           Double click column name to remove filter
         </p>
       );
@@ -68,9 +68,9 @@ export default () => {
       const [tn, cn] = columnName.split(".");
 
       filters.push(
-        <div key={`fl-${columnName}`} className="my-2">
+        <div key={`fl-${columnName}`} className="my-2 ml-6">
           <label
-            className="font-bold mr-2"
+            className="text-sm mr-2"
             onDoubleClick={handleRemoveFilter(columnName)}
           >
             {cn}
@@ -98,17 +98,36 @@ export default () => {
     }
 
     return (
-      <Fragment>
-        {filters}
-
-        <select
-          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-          onChange={addFilter}
-          value="---"
+      <div className="bg-gray-100 mb-2">
+        <div
+          key={`opt-${tableName}`}
+          className={`w-full px-2 ${tableColorWhiteOnMedium(
+            tableColors[tableName]
+          )} cursor-pointer rounded rounded-b-none`}
+          onClick={handleTableSelect}
         >
-          {filterByOptions}
-        </select>
-      </Fragment>
+          <span className="text-lg text-white ml-2 mr-3">
+            <i className="fas fa-table" />
+          </span>
+          <span className="inline-block font-bold text-white">{tableName}</span>
+        </div>
+
+        {currentTable.table_name === tableName ? (
+          <Fragment>
+            {filters}
+
+            <div className="mx-6 my-2">
+              <select
+                className="w-full pl-1 py-1 mb-2 bg-white border rounded"
+                onChange={addFilter}
+                value="---"
+              >
+                {filterByOptions}
+              </select>
+            </div>
+          </Fragment>
+        ) : null}
+      </div>
     );
   };
 
@@ -119,28 +138,14 @@ export default () => {
     >
       <Hx x="4">Filters</Hx>
 
-      <p className="text-gray-700 my-2">
-        You can filter by any column, even the ones that are not visible.
+      <p className="text-sm text-gray-700 my-2 max-w-xs">
+        You can filter by any column, even the ones that are not visible in the
+        grid.
       </p>
 
-      {selectedTables.length > 1 ? (
-        <select
-          className="w-full pl-4 py-2 mb-2 bg-white border rounded font-bold text-lg shadow-md"
-          onChange={handleTableSelect}
-        >
-          {selectedTables.map((x) => (
-            <option
-              key={`opt-${x.table_name}`}
-              className="py-2 bg-white font-bold"
-              value={x.table_name}
-            >
-              {x.table_name}
-            </option>
-          ))}
-        </select>
-      ) : null}
-
-      <PerTable />
+      {selectedTables.map((x) => (
+        <TableItem key={`fl-tbl-${x.table_name}`} tableName={x.table_name} />
+      ))}
     </div>
   );
 };

@@ -15,7 +15,9 @@ export default (schema, tableColumns, selectedColumLabels) => {
   };
 
   const DefaultCell = ({ data }) => <td>{data}</td>;
-  const PrimaryKeyCell = ({ data }) => <th>{data}</th>;
+  const PrimaryKeyCell = ({ data }) => (
+    <th className="text-gray-600">{data}</th>
+  );
   const BooleanCell = ({ data }) => (
     <td>
       {data === true || data === false ? (
