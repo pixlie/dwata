@@ -96,7 +96,7 @@ export default () => {
     >
       <Hx x="4">Columns</Hx>
 
-      <p className="text-sm text-gray-700 my-2 max-w-sm">
+      <p className="text-sm text-gray-700 my-2 max-w-xs">
         Please select the columns you want to see in the grid.
       </p>
 

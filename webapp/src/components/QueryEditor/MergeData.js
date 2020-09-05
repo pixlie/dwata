@@ -1,6 +1,6 @@
 import React, { Fragment, useContext } from "react";
 
-import { QueryContext } from "utils";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 
@@ -18,6 +18,7 @@ export default () => {
   ];
   const startingTableName = querySpecification.select[0].tableName;
   const addedTableNames = [startingTableName];
+  const tableColors = querySpecification.tableColors;
 
   const RelatedItem = ({ tableName, innerRelated }) => {
     if (tableName === undefined || innerRelated === undefined) {
@@ -28,51 +29,59 @@ export default () => {
       toggleRelatedTable(queryContext.key, tableName);
     };
 
-    if (innerRelated.length > 0) {
-      return (
-        <div className="bg-gray-200 border mx-2">
-          <label className="block font-bold text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300">
-            <input
-              type="checkbox"
-              name={tableName}
-              checked={selectedTableNames.includes(tableName)}
-              onChange={handleClick}
-              className="mr-1"
-            />
-            {tableName}
-          </label>
+    return (
+      <div
+        className={`max-w-xs mr-4 ${
+          innerRelated.length > 0 ? "bg-gray-100 pb-4" : ""
+        }`}
+      >
+        <label
+          className={`block px-2 font-bold cursor-pointer rounded
+            ${
+              selectedTableNames.includes(tableName)
+                ? `${tableColorWhiteOnMedium(
+                    tableColors[tableName]
+                  )} text-white`
+                : "bg-gray-100 text-gray-600"
+            }
+            ${innerRelated.length > 0 ? " rounded-b-none" : ""}`}
+        >
+          <span
+            className={`text-lg ml-2 mr-3 ${
+              selectedTableNames.includes(tableName)
+                ? "text-white"
+                : "text-gray-600"
+            }`}
+          >
+            <i className="fas fa-table" />
+          </span>
+          <input
+            type="checkbox"
+            name={tableName}
+            checked={selectedTableNames.includes(tableName)}
+            onChange={handleClick}
+            className="mr-1"
+          />
+          {tableName}
+        </label>
 
-          <p className="px-2 mb-4 text-gray-600 text-sm max-w-xs">
-            For each record of <strong>{tableName}</strong> there may be more
-            than one record of any of the following.
+        {innerRelated.length > 0 ? (
+          <p className="mx-2 my-4 text-gray-600 text-sm">
+            Each record of <strong>{tableName}</strong> may have more than one
+            record of any of the following.
           </p>
-          <div className="pl-6">
-            {innerRelated.map((x) => (
-              <RelatedItem
-                key={`tb-rl-${x.tableName}`}
-                tableName={x.tableName}
-                innerRelated={x.innerRelated}
-              />
-            ))}
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <label className="block font-bold bg-gray-200 text-gray-700 py-1 px-2 mb-1 hover:bg-gray-300 w-64">
-            <input
-              type="checkbox"
-              name={tableName}
-              checked={selectedTableNames.includes(tableName)}
-              onChange={handleClick}
-              className="mr-1"
+        ) : null}
+        <div className="ml-6">
+          {innerRelated.map((x) => (
+            <RelatedItem
+              key={`tb-rl-${x.tableName}`}
+              tableName={x.tableName}
+              innerRelated={x.innerRelated}
             />
-            {tableName}
-          </label>
+          ))}
         </div>
-      );
-    }
+      </div>
+    );
   };
 
   const addRelatedItem = (tableName, level) => {

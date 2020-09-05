@@ -138,7 +138,7 @@ export default () => {
     >
       <Hx x="4">Filters</Hx>
 
-      <p className="text-sm text-gray-700 my-2 max-w-sm">
+      <p className="text-sm text-gray-700 my-2 max-w-xs">
         You can filter by any column, even the ones that are not visible in the
         grid.
       </p>
