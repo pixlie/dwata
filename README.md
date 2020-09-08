@@ -14,6 +14,25 @@
 - Directly integrates with Stripe, Mailchimp, PayPal, Shippo, etc.
 - Build live Reports and Dashboards for customers/suppliers
 
+## Automatically infer (reflect) Database structure
+![Automatically infer Database structure](docs/assets/Screencast_DB_Reflect/DB_Reflect.gif?raw=true "Inferring Database structure")
+**Uses DB Reflection from SQLAlchemy**
+
+## Modern User Experience
+![Grid showing columns](docs/assets/Grid_view_v4.png?raw=true "Grid showing columns")
+**Show JOINed tables in a nice way**
+
+## Multi-table merge (1-1, 1-M Relations)
+![Merge related data](docs/assets/Grid_Merge_view_v4.png?raw=true "Merge related data")
+**There is not SQL to write, everything is visual!**
+
+## Automatically generates SQL
+### JOIN, Sub-query, Grouping, Aggregates, etc.
+![Generates SQL for JOIN or Sub-query](docs/assets/Generated_SQL_v4.png?raw=true "Generates SQL for JOIN or Sub-query")
+
+## Rich set of UI Elements
+![Boolean and large text fields](docs/assets/Detail_view_v4.png?raw=true "Boolean and large text fields")
+
 ## Why would you use dwata?
 
 - Created with Sales, Marketing, Analyst or any non-Developer in mind
@@ -28,20 +47,12 @@
 - dwata scans MySQL/PostgreSQL/SQLite or MongoDB (coming soon)
 - **Automatically understands** data schema - Tables, Columns, Relations
 - Builds dynamic UI automatically with Grids, Widgets, Column view, etc.
-
-![Grid showing columns](docs/assets/Grid_view_v4.png?raw=true "Grid showing columns")
-
 - Visually allows you to **Merge** related data, generates SQL for you!
-
-![Merge related data](docs/assets/Grid_Merge_view_v4.png?raw=true "Merge related data")
-
 - Visually apply Aggregates, Averages, Grouping and many other functions (coming soon)
 - Can connect directly with Stripe, PayPal, Mailchimp, etc. (coming soon)
-- Has Widgets for everything from Numbers, Booleans, Large text, Dates, Geographic data...
-
-![Boolean and large text fields](docs/assets/Detail_view_v4.png?raw=true "Boolean and large text fields")
-
-- Full search for across all of your data sources (coming soon)
+- Has Widgets for everything from Numbers, Booleans, Large text
+- Dates, Timestamps, Geographic data (with Maps) coming soon
+- Full text search coming soon
 - Internal cache so Queries are not repeated unnecessarily
 
 **dwata is in early development stage.**
