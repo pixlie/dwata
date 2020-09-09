@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react";
 
 import { Section, Hx } from "components/LayoutHelpers";
 import SignupEarlyAccess from "components/SignupEarlyAccess";
-import RelatedAndFiltersTour1 from "assets/Product_Tour/Related_and_Filters_Tour_1.png";
+import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v4_Header_Search.gif";
 import RelatedAndFiltersTour2 from "assets/Product_Tour/Related_and_Filters_Tour_2.png";
 import RelatedAndFiltersTour3 from "assets/Product_Tour/Related_and_Filters_Tour_3.png";
 import RelatedAndFiltersTour5 from "assets/Product_Tour/Related_and_Filters_Tour_5.png";
@@ -15,18 +15,20 @@ export default () => {
   return (
     <Fragment>
       <Section extraClasses="bg-white">
-        <div className="max-w-screen-lg md:py-24 mx-2 md:mx-auto">
+        <div className="max-w-screen-lg md:py-12 mx-2 md:mx-auto">
           <Hx x="1">Manage Databases without knowing SQL</Hx>
           <p className="text-3xl">
-            <strong>dwata</strong> enables you to understand and manage Business
-            data without knowing SQL or code.
+            <strong>dwata</strong> has an easy to use interface that is familiar
+            like Spreadsheets. Even for complex related data,{" "}
+            <strong>dwata</strong> takes care of all the SQL/code so you do not
+            have to.
           </p>
         </div>
       </Section>
 
       <div className="bg-indigo-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Easy to use &amp; automatic interface for Databases</Hx>
+          <Hx x="3">Easy to use and automatic interface for Databases</Hx>
           <p className="my-4 p-4 bg-red-200 rounded-lg text-lg font-bold">
             <strong>dwata</strong> finds out all tables, columns and relations
             and gives you a Spreadsheet like GUI, no code needed
