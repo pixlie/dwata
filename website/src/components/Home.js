@@ -4,7 +4,7 @@ import { Section, Hx } from "components/LayoutHelpers";
 import SignupEarlyAccess from "components/SignupEarlyAccess";
 import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v4_Header_Search.gif";
 import RelatedAndFiltersTour2 from "assets/Product_Tour/Product_tour_v4_Merge.gif";
-import RelatedAndFiltersTour3 from "assets/Product_Tour/Related_and_Filters_Tour_3.png";
+import RelatedAndFiltersTour3 from "assets/Product_Tour/Product_tour_v4_Merge_Columns.gif";
 import RelatedAndFiltersTour5 from "assets/Product_Tour/Related_and_Filters_Tour_5.png";
 
 export default () => {
