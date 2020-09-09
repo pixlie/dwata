@@ -57,7 +57,7 @@ export default () => {
             className="inline-block text-md px-3 py-1 rounded bg-blue-500 text-white font-bold hover:bg-blue-800 mr-6"
             href="https://demo.dwata.com"
           >
-            <strong>Try the demo!</strong>
+            <strong>Try now!</strong>
           </a>
         </div>
       </div>

@@ -18,10 +18,19 @@ export default () => {
         <div className="max-w-screen-lg md:py-12 mx-2 md:mx-auto">
           <Hx x="1">Manage Databases without knowing SQL</Hx>
           <p className="text-3xl">
-            <strong>dwata</strong> has an easy to use interface that is familiar
-            like Spreadsheets. Even for complex related data,{" "}
-            <strong>dwata</strong> takes care of all the SQL/code so you do not
-            have to.
+            <strong>dwata</strong> has an easy to use, Spreadsheet like
+            interface that is familiar to anyone. Even for complex related data,{" "}
+            <strong>dwata</strong> takes care of all the SQL/code so you don't
+            have to, even for complex queries.
+          </p>
+
+          <p className="my-4">
+            <a
+              className="inline-block text-md px-3 py-1 rounded bg-blue-500 text-white font-bold text-2xl hover:bg-blue-800 mr-6"
+              href="https://demo.dwata.com"
+            >
+              <strong>Try the demo!</strong>
+            </a>
           </p>
         </div>
       </Section>
@@ -29,7 +38,7 @@ export default () => {
       <div className="bg-indigo-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
           <Hx x="3">Easy to use and automatic interface for Databases</Hx>
-          <p className="my-4 p-4 bg-red-200 rounded-lg text-lg font-bold">
+          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
             <strong>dwata</strong> finds out all tables, columns and relations
             and gives you a Spreadsheet like GUI, no code needed
           </p>
@@ -51,7 +60,7 @@ export default () => {
       <div className="bg-purple-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
           <Hx x="3">View related Tables, just by checking the box</Hx>
-          <p className="my-4 p-4 bg-orange-200 rounded-lg text-lg font-bold">
+          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
             You can merge data from multiple tables{" "}
             <span className="bg-orange-300 px-1">without knowing SQL</span>.
             Also for Grouping, Aggregate, Pivots, etc.
@@ -85,7 +94,7 @@ export default () => {
       <div className="bg-orange-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
           <Hx x="3">Easily work with deeply related data</Hx>
-          <p className="my-4 p-4 bg-red-200 rounded-lg text-lg font-bold">
+          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
             <strong>dwata</strong> manages the SQL for Tables/Columns, including
             Filters, JOINs and sub-queries
           </p>
@@ -116,7 +125,7 @@ export default () => {
       <div className="bg-purple-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
           <Hx x="3">Integers or Dates? dwata handles for you</Hx>
-          <p className="my-4 p-4 bg-orange-200 rounded-lg text-lg font-bold">
+          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
             <strong>dwata</strong> supports Boolean, Integer, Date/Time,
             Geolocation, etc. so you can focus on Business insights
           </p>
