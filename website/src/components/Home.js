@@ -26,10 +26,10 @@ export default () => {
 
       <div className="bg-indigo-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Familiar UX for Databases, no SQL needed</Hx>
+          <Hx x="3">Easy to use &amp; automatic interface for Databases</Hx>
           <p className="my-4 p-4 bg-red-200 rounded-lg text-lg font-bold">
-            <strong>dwata</strong> finds out all tables, their columns and
-            relations, and gives you a Spreadsheet like UX
+            <strong>dwata</strong> finds out all tables, columns and relations
+            and gives you a Spreadsheet like GUI, no code needed
           </p>
         </div>
         <div
@@ -48,10 +48,10 @@ export default () => {
 
       <div className="bg-purple-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Merge multiple Tables, just by checking the box</Hx>
+          <Hx x="3">View related Tables, just by checking the box</Hx>
           <p className="my-4 p-4 bg-orange-200 rounded-lg text-lg font-bold">
-            The SQL is generated for you, including JOIN, sub-query, Grouping,
-            Aggregate
+            You can merge data from multiple tables without knowing SQL. Also
+            for Grouping, Aggregate, Pivots, etc.
           </p>
         </div>
         <div
@@ -81,10 +81,10 @@ export default () => {
 
       <div className="bg-orange-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Columns selection even with Merged data</Hx>
+          <Hx x="3">Easily work with deeply related data</Hx>
           <p className="my-4 p-4 bg-red-200 rounded-lg text-lg font-bold">
-            <strong>dwata</strong> generates new SQL as soon as you change
-            Columns/Filters, including JOINs and sub-queries
+            <strong>dwata</strong> manages the SQL for Tables/Columns, including
+            Filters, JOINs and sub-queries
           </p>
         </div>
         <div
@@ -112,10 +112,10 @@ export default () => {
 
       <div className="bg-purple-100 py-24">
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Easily Filter with data-type aware widgets</Hx>
+          <Hx x="3">Integers or Dates? dwata handles for you</Hx>
           <p className="my-4 p-4 bg-orange-200 rounded-lg text-lg font-bold">
-            <strong>dwata</strong> supports Boolean, Integer, Date/Time, etc.
-            Geolocation, JSON types are coming soon
+            <strong>dwata</strong> supports Boolean, Integer, Date/Time,
+            Geolocation, etc. so you can focus on Business insights
           </p>
         </div>
         <div
