@@ -3,7 +3,7 @@ import React, { Fragment, useEffect } from "react";
 import { Section, Hx } from "components/LayoutHelpers";
 import SignupEarlyAccess from "components/SignupEarlyAccess";
 import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v4_Header_Search.gif";
-import RelatedAndFiltersTour2 from "assets/Product_Tour/Related_and_Filters_Tour_2.png";
+import RelatedAndFiltersTour2 from "assets/Product_Tour/Product_tour_v4_Merge.gif";
 import RelatedAndFiltersTour3 from "assets/Product_Tour/Related_and_Filters_Tour_3.png";
 import RelatedAndFiltersTour5 from "assets/Product_Tour/Related_and_Filters_Tour_5.png";
 
@@ -52,8 +52,9 @@ export default () => {
         <div className="mx-auto" style={{ maxWidth: "1100px" }}>
           <Hx x="3">View related Tables, just by checking the box</Hx>
           <p className="my-4 p-4 bg-orange-200 rounded-lg text-lg font-bold">
-            You can merge data from multiple tables without knowing SQL. Also
-            for Grouping, Aggregate, Pivots, etc.
+            You can merge data from multiple tables{" "}
+            <span className="bg-orange-300 px-1">without knowing SQL</span>.
+            Also for Grouping, Aggregate, Pivots, etc.
           </p>
         </div>
         <div
