@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect } from "react";
 
-import { Section, Hx } from "components/LayoutHelpers";
+import { FeatureImageBox, Hero, Hx } from "components/LayoutHelpers";
 import SignupEarlyAccess from "components/SignupEarlyAccess";
 import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v4_Header_Search.gif";
 import RelatedAndFiltersTour2 from "assets/Product_Tour/Product_tour_v4_Merge.gif";
@@ -14,69 +14,58 @@ export default () => {
 
   return (
     <Fragment>
-      <Section extraClasses="bg-white">
-        <div className="max-w-screen-lg md:py-12 mx-2 md:mx-auto">
-          <Hx x="1">Manage Databases without knowing SQL</Hx>
-          <p className="text-3xl">
+      <Hero extraClasses="bg-white">
+        <Fragment>
+          <Hx x="1">
+            Manage Databases
+            <br /> without knowing SQL
+          </Hx>
+          <p className="max-w-screen-md text-3xl">
             <strong>dwata</strong> has an easy to use, Spreadsheet like
             interface that is familiar to anyone. Even for complex related data,{" "}
             <strong>dwata</strong> takes care of all the SQL/code so you don't
             have to, even for complex queries.
           </p>
 
-          <p className="my-4">
+          <p className="my-8">
             <a
-              className="inline-block text-md px-3 py-1 rounded bg-blue-500 text-white font-bold text-2xl hover:bg-blue-800 mr-6"
+              className="py-3 px-8 text-white font-bold text-2xl rounded shadow-md bg-blue-500 hover:bg-blue-800"
               href="https://demo.dwata.com"
             >
-              <strong>Try the demo!</strong>
+              Try the demo!
             </a>
           </p>
-        </div>
-      </Section>
+        </Fragment>
+      </Hero>
 
-      <div className="bg-indigo-100 py-24">
-        <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Easy to use and automatic interface for Databases</Hx>
-          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
+      <FeatureImageBox
+        extraClasses="bg-indigo-100"
+        heading="Easy to use and automatic interface for Databases"
+        subHeading={
+          <Fragment>
             <strong>dwata</strong> finds out all tables, columns and relations
             and gives you a Spreadsheet like GUI, no code needed
-          </p>
-        </div>
-        <div
-          className="mx-auto rounded-lg border-4"
-          style={{ maxHeight: "600px", maxWidth: "1100px", overflow: "hidden" }}
-        >
-          <img
-            className="w-full"
-            src={RelatedAndFiltersTour1}
-            alt="Screenshot of a grid for a table"
-          />
-        </div>
-      </div>
+          </Fragment>
+        }
+        imageSrc={RelatedAndFiltersTour1}
+        imageAlt="Screenshot of a grid for a table"
+      />
 
       <SignupEarlyAccess />
 
-      <div className="bg-purple-100 py-24">
-        <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">View related Tables, just by checking the box</Hx>
-          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
+      <FeatureImageBox
+        extraClasses="bg-purple-100"
+        heading="View related Tables, just by checking the box"
+        subHeading={
+          <Fragment>
             You can merge data from multiple tables{" "}
             <span className="bg-orange-300 px-1">without knowing SQL</span>.
             Also for Grouping, Aggregate, Pivots, etc.
-          </p>
-        </div>
-        <div
-          className="mx-auto rounded-lg border-4"
-          style={{ maxHeight: "600px", maxWidth: "1100px", overflow: "hidden" }}
-        >
-          <img
-            className="w-full"
-            src={RelatedAndFiltersTour2}
-            alt="Screenshot of two tables merged in a grid"
-          />
-        </div>
-      </div>
+          </Fragment>
+        }
+        imageSrc={RelatedAndFiltersTour2}
+        imageAlt="Screenshot of two tables merged in a grid"
+      />
 
       {/* <div className="bg-yellow-400 py-1 px-2 inline-block rounded">Signup to get early access!</div> */}
 
@@ -91,25 +80,18 @@ export default () => {
         </div>
       </div>
 
-      <div className="bg-orange-100 py-24">
-        <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Easily work with deeply related data</Hx>
-          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
+      <FeatureImageBox
+        extraClasses="bg-orange-100"
+        heading="Easily work with deeply related data"
+        subHeading={
+          <Fragment>
             <strong>dwata</strong> manages the SQL for Tables/Columns, including
             Filters, JOINs and sub-queries
-          </p>
-        </div>
-        <div
-          className="mx-auto rounded-lg border-4"
-          style={{ maxHeight: "600px", maxWidth: "1100px", overflow: "hidden" }}
-        >
-          <img
-            className="w-full"
-            src={RelatedAndFiltersTour3}
-            alt="Screenshot of funnels to understand user behaviour"
-          />
-        </div>
-      </div>
+          </Fragment>
+        }
+        imageSrc={RelatedAndFiltersTour3}
+        imageAlt="Screenshot of funnels to understand user behaviour"
+      />
 
       <div className="mx-auto max-w-xl p-6 border-4 rounded-lg my-32">
         <Hx x="4">Are you a Developer?</Hx>
@@ -122,25 +104,18 @@ export default () => {
         </div>
       </div>
 
-      <div className="bg-purple-100 py-24">
-        <div className="mx-auto" style={{ maxWidth: "1100px" }}>
-          <Hx x="3">Integers or Dates? dwata handles for you</Hx>
-          <p className="my-4 p-3 bg-white border-2 rounded-lg text-lg text-gray-700 font-bold">
+      <FeatureImageBox
+        extraClasses="bg-purple-100"
+        heading="Integers or Dates? dwata handles for you"
+        subHeading={
+          <Fragment>
             <strong>dwata</strong> supports Boolean, Integer, Date/Time,
             Geolocation, etc. so you can focus on Business insights
-          </p>
-        </div>
-        <div
-          className="mx-auto rounded-lg border-4"
-          style={{ maxHeight: "600px", maxWidth: "1100px", overflow: "hidden" }}
-        >
-          <img
-            className="w-full"
-            src={RelatedAndFiltersTour5}
-            alt="Screenshot of funnels to understand user behaviour"
-          />
-        </div>
-      </div>
+          </Fragment>
+        }
+        imageSrc={RelatedAndFiltersTour5}
+        imageAlt="Screenshot of funnels to understand user behaviour"
+      />
     </Fragment>
   );
 };

@@ -1,19 +1,19 @@
 import React from "react";
 
-import { Section, Hx } from "components/LayoutHelpers";
+import { Hero, Hx } from "components/LayoutHelpers";
 
 export default () => (
-  <Section extraClasses="bg-white">
+  <Hero>
     <div id="Get_Early_Access" />
 
-    <div className="max-w-screen-lg mx-2 md:mx-auto">
-      <Hx x="2">Subscribe and get early access!</Hx>
+    <div className="max-w-screen-lg">
+      <Hx x="3">Subscribe and get early access!</Hx>
       <p className="text-xl my-2">
         <strong>dwata</strong> is developed actively and we are looking to pilot
         with startups/businesses.
       </p>
       {/* Begin Mailchimp Signup Form */}
-      <div className="rounded-lg bg-gray-200 p-4">
+      <div className="rounded-lg bg-gray-200 px-3 py-2">
         <form
           action="https://dwata.us8.list-manage.com/subscribe/post?u=637faf509a5896debdab58eda&amp;id=d781c5751b"
           method="post"
@@ -29,7 +29,7 @@ export default () => (
                 Subscribe to our newsletter
               </label>
               <input
-                className="my-2 text-2xl border rounded py-2 px-4"
+                className="inline-block my-2 text-xl border rounded py-2 px-4"
                 type="email"
                 name="EMAIL"
                 id="mce-EMAIL"
@@ -41,7 +41,7 @@ export default () => (
                 value="Subscribe"
                 name="subscribe"
                 id="mc-embedded-subscribe"
-                className="text-2xl bg-blue-500 text-white font-bold hover:bg-blue-800 rounded border rounded ml-6 py-2 px-12"
+                className="text-xl text-white font-bold bg-blue-500 hover:bg-blue-800 rounded border ml-6 py-2 px-12"
               />
             </div>
             {/* real people should not fill this in and expect good things - do not remove this or risk form bot signups */}
@@ -60,5 +60,5 @@ export default () => (
       </div>
       {/* End mc_embed_signup */}
     </div>
-  </Section>
+  </Hero>
 );

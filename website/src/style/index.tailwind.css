@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@460;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
 @import url("https://cdn-images.mailchimp.com/embedcode/slim-10_7.css");
 
 html {
@@ -13,7 +13,8 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  font-family: Quicksand, sans-serif;
+  font-family: Montserrat, sans-serif;
+  letter-spacing: -0.05rem;
   font-weight: 460;
   color: #333333;
 }
@@ -32,12 +33,10 @@ h3.subtitle,
 h4.subtitle,
 h5.subtitle,
 h6.subtitle {
-  font-family: Quicksand, sans-serif;
   font-weight: 400;
 }
 h1 {
   margin: 1rem 0 2.125rem;
-  letter-spacing: -0.1rem;
 }
 h2 {
   margin: 1.05rem 0 1.75rem;
