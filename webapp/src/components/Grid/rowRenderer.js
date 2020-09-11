@@ -13,10 +13,13 @@ export default (schema, tableColumns, selectedColumLabels) => {
     second: "numeric",
     hour12: false,
   };
+  const contentTextSize = "text-sm";
 
-  const DefaultCell = ({ data }) => <td>{data}</td>;
+  const DefaultCell = ({ data }) => (
+    <td className={`p-1 ${contentTextSize}`}>{data}</td>
+  );
   const PrimaryKeyCell = ({ data }) => (
-    <th className="text-gray-600">{data}</th>
+    <th className={`p-1 ${contentTextSize} text-gray-600`}>{data}</th>
   );
   const BooleanCell = ({ data }) => (
     <td>
@@ -67,7 +70,7 @@ export default (schema, tableColumns, selectedColumLabels) => {
       return (
         <td>
           <span
-            className="max-w-sm overflow-hidden h-12 inline-block"
+            className={`inline-block max-w-sm h-12 p-1 ${contentTextSize} overflow-hidden`}
             onClick={handleClick}
           >
             {data}
@@ -75,7 +78,7 @@ export default (schema, tableColumns, selectedColumLabels) => {
         </td>
       );
     } else {
-      return <td>{data}</td>;
+      return <td className={`p-1 ${contentTextSize}`}>{data}</td>;
     }
   };
 

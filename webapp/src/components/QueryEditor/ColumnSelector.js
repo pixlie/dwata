@@ -37,20 +37,24 @@ export default () => {
     const checked = selectedColumLabels.includes(columnLabel);
 
     return (
-      <label
-        className={`block font-display font-medium text-sm py-1 px-2 ml-6 hover:bg-gray-200 ${
-          checked ? "text-gray-700" : "text-gray-500"
-        }`}
-      >
+      <div>
         <input
+          className="inline-block ml-4"
           type="checkbox"
           name={columnLabel}
           checked={checked}
           onChange={handleClick}
-          className="mr-1"
+          id={`col-sl-${tableName}.${column.name}`}
         />
-        {column.name}
-      </label>
+        <label
+          className={`inline-block font-display font-medium text-sm leading-loose ml-4 ${
+            checked ? "text-gray-700" : "text-gray-500"
+          }`}
+          htmlFor={`col-sl-${tableName}.${column.name}`}
+        >
+          {column.name}
+        </label>
+      </div>
     );
   };
 
@@ -62,12 +66,12 @@ export default () => {
     };
 
     return (
-      <div className="bg-gray-100 mb-2">
+      <div>
         <div
           key={`opt-${tableName}`}
           className={`w-full px-2 ${tableColorWhiteOnMedium(
             tableColors[tableName]
-          )} cursor-pointer rounded rounded-b-none`}
+          )} cursor-pointer`}
           onClick={handleTableSelect}
         >
           <span className="text-lg text-white ml-2 mr-3">
@@ -91,15 +95,9 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded p-4 shadow-md"
+      className="fixed bg-white border rounded shadow-md w-64"
       style={{ top: "4rem", right: "1rem" }}
     >
-      <Hx x="4">Columns</Hx>
-
-      <p className="text-sm text-gray-700 my-2 max-w-xs">
-        Please select the columns you want to see in the grid.
-      </p>
-
       {selectedTables.map((x) => (
         <TableItem key={`col-tbl-${x.table_name}`} tableName={x.table_name} />
       ))}
