@@ -19,13 +19,16 @@ class Select(object):
     merge_one_to_many = False
     default_per_page = 25
     is_root = False
-    parent_select = None
-    parent_join = None
-    select_root_table_name = None
+    select_root_table_name = None  # This is the starting table of any Select, including embedded ones
+
     tables_and_columns = None
     requested_tables_in_order = None
     pending_joins = None
-    embedded_selects = None
+
+    embedded_selects = None  # The list of embedded Select(s) that the current Select has
+    embedded_tables = None  # The list of table names in the embedded Select(s)
+    parent_select = None
+    parent_join = None
 
     def __init__(self, qb, table_name=None, parent_select=None, parent_join=None):
         self.qb = qb
@@ -37,10 +40,12 @@ class Select(object):
             self.is_root = False
             self.select_root_table_name = table_name
             self.tables_and_columns = {}
+            self.embedded_tables = []
             self.parent_join = parent_join
         else:
             self.is_root = True
             self.tables_and_columns = {}
+            self.embedded_tables = []
             table_column = qb.query_specification["select"][0]
             if "." in table_column:
                 (self.select_root_table_name, _) = table_column.split(".")
@@ -201,6 +206,7 @@ class Select(object):
                                 "parent": getattr(dm.tables[x.column.table.name].c, x.column.name)
                             }
                         ))
+                        self.embedded_tables.append(table_name)
                         embedded_select = True
                         break
             if embedded_select:
@@ -298,9 +304,14 @@ class Select(object):
             else:
                 table_name = table_column
                 column_name = "__auto__"
-            if not self.is_root and table_name in self.parent_select.tables_and_columns:
-                # We are not a root Select and we will not select tables that have already been selected
-                continue
+            if not self.is_root and table_name != self.select_root_table_name:
+                # We are not a root Select
+                if table_name in self.parent_select.tables_and_columns:
+                    # This table has already been selected in parent, so we will ignore it
+                    continue
+                if table_name in self.parent_select.embedded_tables:
+                    # This table has already been embedded in parent, so we will ignore it
+                    continue
 
             if table_name in self.tables_and_columns:
                 # We have encountered this table in this request already, let's just handle the column
