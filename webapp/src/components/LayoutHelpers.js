@@ -67,7 +67,7 @@ export const Button = ({
   attributes,
   children,
 }) => {
-  let classes = `inline-block font-display font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
+  let classes = `inline-block text-sm font-display font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
       classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
@@ -137,7 +137,7 @@ export const ColumnHead = ({
   children,
 }) => {
   let classes =
-    "label inline-block px-2 rounded font-display font-medium text-sm leading-relaxed cursor-pointer text-gray-700 hover:text-gray-900";
+    "inline-block font-display font-medium text-sm leading-relaxed text-gray-700 hover:text-gray-900 px-2 shadow rounded cursor-pointer";
   classes = classes + ` ${tableColorBlackOnLight(tableColor)}`;
   if (order) {
     if (order === "asc") {
@@ -148,7 +148,7 @@ export const ColumnHead = ({
   }
 
   return (
-    <th className="mb-4 text-left">
+    <th className="border border-gray-400 px-2 py-1 text-left">
       <span className={classes} {...attributes}>
         {label}
       </span>

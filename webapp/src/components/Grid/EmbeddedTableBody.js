@@ -64,7 +64,7 @@ export default () => {
   );
 
   const Row = ({ row, index }) => {
-    const classes = "border-b hover:bg-gray-100";
+    const classes = "hover:bg-gray-100";
 
     return (
       <tr className={classes}>

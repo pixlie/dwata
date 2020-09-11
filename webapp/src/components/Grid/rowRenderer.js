@@ -14,15 +14,20 @@ export default (schema, tableColumns, selectedColumLabels) => {
     hour12: false,
   };
   const contentTextSize = "text-sm";
+  const borderClasses = "border border-gray-300";
 
   const DefaultCell = ({ data }) => (
-    <td className={`p-1 ${contentTextSize}`}>{data}</td>
+    <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>{data}</td>
   );
   const PrimaryKeyCell = ({ data }) => (
-    <th className={`p-1 ${contentTextSize} text-gray-600`}>{data}</th>
+    <th
+      className={`px-2 py-1 ${borderClasses} ${contentTextSize} text-gray-600`}
+    >
+      {data}
+    </th>
   );
   const BooleanCell = ({ data }) => (
-    <td>
+    <td className={`px-2 py-1 ${borderClasses}`}>
       {data === true || data === false ? (
         <Fragment>
           {data === true ? (
@@ -68,9 +73,9 @@ export default (schema, tableColumns, selectedColumLabels) => {
 
     if (data && data.length > maxLengthToShow) {
       return (
-        <td>
+        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
           <span
-            className={`inline-block max-w-sm h-12 p-1 ${contentTextSize} overflow-hidden`}
+            className={`inline-block max-w-sm h-12 overflow-hidden`}
             onClick={handleClick}
           >
             {data}
@@ -78,7 +83,11 @@ export default (schema, tableColumns, selectedColumLabels) => {
         </td>
       );
     } else {
-      return <td className={`p-1 ${contentTextSize}`}>{data}</td>;
+      return (
+        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
+          {data}
+        </td>
+      );
     }
   };
 

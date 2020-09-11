@@ -27,7 +27,7 @@ const GridHead = ({ querySpecification }) => {
   const tableColors = querySpecification.tableColors;
 
   return (
-    <div className={`p-2 pl-6 bg-gray-100 border-gray-300 border-b`}>
+    <div className={`p-2 pl-6 border-gray-300 border-b`}>
       <Hx x="3">
         Showing:{" "}
         {mainTableNames.map((x) => (
@@ -80,7 +80,7 @@ export default () => {
       <Fragment>
         <GridHead querySpecification={querySpecification} />
         <div>
-          <table>
+          <table className="border-collapse">
             <thead>
               <TableHead />
             </thead>

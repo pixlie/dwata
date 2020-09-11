@@ -68,5 +68,5 @@ export default () => {
     i++;
   }
 
-  return <tr className="border-b-4 h-10">{headList}</tr>;
+  return <tr className="bg-gray-100 h-10">{headList}</tr>;
 };

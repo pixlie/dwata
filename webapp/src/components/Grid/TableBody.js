@@ -86,7 +86,7 @@ export default () => {
         pk: row[0],
       });
     };
-    let classes = "border-b hover:bg-gray-100";
+    let classes = "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
     return (
@@ -171,7 +171,7 @@ export default () => {
     return (
       <Fragment>
         {mainRow}
-        <tr className="border-b">
+        <tr>
           <td colSpan={row.length + 1} className="py-1 px-4">
             {embeddedTableNames.map((x, j) => (
               <ExpandableTable
