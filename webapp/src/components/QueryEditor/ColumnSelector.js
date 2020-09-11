@@ -38,7 +38,7 @@ export default () => {
 
     return (
       <label
-        className={`block font-mono font-normal text-sm py-1 px-2 ml-6 hover:bg-gray-200 ${
+        className={`block font-display font-medium text-sm py-1 px-2 ml-6 hover:bg-gray-200 ${
           checked ? "text-gray-700" : "text-gray-500"
         }`}
       >

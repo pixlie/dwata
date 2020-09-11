@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@460;700&Source+Code+Pro:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Montserrat:wght@400;500;600&display=swap");
 
 @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
 
@@ -421,7 +421,7 @@ ul {
  */
 
 html {
-  font-family: Quicksand; /* 1 */
+  font-family: Open Sans; /* 1 */
   line-height: 1.5; /* 2 */
 }
 
@@ -549,7 +549,7 @@ pre,
 code,
 kbd,
 samp {
-  font-family: Source Code Pro;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /**
@@ -10068,11 +10068,11 @@ video {
 }
 
 .font-sans{
-  font-family: Quicksand;
+  font-family: Open Sans;
 }
 
-.font-mono{
-  font-family: Source Code Pro;
+.font-display{
+  font-family: Montserrat;
 }
 
 .font-hairline{
@@ -18655,18 +18655,9 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  font-family: Quicksand, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-weight: 460;
   color: #333333;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
 }
 
 .col-hd .label::after {
@@ -28178,11 +28169,11 @@ h6 {
   }
 
   .sm\:font-sans{
-    font-family: Quicksand;
+    font-family: Open Sans;
   }
 
-  .sm\:font-mono{
-    font-family: Source Code Pro;
+  .sm\:font-display{
+    font-family: Montserrat;
   }
 
   .sm\:font-hairline{
@@ -46211,11 +46202,11 @@ h6 {
   }
 
   .md\:font-sans{
-    font-family: Quicksand;
+    font-family: Open Sans;
   }
 
-  .md\:font-mono{
-    font-family: Source Code Pro;
+  .md\:font-display{
+    font-family: Montserrat;
   }
 
   .md\:font-hairline{
@@ -64244,11 +64235,11 @@ h6 {
   }
 
   .lg\:font-sans{
-    font-family: Quicksand;
+    font-family: Open Sans;
   }
 
-  .lg\:font-mono{
-    font-family: Source Code Pro;
+  .lg\:font-display{
+    font-family: Montserrat;
   }
 
   .lg\:font-hairline{
@@ -82277,11 +82268,11 @@ h6 {
   }
 
   .xl\:font-sans{
-    font-family: Quicksand;
+    font-family: Open Sans;
   }
 
-  .xl\:font-mono{
-    font-family: Source Code Pro;
+  .xl\:font-display{
+    font-family: Montserrat;
   }
 
   .xl\:font-hairline{

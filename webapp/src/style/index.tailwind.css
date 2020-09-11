@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@460;700&Source+Code+Pro:wght@400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Montserrat:wght@400;500;600&display=swap");
 @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
 @import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
 @import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
@@ -15,18 +15,9 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  font-family: Quicksand, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-weight: 460;
   color: #333333;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
 }
 
 .col-hd .label::after {
