@@ -34,7 +34,9 @@ export const Hx = ({ x = "3", children }) => {
   };
   return React.createElement(
     `h${x}`,
-    { className: `text-gray-700 pl-3 ${xSizeClass[x]}` },
+    {
+      className: `font-display font-medium text-gray-700 pl-3 ${xSizeClass[x]}`,
+    },
     children
   );
 };
@@ -59,13 +61,13 @@ export const Button = ({
   theme = "primary",
   active = false,
   disabled = false,
-  padding = "px-3 py-1",
+  padding = "px-3",
   margin = "mx-1",
   rounded = "rounded",
   attributes,
   children,
 }) => {
-  let classes = `inline-block font-bold shadow hover:shadow-sm ${rounded} ${padding} ${margin}`;
+  let classes = `inline-block font-display font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
       classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
@@ -135,7 +137,7 @@ export const ColumnHead = ({
   children,
 }) => {
   let classes =
-    "label inline-block px-2 rounded font-bold cursor-pointer text-gray-700 hover:text-gray-900";
+    "label inline-block px-2 rounded font-display font-medium text-sm leading-relaxed cursor-pointer text-gray-700 hover:text-gray-900";
   classes = classes + ` ${tableColorBlackOnLight(tableColor)}`;
   if (order) {
     if (order === "asc") {

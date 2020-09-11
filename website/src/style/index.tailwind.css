@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@460;700&family=Quattrocento:wght@700&display=swap');
-@import url('https://cdn-images.mailchimp.com/embedcode/slim-10_7.css');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
+@import url("https://cdn-images.mailchimp.com/embedcode/slim-10_7.css");
 
 html {
   min-width: 100%;
@@ -13,23 +13,30 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  font-family: Quicksand, sans-serif;
+  font-family: Montserrat, sans-serif;
+  letter-spacing: -0.05rem;
   font-weight: 460;
-  background-color: #f5f5f5;
   color: #333333;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: "Quattrocento", serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
 }
-h1.subtitle, h2.subtitle, h3.subtitle, h4.subtitle, h5.subtitle, h6.subtitle {
-  font-family: Quicksand, sans-serif;
+h1.subtitle,
+h2.subtitle,
+h3.subtitle,
+h4.subtitle,
+h5.subtitle,
+h6.subtitle {
   font-weight: 400;
 }
 h1 {
   margin: 1rem 0 2.125rem;
-  letter-spacing: -0.1rem;
 }
 h2 {
   margin: 1.05rem 0 1.75rem;
@@ -45,7 +52,12 @@ h4 {
 .blog-post {
   margin: 2rem 0 12rem 0;
 }
-.blog-post h1, .blog-post h2, .blog-post h3, .blog-post h4, .blog-post h5, .blog-post h6 {
+.blog-post h1,
+.blog-post h2,
+.blog-post h3,
+.blog-post h4,
+.blog-post h5,
+.blog-post h6 {
   font-family: "Quattrocento", serif;
   font-weight: 700;
 }

@@ -133,16 +133,9 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded p-4 shadow-md"
+      className="fixed bg-white border rounded shadow-md w-64"
       style={{ top: "4rem", right: "1rem" }}
     >
-      <Hx x="4">Filters</Hx>
-
-      <p className="text-sm text-gray-700 my-2 max-w-xs">
-        You can filter by any column, even the ones that are not visible in the
-        grid.
-      </p>
-
       {selectedTables.map((x) => (
         <TableItem key={`fl-tbl-${x.table_name}`} tableName={x.table_name} />
       ))}

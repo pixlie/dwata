@@ -83,7 +83,7 @@ const KPIBox = ({ value, metric, tags }) => (
 export default () => {
   return (
     <Fragment>
-      <div className="flex items-stretch">
+      <div className="h-screen flex items-stretch">
         <div className="flex-1 max-w-sm border-r border-gray-300">
           <Hx x="3">Browse</Hx>
           <Source />
