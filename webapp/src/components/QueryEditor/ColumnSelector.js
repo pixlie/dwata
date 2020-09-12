@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 
 import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
-import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const [state, setState] = useState({
@@ -47,7 +46,7 @@ export default () => {
           id={`col-sl-${tableName}.${column.name}`}
         />
         <label
-          className={`inline-block font-display font-medium text-sm leading-loose ml-4 ${
+          className={`inline-block font-medium text-sm leading-loose ml-4 ${
             checked ? "text-gray-700" : "text-gray-500"
           }`}
           htmlFor={`col-sl-${tableName}.${column.name}`}
@@ -77,7 +76,9 @@ export default () => {
           <span className="text-lg text-white ml-2 mr-3">
             <i className="fas fa-table" />
           </span>
-          <span className="inline-block font-bold text-white">{tableName}</span>
+          <span className="inline-block font-semibold text-white">
+            {tableName}
+          </span>
         </div>
 
         {currentTable.table_name === tableName

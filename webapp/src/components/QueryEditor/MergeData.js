@@ -1,8 +1,7 @@
-import React, { Fragment, useContext } from "react";
+import React, { useContext } from "react";
 
 import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
-import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -36,7 +35,7 @@ export default () => {
         }`}
       >
         <label
-          className={`block px-2 font-bold cursor-pointer rounded
+          className={`block px-2 font-semibold cursor-pointer rounded
             ${
               selectedTableNames.includes(tableName)
                 ? `${tableColorWhiteOnMedium(

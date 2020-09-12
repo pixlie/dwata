@@ -42,7 +42,11 @@ export default ({ isSourceFetching, toggleSidebar }) => {
       aria-label="main navigation"
     >
       <div className="mx-4">
-        <a className="font-bold text-lg" href="/" onClick={handleHome}>
+        <a
+          className="font-semibold text-lg text-gray-700"
+          href="/"
+          onClick={handleHome}
+        >
           Home
         </a>
       </div>

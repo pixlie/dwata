@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 
 import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
@@ -60,14 +60,14 @@ const ActivityBox = ({ created_by, activity, entity, created_at }) => (
   <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
     <span className="text-gray-600 mr-1">{created_by}</span>
     <span className="text-gray-700 mr-1">{activity}</span>
-    <span className="font-bold text-gray-700 mr-1">{entity}</span>
+    <span className="font-semibold text-gray-700 mr-1">{entity}</span>
     <span className="text-sm text-gray-600">{created_at}</span>
   </div>
 );
 
 const KPIBox = ({ value, metric, tags }) => (
   <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
-    <span className="text-4xl font-bold mr-4">{value}</span>
+    <span className="text-4xl font-semibold mr-4">{value}</span>
     <span className="text-gray-600">{metric}</span>&nbsp;
     {tags.map((x, i) => (
       <span
@@ -82,43 +82,33 @@ const KPIBox = ({ value, metric, tags }) => (
 
 export default () => {
   return (
-    <Fragment>
-      <div className="h-screen flex items-stretch">
-        <div className="flex-1 max-w-sm border-r border-gray-300">
-          <Hx x="3">Browse</Hx>
-          <Source />
-        </div>
-
-        <div className="flex-1 px-2 bg-gray-100">
-          <Hx x="3">Recent activity</Hx>
-          <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
-            Coming soon
-          </div>
-          {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
-          {sampleActivityList.map((x, i) => (
-            <ActivityBox key={`ac-${i}`} {...x} />
-          ))}
-        </div>
-
-        <div className="flex-1 max-w-sm bg-gray-100">
-          <Hx x="3">KPIs</Hx>
-          <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
-            Coming soon
-          </div>
-          <KPIBox value={39} metric="New Orders" tags={["last 24 hours"]} />
-          <KPIBox
-            value={3128}
-            metric="Product views"
-            tags={["last 24 hours"]}
-          />
-          <KPIBox
-            value={84}
-            metric="Abandoned carts"
-            tags={["last 24 hours"]}
-          />
-          <Button size="large">Add KPI</Button>
-        </div>
+    <div className="flex items-stretch">
+      <div className="flex-1 max-w-sm bg-white border-r border-gray-300">
+        <Hx x="3">Browse</Hx>
+        <Source />
       </div>
-    </Fragment>
+
+      <div className="flex-1 px-2">
+        <Hx x="3">Recent activity</Hx>
+        <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
+          Coming soon
+        </div>
+        {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
+        {sampleActivityList.map((x, i) => (
+          <ActivityBox key={`ac-${i}`} {...x} />
+        ))}
+      </div>
+
+      <div className="flex-1 max-w-sm">
+        <Hx x="3">KPIs</Hx>
+        <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
+          Coming soon
+        </div>
+        <KPIBox value={39} metric="New Orders" tags={["last 24 hours"]} />
+        <KPIBox value={3128} metric="Product views" tags={["last 24 hours"]} />
+        <KPIBox value={84} metric="Abandoned carts" tags={["last 24 hours"]} />
+        <Button size="large">Add KPI</Button>
+      </div>
+    </div>
   );
 };

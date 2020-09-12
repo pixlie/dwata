@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Montserrat:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Montserrat:wght@400;500;600;700&display=swap");
 
 @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
 
@@ -421,7 +421,7 @@ ul {
  */
 
 html {
-  font-family: Open Sans; /* 1 */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 1 */
   line-height: 1.5; /* 2 */
 }
 
@@ -10067,12 +10067,8 @@ video {
   clear: none;
 }
 
-.font-sans{
+.font-content{
   font-family: Open Sans;
-}
-
-.font-display{
-  font-family: Montserrat;
 }
 
 .font-hairline{
@@ -18655,9 +18651,11 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 400;
+  letter-spacing: -0.025em;
   color: #333333;
+  background-color: #f7fafc;
 }
 
 .col-hd .label::after {
@@ -28168,12 +28166,8 @@ body {
     clear: none;
   }
 
-  .sm\:font-sans{
+  .sm\:font-content{
     font-family: Open Sans;
-  }
-
-  .sm\:font-display{
-    font-family: Montserrat;
   }
 
   .sm\:font-hairline{
@@ -46201,12 +46195,8 @@ body {
     clear: none;
   }
 
-  .md\:font-sans{
+  .md\:font-content{
     font-family: Open Sans;
-  }
-
-  .md\:font-display{
-    font-family: Montserrat;
   }
 
   .md\:font-hairline{
@@ -64234,12 +64224,8 @@ body {
     clear: none;
   }
 
-  .lg\:font-sans{
+  .lg\:font-content{
     font-family: Open Sans;
-  }
-
-  .lg\:font-display{
-    font-family: Montserrat;
   }
 
   .lg\:font-hairline{
@@ -82267,12 +82253,8 @@ body {
     clear: none;
   }
 
-  .xl\:font-sans{
+  .xl\:font-content{
     font-family: Open Sans;
-  }
-
-  .xl\:font-display{
-    font-family: Montserrat;
   }
 
   .xl\:font-hairline{

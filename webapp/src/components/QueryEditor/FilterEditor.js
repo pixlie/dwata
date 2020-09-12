@@ -3,7 +3,6 @@ import React, { Fragment, useContext, useState } from "react";
 import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
-import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
@@ -109,7 +108,9 @@ export default () => {
           <span className="text-lg text-white ml-2 mr-3">
             <i className="fas fa-table" />
           </span>
-          <span className="inline-block font-bold text-white">{tableName}</span>
+          <span className="inline-block font-semibold text-white">
+            {tableName}
+          </span>
         </div>
 
         {currentTable.table_name === tableName ? (

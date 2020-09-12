@@ -33,7 +33,7 @@ const GridHead = ({ querySpecification }) => {
         {mainTableNames.map((x) => (
           <span
             key={`grd-hd-tbl-${x}`}
-            className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+            className={`font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
               tableColors[x]
             )} text-white`}
           >
@@ -80,7 +80,7 @@ export default () => {
       <Fragment>
         <GridHead querySpecification={querySpecification} />
         <div>
-          <table className="border-collapse">
+          <table className="font-content tracking-normal bg-white border-collapse">
             <thead>
               <TableHead />
             </thead>

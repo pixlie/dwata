@@ -17,7 +17,7 @@ const cellRenderer = (column) => {
 
   const DefaultCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
@@ -29,7 +29,7 @@ const cellRenderer = (column) => {
 
   const TitleCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
@@ -41,7 +41,7 @@ const cellRenderer = (column) => {
 
   const TextareaCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <textarea
         className="block border px-2 py-1 w-full h-40 rounded"
         disabled
@@ -52,7 +52,7 @@ const cellRenderer = (column) => {
 
   const PrimaryKeyCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="border px-2 py-1"
         type="text"
@@ -64,7 +64,7 @@ const cellRenderer = (column) => {
 
   const RelatedCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
@@ -98,7 +98,7 @@ const cellRenderer = (column) => {
 
   const JSONCell = ({ data }) => (
     <div className="my-4">
-      <label className="font-bold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{column.name}</label>
       <div className="control">
         {data !== null ? (
           <div
@@ -128,7 +128,7 @@ const cellRenderer = (column) => {
     }
     return (
       <div className="my-4">
-        <label className="font-bold mr-2">{column.name}</label>
+        <label className="font-semibold mr-2">{column.name}</label>
         <input
           className="block border px-2 py-1 w-full rounded"
           type="text"
