@@ -83,7 +83,10 @@ const KPIBox = ({ value, metric, tags }) => (
 export default () => {
   return (
     <div className="flex items-stretch">
-      <div className="flex-1 max-w-sm bg-white border-r border-gray-300">
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden max-w-sm bg-white border-r border-gray-300"
+        style={{ height: "calc(100vh - 60px)" }}
+      >
         <Hx x="3">Browse</Hx>
         <Source />
       </div>

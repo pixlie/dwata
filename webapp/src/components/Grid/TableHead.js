@@ -54,6 +54,12 @@ export default () => {
           tableColor={tableColors[col.tableName]}
         />
       );
+      headList.push(
+        <th
+          key={`th-${col.tableName}-exp`}
+          className="border border-gray-400 px-2 py-1 text-left"
+        ></th>
+      );
     } else {
       headList.push(
         <TableHeadItem

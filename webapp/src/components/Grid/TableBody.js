@@ -1,12 +1,7 @@
 import React, { useState, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import {
-  useData,
-  useSchema,
-  useQuerySpecification,
-  useQueryContext,
-} from "services/store";
+import { useData, useSchema, useQuerySpecification } from "services/store";
 import ProductGuide from "components/ProductGuide";
 import rowRenderer from "./rowRenderer";
 import EmbeddedTable from "./EmbeddedTable";
@@ -22,7 +17,6 @@ export default () => {
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
 
   // useEffect(() => {
   //   if (isReady && showPinnedRecords) {
@@ -47,11 +41,7 @@ export default () => {
     ),
   ];
 
-  const rowRendererList = rowRenderer(
-    schema.rows,
-    columns,
-    selectedColumLabels
-  );
+  const rowRendererList = rowRenderer(schema.rows, columns, querySpecification);
 
   const RowSelectorCell = ({ row }) => {
     const handleRowSelect = (event) => {
@@ -79,52 +69,51 @@ export default () => {
 
   const RowWithoutEmbed = ({ row, index, pinned = false }) => {
     // This is a normal grid row that does not show embedded grid inside it.
-    const handleRowClick = () => {
-      toggleDetailItem({
-        sourceLabel: querySpecification.sourceLabel,
-        tableName: querySpecification.select[0].tableName,
-        pk: row[0],
-      });
-    };
     let classes = "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
-    return (
-      <tr onClick={handleRowClick} className={classes}>
-        {/* <RowSelectorCell row={row} /> */}
-        {row.map((cell, j) => {
-          const Cell = rowRendererList[j];
-          return Cell !== null ? (
-            <Cell key={`td-${index}-${j}`} data={cell} />
-          ) : null;
-        })}
-      </tr>
-    );
+    const rowList = [];
+    {
+      /* <RowSelectorCell row={row} /> */
+    }
+    for (const j in rowRendererList) {
+      const [cellIndex, Cell] = rowRendererList[j];
+      if (cellIndex === null) {
+        rowList.push(<Cell key={`td-${index}-${j}`} row={row} />);
+      } else {
+        rowList.push(
+          <Cell key={`td-${index}-${j}`} data={row[cellIndex]} row={row} />
+        );
+      }
+    }
+
+    return <tr className={classes}>{rowList}</tr>;
   };
 
   const RowWithEmbed = ({ row, index, pinned = false }) => {
     // This is a grid row that expands the merged (embedded) data that is related to this row.
-    const handleRowClick = () => {
-      toggleDetailItem({
-        sourceLabel: querySpecification.sourceLabel,
-        tableName: querySpecification.tableName,
-        pk: row[0],
-      });
-    };
     let classes = "hover:bg-gray-100";
     classes = classes + (pinned ? " is-pin" : "");
 
-    const mainRow = (
-      <tr onClick={handleRowClick} className={classes}>
-        {/* <RowSelectorCell row={row} /> */}
-        {row.map((cell, j) => {
-          const Cell = rowRendererList[j];
-          return Cell !== null ? (
-            <Cell key={`td-${index}-${j}`} data={cell} />
-          ) : null;
-        })}
-      </tr>
-    );
+    const rowList = [];
+    {
+      /* <RowSelectorCell row={row} /> */
+    }
+    for (const j in rowRendererList) {
+      const [cellIndex, Cell] = rowRendererList[j];
+      if (Cell === null) {
+        rowList.push(null);
+      }
+      if (cellIndex === null) {
+        rowList.push(<Cell key={`td-${index}-${j}`} row={row} />);
+      } else {
+        rowList.push(
+          <Cell key={`td-${index}-${j}`} data={row[cellIndex]} row={row} />
+        );
+      }
+    }
+
+    const mainRow = <tr className={classes}>{rowList}</tr>;
 
     const ExpandableTable = ({ embeddedDataIndex, tableName }) => {
       const handleExpandClick = () => {

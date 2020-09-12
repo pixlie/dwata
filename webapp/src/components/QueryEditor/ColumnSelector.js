@@ -36,7 +36,7 @@ export default () => {
     const checked = selectedColumLabels.includes(columnLabel);
 
     return (
-      <div>
+      <div className="border-b hover:bg-gray-200">
         <input
           className="inline-block ml-4"
           type="checkbox"

@@ -1,8 +1,11 @@
 import React, { Fragment } from "react";
 
 import { getColumnSchema } from "services/querySpecification/getters";
+import { useQueryContext } from "services/store";
 
-export default (schema, tableColumns, selectedColumLabels) => {
+export default (schema, tableColumns, querySpecification) => {
+  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+
   const rowList = [];
   const date_time_options = {
     year: "numeric",
@@ -15,6 +18,27 @@ export default (schema, tableColumns, selectedColumLabels) => {
   };
   const contentTextSize = "text-sm";
   const borderClasses = "border border-gray-300";
+
+  const RowExpandCell = ({ data, row }) => {
+    const handleClick = () => {
+      toggleDetailItem({
+        sourceLabel: querySpecification.sourceLabel,
+        tableName: querySpecification.select[0].tableName,
+        pk: row[0],
+      });
+    };
+
+    return (
+      <td className="px-2 py-1 border border-gray-300">
+        <span
+          className="text-sm text-blue-600 cursor-pointer"
+          onClick={handleClick}
+        >
+          <i className="far fa-window-maximize" />
+        </span>
+      </td>
+    );
+  };
 
   const DefaultCell = ({ data }) => (
     <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>{data}</td>
@@ -91,28 +115,31 @@ export default (schema, tableColumns, selectedColumLabels) => {
     }
   };
 
-  for (const col of tableColumns) {
-    if (!selectedColumLabels.includes(col)) {
-      rowList.push(null);
+  for (const [i, col] of tableColumns.entries()) {
+    /* if (!selectedColumLabels.includes(col)) {
+      rowList.push([i, null]);
       continue;
-    }
+    } */
     const head = getColumnSchema(schema, col);
     if (head.is_primary_key) {
-      rowList.push(PrimaryKeyCell);
+      rowList.push([i, PrimaryKeyCell]);
+      if (i === 0) {
+        rowList.push([null, RowExpandCell]);
+      }
     } else if (head.has_foreign_keys) {
-      rowList.push(DefaultCell);
+      rowList.push([i, DefaultCell]);
     } else if (head.ui_hints.includes("is_meta")) {
-      rowList.push(DefaultCell);
+      rowList.push([i, DefaultCell]);
     } else if (head.type === "JSONB" || head.type === "JSON") {
-      rowList.push(JSONCell);
+      rowList.push([i, JSONCell]);
     } else if (head.type === "BOOLEAN") {
-      rowList.push(BooleanCell);
+      rowList.push([i, BooleanCell]);
     } else if (head.type === "TIMESTAMP") {
-      rowList.push(TimeStampCell);
+      rowList.push([i, TimeStampCell]);
     } else if (head.type === "VARCHAR") {
-      rowList.push(CharCell);
+      rowList.push([i, CharCell]);
     } else {
-      rowList.push(DefaultCell);
+      rowList.push([i, DefaultCell]);
     }
   }
 
