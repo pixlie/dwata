@@ -37,8 +37,7 @@ export default () => {
     _columns = querySpecification.columns;
   }
 
-  let i = 0;
-  for (const col of _columns) {
+  for (const [i, col] of _columns.entries()) {
     const tableColumnName = col.label;
     if (!selectedTableColumNames.includes(tableColumnName)) {
       continue;
@@ -54,12 +53,14 @@ export default () => {
           tableColor={tableColors[col.tableName]}
         />
       );
-      headList.push(
-        <th
-          key={`th-${col.tableName}-exp`}
-          className="border border-gray-400 px-2 py-1 text-left"
-        ></th>
-      );
+      if (i === 0) {
+        headList.push(
+          <th
+            key={`th-${col.tableName}-exp`}
+            className="border border-gray-400 px-2 py-1 text-left"
+          ></th>
+        );
+      }
     } else {
       headList.push(
         <TableHeadItem
@@ -71,7 +72,6 @@ export default () => {
         />
       );
     }
-    i++;
   }
 
   return <tr className="bg-gray-100 h-10">{headList}</tr>;

@@ -47,7 +47,7 @@ export default () => {
         />
         <label
           className={`inline-block font-medium text-sm leading-loose ml-4 ${
-            checked ? "text-gray-700" : "text-gray-500"
+            checked ? "text-gray-600" : "text-gray-500"
           }`}
           htmlFor={`col-sl-${tableName}.${column.name}`}
         >

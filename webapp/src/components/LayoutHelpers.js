@@ -137,7 +137,7 @@ export const ColumnHead = ({
   children,
 }) => {
   let classes =
-    "inline-block font-medium text-sm leading-relaxed text-gray-700 hover:text-gray-900 px-2 shadow rounded cursor-pointer";
+    "inline-block font-medium text-sm leading-normal text-gray-700 hover:text-gray-900 px-2 shadow rounded cursor-pointer";
   classes = classes + ` ${tableColorBlackOnLight(tableColor)}`;
   if (order) {
     if (order === "asc") {

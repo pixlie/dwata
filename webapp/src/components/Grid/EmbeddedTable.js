@@ -16,7 +16,7 @@ export default ({ embedContext }) => {
     <QueryContext.Provider value={ctx}>
       <Fragment>
         <div>
-          <table className="border">
+          <table className="font-content tracking-normal bg-white border-collapse">
             <thead>
               <EmbeddedTableHead />
             </thead>
