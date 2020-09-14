@@ -96,8 +96,8 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded shadow-md w-64"
-      style={{ top: "4rem", right: "1rem" }}
+      className="fixed bg-white border-2 border-t-0 shadow-md w-64"
+      style={{ top: "3.5rem", right: "1rem" }}
     >
       {selectedTables.map((x) => (
         <TableItem key={`col-tbl-${x.table_name}`} tableName={x.table_name} />
