@@ -32,7 +32,6 @@ export default () => {
   if (data) {
     ({ columns, rows, selectedRowList, embedded } = data);
   }
-  const selectedColumLabels = querySpecification.columns.map((x) => x.label);
   const embeddedTableNames = [
     ...new Set(
       querySpecification.embeddedColumns

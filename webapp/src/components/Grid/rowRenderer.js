@@ -123,9 +123,7 @@ export default (schema, tableColumns, querySpecification) => {
     const head = getColumnSchema(schema, col);
     if (head.is_primary_key) {
       rowList.push([i, PrimaryKeyCell]);
-      if (i === 0) {
-        rowList.push([null, RowExpandCell]);
-      }
+      rowList.push([null, RowExpandCell]);
     } else if (head.has_foreign_keys) {
       rowList.push([i, DefaultCell]);
     } else if (head.ui_hints.includes("is_meta")) {

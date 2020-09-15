@@ -28,38 +28,35 @@ const GridHead = ({ querySpecification }) => {
 
   return (
     <div className={`p-2 pl-6 bg-white border-gray-300 border-b`}>
-      <Hx x="3">
-        Showing:{" "}
-        {mainTableNames.map((x) => (
-          <span
-            key={`grd-hd-tbl-${x}`}
-            className={`font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
-              tableColors[x]
-            )} text-white`}
-          >
-            {x}
-          </span>
-        ))}
-        &nbsp;&nbsp;
-        <span className="relative">
-          <ProductGuide guideFor="gridHead" />
+      {mainTableNames.map((x) => (
+        <span
+          key={`grd-hd-tbl-${x}`}
+          className={` text-2xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+            tableColors[x]
+          )} text-white`}
+        >
+          {x}
         </span>
-      </Hx>
+      ))}
       {embeddedTableNames.length ? (
-        <Hx x="5">
-          Merged (multiple) records:{" "}
+        <Fragment>
+          {"(embedded) "}
           {embeddedTableNames.map((x) => (
             <span
               key={`grd-hd-tbl-${x}`}
-              className={`px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              className={`text-lg font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
                 tableColors[x]
               )} text-white`}
             >
               {x}
             </span>
           ))}
-        </Hx>
+        </Fragment>
       ) : null}
+      &nbsp;&nbsp;
+      <span className="relative">
+        <ProductGuide guideFor="gridHead" />
+      </span>
     </div>
   );
 };

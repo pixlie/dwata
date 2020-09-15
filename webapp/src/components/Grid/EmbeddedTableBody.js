@@ -46,9 +46,6 @@ export default () => {
   if (data) {
     ({ embedded } = data);
   }
-  const selectedColumLabels = querySpecification.embeddedColumns[
-    queryContext.embeddedDataIndex
-  ].map((x) => x.label);
   const parentJoin = embedded[queryContext.embeddedDataIndex].parent_join;
   let filterByParent = generateFilter(
     querySpecification.columns,
@@ -60,7 +57,7 @@ export default () => {
   const rowRendererList = rowRenderer(
     schema.rows,
     embedded[queryContext.embeddedDataIndex].columns,
-    selectedColumLabels
+    querySpecification
   );
 
   const Row = ({ row, index }) => {
