@@ -9,29 +9,16 @@
 
   vars:
     system_user: dwata
-    system_packages: [ "ufw" ]
+    system_packages: ["ufw"]
 
   tasks:
-    - name: Add the system user
-      user:
-        name: "{{ system_user }}"
-        comment: System Admin
-        group: sudo
-        shell: /bin/bash
-
-    - name: Set authorized keys from GitHub URLs
-      authorized_key:
-        user: "{{ system_user }}"
-        state: present
-        key: https://github.com/brainless.keys
-
     - name: Allow 'sudo' group to have passwordless sudo
       lineinfile:
         path: /etc/sudoers
         state: present
-        regexp: '^%sudo'
-        line: '%sudo ALL=(ALL) NOPASSWD: ALL'
-        validate: '/usr/sbin/visudo -cf %s'
+        regexp: "^%sudo"
+        line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+        validate: "/usr/sbin/visudo -cf %s"
 
     - name: Harden sshd configuration
       lineinfile:
