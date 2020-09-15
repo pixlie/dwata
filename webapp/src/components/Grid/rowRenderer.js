@@ -19,25 +19,31 @@ export default (schema, tableColumns, querySpecification) => {
   const contentTextSize = "text-sm";
   const borderClasses = "border border-gray-300";
 
-  const RowExpandCell = ({ data, row }) => {
-    const handleClick = () => {
-      toggleDetailItem({
-        sourceLabel: querySpecification.sourceLabel,
-        tableName: querySpecification.select[0].tableName,
-        pk: row[0],
-      });
+  const createRowExpandCell = (tableColumn, colIndex) => {
+    const RowExpandCell = ({ data, row }) => {
+      const handleClick = () => {
+        const [tableName, columnName] = tableColumn.split(".");
+        console.log(row);
+        toggleDetailItem({
+          sourceLabel: querySpecification.sourceLabel,
+          tableName: tableName,
+          pk: row[colIndex],
+        });
+      };
+
+      return (
+        <td className="px-2 py-1 border border-gray-300">
+          <span
+            className="text-sm text-blue-600 cursor-pointer"
+            onClick={handleClick}
+          >
+            <i className="far fa-window-maximize" />
+          </span>
+        </td>
+      );
     };
 
-    return (
-      <td className="px-2 py-1 border border-gray-300">
-        <span
-          className="text-sm text-blue-600 cursor-pointer"
-          onClick={handleClick}
-        >
-          <i className="far fa-window-maximize" />
-        </span>
-      </td>
-    );
+    return RowExpandCell;
   };
 
   const DefaultCell = ({ data }) => (
@@ -120,21 +126,21 @@ export default (schema, tableColumns, querySpecification) => {
       rowList.push([i, null]);
       continue;
     } */
-    const head = getColumnSchema(schema, col);
-    if (head.is_primary_key) {
+    const columnSchema = getColumnSchema(schema, col);
+    if (columnSchema.is_primary_key) {
       rowList.push([i, PrimaryKeyCell]);
-      rowList.push([null, RowExpandCell]);
-    } else if (head.has_foreign_keys) {
+      rowList.push([null, createRowExpandCell(col, i)]);
+    } else if (columnSchema.has_foreign_keys) {
       rowList.push([i, DefaultCell]);
-    } else if (head.ui_hints.includes("is_meta")) {
+    } else if (columnSchema.ui_hints.includes("is_meta")) {
       rowList.push([i, DefaultCell]);
-    } else if (head.type === "JSONB" || head.type === "JSON") {
+    } else if (columnSchema.type === "JSONB" || columnSchema.type === "JSON") {
       rowList.push([i, JSONCell]);
-    } else if (head.type === "BOOLEAN") {
+    } else if (columnSchema.type === "BOOLEAN") {
       rowList.push([i, BooleanCell]);
-    } else if (head.type === "TIMESTAMP") {
+    } else if (columnSchema.type === "TIMESTAMP") {
       rowList.push([i, TimeStampCell]);
-    } else if (head.type === "VARCHAR") {
+    } else if (columnSchema.type === "VARCHAR") {
       rowList.push([i, CharCell]);
     } else {
       rowList.push([i, DefaultCell]);
