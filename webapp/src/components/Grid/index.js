@@ -1,8 +1,7 @@
 import React, { useContext, Fragment } from "react";
 
-import { QueryContext, tableColorWhiteOnMedium } from "utils";
+import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { Hx } from "components/LayoutHelpers";
 import QueryLoader from "./QueryLoader";
 import SavedQueryLoader from "./SavedQueryLoader";
 import TableHead from "./TableHead";
@@ -11,55 +10,6 @@ import ColumnSelector from "components/QueryEditor/ColumnSelector";
 import FilterEditor from "components/QueryEditor/FilterEditor";
 import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
-import ProductGuide from "components/ProductGuide";
-
-const GridHead = ({ querySpecification }) => {
-  const mainTableNames = [
-    ...new Set(querySpecification.columns.map((x) => x.tableName)),
-  ];
-  const embeddedTableNames = [
-    ...new Set(
-      querySpecification.embeddedColumns
-        .reduce((acc, x) => [...acc, ...x], [])
-        .map((x) => x.tableName)
-    ),
-  ];
-  const tableColors = querySpecification.tableColors;
-
-  return (
-    <div className={`p-2 pl-6 bg-white border-gray-300 border-b`}>
-      {mainTableNames.map((x) => (
-        <span
-          key={`grd-hd-tbl-${x}`}
-          className={` text-2xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
-            tableColors[x]
-          )} text-white`}
-        >
-          {x}
-        </span>
-      ))}
-      {embeddedTableNames.length ? (
-        <Fragment>
-          {"(embedded) "}
-          {embeddedTableNames.map((x) => (
-            <span
-              key={`grd-hd-tbl-${x}`}
-              className={`text-lg font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
-                tableColors[x]
-              )} text-white`}
-            >
-              {x}
-            </span>
-          ))}
-        </Fragment>
-      ) : null}
-      &nbsp;&nbsp;
-      <span className="relative">
-        <ProductGuide guideFor="gridHead" />
-      </span>
-    </div>
-  );
-};
 
 export default () => {
   const queryContext = useContext(QueryContext);
@@ -75,7 +25,6 @@ export default () => {
   return (
     <Loader>
       <Fragment>
-        <GridHead querySpecification={querySpecification} />
         <div>
           <table className="font-content tracking-normal bg-white border-collapse">
             <thead>

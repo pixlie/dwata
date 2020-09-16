@@ -5,7 +5,6 @@ import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import FilterItem from "components/QueryEditor/FilterItem";
 import { ColumnHead } from "components/LayoutHelpers";
-import ProductGuide from "components/ProductGuide";
 
 const ColumnHeadSpecification = ({ tableColumnName }) => {
   const queryContext = useContext(QueryContext);
@@ -56,11 +55,6 @@ export default ({ tableColumnName, label, tableColor, index }) => {
       <Fragment>
         {activeColumnHeadSpecification === tableColumnName ? (
           <ColumnHeadSpecification tableColumnName={tableColumnName} />
-        ) : null}
-        {index === 1 ? (
-          <span className="relative ml-2">
-            <ProductGuide guideFor="tableHead" />
-          </span>
         ) : null}
       </Fragment>
     </ColumnHead>

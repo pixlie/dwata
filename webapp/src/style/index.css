@@ -1023,10 +1023,6 @@ code {
   padding-left: 1rem;
 }
 
-.pl-6{
-  padding-left: 1.5rem;
-}
-
 .fixed{
   position: fixed;
 }
@@ -1181,10 +1177,6 @@ code {
 
 .w-64{
   width: 16rem;
-}
-
-.w-auto{
-  width: auto;
 }
 
 .w-full{

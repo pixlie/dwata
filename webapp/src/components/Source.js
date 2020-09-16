@@ -1,22 +1,12 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import { useSource } from "services/store";
 import TableList from "components/TableList";
-import ProductGuide from "components/ProductGuide";
 
 const SourceItem = ({ source, sourceType, index }) => {
   const [state, setState] = useState({
     isOpen: true,
-    productGuidePingPosition: null,
   });
-  const firstSourceRef = useRef(null);
-  useEffect(() => {
-    firstSourceRef.current &&
-      index === 0 &&
-      setState({
-        productGuidePingPosition: firstSourceRef.current.getBoundingClientRect(),
-      });
-  }, []);
 
   if (source.properties["is_system_db"]) {
     return null;
@@ -30,7 +20,7 @@ const SourceItem = ({ source, sourceType, index }) => {
 
   return (
     <Fragment>
-      <div className="relative" ref={firstSourceRef}>
+      <div className="relative">
         <div
           className="block p-2 pl-3 border-b cursor-default"
           onClick={handleClickSource}
@@ -46,9 +36,6 @@ const SourceItem = ({ source, sourceType, index }) => {
             {source.provider}
           </span>
         </div>
-        {state.productGuidePingPosition ? (
-          <ProductGuide guideFor="source" />
-        ) : null}
       </div>
 
       {state.isOpen ? (

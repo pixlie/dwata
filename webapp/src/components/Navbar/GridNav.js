@@ -1,9 +1,67 @@
-import React, { useEffect, useContext, Fragment } from "react";
+import React, { Fragment, useEffect, useContext } from "react";
 
-import { QueryContext } from "utils";
-import { useApps, useData, useQueryContext } from "services/store";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
+import {
+  useApps,
+  useData,
+  useQueryContext,
+  useQuerySpecification,
+} from "services/store";
 import { Button } from "components/LayoutHelpers";
 import ProductGuide from "components/ProductGuide";
+
+const GridStats = () => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  if (!querySpecification) {
+    return null;
+  }
+
+  const mainTableNames = [
+    ...new Set(querySpecification.columns.map((x) => x.tableName)),
+  ];
+  const embeddedTableNames = [
+    ...new Set(
+      querySpecification.embeddedColumns
+        .reduce((acc, x) => [...acc, ...x], [])
+        .map((x) => x.tableName)
+    ),
+  ];
+  const tableColors = querySpecification.tableColors;
+
+  return (
+    <Fragment>
+      {mainTableNames.map((x) => (
+        <span
+          key={`grd-hd-tbl-${x}`}
+          className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+            tableColors[x]
+          )} text-white`}
+        >
+          {x}
+        </span>
+      ))}
+      {embeddedTableNames.length ? (
+        <Fragment>
+          {"[ Embedded - "}
+          {embeddedTableNames.map((x) => (
+            <span
+              key={`grd-hd-tbl-${x}`}
+              className={`inline-block text-md font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+                tableColors[x]
+              )} text-white`}
+            >
+              {x}
+            </span>
+          ))}
+          {"]"}
+        </Fragment>
+      ) : null}
+    </Fragment>
+  );
+};
 
 export default ({ toggleActions, togglePinnedRecords }) => {
   const queryContext = useContext(QueryContext);
@@ -43,7 +101,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   };
 
   return (
-    <Fragment>
+    <div className="flex items-center">
       {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
@@ -63,26 +121,31 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         <i className="fas fa-thumbtack" />
         &nbsp; Pins
       </Button> */}
+      <div className="block lg:inline-block items-center flex-grow">
+        <GridStats />
+      </div>
 
-      <span className="relative">
-        <Button
-          theme="secondary"
-          attributes={{
-            onClick: handleMergeClick,
-          }}
-        >
-          Related
+      <div className="block lg:inline-block items-center">
+        <span className="relative">
+          <Button
+            theme="secondary"
+            attributes={{
+              onClick: handleMergeClick,
+            }}
+          >
+            Related
+          </Button>
+          <ProductGuide guideFor="relatedButton" />
+        </span>
+
+        <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
+          Columns
         </Button>
-        <ProductGuide guideFor="relatedButton" />
-      </span>
 
-      <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
-        Columns
-      </Button>
-
-      <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
-        Filters
-      </Button>
-    </Fragment>
+        <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
+          Filters
+        </Button>
+      </div>
+    </div>
   );
 };
