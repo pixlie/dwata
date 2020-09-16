@@ -7,9 +7,12 @@
   vars:
     system_packages:
       [
-        "build-essential",
         "nginx",
-        "pipenv",
+        "git",
+        "python3-pip",
+        "python3-virtualenv",
+        "build-essential",
+        "virtualenv",
         "libssl-dev",
         "zlib1g-dev",
         "libncurses5-dev",
@@ -23,6 +26,7 @@
         "libexpat1-dev",
         "liblzma-dev",
         "libffi-dev",
+        "libpq-dev",
       ]
 
   tasks:
@@ -35,3 +39,17 @@
       become: yes
       become_user: root
       apt: name={{ system_packages }} state=latest
+
+    - name: Enable nginx to start on boot
+      become: yes
+      become_user: root
+      systemd:
+        name: nginx
+        enabled: yes
+
+    - name: Start nginx server
+      become: yes
+      become_user: root
+      systemd:
+        name: nginx
+        state: started

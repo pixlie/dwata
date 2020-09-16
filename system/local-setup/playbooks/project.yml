@@ -6,22 +6,11 @@
 
   vars:
     projects_root: /home/vagrant
-    project_repo_url: git@github.com:brainless/dwata.git
+    project_repo_url: https://github.com/brainless/dwata.git
     python_path: /usr/bin/python3
-    system_packages: ["git"]
     project_name: "dwata"
 
   tasks:
-    - name: Install required system packages
-      become: yes
-      become_user: root
-      apt: name={{ system_packages }} state=latest
-
-    - name: Create Projects directory
-      file:
-        path: "{{ projects_root }}"
-        state: directory
-
     - name: Clone project repo
       git:
         repo: "{{ project_repo_url }}"
@@ -31,8 +20,9 @@
 
     - name: Install/update Python requirements for backend
       pip:
-        requirements: "{{ projects_root }}/{{ project_name }}/backend/requirements/base.txt"
+        requirements: "{{ projects_root }}/{{ project_name }}/backend/requirements.txt"
         chdir: "{{ projects_root }}/{{ project_name }}/backend"
+        virtualenv_python: "/usr/bin/python3"
         virtualenv: "{{ projects_root }}/{{ project_name }}/backend/.venv"
 
     - name: Copy nginx config files
@@ -41,10 +31,7 @@
         dest: "/etc/nginx/sites-available/"
         remote_src: yes
       with_items:
-        - "{{ projects_root }}/{{ project_name }}/system/nginx/www_{{ project_name }}_com.conf"
-        - "{{ projects_root }}/{{ project_name }}/system/nginx/api_{{ project_name }}_com.conf"
-        - "{{ projects_root }}/{{ project_name }}/system/nginx/admin_{{ project_name }}_com.conf"
-        - "{{ projects_root }}/{{ project_name }}/system/nginx/{{ project_name }}_com.conf"
+        - "{{ projects_root }}/{{ project_name }}/system/nginx/{{ project_name }}_local.conf"
       become: yes
       become_user: "root"
 
@@ -54,21 +41,6 @@
         dest: "/etc/nginx/sites-enabled/{{ item }}"
         state: link
       with_items:
-        - "www_{{ project_name }}_com.conf"
-        - "api_{{ project_name }}_com.conf"
-        - "admin_{{ project_name }}_com.conf"
-        - "{{ project_name }}_com.conf"
+        - "{{ project_name }}_local.conf"
       become: yes
       become_user: "root"
-
-    - name: Copy backend config file
-      copy:
-        src: "{{ projects_root }}/{{ project_name }}/backend/settings.ini.template"
-        dest: "{{ projects_root }}/{{ project_name }}/backend/settings.ini"
-        remote_src: yes
-
-    - name: Copy backend DB migrtions config file
-      copy:
-        src: "{{ projects_root }}/{{ project_name }}/backend/db-migrations/migrate.cfg.template"
-        dest: "{{ projects_root }}/{{ project_name }}/backend/db-migrations/migrate.cfg"
-        remote_src: yes

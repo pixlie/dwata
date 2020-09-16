@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/brainless/Projects/dwata/system/local-setup","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
