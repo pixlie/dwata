@@ -1,0 +1,34 @@
+---
+- name: Setup nginx and uvicorn services in systemd
+
+  # Specify the hosts you want to target
+  hosts: all
+
+  tasks:
+    - name: Enable nginx to start on boot
+      become: yes
+      become_user: root
+      systemd:
+        name: nginx
+        enabled: yes
+
+    - name: Start nginx server
+      become: yes
+      become_user: root
+      systemd:
+        name: nginx
+        state: started
+
+    - name: Enable uvicorn to start on boot
+      become: yes
+      become_user: root
+      systemd:
+        name: uvicorn
+        enabled: yes
+
+    - name: Start uvicorn server
+      become: yes
+      become_user: root
+      systemd:
+        name: uvicorn
+        state: started

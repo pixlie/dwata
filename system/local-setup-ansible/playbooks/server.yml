@@ -1,5 +1,5 @@
 ---
-- name: Setup python, pipenv on a Debian 10+ host
+- name: Setup python, nginx, git and other software on a Debian 10+ host
 
   # Specify the hosts you want to target
   hosts: all
@@ -9,6 +9,7 @@
       [
         "nginx",
         "git",
+        "rsync",
         "python3-pip",
         "python3-virtualenv",
         "build-essential",

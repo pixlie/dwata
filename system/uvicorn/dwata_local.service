@@ -1,0 +1,19 @@
+[Unit]
+Description=dwata uvicorn daemon
+After=network.target
+
+
+[Service]
+PIDFile=/run/dwata_uvicorn/pid
+User=root
+Group=root
+WorkingDirectory=/home/vagrant/dwata/backend
+ExecStart=/home/vagrant/dwata/backend/.venv/bin/uvicorn --uds /tmp/dwata_uvicorn.sock --workers 4 server:app
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=on-abort
+PrivateTmp=true
+
+
+[Install]
+WantedBy=multi-user.target

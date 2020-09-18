@@ -11,12 +11,13 @@
     project_name: "dwata"
 
   tasks:
-    - name: Clone project repo
-      git:
-        repo: "{{ project_repo_url }}"
-        accept_hostkey: yes
-        dest: "{{ projects_root }}/{{ project_name }}"
-        version: develop
+    - name: Fetch and unarchive the built webapp from dwata.com
+      unarchive:
+        remote_src: yes
+        src: "https://dwata.com/dwata_webapp_26f881478134d267.tgz"
+        dest: "/var/www/html"
+      become: yes
+      become_user: "root"
 
     - name: Install/update Python requirements for backend
       pip:
@@ -42,5 +43,22 @@
         state: link
       with_items:
         - "{{ project_name }}_local.conf"
+      become: yes
+      become_user: "root"
+
+    - name: Remove default nginx server config
+      file:
+        path: "/etc/nginx/sites-enabled/default"
+        state: absent
+      become: yes
+      become_user: "root"
+
+    - name: Copy uvicorn systemd service
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/uvicorn.service"
+        remote_src: yes
+      with_items:
+        - "{{ projects_root }}/{{ project_name }}/system/uvicorn/{{ project_name }}_local.service"
       become: yes
       become_user: "root"
