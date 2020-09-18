@@ -1,6 +1,12 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useContext } from "react";
 
-import { useSchema, useData, useQueryContext } from "services/store";
+import { QueryContext, tableColorWhiteOnMedium } from "utils";
+import {
+  useSchema,
+  useData,
+  useQueryContext,
+  useQuerySpecification,
+} from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { Button } from "components/LayoutHelpers";
 
@@ -160,6 +166,10 @@ const cellRenderer = (column) => {
 
 export default ({ item, index }) => {
   const key = `${item.sourceLabel}/${item.tableName}/${item.pk}`;
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
   const fetchData = useData((state) => state.fetchData);
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
   const schema = useSchema((state) => state[item.sourceLabel]);
@@ -167,6 +177,7 @@ export default ({ item, index }) => {
     fetchData(key, item);
   }, [key, item, fetchData]);
   const dataItem = useData((state) => state[key]);
+  const tableColors = querySpecification.tableColors;
 
   const handleKey = useCallback(
     (event) => {
@@ -222,26 +233,41 @@ export default ({ item, index }) => {
 
   return (
     <div
-      className="fixed bg-white border rounded p-4 shadow-md"
+      className="fixed bg-white border rounded shadow-md"
       style={{ top: `${4 + index * 0.4}rem`, left: `${20 + index * 2}%` }}
     >
-      <Button
-        size="sm"
-        theme="secondary"
-        attributes={{ onClick: () => toggleDetailItem(item) }}
-      >
-        Close&nbsp;<i className="fas fa-times"></i>
-      </Button>
+      <div className="flex items-center bg-gray-200 p-4">
+        <div className="inline-block items-center flex-grow">
+          <span
+            key={`grd-hd-tbl-${item.tableName}`}
+            className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              tableColors[item.tableName]
+            )} text-white cursor-default`}
+          >
+            {item.tableName}
+          </span>
+        </div>
+
+        <div className="inline-block items-center">
+          <Button
+            size="sm"
+            theme="secondary"
+            attributes={{ onClick: () => toggleDetailItem(item) }}
+          >
+            Close&nbsp;<i className="fas fa-times"></i>
+          </Button>
+        </div>
+      </div>
 
       <div className="flex flex-row">
         <div
-          className="flex-1 pr-4 min-h-full border-r-2"
+          className="flex-1 p-4 min-h-full border-r-2"
           style={{ minWidth: "32rem" }}
         >
           {mainFields}
         </div>
 
-        <div className="flex-1 pl-4">{metaDataFields}</div>
+        <div className="flex-1 p-4">{metaDataFields}</div>
       </div>
     </div>
   );

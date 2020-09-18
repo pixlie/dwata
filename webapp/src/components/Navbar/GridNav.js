@@ -38,7 +38,7 @@ const GridStats = () => {
           key={`grd-hd-tbl-${x}`}
           className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
             tableColors[x]
-          )} text-white`}
+          )} text-white cursor-default`}
         >
           {x}
         </span>
@@ -51,7 +51,7 @@ const GridStats = () => {
               key={`grd-hd-tbl-${x}`}
               className={`inline-block text-md font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
                 tableColors[x]
-              )} text-white`}
+              )} text-white cursor-default`}
             >
               {x}
             </span>
