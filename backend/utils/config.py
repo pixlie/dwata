@@ -36,7 +36,7 @@ class Settings(object):
 
         # Settings for running the server on localhost with port number
         self.SERVER_HOST = self._settings.get("server_host", "127.0.0.1")
-        self.SERVER_PORT = self._settings.get("dwata", {}).get("server_port", 12121)
+        self.SERVER_PORT = self._settings.get("dwata", {}).get("server_port", 39282)
         self.DATABASES = self._database_settings()
         self.ALLOWED_ORIGINS = self._settings.get("allowed_origins", [
             "http://localhost:12122"
