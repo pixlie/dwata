@@ -249,6 +249,9 @@ export default ({ item, index }) => {
         </div>
 
         <div className="inline-block items-center">
+          <Button size="sm" theme="secondary">
+            Update&nbsp;<i className="fas far-edit"></i>
+          </Button>
           <Button
             size="sm"
             theme="secondary"

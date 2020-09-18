@@ -21,7 +21,7 @@
   "scripts": {
     "build:tailwind": "postcss src/style/index.tailwind.css -o src/style/index.css",
     "watch:tailwind": "postcss -w src/style/index.tailwind.css -o src/style/index.css",
-    "start": "PORT=12122 run-p watch:tailwind start:react",
+    "start": "PORT=39283 run-p watch:tailwind start:react",
     "start:react": "react-scripts start",
     "prebuild": "npm run build:tailwind",
     "build": "react-scripts build",
