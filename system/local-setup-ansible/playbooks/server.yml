@@ -8,6 +8,7 @@
     system_packages:
       [
         "nginx",
+        "redis-server",
         "git",
         "rsync",
         "python3-pip",

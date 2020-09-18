@@ -6,29 +6,29 @@
 
   tasks:
     - name: Enable nginx to start on boot
-      become: yes
-      become_user: root
       systemd:
         name: nginx
         enabled: yes
+      become: yes
+      become_user: root
 
     - name: Start nginx server
-      become: yes
-      become_user: root
       systemd:
         name: nginx
         state: started
-
-    - name: Enable uvicorn to start on boot
       become: yes
       become_user: root
+
+    - name: Enable uvicorn to start on boot
       systemd:
         name: uvicorn
         enabled: yes
-
-    - name: Start uvicorn server
       become: yes
       become_user: root
+
+    - name: Start uvicorn server
       systemd:
         name: uvicorn
         state: started
+      become: yes
+      become_user: root
