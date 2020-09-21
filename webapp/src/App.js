@@ -7,6 +7,7 @@ import Navbar from "components/Navbar";
 // import Source from "components/Source";
 // import Sidebar from "components/Sidebar";
 import Home from "components/Home";
+import Admin from "components/Admin";
 import Grid from "components/Grid";
 import Notes from "components/Notes";
 // import Actions from "components/Actions";
@@ -31,6 +32,10 @@ export default () => {
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
         <Report />
+      ) : null}
+
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_ADMIN ? (
+        <Admin />
       ) : null}
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (

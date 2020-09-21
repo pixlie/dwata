@@ -5,6 +5,7 @@ import * as globalConstants from "services/global/constants";
 import { Button } from "components/LayoutHelpers";
 // import ProductGuide from "components/ProductGuide";
 import GridNav from "./GridNav";
+import HomeNav from "./HomeNav";
 
 export default ({ isSourceFetching, toggleSidebar }) => {
   const mainApp = useQueryContext((state) => state["main"]);
@@ -94,6 +95,9 @@ export default ({ isSourceFetching, toggleSidebar }) => {
       <div className="block lg:inline-block items-center flex-grow">
         {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
           <GridNav />
+        ) : null}
+        {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
+          <HomeNav />
         ) : null}
       </div>
     </nav>
