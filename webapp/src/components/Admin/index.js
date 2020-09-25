@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 
 import Account from "./Account";
+import Users from "./Users";
 import Auth from "./Auth";
+import Tables from "./Tables";
+import DataSources from "./DataSources";
 
 const SideNavItem = ({ label, icon, tab, setActiveTab }) => {
   const handleClick = () => {
@@ -28,11 +31,19 @@ const sideNavItems = [
     label: "Account",
     tab: "account",
     icon: "fas fa-user-circle",
+    component: Account,
   },
   {
     label: "Users",
     tab: "users",
     icon: "fas fa-users",
+    component: Users,
+  },
+  {
+    label: "Tables",
+    tab: "tables",
+    icon: "fas fa-table",
+    component: Tables,
   },
   {
     label: "Permissions",
@@ -43,11 +54,13 @@ const sideNavItems = [
     label: "Auth",
     tab: "auth",
     icon: "far fa-id-card",
+    component: Auth,
   },
   {
     label: "Data sources",
     tab: "sources",
     icon: "fas fa-database",
+    component: DataSources,
   },
 ];
 
@@ -61,6 +74,9 @@ export default () => {
       currentTab: tabName,
     });
   };
+
+  const currentNavItem = sideNavItems.find((el) => el.tab === state.currentTab);
+  const CurrentComponent = currentNavItem.component;
 
   return (
     <div className="flex flex-row">
@@ -78,8 +94,7 @@ export default () => {
       </div>
 
       <div className="p-8">
-        {state.currentTab === "account" ? <Account /> : null}
-        {state.currentTab === "auth" ? <Auth /> : null}
+        <CurrentComponent />
       </div>
     </div>
   );

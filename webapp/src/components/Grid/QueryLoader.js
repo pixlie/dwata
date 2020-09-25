@@ -11,7 +11,11 @@ export default ({ children }) => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const schema = useSchema((state) =>
+    !!querySpecification && !!querySpecification.sourceLabel
+      ? state[querySpecification.sourceLabel]
+      : null
+  );
   const data = useData((state) => state[queryContext.key]);
 
   useEffect(() => {
@@ -24,12 +28,7 @@ export default ({ children }) => {
     if (!!querySpecification && !!querySpecification.fetchNeeded) {
       fetchData(queryContext.key, querySpecification);
     }
-  }, [
-    querySpecification,
-    querySpecification.fetchNeeded,
-    queryContext.key,
-    fetchData,
-  ]);
+  }, [querySpecification, queryContext.key, fetchData]);
 
   if (!(data && querySpecification && schema)) {
     return <div>Loading...</div>;

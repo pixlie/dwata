@@ -4,7 +4,7 @@ import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   return (
-    <div className="rounded">
+    <div>
       <Hx x="3">Users</Hx>
     </div>
   );

@@ -171,7 +171,6 @@ export default () => {
             {index === state.selectedRowIndex &&
             state.selectedEmbeddedDataIndex !== null ? (
               <EmbeddedTable
-                parentRecordIndex={index}
                 embedContext={{
                   embeddedDataIndex: state.selectedEmbeddedDataIndex,
                   parentRow: row,

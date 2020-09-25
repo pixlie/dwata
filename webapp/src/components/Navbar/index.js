@@ -1,9 +1,7 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 
 import { useQueryContext, useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
-import { Button } from "components/LayoutHelpers";
-// import ProductGuide from "components/ProductGuide";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
 
@@ -11,19 +9,6 @@ export default ({ isSourceFetching, toggleSidebar }) => {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
   const showNotes = useGlobal((state) => state.showNotes);
-  /* const setNavigationButtonMeta = useGlobal(
-    (state) => state.setNavigationButtonMeta
-  ); */
-  const notesButtonRef = useRef(null);
-  /* useEffect(() => {
-    notesButtonRef.current &&
-      setNavigationButtonMeta("notes", {
-        position: {
-          top: notesButtonRef.current.getBoundingClientRect().top,
-          left: notesButtonRef.current.getBoundingClientRect().left,
-        },
-      });
-  }, []); */
 
   const handleHome = (event) => {
     event.preventDefault();
@@ -80,7 +65,6 @@ export default ({ isSourceFetching, toggleSidebar }) => {
               <i className="far fa-sticky-note" />
               &nbsp; Notes
             </Button> */}
-            {/* <ProductGuide guideFor="notesButton" /> */}
           </span>
 
           {/* <div className="inline-block">
