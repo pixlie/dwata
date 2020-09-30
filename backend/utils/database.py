@@ -87,3 +87,8 @@ def get_relations_matrix(source_settings, meta):
                     }
 
     return tables
+
+
+def run_migrations():
+    from migrate.versioning.api import upgrade
+    upgrade("sqlite://dwata_meta.db", "dwata_meta_migrations")

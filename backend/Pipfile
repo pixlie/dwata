@@ -18,6 +18,7 @@ rapidjson = "*"
 toml = "*"
 psycopg2 = "*"
 faker = "*"
+sqlalchemy-migrate = "*"
 
 [requires]
 python_version = "3.8"
