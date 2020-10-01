@@ -25,7 +25,7 @@ const completeFetch = (payload) => ({
   fetchedAt: Math.round(new Date().getTime() / 1000),
 });
 
-const useStore = create((set, get) => ({
+export default create((set, get) => ({
   fetchSchema: async (sourceLabel) => {
     if (!sourceLabel) {
       return;
@@ -56,5 +56,3 @@ const useStore = create((set, get) => ({
     }
   },
 }));
-
-export default useStore;

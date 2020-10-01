@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 
+import * as globalConstants from "services/global/constants";
 import { QueryContext } from "utils";
-import { useQuerySpecification } from "services/store";
+import { useQuerySpecification, useQueryContext } from "services/store";
 import { Hx, Button } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
@@ -10,6 +11,8 @@ export default () => {
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
   );
+  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+
   useEffect(() => {
     initiateQuerySpecification(key, {
       sourceLabel: "dwata_meta",
@@ -24,6 +27,14 @@ export default () => {
     });
   }, []);
 
+  const handleCreateClick = () => {
+    toggleDetailItem({
+      sourceLabel: "dwata_meta",
+      tableName: "dwata_meta_data_sources",
+      operation: globalConstants.OBJECT_CREATE,
+    });
+  };
+
   return (
     <div>
       <Hx x="3">Data sources</Hx>
@@ -32,7 +43,9 @@ export default () => {
         <Grid showPaginator={false} />
       </QueryContext.Provider>
 
-      <Button>Add a data source</Button>
+      <Button attributes={{ onClick: handleCreateClick }}>
+        Add a data source
+      </Button>
     </div>
   );
 };

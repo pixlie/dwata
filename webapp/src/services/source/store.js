@@ -22,7 +22,7 @@ const completeFetch = (payload) => ({
   isReady: true,
 });
 
-const useStore = create((set, get) => ({
+export default create((set, get) => ({
   ...initialState,
 
   fetchSource: async () => {
@@ -44,5 +44,3 @@ const useStore = create((set, get) => ({
     }
   },
 }));
-
-export default useStore;

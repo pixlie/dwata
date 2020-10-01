@@ -48,7 +48,7 @@ const completeFetch = (payload) => {
   };
 };
 
-const useApps = create((set) => ({
+export default create((set) => ({
   ...initialState,
 
   fetchApps: async () => {
@@ -60,5 +60,3 @@ const useApps = create((set) => ({
     }
   },
 }));
-
-export default useApps;

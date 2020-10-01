@@ -285,7 +285,7 @@ export const getQuerySpecificationPayload = (querySpecification) => ({
   limit: querySpecification.limit,
 });
 
-const useStore = create((set) => ({
+export default create((set) => ({
   ...loadFromLocalStorage(),
 
   initiateQuerySpecification: (key, payload) =>
@@ -365,5 +365,3 @@ const useStore = create((set) => ({
       };
     }),
 }));
-
-export default useStore;

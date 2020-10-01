@@ -1,5 +1,6 @@
 import React, { Fragment } from "react";
 
+import * as globalConstants from "services/global/constants";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { useQueryContext } from "services/store";
 
@@ -22,11 +23,12 @@ export default (schema, tableColumns, querySpecification) => {
   const createRowExpandCell = (tableColumn, colIndex) => {
     const RowExpandCell = ({ data, row }) => {
       const handleClick = () => {
-        const [tableName, columnName] = tableColumn.split(".");
+        const [tableName] = tableColumn.split(".");
         toggleDetailItem({
           sourceLabel: querySpecification.sourceLabel,
           tableName: tableName,
           pk: row[colIndex],
+          operation: globalConstants.OBJECT_READ,
         });
       };
 

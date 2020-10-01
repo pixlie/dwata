@@ -36,7 +36,7 @@ const saveToLocalStorage = (appName, context) => {
   return true;
 };
 
-const useQueryContext = create((set) => ({
+export default create((set) => ({
   ...loadFromLocalStorage(),
 
   setContext: (appName, context) =>
@@ -104,5 +104,3 @@ const useQueryContext = create((set) => ({
       },
     })),
 }));
-
-export default useQueryContext;

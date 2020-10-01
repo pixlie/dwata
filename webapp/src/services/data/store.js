@@ -43,7 +43,7 @@ const completeFetchItem = (payload) => ({
   lastFetchedAt: +new Date(),
 });
 
-const useStore = create((set, get) => ({
+export default create((set, get) => ({
   fetchData: async (key, querySpecification) => {
     if (!key) {
       return;
@@ -96,5 +96,3 @@ const useStore = create((set, get) => ({
     }
   },
 }));
-
-export default useStore;

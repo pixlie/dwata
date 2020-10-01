@@ -7,7 +7,7 @@ const initialState = {
   showProductGuideFor: null,
 };
 
-const useStore = create((set) => ({
+export default create((set) => ({
   ...initialState,
 
   toggleSidebar: () =>
@@ -33,5 +33,3 @@ const useStore = create((set) => ({
       showProductGuideFor: guideFor,
     }),
 }));
-
-export default useStore;
