@@ -23,7 +23,6 @@ export default (schema, tableColumns, querySpecification) => {
     const RowExpandCell = ({ data, row }) => {
       const handleClick = () => {
         const [tableName, columnName] = tableColumn.split(".");
-        console.log(row);
         toggleDetailItem({
           sourceLabel: querySpecification.sourceLabel,
           tableName: tableName,

@@ -9,10 +9,10 @@ import Navbar from "components/Navbar";
 import Home from "components/Home";
 import Admin from "components/Admin";
 import Grid from "components/Grid";
+import Detail from "components/Detail";
 import Notes from "components/Notes";
 // import Actions from "components/Actions";
 import Report from "components/Report";
-import Detail from "components/Detail";
 
 export default () => {
   const mainApp = useQueryContext((state) => state["main"]);
@@ -24,20 +24,17 @@ export default () => {
 
       <Detail />
       <Notes />
-      {/* <Sidebar><Source /></Sidebar> */}
 
+      {/* <Sidebar><Source /></Sidebar> */}
       {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
         <Grid />
       ) : null}
-
       {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
         <Report />
       ) : null}
-
       {mainApp && mainApp.appType === globalConstants.APP_NAME_ADMIN ? (
         <Admin />
       ) : null}
-
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
         <Home />
       ) : null}

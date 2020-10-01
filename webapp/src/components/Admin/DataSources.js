@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { Hx } from "components/LayoutHelpers";
+import { Hx, Button } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
 export default () => {
@@ -15,8 +15,9 @@ export default () => {
       sourceLabel: "dwata_meta",
       select: [
         {
-          label: "dwata_meta_data_sources",
+          label: "dwata_meta_data_sources.*",
           tableName: "dwata_meta_data_sources",
+          columnName: "*",
         },
       ],
       fetchNeeded: true,
@@ -28,8 +29,10 @@ export default () => {
       <Hx x="3">Data sources</Hx>
 
       <QueryContext.Provider value={{ key }}>
-        <Grid />
+        <Grid showPaginator={false} />
       </QueryContext.Provider>
+
+      <Button>Add a data source</Button>
     </div>
   );
 };

@@ -247,7 +247,7 @@ class Select(object):
                               if column_name not in uc[table_name]]
         current_table = dm.tables[table_name]
         current_table_columns = []
-        if "id" in table_column_names and "id" not in column_list:
+        if "id" in table_column_names and "id" not in column_list and column_list != {"*"}:
             # If there is an "id" column then it is always included, the UI hides it as needed
             current_table_columns.append(getattr(current_table.c, "id"))
 
