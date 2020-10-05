@@ -1,7 +1,8 @@
 from starlette.background import BackgroundTask
 
 from utils.response import RapidJSONResponse
-from utils.settings import get_all_sources, get_source_settings, get_source_database
+from utils.settings import get_all_sources, get_source_settings
+from database.schema import get_schema
 from services import all_services
 from utils.cache import read_from_redis, cache_to_redis
 
@@ -17,7 +18,7 @@ async def schema_get(request):
         cache_value = await read_from_redis(cache_key=cache_key)
         if cache_value:
             return RapidJSONResponse(cache_value)
-        response = await get_source_database(
+        response = await get_schema(
             source_settings=source_settings,
             table_name=table_name
         )

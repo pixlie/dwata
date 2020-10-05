@@ -6,7 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from json.decoder import JSONDecodeError
 
 from utils.response import RapidJSONResponse, web_error
-from utils.database import connect_database, get_unavailable_columns
+from utils.database import get_unavailable_columns
+from database.connect import connect_database
 from utils.settings import get_source_settings
 
 
