@@ -1,30 +1,14 @@
-import React, { useEffect, useCallback, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
-import { QueryContext, tableColorWhiteOnMedium } from "utils";
-import {
-  useSchema,
-  // useData,
-  useQueryContext,
-  useQuerySpecification,
-} from "services/store";
-// import { getColumnSchema } from "services/querySpecification/getters";
+import { saveDataSource } from "services/apps/actions";
+import { useSchema, useQueryContext } from "services/store";
 import { Button } from "components/LayoutHelpers";
 import cellRenderer from "./Cell";
 
 export default ({ item, index }) => {
-  // const key = `${item.sourceLabel}/${item.tableName}/${item.pk}`;
-  const queryContext = useContext(QueryContext);
-  const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
-  );
-  // const fetchData = useData((state) => state.fetchData);
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
   const schema = useSchema((state) => state[item.sourceLabel]);
-  /* useEffect(() => {
-    fetchData(key, item);
-  }, [key, item, fetchData]); */
-  // const dataItem = useData((state) => state[key]);
-  const tableColors = querySpecification.tableColors;
+  const [state, setState] = useState({});
 
   const handleKey = useCallback(
     (event) => {
@@ -42,9 +26,15 @@ export default ({ item, index }) => {
     };
   }, [handleKey]);
 
-  /* if (!dataItem || !dataItem.isReady) {
-    return null;
-  } */
+  const updateInputChange = (columnName, value) => {
+    setState({
+      [columnName]: value,
+    });
+  };
+
+  const handleClickSave = () => {
+    saveDataSource();
+  };
 
   const mainFields = [];
   const metaDataFields = [];
@@ -52,27 +42,20 @@ export default ({ item, index }) => {
 
   for (const colDefinition of schemaTable.columns) {
     const columnName = colDefinition.name;
-    /* const colDefinition = getColumnSchema(
-      schema.rows,
-      `${item.tableName}.${columnName}`
-    ); */
-    const Cell = cellRenderer(colDefinition, item.sourceLabel);
+    const Cell = cellRenderer(
+      colDefinition,
+      updateInputChange,
+      item.sourceLabel
+    );
 
     if (Cell === null) {
       continue;
     }
     if (colDefinition.ui_hints.includes("is_meta")) {
-      metaDataFields.push(
-        <Cell key={`cl-${columnName}`} data={null} column={colDefinition} />
-      );
+      metaDataFields.push(<Cell key={`cl-${columnName}`} data={null} />);
     } else {
       mainFields.push(
-        <Cell
-          key={`cl-${columnName}`}
-          data={null}
-          column={colDefinition}
-          isDisabled={false}
-        />
+        <Cell key={`cl-${columnName}`} data={null} isDisabled={false} />
       );
     }
   }
@@ -86,17 +69,15 @@ export default ({ item, index }) => {
         <div className="inline-block items-center flex-grow">
           <span
             key={`grd-hd-tbl-${item.tableName}`}
-            className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
-              tableColors[item.tableName]
-            )} text-white cursor-default`}
+            className="inline-block text-xl font-semibold px-2 mr-2 rounded cursor-default"
           >
             {item.tableName}
           </span>
         </div>
 
         <div className="inline-block items-center">
-          <Button size="sm" theme="secondary">
-            Update&nbsp;<i className="fas far-edit"></i>
+          <Button size="sm" theme="success">
+            Create&nbsp;<i className="far fa-check-circle"></i>
           </Button>
           <Button
             size="sm"

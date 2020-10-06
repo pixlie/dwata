@@ -1,6 +1,6 @@
 import React from "react";
 
-export default (column, sourceLabel) => {
+export default (columnDefinition, updateChange, sourceLabel) => {
   const date_time_options = {
     year: "numeric",
     month: "numeric",
@@ -11,13 +11,17 @@ export default (column, sourceLabel) => {
     hour12: false,
   };
 
+  const handleChange = (event) => {
+    updateChange(columnDefinition.name, event.target.value);
+  };
+
   const DefaultCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
-        value={data === null ? "" : data}
+        defaultValue={data === null ? "" : data}
         disabled={isDisabled}
       />
     </div>
@@ -25,11 +29,11 @@ export default (column, sourceLabel) => {
 
   const TitleCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
-        value={data === null ? "" : data}
+        defaultValue={data === null ? "" : data}
         disabled={isDisabled}
       />
     </div>
@@ -37,7 +41,7 @@ export default (column, sourceLabel) => {
 
   const TextareaCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <textarea
         className="block border px-2 py-1 w-full h-40 rounded"
         disabled={isDisabled}
@@ -48,11 +52,11 @@ export default (column, sourceLabel) => {
 
   const PrimaryKeyCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
-        value={data === null ? "" : data}
+        defaultValue={data === null ? "" : data}
         disabled={isDisabled}
       />
     </div>
@@ -60,11 +64,11 @@ export default (column, sourceLabel) => {
 
   const RelatedCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
-        value={data === null ? "" : data}
+        defaultValue={data === null ? "" : data}
         disabled={isDisabled}
       />
       {/* {data ? (
@@ -88,18 +92,19 @@ export default (column, sourceLabel) => {
       <label className="checkbox">
         <input type="checkbox" checked={data === true} disabled={isDisabled} />{" "}
         &nbsp;
-        {column.name}
+        {columnDefinition.name}
       </label>
     </div>
   );
 
   const JSONCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
+      <label className="font-semibold mr-2">{columnDefinition.name}</label>
       <textarea
         className="block border px-2 py-1 w-full h-40 rounded"
         disabled={isDisabled}
         defaultValue={data !== null ? JSON.stringify(data, null, 2) : ""}
+        onChange={handleChange}
       />
     </div>
   );
@@ -117,30 +122,33 @@ export default (column, sourceLabel) => {
     }
     return (
       <div className="my-4">
-        <label className="font-semibold mr-2">{column.name}</label>
+        <label className="font-semibold mr-2">{columnDefinition.name}</label>
         <input
           className="block border px-2 py-1 w-full rounded"
           type="text"
-          value={parsedDate === null ? "-" : data}
+          defaultValue={parsedDate === null ? "-" : data}
           disabled={isDisabled}
         />
       </div>
     );
   };
 
-  if (column.is_primary_key) {
+  if (columnDefinition.is_primary_key) {
     return PrimaryKeyCell;
-  } else if (column.has_foreign_keys) {
+  } else if (columnDefinition.has_foreign_keys) {
     return RelatedCell;
-  } else if (column.type === "BOOLEAN") {
+  } else if (columnDefinition.type === "BOOLEAN") {
     return BooleanCell;
-  } else if (column.type === "JSONB" || column.type === "JSON") {
+  } else if (
+    columnDefinition.type === "JSONB" ||
+    columnDefinition.type === "JSON"
+  ) {
     return JSONCell;
-  } else if (column.type === "TIMESTAMP") {
+  } else if (columnDefinition.type === "TIMESTAMP") {
     return TimeStampCell;
-  } else if (column.ui_hints.includes("is_title")) {
+  } else if (columnDefinition.ui_hints.includes("is_title")) {
     return TitleCell;
-  } else if (column.ui_hints.includes("is_text_lg")) {
+  } else if (columnDefinition.ui_hints.includes("is_text_lg")) {
     return TextareaCell;
   } else {
     return DefaultCell;

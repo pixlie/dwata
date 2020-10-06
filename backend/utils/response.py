@@ -23,7 +23,7 @@ class RapidJSONResponse(JSONResponse):
         return RapidJSONEncoder().encode(content).encode("utf-8")
 
 
-def web_error(error_code, message, level="error"):
+def web_error(error_code: str, message: str) -> RapidJSONResponse:
     logger.error("({}) {}".format(error_code, message))
     return RapidJSONResponse({
         "error_code": error_code,

@@ -71,6 +71,10 @@ export const Button = ({
   if (theme === "primary") {
     classes =
       classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
+  } else if (theme === "success") {
+    classes =
+      classes +
+      " bg-green-400 text-gray-700 hover:bg-green-700 hover:text-white";
   } else if (theme === "secondary") {
     classes =
       classes + " bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";

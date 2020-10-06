@@ -1,3 +1,4 @@
+from typing import Union
 from importlib import import_module
 from starlette.responses import Response
 from starlette.requests import Request
@@ -11,7 +12,7 @@ from database.connect import connect_database
 from utils.settings import get_source_settings
 
 
-async def item_get(request: Request):
+async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
     """
     This method fetches a single row of data given the source_id, table_name and primary key id.
     There are tables which do not have a primary key and in those case an index might be used.
@@ -63,7 +64,7 @@ async def item_get(request: Request):
     )
 
 
-async def item_post(request: Request):
+async def item_post(request: Request) -> Union[Response, RapidJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     settings = get_source_settings(source_label=source_label)
@@ -75,6 +76,7 @@ async def item_post(request: Request):
 
     if not table_name or (table_name and table_name not in meta.tables):
         conn.close()
+        # Todo: Refactor all 404 Response to be a `raise` statement instead
         return Response("", status_code=404)
     table_to_insert = meta.tables[table_name]
     table_column_names = meta.tables[table_name].columns.keys()
@@ -94,6 +96,7 @@ async def item_post(request: Request):
         )
     if request.app.state.IS_DWATA_APP:
         app_name = request.app.state.DWATA_APP_NAME
+        # Todo: Refactor this to use a configurable settings (SQLite store) based approach
         module = import_module("apps.{}.models".format(app_name))
         if hasattr(module, "{}_pre_insert".format(app_name)):
             payload = getattr(module, "{}_pre_insert".format(app_name))(payload)
@@ -109,11 +112,10 @@ async def item_post(request: Request):
     except IntegrityError as e:
         # Todo: handle error when required fields are not provided
         if hasattr(e, "args") and "UNIQUE constraint failed" in e.args[0]:
-            # Todo: update this response status
             return Response("", status_code=404)
 
 
-async def item_put(request: Request):
+async def item_put(request: Request) -> Union[Response, RapidJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     item_pk = request.path_params["item_pk"]

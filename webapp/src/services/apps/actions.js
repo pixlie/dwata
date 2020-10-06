@@ -16,6 +16,17 @@ export const saveNote = async (querySpecification, payload, pk) => {
   });
 };
 
+export const saveDataSource = async (payload, pk) => {
+  const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_data_sources`;
+  const url = pk !== null ? `${baseURL}/${pk}` : baseURL;
+
+  await axios({
+    method: pk !== null ? "put" : "post",
+    url,
+    data: payload,
+  });
+};
+
 /*
 export const pinRecords = (path, selectedRowList) => {
   const { sourceId, tableName } = getRecordPinAppConfig(state);
