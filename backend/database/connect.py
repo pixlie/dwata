@@ -30,9 +30,3 @@ async def connect_database(db_url):
             message="We encountered an unknown error with the database"
         )
     return engine, conn
-
-
-async def connect_dwata_meta_database(db_url):
-    engine = create_engine(db_url)
-    conn = engine.connect()
-    return engine, conn

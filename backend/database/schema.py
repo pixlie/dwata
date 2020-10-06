@@ -29,7 +29,7 @@ def column_definition(col, col_def):
         hints = []
         if (col_def.primary_key or
                 len(col_def.foreign_keys) > 0 or
-                _type in ["INET", "TIMESTAMP", "DATE", "JSONB", "JSON"]):
+                _type in ["INET", "TIMESTAMP", "DATE"]):
             hints.append("is_meta")
         elif col.lower()[-3:] in ["_id", "_pk", "_fk"]:
             hints.append("is_meta")

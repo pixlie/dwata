@@ -1,10 +1,10 @@
-import uvicorn
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
+# from starlette.middleware.cors import CORSMiddleware
 from starlette.routing import Route
 
-from utils.config import settings
+from database.dwata_meta import dwata_meta_db
+# from utils.config import get_settings
 from utils.exceptions import web_exception_handlers
 from utils.app import DwataAppMiddleware
 from endpoints.source import source_get
@@ -38,21 +38,24 @@ handlers = [
 ]
 
 
-middleware = [
-    Middleware(
-        CORSMiddleware,
-        allow_origins=settings.ALLOWED_ORIGINS,
-        allow_methods=["OPTIONS", "GET", "POST", "PUT"],
-        allow_headers="Authorization,Access-Control-Allow-Headers,Origin,Accept,X-Requested-With"
-                      ",Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers"
-    ),
-    Middleware(DwataAppMiddleware)
+middlewares = [
+    Middleware(DwataAppMiddleware),
 ]
+"""
+Middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_methods=["OPTIONS", "GET", "POST", "PUT"],
+    allow_headers="Authorization,Access-Control-Allow-Headers,Origin,Accept,X-Requested-With"
+                  ",Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers"
+),
+"""
 
-
-# app = Starlette(debug=True, routes=handlers, exception_handlers=exception_handlers)
-app = Starlette(debug=True, routes=handlers, middleware=middleware, exception_handlers=web_exception_handlers)
-
-
-if __name__ == "__main__":
-    uvicorn.run(app=app, host=settings.SERVER_HOST, port=settings.SERVER_PORT)
+app = Starlette(
+    debug=True,
+    on_startup=[dwata_meta_db.connect],
+    on_shutdown=[dwata_meta_db.disconnect],
+    routes=handlers,
+    middleware=middlewares,
+    exception_handlers=web_exception_handlers
+)

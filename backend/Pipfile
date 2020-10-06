@@ -15,10 +15,10 @@ loguru = "*"
 aiohttp = "*"
 aioredis = "*"
 rapidjson = "*"
-toml = "*"
 psycopg2 = "*"
 faker = "*"
 sqlalchemy-migrate = "*"
+databases = {extras = ["sqlite"],version = "*"}
 
 [requires]
 python_version = "3.8"

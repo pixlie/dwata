@@ -67,7 +67,12 @@ export default ({ item, index }) => {
       );
     } else {
       mainFields.push(
-        <Cell key={`cl-${columnName}`} data={null} column={colDefinition} />
+        <Cell
+          key={`cl-${columnName}`}
+          data={null}
+          column={colDefinition}
+          isDisabled={false}
+        />
       );
     }
   }

@@ -9,7 +9,8 @@ from utils.cache import read_from_redis, cache_to_redis
 
 async def schema_get(request):
     source_label = request.path_params["source_label"]
-    requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
+    all_sources = await get_all_sources()
+    requested_source = [x for x in all_sources if x[0] == source_label][0]
     source_settings = get_source_settings(source_label=source_label)
 
     if requested_source[1] == "database":

@@ -11,61 +11,61 @@ export default (column, sourceLabel) => {
     hour12: false,
   };
 
-  const DefaultCell = ({ data }) => (
+  const DefaultCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
         value={data === null ? "" : data}
-        disabled
+        disabled={isDisabled}
       />
     </div>
   );
 
-  const TitleCell = ({ data }) => (
+  const TitleCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
         value={data === null ? "" : data}
-        disabled
+        disabled={isDisabled}
       />
     </div>
   );
 
-  const TextareaCell = ({ data }) => (
+  const TextareaCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="font-semibold mr-2">{column.name}</label>
       <textarea
         className="block border px-2 py-1 w-full h-40 rounded"
-        disabled
+        disabled={isDisabled}
         defaultValue={data}
       />
     </div>
   );
 
-  const PrimaryKeyCell = ({ data }) => (
-    <div className="my-4">
-      <label className="font-semibold mr-2">{column.name}</label>
-      <input
-        className="border px-2 py-1"
-        type="text"
-        value={data === null ? "" : data}
-        disabled
-      />
-    </div>
-  );
-
-  const RelatedCell = ({ data }) => (
+  const PrimaryKeyCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="font-semibold mr-2">{column.name}</label>
       <input
         className="block border px-2 py-1 w-full rounded"
         type="text"
         value={data === null ? "" : data}
-        disabled
+        disabled={isDisabled}
+      />
+    </div>
+  );
+
+  const RelatedCell = ({ data, isDisabled = true }) => (
+    <div className="my-4">
+      <label className="font-semibold mr-2">{column.name}</label>
+      <input
+        className="block border px-2 py-1 w-full rounded"
+        type="text"
+        value={data === null ? "" : data}
+        disabled={isDisabled}
       />
       {/* {data ? (
         <p className="help">
@@ -83,35 +83,28 @@ export default (column, sourceLabel) => {
     </div>
   );
 
-  const BooleanCell = ({ data }) => (
+  const BooleanCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="checkbox">
-        <input type="checkbox" checked={data === true} disabled /> &nbsp;
+        <input type="checkbox" checked={data === true} disabled={isDisabled} />{" "}
+        &nbsp;
         {column.name}
       </label>
     </div>
   );
 
-  const JSONCell = ({ data }) => (
+  const JSONCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
       <label className="font-semibold mr-2">{column.name}</label>
-      <div className="control">
-        {data !== null ? (
-          <div
-            onClick={() => {
-              alert(JSON.stringify(data));
-            }}
-          >
-            {"{JSON}"}
-          </div>
-        ) : (
-          "{}"
-        )}
-      </div>
+      <textarea
+        className="block border px-2 py-1 w-full h-40 rounded"
+        disabled={isDisabled}
+        defaultValue={data !== null ? JSON.stringify(data, null, 2) : ""}
+      />
     </div>
   );
 
-  const TimeStampCell = ({ data }) => {
+  const TimeStampCell = ({ data, isDisabled = true }) => {
     let parsedDate = null;
     if (data !== null) {
       try {
@@ -129,7 +122,7 @@ export default (column, sourceLabel) => {
           className="block border px-2 py-1 w-full rounded"
           type="text"
           value={parsedDate === null ? "-" : data}
-          disabled
+          disabled={isDisabled}
         />
       </div>
     );

@@ -1,10 +1,11 @@
 from urllib.parse import urlparse
 
-from utils.config import settings
+from utils.config import get_settings
 
 
-def get_all_sources():
+async def get_all_sources():
     from services import all_services
+    settings = await get_settings()
 
     databases = [
         [label, "database", db.scheme, {}] for (label, db) in [
