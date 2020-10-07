@@ -5,10 +5,76 @@ import { useSchema, useQueryContext } from "services/store";
 import { Button } from "components/LayoutHelpers";
 import cellRenderer from "./Cell";
 
+const FormInner = ({ columns }) => {
+  const [state, setState] = useState({});
+  const updateInputChange = (columnName, value) => {
+    setState((current) => ({
+      ...current,
+      [columnName]: value,
+    }));
+  };
+
+  const handleClickSave = async () => {
+    await saveDataSource(state);
+  };
+
+  const mainFields = [];
+  const metaDataFields = [];
+
+  for (const colDefinition of columns) {
+    const columnName = colDefinition.name;
+    const Cell = colDefinition.cell;
+
+    if (Cell === null) {
+      continue;
+    }
+    if (colDefinition.ui_hints.includes("is_meta")) {
+      metaDataFields.push(
+        <Cell
+          key={`cl-${columnName}`}
+          data={state[columnName]}
+          updateChange={updateInputChange}
+        />
+      );
+    } else {
+      mainFields.push(
+        <Cell
+          key={`cl-${columnName}`}
+          data={state[columnName]}
+          isDisabled={false}
+          updateChange={updateInputChange}
+        />
+      );
+    }
+  }
+
+  return (
+    <div className="flex flex-row">
+      <div
+        className="flex-1 p-4 min-h-full border-r-2"
+        style={{ minWidth: "32rem" }}
+      >
+        {mainFields}
+
+        <div className="mt-4 flex justify-end">
+          <Button
+            size="lg"
+            theme="success"
+            attributes={{ onClick: handleClickSave }}
+          >
+            Create&nbsp;<i className="far fa-check-circle"></i>
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex-1 p-4">{metaDataFields}</div>
+    </div>
+  );
+};
+
 export default ({ item, index }) => {
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
   const schema = useSchema((state) => state[item.sourceLabel]);
-  const [state, setState] = useState({});
 
   const handleKey = useCallback(
     (event) => {
@@ -26,38 +92,9 @@ export default ({ item, index }) => {
     };
   }, [handleKey]);
 
-  const updateInputChange = (columnName, value) => {
-    setState({
-      [columnName]: value,
-    });
-  };
-
-  const handleClickSave = () => {
-    saveDataSource();
-  };
-
-  const mainFields = [];
-  const metaDataFields = [];
   const schemaTable = schema.rows.find((x) => x.table_name === item.tableName);
-
   for (const colDefinition of schemaTable.columns) {
-    const columnName = colDefinition.name;
-    const Cell = cellRenderer(
-      colDefinition,
-      updateInputChange,
-      item.sourceLabel
-    );
-
-    if (Cell === null) {
-      continue;
-    }
-    if (colDefinition.ui_hints.includes("is_meta")) {
-      metaDataFields.push(<Cell key={`cl-${columnName}`} data={null} />);
-    } else {
-      mainFields.push(
-        <Cell key={`cl-${columnName}`} data={null} isDisabled={false} />
-      );
-    }
+    colDefinition.cell = cellRenderer(colDefinition, item.sourceLabel);
   }
 
   return (
@@ -76,9 +113,6 @@ export default ({ item, index }) => {
         </div>
 
         <div className="inline-block items-center">
-          <Button size="sm" theme="success">
-            Create&nbsp;<i className="far fa-check-circle"></i>
-          </Button>
           <Button
             size="sm"
             theme="secondary"
@@ -89,16 +123,7 @@ export default ({ item, index }) => {
         </div>
       </div>
 
-      <div className="flex flex-row">
-        <div
-          className="flex-1 p-4 min-h-full border-r-2"
-          style={{ minWidth: "32rem" }}
-        >
-          {mainFields}
-        </div>
-
-        <div className="flex-1 p-4">{metaDataFields}</div>
-      </div>
+      <FormInner columns={schemaTable.columns} />
     </div>
   );
 };

@@ -4,10 +4,10 @@ import { dataItemURL } from "services/urls";
 
 export const saveNote = async (querySpecification, payload, pk) => {
   const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_note`;
-  const url = pk !== null ? `${baseURL}/${pk}` : baseURL;
+  const url = !!pk ? `${baseURL}/${pk}` : baseURL;
 
   await axios({
-    method: pk !== null ? "put" : "post",
+    method: !!pk ? "put" : "post",
     url,
     data: {
       query_specification: querySpecification,
@@ -18,10 +18,10 @@ export const saveNote = async (querySpecification, payload, pk) => {
 
 export const saveDataSource = async (payload, pk) => {
   const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_data_sources`;
-  const url = pk !== null ? `${baseURL}/${pk}` : baseURL;
+  const url = !!pk ? `${baseURL}/${pk}` : baseURL;
 
   await axios({
-    method: pk !== null ? "put" : "post",
+    method: !!pk ? "put" : "post",
     url,
     data: payload,
   });

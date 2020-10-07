@@ -1,6 +1,6 @@
 import React from "react";
 
-export default (columnDefinition, updateChange, sourceLabel) => {
+export default (columnDefinition, sourceLabel) => {
   const date_time_options = {
     year: "numeric",
     month: "numeric",
@@ -11,44 +11,61 @@ export default (columnDefinition, updateChange, sourceLabel) => {
     hour12: false,
   };
 
-  const handleChange = (event) => {
-    updateChange(columnDefinition.name, event.target.value);
+  const DefaultCell = ({ data, isDisabled = true, updateChange }) => {
+    const handleChange = (event) => {
+      updateChange(columnDefinition.name, event.target.value);
+    };
+
+    return (
+      <div className="my-4">
+        <label className="font-semibold mr-2">{columnDefinition.name}</label>
+        <input
+          className="block border px-2 py-1 w-full rounded"
+          type="text"
+          data={!!data ? data : ""}
+          disabled={isDisabled}
+          onChange={handleChange}
+        />
+      </div>
+    );
   };
 
-  const DefaultCell = ({ data, isDisabled = true }) => (
-    <div className="my-4">
-      <label className="font-semibold mr-2">{columnDefinition.name}</label>
-      <input
-        className="block border px-2 py-1 w-full rounded"
-        type="text"
-        defaultValue={data === null ? "" : data}
-        disabled={isDisabled}
-      />
-    </div>
-  );
+  const TitleCell = ({ data, isDisabled = true, updateChange }) => {
+    const handleChange = (event) => {
+      updateChange(columnDefinition.name, event.target.value);
+    };
 
-  const TitleCell = ({ data, isDisabled = true }) => (
-    <div className="my-4">
-      <label className="font-semibold mr-2">{columnDefinition.name}</label>
-      <input
-        className="block border px-2 py-1 w-full rounded"
-        type="text"
-        defaultValue={data === null ? "" : data}
-        disabled={isDisabled}
-      />
-    </div>
-  );
+    return (
+      <div className="my-4">
+        <label className="font-semibold mr-2">{columnDefinition.name}</label>
+        <input
+          className="block border px-2 py-1 w-full rounded"
+          type="text"
+          data={!!data ? data : ""}
+          disabled={isDisabled}
+          onChange={handleChange}
+        />
+      </div>
+    );
+  };
 
-  const TextareaCell = ({ data, isDisabled = true }) => (
-    <div className="my-4">
-      <label className="font-semibold mr-2">{columnDefinition.name}</label>
-      <textarea
-        className="block border px-2 py-1 w-full h-40 rounded"
-        disabled={isDisabled}
-        defaultValue={data}
-      />
-    </div>
-  );
+  const TextareaCell = ({ data, isDisabled = true, updateChange }) => {
+    const handleChange = (event) => {
+      updateChange(columnDefinition.name, event.target.value);
+    };
+
+    return (
+      <div className="my-4">
+        <label className="font-semibold mr-2">{columnDefinition.name}</label>
+        <textarea
+          className="block border px-2 py-1 w-full h-40 rounded"
+          data={!!data ? data : ""}
+          disabled={isDisabled}
+          onChange={handleChange}
+        />
+      </div>
+    );
+  };
 
   const PrimaryKeyCell = ({ data, isDisabled = true }) => (
     <div className="my-4">
@@ -97,17 +114,23 @@ export default (columnDefinition, updateChange, sourceLabel) => {
     </div>
   );
 
-  const JSONCell = ({ data, isDisabled = true }) => (
-    <div className="my-4">
-      <label className="font-semibold mr-2">{columnDefinition.name}</label>
-      <textarea
-        className="block border px-2 py-1 w-full h-40 rounded"
-        disabled={isDisabled}
-        defaultValue={data !== null ? JSON.stringify(data, null, 2) : ""}
-        onChange={handleChange}
-      />
-    </div>
-  );
+  const JSONCell = ({ data, isDisabled = true, updateChange }) => {
+    const handleChange = (event) => {
+      updateChange(columnDefinition.name, event.target.value);
+    };
+
+    return (
+      <div className="my-4">
+        <label className="font-semibold mr-2">{columnDefinition.name}</label>
+        <textarea
+          className="block border px-2 py-1 w-full h-40 rounded"
+          data={!!data ? data : ""}
+          disabled={isDisabled}
+          onChange={handleChange}
+        />
+      </div>
+    );
+  };
 
   const TimeStampCell = ({ data, isDisabled = true }) => {
     let parsedDate = null;
