@@ -22,7 +22,7 @@ export default (columnDefinition, sourceLabel) => {
         <input
           className="block border px-2 py-1 w-full rounded"
           type="text"
-          data={!!data ? data : ""}
+          value={!!data ? data : ""}
           disabled={isDisabled}
           onChange={handleChange}
         />
@@ -41,7 +41,7 @@ export default (columnDefinition, sourceLabel) => {
         <input
           className="block border px-2 py-1 w-full rounded"
           type="text"
-          data={!!data ? data : ""}
+          value={!!data ? data : ""}
           disabled={isDisabled}
           onChange={handleChange}
         />
@@ -59,7 +59,7 @@ export default (columnDefinition, sourceLabel) => {
         <label className="font-semibold mr-2">{columnDefinition.name}</label>
         <textarea
           className="block border px-2 py-1 w-full h-40 rounded"
-          data={!!data ? data : ""}
+          value={!!data ? data : ""}
           disabled={isDisabled}
           onChange={handleChange}
         />
@@ -104,15 +104,26 @@ export default (columnDefinition, sourceLabel) => {
     </div>
   );
 
-  const BooleanCell = ({ data, isDisabled = true }) => (
-    <div className="my-4">
-      <label className="checkbox">
-        <input type="checkbox" checked={data === true} disabled={isDisabled} />{" "}
-        &nbsp;
-        {columnDefinition.name}
-      </label>
-    </div>
-  );
+  const BooleanCell = ({ data, isDisabled = true, updateChange }) => {
+    const handleChange = (event) => {
+      updateChange(columnDefinition.name, event.target.value);
+    };
+
+    return (
+      <div className="my-4">
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={data === true}
+            disabled={isDisabled}
+            onChange={handleChange}
+          />
+          &nbsp;
+          {columnDefinition.name}
+        </label>
+      </div>
+    );
+  };
 
   const JSONCell = ({ data, isDisabled = true, updateChange }) => {
     const handleChange = (event) => {
@@ -124,7 +135,7 @@ export default (columnDefinition, sourceLabel) => {
         <label className="font-semibold mr-2">{columnDefinition.name}</label>
         <textarea
           className="block border px-2 py-1 w-full h-40 rounded"
-          data={!!data ? data : ""}
+          value={!!data ? data : ""}
           disabled={isDisabled}
           onChange={handleChange}
         />

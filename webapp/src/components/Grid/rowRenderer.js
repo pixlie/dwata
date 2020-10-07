@@ -17,8 +17,9 @@ export default (schema, tableColumns, querySpecification) => {
     second: "numeric",
     hour12: false,
   };
-  const contentTextSize = "text-sm";
+  const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-300";
+  const paddingClasses = "px-2 py-1";
 
   const createRowExpandCell = (tableColumn, colIndex) => {
     const RowExpandCell = ({ data, row }) => {
@@ -33,7 +34,7 @@ export default (schema, tableColumns, querySpecification) => {
       };
 
       return (
-        <td className="px-2 py-1 border border-gray-300">
+        <td className={`${paddingClasses} ${borderClasses}`}>
           <span
             className="text-sm text-blue-600 cursor-pointer"
             onClick={handleClick}
@@ -48,17 +49,23 @@ export default (schema, tableColumns, querySpecification) => {
   };
 
   const DefaultCell = ({ data }) => (
-    <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>{data}</td>
+    <td
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+    >
+      {data}
+    </td>
   );
+
   const PrimaryKeyCell = ({ data }) => (
     <th
-      className={`px-2 py-1 ${borderClasses} ${contentTextSize} text-gray-600`}
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses} text-gray-600`}
     >
       {data}
     </th>
   );
+
   const BooleanCell = ({ data }) => (
-    <td className={`px-2 py-1 ${borderClasses}`}>
+    <td className={`${paddingClasses} ${borderClasses}`}>
       {data === true || data === false ? (
         <Fragment>
           {data === true ? (
@@ -82,7 +89,11 @@ export default (schema, tableColumns, querySpecification) => {
       )}
     </td>
   );
-  const JSONCell = () => <td>{"{}"}</td>;
+
+  const JSONCell = () => (
+    <td className={`${paddingClasses} ${borderClasses}`}>{"{}"}</td>
+  );
+
   const TimeStampCell = ({ data }) => {
     try {
       return (
@@ -98,13 +109,16 @@ export default (schema, tableColumns, querySpecification) => {
       }
     }
   };
+
   const CharCell = ({ data }) => {
     const maxLengthToShow = 40;
     const handleClick = () => {};
 
     if (data && data.length > maxLengthToShow) {
       return (
-        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
+        <td
+          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+        >
           <span
             className={`inline-block max-w-sm h-12 overflow-hidden`}
             onClick={handleClick}
@@ -115,7 +129,9 @@ export default (schema, tableColumns, querySpecification) => {
       );
     } else {
       return (
-        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
+        <td
+          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+        >
           {data}
         </td>
       );

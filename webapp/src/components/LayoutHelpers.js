@@ -70,7 +70,7 @@ export const Button = ({
   let classes = `inline-block text-sm font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
   if (theme === "primary") {
     classes =
-      classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
+      classes + " bg-blue-300 text-gray-800 hover:bg-blue-700 hover:text-white";
   } else if (theme === "success") {
     classes =
       classes +

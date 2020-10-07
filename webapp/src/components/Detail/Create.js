@@ -59,6 +59,7 @@ const FormInner = ({ columns }) => {
         <div className="mt-4 flex justify-end">
           <Button
             size="lg"
+            margin=""
             theme="success"
             attributes={{ onClick: handleClickSave }}
           >

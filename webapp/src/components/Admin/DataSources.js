@@ -43,9 +43,11 @@ export default () => {
         <Grid showPaginator={false} />
       </QueryContext.Provider>
 
-      <Button attributes={{ onClick: handleCreateClick }}>
-        Add a data source
-      </Button>
+      <div className="mt-4 flex justify-end">
+        <Button margin="" size="sm" attributes={{ onClick: handleCreateClick }}>
+          Add a data source
+        </Button>
+      </div>
     </div>
   );
 };

@@ -7,23 +7,75 @@ import {
   useQueryContext,
   useQuerySpecification,
 } from "services/store";
-import { getColumnSchema } from "services/querySpecification/getters";
 import { Button } from "components/LayoutHelpers";
 import cellRenderer from "./Cell";
 
-export default ({ item, index }) => {
+const ViewInner = ({ item, columns }) => {
   const key = `${item.sourceLabel}/${item.tableName}/${item.pk}`;
-  const queryContext = useContext(QueryContext);
-  const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
-  );
   const fetchData = useData((state) => state.fetchData);
-  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
-  const schema = useSchema((state) => state[item.sourceLabel]);
+
   useEffect(() => {
     fetchData(key, item);
   }, [key, item, fetchData]);
   const dataItem = useData((state) => state[key]);
+
+  if (!dataItem || !dataItem.isReady) {
+    return null;
+  }
+  console.log(dataItem.item);
+
+  const updateInputChange = () => {};
+  const mainFields = [];
+  const metaDataFields = [];
+
+  for (const colDefinition of columns) {
+    const columnName = colDefinition.name;
+    const Cell = colDefinition.cell;
+
+    if (Cell === null) {
+      continue;
+    }
+    if (colDefinition.ui_hints.includes("is_meta")) {
+      metaDataFields.push(
+        <Cell
+          key={`cl-${columnName}`}
+          data={dataItem.item[columnName]}
+          updateChange={updateInputChange}
+        />
+      );
+    } else {
+      mainFields.push(
+        <Cell
+          key={`cl-${columnName}`}
+          data={dataItem.item[columnName]}
+          isDisabled={false}
+          updateChange={updateInputChange}
+        />
+      );
+    }
+  }
+
+  return (
+    <div className="flex flex-row">
+      <div
+        className="flex-1 p-4 min-h-full border-r-2"
+        style={{ minWidth: "32rem" }}
+      >
+        {mainFields}
+      </div>
+
+      <div className="flex-1 p-4">{metaDataFields}</div>
+    </div>
+  );
+};
+
+export default ({ item, index }) => {
+  const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+  const schema = useSchema((state) => state[item.sourceLabel]);
   const tableColors = querySpecification.tableColors;
 
   const handleKey = useCallback(
@@ -42,40 +94,9 @@ export default ({ item, index }) => {
     };
   }, [handleKey]);
 
-  if (!dataItem || !dataItem.isReady) {
-    return null;
-  }
-
-  const mainFields = [];
-  const metaDataFields = [];
-
-  for (const columnName in dataItem.item) {
-    const colDefinition = getColumnSchema(
-      schema.rows,
-      `${item.tableName}.${columnName}`
-    );
-    const Cell = cellRenderer(colDefinition, item.sourceLabel);
-
-    if (Cell === null) {
-      continue;
-    }
-    if (colDefinition.ui_hints.includes("is_meta")) {
-      metaDataFields.push(
-        <Cell
-          key={`cl-${columnName}`}
-          data={dataItem.item[columnName]}
-          column={colDefinition}
-        />
-      );
-    } else {
-      mainFields.push(
-        <Cell
-          key={`cl-${columnName}`}
-          data={dataItem.item[columnName]}
-          column={colDefinition}
-        />
-      );
-    }
+  const schemaTable = schema.rows.find((x) => x.table_name === item.tableName);
+  for (const colDefinition of schemaTable.columns) {
+    colDefinition.cell = cellRenderer(colDefinition, item.sourceLabel);
   }
 
   return (
@@ -109,16 +130,7 @@ export default ({ item, index }) => {
         </div>
       </div>
 
-      <div className="flex flex-row">
-        <div
-          className="flex-1 p-4 min-h-full border-r-2"
-          style={{ minWidth: "32rem" }}
-        >
-          {mainFields}
-        </div>
-
-        <div className="flex-1 p-4">{metaDataFields}</div>
-      </div>
+      <ViewInner item={item} columns={schemaTable.columns} />
     </div>
   );
 };
