@@ -23,13 +23,14 @@ async def get_all_sources():
     return databases + services
 
 
-def get_source_settings(source_label):
+async def get_source_settings(source_label):
     if source_label == "dwata_meta":
         return {
             "db_url": "sqlite:///dwata_meta.db"
         }
-
-    requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
+    settings = await get_settings()
+    all_sources = await get_all_sources()
+    requested_source = [x for x in all_sources if x[0] == source_label][0]
     if requested_source[1] == "database":
         return settings.DATABASES[requested_source[0]]
     elif requested_source[1] == "service":

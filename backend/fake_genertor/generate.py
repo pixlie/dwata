@@ -81,7 +81,7 @@ def fake_value():
 
 async def generate_fake():
     source_label = "myteeshop"
-    source_settings = get_source_settings(source_label=source_label)
+    source_settings = await get_source_settings(source_label=source_label)
     engine, conn = await connect_database(db_url=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()

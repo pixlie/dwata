@@ -26,7 +26,7 @@ async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
         # We do not have a PK in request, check if we have any filters
         if len(request.query_params.keys()) == 0:
             return Response("", status_code=404)
-    settings = get_source_settings(source_label=source_label)
+    settings = await get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
@@ -67,7 +67,7 @@ async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
 async def item_post(request: Request) -> Union[Response, RapidJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
-    settings = get_source_settings(source_label=source_label)
+    settings = await get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
@@ -119,7 +119,7 @@ async def item_put(request: Request) -> Union[Response, RapidJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     item_pk = request.path_params["item_pk"]
-    settings = get_source_settings(source_label=source_label)
+    settings = await get_source_settings(source_label=source_label)
 
     engine, conn = await connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)

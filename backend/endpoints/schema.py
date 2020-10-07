@@ -11,7 +11,7 @@ async def schema_get(request):
     source_label = request.path_params["source_label"]
     all_sources = await get_all_sources()
     requested_source = [x for x in all_sources if x[0] == source_label][0]
-    source_settings = get_source_settings(source_label=source_label)
+    source_settings = await get_source_settings(source_label=source_label)
 
     if requested_source[1] == "database":
         table_name = request.path_params.get("table_name", None)

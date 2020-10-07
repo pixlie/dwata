@@ -11,7 +11,7 @@ async def service_fetch(request):
     source_label = request.path_params["source_label"]
     resource_name = request.path_params["resource_name"]
     requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
-    source_settings = get_source_settings(source_label=source_label)
+    source_settings = await get_source_settings(source_label=source_label)
     service = all_services[requested_source[2]](**source_settings)
 
     async with service.client_factory() as session:
