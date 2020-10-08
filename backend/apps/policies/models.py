@@ -5,8 +5,8 @@ from sqlalchemy import MetaData, Table, Column, Integer, String, Text, DateTime
 metadata = MetaData()
 
 
-permissions = Table(
-    "dwata_meta_permissions",
+policies = Table(
+    "dwata_meta_policies",
     metadata,
 
     Column("id", Integer, primary_key=True),
@@ -18,11 +18,11 @@ permissions = Table(
 )
 
 
-def permissions_pre_insert(values):
+def policies_pre_insert(values):
     values["created_at"] = datetime.utcnow()
     return values
 
 
-def permissions_pre_update(values):
+def policies_pre_update(values):
     values["modified_at"] = datetime.utcnow()
     return values

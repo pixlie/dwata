@@ -6,14 +6,13 @@ from sqlalchemy.dialects.sqlite import JSON
 metadata = MetaData()
 
 
-users = Table(
-    "dwata_meta_users",
+tables = Table(
+    "dwata_meta_tables",
     metadata,
 
     Column("id", Integer, primary_key=True),
-    Column("email", String(length=100), nullable=False),
-    Column("first_name", String(length=40), nullable=True),
-    Column("last_name", String(length=40), nullable=True),
+    Column("data_source_id", Integer, nullable=False),
+    Column("table_name", String(length=100), nullable=False),
 
     Column("attributes_json", JSON, nullable=False),
 
@@ -22,13 +21,13 @@ users = Table(
 )
 
 
-def users_pre_insert(values):
+def tables_pre_insert(values):
     values["created_at"] = datetime.utcnow()
     if values["attributes_json"] is None:
         values["attributes_json"] = {}
     return values
 
 
-def users_pre_update(values):
+def tables_pre_update(values):
     values["modified_at"] = datetime.utcnow()
     return values
