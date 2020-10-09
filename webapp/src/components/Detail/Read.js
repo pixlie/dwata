@@ -22,7 +22,6 @@ const ViewInner = ({ item, columns }) => {
   if (!dataItem || !dataItem.isReady) {
     return null;
   }
-  console.log(dataItem.item);
 
   const updateInputChange = () => {};
   const mainFields = [];
