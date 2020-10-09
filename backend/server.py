@@ -11,7 +11,7 @@ from endpoints.schema import schema_get
 from endpoints.data import data_post
 from endpoints.item import item_get, item_post, item_put
 from endpoints.service import service_fetch
-from endpoints.worker import worker_dispatch
+from endpoints.worker import worker_background, worker_execute
 
 
 handlers = [
@@ -37,7 +37,8 @@ handlers = [
     Route(r"/api/service/{source_label:str}/{resource_name:str}", service_fetch, methods=["GET", "POST"]),
 
     # Dispatch background workers (RabbitMQ as broker), which handle actions
-    Route(r"/api/worker/{worker_name:str}", worker_dispatch, methods=["POST"]),
+    Route(r"/api/background/{app_name:str}/{worker_name:str}", worker_background, methods=["POST"]),
+    Route(r"/api/execute/{app_name:str}/{worker_name:str}", worker_execute, methods=["POST"]),
 ]
 
 

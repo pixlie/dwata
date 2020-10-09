@@ -20,5 +20,3 @@ def get_system_tables(source_settings):
     if "system_tables" in source_settings and len(source_settings.get("system_tables", [])):
         return source_settings["system_tables"]
     return []
-
-
