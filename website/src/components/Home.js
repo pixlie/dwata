@@ -29,11 +29,11 @@ export default () => {
 
           <div
             className="relative w-full overflow-hidden mt-8 mb-12"
-            style={{ paddingTop: "58.63%" }}
+            style={{ paddingTop: "56.2%" }}
           >
             <iframe
               className="absolute inset-0 w-full h-full"
-              src="https://www.youtube.com/embed/hJD5EVlOHpE"
+              src="https://www.youtube.com/embed/EzZ0v5QKsiY"
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
