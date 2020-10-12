@@ -44,8 +44,7 @@ export default ({ isSourceFetching, toggleSidebar }) => {
       <div className="block lg:inline-block lg:mt-0 p-4">&nbsp;</div>
 
       <div className="block lg:inline-block items-center">
-        <div className="inline-block">
-          {/* <Button
+        {/* <Button
             theme={
               mainApp && mainApp.appType === globalConstants.APP_NAME_HOME
                 ? "primary"
@@ -57,26 +56,25 @@ export default ({ isSourceFetching, toggleSidebar }) => {
             &nbsp;Browse
           </Button> */}
 
-          <span className="relative">
-            {/* <Button
+        {/* <span className="relative">
+            <Button
               attributes={{ onClick: handleNotesClick, ref: notesButtonRef }}
               theme="info"
             >
               <i className="far fa-sticky-note" />
               &nbsp; Notes
-            </Button> */}
-          </span>
+            </Button>
+          </span> */}
 
-          {/* <div className="inline-block">
+        {/* <div className="inline-block">
             <input className="input" type="text" placeholder="Coming soon..." />
             <span className="icon is-small is-left">
               <i className="fas fa-search"></i>
             </span>
           </div> */}
-        </div>
       </div>
 
-      <div className="block lg:inline-block items-center flex-grow">
+      <div className="block lg:inline-block flex-grow">
         {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
           <GridNav />
         ) : null}

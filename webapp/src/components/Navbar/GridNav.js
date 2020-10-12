@@ -10,7 +10,7 @@ import {
 import { Button } from "components/LayoutHelpers";
 import ProductGuide from "components/ProductGuide";
 
-const GridStats = () => {
+const GridStats = ({ size = "md" }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -36,7 +36,7 @@ const GridStats = () => {
       {mainTableNames.map((x) => (
         <span
           key={`grd-hd-tbl-${x}`}
-          className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+          className={`inline-block text-md font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
             tableColors[x]
           )} text-white cursor-default`}
         >
@@ -63,7 +63,12 @@ const GridStats = () => {
   );
 };
 
-export default ({ toggleActions, togglePinnedRecords }) => {
+export default ({
+  showRelated = true,
+  size = "md",
+  toggleActions,
+  togglePinnedRecords,
+}) => {
   const queryContext = useContext(QueryContext);
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleColumnSelector = useQueryContext(
@@ -101,7 +106,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex">
       {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
@@ -122,27 +127,38 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         &nbsp; Pins
       </Button> */}
       <div className="block lg:inline-block items-center flex-grow">
-        <GridStats />
+        <GridStats size={size} />
       </div>
 
       <div className="block lg:inline-block items-center">
-        <span className="relative">
-          <Button
-            theme="secondary"
-            attributes={{
-              onClick: handleMergeClick,
-            }}
-          >
-            Related
-          </Button>
-          <ProductGuide guideFor="relatedButton" />
-        </span>
+        {showRelated ? (
+          <span className="relative">
+            <Button
+              size={size}
+              theme="secondary"
+              attributes={{
+                onClick: handleMergeClick,
+              }}
+            >
+              Related
+            </Button>
+            <ProductGuide guideFor="relatedButton" />
+          </span>
+        ) : null}
 
-        <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
+        <Button
+          size={size}
+          theme="secondary"
+          attributes={{ onClick: handleColumnsClick }}
+        >
           Columns
         </Button>
 
-        <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
+        <Button
+          size={size}
+          theme="secondary"
+          attributes={{ onClick: handleFiltersClick }}
+        >
           Filters
         </Button>
       </div>

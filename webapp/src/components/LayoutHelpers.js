@@ -67,31 +67,35 @@ export const Button = ({
   attributes,
   children,
 }) => {
-  let classes = `inline-block text-sm font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
+  let themeClasses = "",
+    sizeClasses = "";
   if (theme === "primary") {
-    classes =
-      classes + " bg-blue-300 text-gray-800 hover:bg-blue-700 hover:text-white";
+    themeClasses =
+      "bg-blue-300 text-gray-800 hover:bg-blue-700 hover:text-white";
   } else if (theme === "success") {
-    classes =
-      classes +
-      " bg-green-400 text-gray-700 hover:bg-green-700 hover:text-white";
+    themeClasses =
+      "bg-green-400 text-gray-700 hover:bg-green-700 hover:text-white";
   } else if (theme === "secondary") {
-    classes =
-      classes + " bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
+    themeClasses =
+      "bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
   } else if (theme === "info") {
-    classes =
-      classes +
-      (active ? " bg-yellow-400" : " bg-yellow-200") +
+    themeClasses =
+      (active ? "bg-yellow-400" : "bg-yellow-200") +
       " text-gray-700 hover:bg-yellow-700 hover:text-white";
   } else if (theme === "link") {
-    classes = "inline-block font-semibold underline";
+    themeClasses = "inline-block underline";
   }
 
-  if (["sm", "md", "lg"].includes(size)) {
-    classes = classes + ` text-${size}`;
+  if (size === "sm") {
+    sizeClasses = "text-sm font-medium";
   } else {
-    classes = classes + " text-md";
+    sizeClasses = "text-md leading-loose font-semibold";
   }
+
+  const classes =
+    "inline-block text-sm  shadow " +
+    "hover:shadow-sm focus:outline-none " +
+    `${rounded} ${padding} ${margin} ${themeClasses} ${sizeClasses}`;
 
   return (
     <button className={classes} {...attributes} disabled={disabled}>
