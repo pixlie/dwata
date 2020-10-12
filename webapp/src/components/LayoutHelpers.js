@@ -87,14 +87,13 @@ export const Button = ({
   }
 
   if (size === "sm") {
-    sizeClasses = "text-sm font-medium";
+    sizeClasses = "text-sm leading-relaxed";
   } else {
     sizeClasses = "text-md leading-loose font-semibold";
   }
 
   const classes =
-    "inline-block text-sm  shadow " +
-    "hover:shadow-sm focus:outline-none " +
+    "inline-block shadow hover:shadow-none focus:outline-none " +
     `${rounded} ${padding} ${margin} ${themeClasses} ${sizeClasses}`;
 
   return (

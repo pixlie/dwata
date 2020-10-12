@@ -91,7 +91,7 @@ export default (schema, tableColumns, querySpecification) => {
   );
 
   const JSONCell = () => (
-    <td className={`${paddingClasses} ${borderClasses}`}>{"{}"}</td>
+    <td className={`${paddingClasses} ${borderClasses} text-gray-500`}>json</td>
   );
 
   const TimeStampCell = ({ data }) => {

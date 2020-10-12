@@ -31,7 +31,7 @@ export default () => {
       <Hx x="3">Tables</Hx>
 
       <QueryContext.Provider value={{ key }}>
-        <GridNav size={"sm"} showRelated={false} />
+        {/* <GridNav size={"sm"} showRelated={false} /> */}
         <div className="my-2" />
         <Grid showPaginator={false} />
       </QueryContext.Provider>

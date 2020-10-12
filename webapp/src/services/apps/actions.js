@@ -27,6 +27,15 @@ export const saveDataSource = async (payload, pk) => {
   });
 };
 
+export const refreshTables = async () => {
+  const url = `${dataItemURL}/execute/tables/refresh`;
+
+  await axios({
+    method: "get",
+    url,
+  });
+};
+
 /*
 export const pinRecords = (path, selectedRowList) => {
   const { sourceId, tableName } = getRecordPinAppConfig(state);
