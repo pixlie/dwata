@@ -14,7 +14,7 @@ tables = Table(
     Column("data_source_id", Integer, nullable=False),
     Column("table_name", String(length=100), nullable=False),
 
-    Column("attributes_json", JSON, nullable=False),
+    Column("attributes", JSON, nullable=False),
 
     Column("created_at", DateTime, nullable=False),
     Column("modified_at", DateTime, nullable=True)
@@ -23,8 +23,8 @@ tables = Table(
 
 def tables_pre_insert(values):
     values["created_at"] = datetime.utcnow()
-    if values["attributes_json"] is None:
-        values["attributes_json"] = {}
+    if values["attributes"] is None:
+        values["attributes"] = []
     return values
 
 

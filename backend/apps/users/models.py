@@ -15,7 +15,7 @@ users = Table(
     Column("first_name", String(length=40), nullable=True),
     Column("last_name", String(length=40), nullable=True),
 
-    Column("attributes_json", JSON, nullable=False),
+    Column("attributes", JSON, nullable=False),
 
     Column("created_at", DateTime, nullable=False),
     Column("modified_at", DateTime, nullable=True)
@@ -24,8 +24,8 @@ users = Table(
 
 def users_pre_insert(values):
     values["created_at"] = datetime.utcnow()
-    if values["attributes_json"] is None:
-        values["attributes_json"] = {}
+    if values["attributes"] is None:
+        values["attributes"] = {}
     return values
 
 
