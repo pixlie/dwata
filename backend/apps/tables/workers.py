@@ -27,7 +27,7 @@ async def refresh(source_label):
         query = tables.insert().values(
             data_source_id=data_source["id"],
             table_name=name,
-            attributes_json={},
+            attributes_json=[],
             created_at=datetime.utcnow()
         )
         await dwata_meta_db.execute(query)
