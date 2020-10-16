@@ -11,7 +11,7 @@ import FilterEditor from "components/QueryEditor/FilterEditor";
 import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
 
-export default ({ showHeader = true, showPaginator = true }) => {
+export default ({ showHeader = true, showPaginator = true } = {}) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]

@@ -140,7 +140,7 @@ export default ({
                 onClick: handleMergeClick,
               }}
             >
-              Related
+              <i className="fas fa-link" /> Related
             </Button>
             <ProductGuide guideFor="relatedButton" />
           </span>
@@ -151,7 +151,7 @@ export default ({
           theme="secondary"
           attributes={{ onClick: handleColumnsClick }}
         >
-          Columns
+          <i className="fas fa-eye" /> Columns
         </Button>
 
         <Button
@@ -159,7 +159,7 @@ export default ({
           theme="secondary"
           attributes={{ onClick: handleFiltersClick }}
         >
-          Filters
+          <i className="fas fa-search" /> Filters
         </Button>
       </div>
     </div>

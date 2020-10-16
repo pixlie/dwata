@@ -17,6 +17,7 @@ const initialState = {
 
   tableColors: {},
 
+  isRowSelectable: false,
   isReady: false,
   isFetching: false,
   fetchNeeded: false,
@@ -271,6 +272,7 @@ export const querySpecificationObject = (state, payload) => ({
   count: payload.count,
   limit: payload.limit,
   offset: payload.offset,
+
   isReady: true,
   isFetching: false,
   fetchNeeded: false,

@@ -1,1 +1,0 @@
-export const COMPLETE_FETCH_APP = "COMPLETE_FETCH_APP";

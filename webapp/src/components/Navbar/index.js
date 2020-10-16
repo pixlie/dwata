@@ -23,7 +23,7 @@ export default ({ isSourceFetching, toggleSidebar }) => {
 
   return (
     <nav
-      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 px-6 z-10"
+      className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 px-6 py-3 z-10"
       role="navigation"
       aria-label="main navigation"
     >
@@ -41,7 +41,7 @@ export default ({ isSourceFetching, toggleSidebar }) => {
         </a>
       </div>
 
-      <div className="block lg:inline-block lg:mt-0 p-4">&nbsp;</div>
+      <div className="block lg:inline-block lg:mt-0 px-4">&nbsp;</div>
 
       <div className="block lg:inline-block items-center">
         {/* <Button

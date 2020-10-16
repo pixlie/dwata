@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { dataItemURL } from "services/urls";
+import { dataItemURL, workerExecuteURL } from "services/urls";
 
 export const saveNote = async (querySpecification, payload, pk) => {
   const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_note`;
@@ -27,12 +27,13 @@ export const saveDataSource = async (payload, pk) => {
   });
 };
 
-export const refreshTables = async () => {
-  const url = `${dataItemURL}/execute/tables/refresh`;
+export const refreshTables = async (payload) => {
+  const url = `${workerExecuteURL}/tables/refresh`;
 
   await axios({
-    method: "get",
+    method: "post",
     url,
+    data: payload,
   });
 };
 

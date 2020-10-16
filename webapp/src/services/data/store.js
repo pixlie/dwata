@@ -95,4 +95,6 @@ export default create((set, get) => ({
       console.log("Could not fetch data. Try again later.");
     }
   },
+
+  toggleRowSelection: () => {},
 }));

@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 
 import * as globalConstants from "services/global/constants";
+import { refreshTables } from "services/apps/actions";
 import { QueryContext } from "utils";
 import { useQuerySpecification, useQueryContext } from "services/store";
+import GridNav from "components/Navbar/GridNav";
 import { Hx, Button } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
@@ -24,6 +26,7 @@ export default () => {
         },
       ],
       fetchNeeded: true,
+      isRowSelectable: true,
     });
   }, []);
 
@@ -35,11 +38,27 @@ export default () => {
     });
   };
 
+  const Actions = ({}) => {
+    return (
+      <Button margin="" size="sm" attributes={{ onClick: handleClickRefresh }}>
+        Refresh tables
+      </Button>
+    );
+  };
+
+  const handleClickRefresh = async () => {
+    await refreshTables({
+      sourceLabel: "",
+    });
+  };
+
   return (
     <div>
       <Hx x="3">Data sources</Hx>
 
       <QueryContext.Provider value={{ key }}>
+        <GridNav showRelated={false} size="sm" />
+        <div className="my-2" />
         <Grid showPaginator={false} />
       </QueryContext.Provider>
 

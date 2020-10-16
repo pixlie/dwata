@@ -2,8 +2,7 @@ import React, { useEffect } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
-import { Hx, Button } from "components/LayoutHelpers";
-import GridNav from "components/Navbar/GridNav";
+import { Hx } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
 export default () => {
@@ -35,12 +34,6 @@ export default () => {
         <div className="my-2" />
         <Grid showPaginator={false} />
       </QueryContext.Provider>
-
-      <div className="mt-4 flex justify-end">
-        <Button margin="" size="sm">
-          Refresh tables
-        </Button>
-      </div>
     </div>
   );
 };

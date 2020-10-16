@@ -61,7 +61,7 @@ export const Button = ({
   theme = "primary",
   active = false,
   disabled = false,
-  padding = "px-3",
+  padding = "px-2",
   margin = "mx-1",
   rounded = "rounded",
   attributes,
@@ -87,9 +87,9 @@ export const Button = ({
   }
 
   if (size === "sm") {
-    sizeClasses = "text-sm leading-relaxed";
+    sizeClasses = "text-xs leading-5";
   } else {
-    sizeClasses = "text-md leading-loose font-semibold";
+    sizeClasses = "text-sm leading-6";
   }
 
   const classes =

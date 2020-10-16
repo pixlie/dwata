@@ -1,11 +1,20 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
 
 import * as globalConstants from "services/global/constants";
+import { QueryContext } from "utils";
+import { useData, useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { useQueryContext } from "services/store";
 
-export default (schema, tableColumns, querySpecification) => {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const gridData = useData((state) => state[queryContext.key]);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+  const { columns, selectedRowList } = gridData;
 
   const rowList = [];
   const date_time_options = {
@@ -46,6 +55,27 @@ export default (schema, tableColumns, querySpecification) => {
     };
 
     return RowExpandCell;
+  };
+
+  const createRowSelectorCell = () => {
+    const RowSelectorCell = ({ data, row }) => {
+      const handleRowSelect = (event) => {
+        event.preventDefault();
+        // toggleRowSelection(row[0]);
+      };
+
+      return (
+        <td className={`${paddingClasses} ${borderClasses}`}>
+          <input
+            type="checkbox"
+            onChange={handleRowSelect}
+            checked={selectedRowList.includes(row[0])}
+          />
+        </td>
+      );
+    };
+
+    return RowSelectorCell;
   };
 
   const DefaultCell = ({ data }) => (
@@ -138,12 +168,15 @@ export default (schema, tableColumns, querySpecification) => {
     }
   };
 
-  for (const [i, col] of tableColumns.entries()) {
+  if (querySpecification.isRowSelectable) {
+    rowList.push([null, createRowSelectorCell()]);
+  }
+  for (const [i, col] of columns.entries()) {
     /* if (!selectedColumLabels.includes(col)) {
       rowList.push([i, null]);
       continue;
     } */
-    const columnSchema = getColumnSchema(schema, col);
+    const columnSchema = getColumnSchema(schema.rows, col);
     if (columnSchema.is_primary_key) {
       rowList.push([i, PrimaryKeyCell]);
       rowList.push([null, createRowExpandCell(col, i)]);

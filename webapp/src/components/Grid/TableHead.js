@@ -27,6 +27,11 @@ export default () => {
     _columns = querySpecification.columns;
   }
 
+  if (querySpecification.isRowSelectable) {
+    headList.push(
+      <th className="border border-gray-400 px-2 py-1 text-left" />
+    ); // This is for the row selector
+  }
   for (const [i, col] of _columns.entries()) {
     const tableColumnName = col.label;
     if (!selectedTableColumNames.includes(tableColumnName)) {
