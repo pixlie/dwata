@@ -37,10 +37,10 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
       className="block w-full py-1 border-b cursor-pointer hover:bg-gray-200"
       onClick={handleClick}
     >
-      <span className="text-md text-gray-600 text-center ml-6 mr-3">
+      <span className="text-sm text-gray-600 text-center ml-6 mr-3">
         <i className="fas fa-table" />
       </span>
-      <span className="text-sm font-semibold tracking-normal text-blue-700">
+      <span className="text-xs font-medium tracking-normal text-blue-700">
         {item.table_name}
       </span>
     </div>

@@ -31,12 +31,19 @@ const GridStats = ({ size = "md" }) => {
   ];
   const tableColors = querySpecification.tableColors;
 
+  let sizeClasses = "";
+  if (size === "sm") {
+    sizeClasses = "text-xs font-medium leading-5";
+  } else {
+    sizeClasses = "text-sm font-medium leading-6";
+  }
+
   return (
     <Fragment>
       {mainTableNames.map((x) => (
         <span
           key={`grd-hd-tbl-${x}`}
-          className={`inline-block text-md font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+          className={`inline-block px-2 mr-2 rounded ${sizeClasses} ${tableColorWhiteOnMedium(
             tableColors[x]
           )} text-white cursor-default`}
         >
@@ -49,7 +56,7 @@ const GridStats = ({ size = "md" }) => {
           {embeddedTableNames.map((x) => (
             <span
               key={`grd-hd-tbl-${x}`}
-              className={`inline-block text-md font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              className={`inline-block text-xs font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
                 tableColors[x]
               )} text-white cursor-default`}
             >

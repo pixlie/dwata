@@ -20,7 +20,7 @@ export default () => {
   return (
     <QueryContext.Provider value={mainApp}>
       <Navbar />
-      <div className="block clear-both" style={{ paddingBottom: "57px" }} />
+      <div className="block clear-both" style={{ paddingBottom: "52px" }} />
 
       <Detail />
       <Notes />

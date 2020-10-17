@@ -57,11 +57,11 @@ const sampleActivityList = [
 ];
 
 const ActivityBox = ({ created_by, activity, entity, created_at }) => (
-  <div className="block p-6 my-2 mr-1 bg-white border border-gray-300 rounded">
-    <span className="text-gray-600 mr-1">{created_by}</span>
-    <span className="text-gray-700 mr-1">{activity}</span>
-    <span className="font-semibold text-gray-700 mr-1">{entity}</span>
-    <span className="text-sm text-gray-600">{created_at}</span>
+  <div className="block p-4 my-2 mr-1 bg-white border border-gray-300 rounded">
+    <span className="text-gray-600 mr-1 text-sm">{created_by}</span>
+    <span className="text-gray-700 mr-1 text-sm">{activity}</span>
+    <span className="font-medium text-sm text-gray-700 mr-1">{entity}</span>
+    <span className="text-gray-600 text-xs">{created_at}</span>
   </div>
 );
 

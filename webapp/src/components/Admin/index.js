@@ -16,10 +16,10 @@ const SideNavItem = ({ label, icon, tab, setActiveTab }) => {
       className="my-6 py-2 cursor-pointer hover:bg-green-600"
       onClick={handleClick}
     >
-      <span className="block text-white text-3xl text-center">
+      <span className="block text-white text-2xl text-center">
         <i className={icon} />
       </span>
-      <span className="block text-sm text-white font-medium text-center">
+      <span className="block text-xs text-white font-medium text-center">
         {label}
       </span>
     </div>
@@ -82,7 +82,7 @@ export default () => {
     <div className="flex flex-row">
       <div
         className="w-24 bg-green-700"
-        style={{ height: "calc(100vh - 57px)" }}
+        style={{ height: "calc(100vh - 52px)" }}
       >
         {sideNavItems.map((navItem, i) => (
           <SideNavItem
