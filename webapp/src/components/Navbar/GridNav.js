@@ -9,6 +9,7 @@ import {
 } from "services/store";
 import { Button } from "components/LayoutHelpers";
 import ProductGuide from "components/ProductGuide";
+import ActionButton from "./ActionButton";
 
 const GridStats = ({ size = "md" }) => {
   const queryContext = useContext(QueryContext);
@@ -77,6 +78,9 @@ export default ({
   togglePinnedRecords,
 }) => {
   const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleColumnSelector = useQueryContext(
     (state) => state.toggleColumnSelector
@@ -114,7 +118,24 @@ export default ({
 
   return (
     <div className="flex">
-      {/* <Button
+      <div className="block lg:inline-block items-center flex-grow">
+        <GridStats size={size} />
+      </div>
+
+      <div className="block lg:inline-block items-center">
+        {querySpecification.actions &&
+          querySpecification.actions.map((actionSpecification, i) => (
+            <ActionButton
+              key={`gr-nv-ac-${i}`}
+              {...actionSpecification}
+              size={
+                actionSpecification.size !== undefined
+                  ? actionSpecification.size
+                  : size
+              }
+            />
+          ))}
+        {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
         disabled={selectedRowList.length === 0}
@@ -125,7 +146,7 @@ export default ({
         </span>
         &nbsp; Actions
       </Button> */}
-      {/* <Button
+        {/* <Button
         attributes={{ onClick: handlePinClick }}
         active={showPinnedRecords === true}
         theme="secondary"
@@ -133,11 +154,7 @@ export default ({
         <i className="fas fa-thumbtack" />
         &nbsp; Pins
       </Button> */}
-      <div className="block lg:inline-block items-center flex-grow">
-        <GridStats size={size} />
-      </div>
 
-      <div className="block lg:inline-block items-center">
         {showRelated ? (
           <span className="relative">
             <Button

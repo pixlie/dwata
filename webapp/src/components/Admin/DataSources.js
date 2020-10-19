@@ -27,6 +27,19 @@ export default () => {
       ],
       fetchNeeded: true,
       isRowSelectable: true,
+      actions: [
+        {
+          label: "Refresh tables",
+          isVisibleWhen: (qs) => qs.isRowSelectable,
+          isEnabledWhen: ({ querySpecification, data, selected }) =>
+            querySpecification.isRowSelectable &&
+            selected.selectedList.length > 0,
+          handler: ({ selected }) =>
+            refreshTables({
+              source_label_list: selected.selectedList.map((x) => x[2]),
+            }),
+        },
+      ],
     });
   }, []);
 

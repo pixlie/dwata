@@ -1,8 +1,14 @@
 import React, { Fragment, useContext } from "react";
+import _ from "lodash";
 
 import * as globalConstants from "services/global/constants";
 import { QueryContext } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import {
+  useData,
+  useSchema,
+  useQuerySpecification,
+  useSelected,
+} from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { useQueryContext } from "services/store";
 
@@ -14,7 +20,11 @@ export default () => {
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
-  const { columns, selectedRowList } = gridData;
+  const toggleSelection = useSelected((state) => state.toggleSelection);
+  const selectedRowList = useSelected(
+    (state) => state[queryContext.key].selectedList
+  );
+  const { columns } = gridData;
 
   const rowList = [];
   const date_time_options = {
@@ -58,10 +68,10 @@ export default () => {
   };
 
   const createRowSelectorCell = () => {
-    const RowSelectorCell = ({ data, row }) => {
+    const RowSelectorCell = ({ row }) => {
       const handleRowSelect = (event) => {
         event.preventDefault();
-        // toggleRowSelection(row[0]);
+        toggleSelection(queryContext.key, row);
       };
 
       return (
@@ -69,7 +79,7 @@ export default () => {
           <input
             type="checkbox"
             onChange={handleRowSelect}
-            checked={selectedRowList.includes(row[0])}
+            checked={selectedRowList.findIndex((x) => _.isEqual(x, row)) !== -1}
           />
         </td>
       );

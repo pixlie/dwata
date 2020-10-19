@@ -1,18 +1,19 @@
 import create from "zustand";
 import axios from "axios";
+import _ from "lodash";
 
 import { dataURL, dataItemURL } from "services/urls";
 import useQuerySpecification, {
   querySpecificationObject,
   getQuerySpecificationPayload,
 } from "services/querySpecification/store";
+import useSelected from "services/selected/store";
 
 const initialState = {
   columns: [],
   rows: [],
   querySQL: null,
   embedded: [],
-  selectedRowList: [],
 
   isFetching: false,
   isReady: false,
@@ -25,7 +26,6 @@ const completeFetchList = (inner, payload) => ({
   rows: payload.rows, // Here we do not transform data into maps/dicts
   querySQL: payload.query_sql,
   embedded: payload.embedded,
-  selectedRowList: [...inner.selectedRowList],
 
   isFetching: false,
   isReady: true,
@@ -36,7 +36,6 @@ const completeFetchList = (inner, payload) => ({
 const completeFetchItem = (payload) => ({
   item: payload.item,
   querySQL: payload.query_sql,
-  selectedRowList: [], // This is a hack
 
   isFetching: false,
   isReady: true,
@@ -87,6 +86,11 @@ export default create((set, get) => ({
         useQuerySpecification.setState((state) => ({
           [key]: querySpecificationObject(state[key], response.data),
         }));
+        useSelected.setState(() => ({
+          [key]: {
+            selectedList: [],
+          },
+        }));
         set((state) => ({
           [key]: completeFetchList(state[key], response.data),
         }));
@@ -95,6 +99,4 @@ export default create((set, get) => ({
       console.log("Could not fetch data. Try again later.");
     }
   },
-
-  toggleRowSelection: () => {},
 }));

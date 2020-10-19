@@ -45,7 +45,6 @@ export default () => {
     classes = classes + (pinned ? " is-pin" : "");
 
     const rowList = [];
-    // rowList.push(<RowSelectorCell row={row} />);
     for (const j in rowRendererList) {
       const [cellIndex, Cell] = rowRendererList[j];
       if (cellIndex === null) {
@@ -66,9 +65,6 @@ export default () => {
     classes = classes + (pinned ? " is-pin" : "");
 
     const rowList = [];
-    {
-      /* <RowSelectorCell row={row} /> */
-    }
     for (const j in rowRendererList) {
       const [cellIndex, Cell] = rowRendererList[j];
       if (Cell === null) {

@@ -77,7 +77,10 @@ export const Button = ({
       "bg-green-400 text-gray-700 hover:bg-green-700 hover:text-white";
   } else if (theme === "secondary") {
     themeClasses =
-      "bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
+      "bg-gray-300" +
+      (disabled
+        ? " text-gray-500"
+        : " text-gray-700 hover:bg-gray-700 hover:text-white");
   } else if (theme === "info") {
     themeClasses =
       (active ? "bg-yellow-400" : "bg-yellow-200") +
@@ -93,7 +96,8 @@ export const Button = ({
   }
 
   const classes =
-    "inline-block shadow hover:shadow-none focus:outline-none " +
+    "inline-block shadow focus:outline-none" +
+    (disabled ? " " : " hover:shadow-none ") +
     `${rounded} ${padding} ${margin} ${themeClasses} ${sizeClasses}`;
 
   return (

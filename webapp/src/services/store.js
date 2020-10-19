@@ -5,6 +5,7 @@ import useSchema from "./schema/store";
 import useData from "./data/store";
 import useQuerySpecification from "./querySpecification/store";
 import useApps from "./apps/store";
+import useSelected from "./selected/store";
 
 export {
   useGlobal,
@@ -14,4 +15,5 @@ export {
   useData,
   useQuerySpecification,
   useApps,
+  useSelected,
 };
