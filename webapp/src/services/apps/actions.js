@@ -23,7 +23,18 @@ export const saveDataSource = async (payload, pk) => {
   await axios({
     method: !!pk ? "put" : "post",
     url,
-    data: payload,
+    data: Object.keys(payload).reduce((acc, x) => {
+      if (payload[x] instanceof Object && "is_dwata_field" in payload[x]) {
+        return {
+          ...acc,
+          [x]: payload[x].payload,
+        };
+      }
+      return {
+        ...acc,
+        [x]: payload[x],
+      };
+    }, {}),
   });
 };
 

@@ -1,5 +1,6 @@
 import React, { Fragment, useContext } from "react";
 import _ from "lodash";
+import dayjs from "dayjs";
 
 import * as globalConstants from "services/global/constants";
 import { QueryContext } from "utils";
@@ -131,23 +132,21 @@ export default () => {
   );
 
   const JSONCell = () => (
-    <td className={`${paddingClasses} ${borderClasses} text-gray-500`}>json</td>
+    <td
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses} text-gray-500`}
+    >
+      json
+    </td>
   );
 
   const TimeStampCell = ({ data }) => {
-    try {
-      return (
-        <td>
-          {new Intl.DateTimeFormat("en-GB", date_time_options).format(
-            new Date(data * 1000)
-          )}
-        </td>
-      );
-    } catch (error) {
-      if (error instanceof RangeError) {
-        return <td>{data}</td>;
-      }
-    }
+    return (
+      <td
+        className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+      >
+        {dayjs(data).format("DD MMMM YYYY")}
+      </td>
+    );
   };
 
   const CharCell = ({ data }) => {
@@ -192,8 +191,6 @@ export default () => {
       rowList.push([null, createRowExpandCell(col, i)]);
     } else if (columnSchema.has_foreign_keys) {
       rowList.push([i, DefaultCell]);
-    } else if (columnSchema.ui_hints.includes("is_meta")) {
-      rowList.push([i, DefaultCell]);
     } else if (columnSchema.type === "JSONB" || columnSchema.type === "JSON") {
       rowList.push([i, JSONCell]);
     } else if (columnSchema.type === "BOOLEAN") {
@@ -202,6 +199,8 @@ export default () => {
       rowList.push([i, TimeStampCell]);
     } else if (columnSchema.type === "VARCHAR") {
       rowList.push([i, CharCell]);
+    } else if (columnSchema.ui_hints.includes("is_meta")) {
+      rowList.push([i, DefaultCell]);
     } else {
       rowList.push([i, DefaultCell]);
     }

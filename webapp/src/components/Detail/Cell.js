@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Fragment } from "react";
+import { parse } from "uuid";
 
 export default (columnDefinition, sourceLabel) => {
   const date_time_options = {
@@ -125,20 +126,107 @@ export default (columnDefinition, sourceLabel) => {
     );
   };
 
+  const JSONCheck = ({ data }) => {
+    let _status = false;
+
+    try {
+      if (!!data.parsed) {
+        _status = true;
+      }
+    } catch (error) {
+      // Todo: see if we can give hints on errors
+    }
+
+    return (
+      <Fragment>
+        <div
+          className={`text-xs bg-gray-300 px-1 leading-6 ${
+            !!_status ? "" : "rounded rounded-t-none"
+          }`}
+        >
+          JSON is {!!_status ? "valid" : "invalid"}
+        </div>
+        {!!_status && (
+          <div className="text-xs bg-gray-400 rounded rounded-t-none p-1">
+            <pre className="whitespace-pre-wrap break-words">
+              {JSON.stringify(data.parsed, null, 2)}
+            </pre>
+          </div>
+        )}
+      </Fragment>
+    );
+  };
+
   const JSONCell = ({ data, isDisabled = true, updateChange }) => {
+    const initialParse = (_data) => {
+      // Supposed we are getting this data straight from the API
+      // So we try and parse JSON and set the status and internal value
+      let _temp = undefined;
+      if (_data instanceof Object && "is_dwata_field" in _data) {
+        // We have already parsed the raw data into an Object fit for our form handling
+        _temp = _data;
+      } else {
+        // We have not parsed the raw data, let us do that here
+        let value = _data;
+        if (value === "") {
+          value = undefined;
+        }
+        let parsed = undefined;
+
+        try {
+          if (!!value) {
+            parsed = JSON.parse(value);
+          }
+        } catch (error) {
+          // Todo: see if we can give hints on errors
+        }
+
+        _temp = {
+          is_dwata_field: true,
+          parsed,
+          value,
+          payload: !!parsed ? parsed : value,
+        };
+      }
+
+      return _temp;
+    };
+
+    const dwata_data = initialParse(data);
+
     const handleChange = (event) => {
-      updateChange(columnDefinition.name, event.target.value);
+      let { value } = event.target;
+      if (value === "") {
+        value = undefined;
+      }
+      let parsed = undefined;
+
+      try {
+        if (!!value) {
+          parsed = JSON.parse(value);
+        }
+      } catch (error) {
+        // Todo: see if we can give hints on errors
+      }
+
+      updateChange(columnDefinition.name, {
+        is_dwata_field: true,
+        parsed,
+        value,
+        payload: !!parsed ? parsed : value,
+      });
     };
 
     return (
       <div className="my-4">
         <label className="font-semibold mr-2">{columnDefinition.name}</label>
         <textarea
-          className="block border px-2 py-1 w-full h-40 rounded"
-          value={!!data ? data : ""}
+          className="block border rounded-b-none px-2 py-1 w-full h-40 rounded"
+          value={dwata_data.value !== undefined ? dwata_data.value : ""}
           disabled={isDisabled}
           onChange={handleChange}
         />
+        <JSONCheck data={dwata_data} />
       </div>
     );
   };
