@@ -23,7 +23,7 @@ class DatabaseSettings(object):
 
     def items(self):
         for x in self.__results:
-            yield x[2], rapidjson.loads(x[3])
+            yield x[2], x[3]
 
 
 class Settings(object):

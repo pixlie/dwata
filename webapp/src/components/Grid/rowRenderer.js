@@ -144,7 +144,7 @@ export default () => {
       <td
         className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
       >
-        {dayjs(data).format("DD MMMM YYYY")}
+        {!!data ? dayjs(data).format("DD MMMM YYYY") : "-"}
       </td>
     );
   };
@@ -195,7 +195,10 @@ export default () => {
       rowList.push([i, JSONCell]);
     } else if (columnSchema.type === "BOOLEAN") {
       rowList.push([i, BooleanCell]);
-    } else if (columnSchema.type === "TIMESTAMP") {
+    } else if (
+      columnSchema.type === "TIMESTAMP" ||
+      columnSchema.type === "DATETIME"
+    ) {
       rowList.push([i, TimeStampCell]);
     } else if (columnSchema.type === "VARCHAR") {
       rowList.push([i, CharCell]);
