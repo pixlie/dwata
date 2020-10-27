@@ -1,4 +1,4 @@
-from .response import RapidJSONResponse
+from .http import RapidJSONResponse
 from exceptions.base import DwataException
 
 

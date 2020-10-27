@@ -2,7 +2,7 @@ import importlib
 from starlette.exceptions import HTTPException
 from starlette.background import BackgroundTask
 
-from utils.response import RapidJSONResponse
+from utils.http import RapidJSONResponse
 
 
 STATUS_QUEUED = "status_queued"

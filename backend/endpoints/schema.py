@@ -1,6 +1,6 @@
 from starlette.background import BackgroundTask
 
-from utils.response import RapidJSONResponse
+from utils.http import RapidJSONResponse
 from utils.settings import get_all_sources, get_source_settings
 from database.schema import infer_schema
 from services import all_services

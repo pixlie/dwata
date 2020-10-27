@@ -1,4 +1,4 @@
-from utils.response import RapidJSONResponse
+from utils.http import RapidJSONResponse
 from utils.settings import get_all_sources
 
 
