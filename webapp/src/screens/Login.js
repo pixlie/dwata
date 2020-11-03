@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const GoogleSignInButton = ({}) => {
   const GOOGLE_BUTTON_ID = "id-google-button";
@@ -52,5 +52,17 @@ export default () => {
     }, 100);
   }, []);
 
-  return <div>{state.isApiReady ? <GoogleSignInButton /> : null}</div>;
+  return (
+    <div className="w-full">
+      <div className="max-w-screen-sm mx-auto border rounded bg-white">
+        <div className="p-4 border-gray-400 border-b">
+          <h4>Login</h4>
+        </div>
+
+        <div className="p-4">
+          {state.isApiReady ? <GoogleSignInButton /> : null}
+        </div>
+      </div>
+    </div>
+  );
 };

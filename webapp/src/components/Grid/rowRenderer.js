@@ -28,7 +28,7 @@ export default () => {
   const { columns } = gridData;
 
   const rowList = [];
-  const date_time_options = {
+  /* const date_time_options = {
     year: "numeric",
     month: "numeric",
     day: "numeric",
@@ -36,7 +36,7 @@ export default () => {
     minute: "numeric",
     second: "numeric",
     hour12: false,
-  };
+  }; */
   const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-300";
   const paddingClasses = "px-2 py-1";

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
@@ -30,11 +30,6 @@ const SavedQueryContainer = ({ pk }) => {
 };
 
 export default () => {
-  const queryContext = useContext(QueryContext);
-  const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
-  );
-
   return (
     <Section>
       <Hx x="2">Monthly Report</Hx>

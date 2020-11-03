@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import { useQueryContext, useGlobal } from "services/store";
 import * as globalConstants from "services/global/constants";
@@ -17,9 +17,9 @@ export default ({ isSourceFetching, toggleSidebar }) => {
     });
   };
 
-  const handleNotesClick = () => {
+  /* const handleNotesClick = () => {
     showNotes();
-  };
+  }; */
 
   return (
     <nav

@@ -5,6 +5,9 @@ const initialState = {
   isNotesVisible: false,
   navigationButtonMeta: {},
   showProductGuideFor: null,
+  currentUser: {
+    isAuthenticated: false,
+  },
 };
 
 export default create((set) => ({
