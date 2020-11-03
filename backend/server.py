@@ -12,12 +12,13 @@ from endpoints.data import data_post
 from endpoints.item import item_get, item_post, item_put
 from endpoints.service import service_fetch
 from endpoints.worker import worker_background, worker_execute
-from apps.settings.handlers import settings_get
+from apps.settings.handlers import settings_get, settings_set
 
 
 handlers = [
     # Get a list of settings (labels, values) given the label path
-    Route(r"/api/settings/{label_root}", settings_get, methods=["GET"]),
+    Route(r"/api/settings/{label_root:path}", settings_get, methods=["GET"]),
+    Route(r"/api/settings", settings_set, methods=["POST", "PUT"]),
 
     # Finding out what data sources exist
     Route(r"/api/source", source_get, methods=["GET"]),

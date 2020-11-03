@@ -20,6 +20,7 @@ faker = "*"
 sqlalchemy-migrate = "*"
 databases = {extras = ["sqlite"],version = "*"}
 dramatiq = {extras = ["rabbitmq", "watch"],version = "*"}
+python-benedict = "*"
 
 [requires]
 python_version = "3.8"
