@@ -46,9 +46,6 @@ export default () => {
   if (data) {
     ({ embedded } = data);
   }
-  const selectedColumLabels = querySpecification.embeddedColumns[
-    queryContext.embeddedDataIndex
-  ].map((x) => x.label);
   const parentJoin = embedded[queryContext.embeddedDataIndex].parent_join;
   let filterByParent = generateFilter(
     querySpecification.columns,
@@ -60,22 +57,25 @@ export default () => {
   const rowRendererList = rowRenderer(
     schema.rows,
     embedded[queryContext.embeddedDataIndex].columns,
-    selectedColumLabels
+    querySpecification
   );
 
   const Row = ({ row, index }) => {
-    const classes = "border-b hover:bg-gray-100";
+    const classes = "hover:bg-gray-100";
 
-    return (
-      <tr className={classes}>
-        {row.map((cell, j) => {
-          const Cell = rowRendererList[j];
-          return Cell !== null ? (
-            <Cell key={`td-${index}-${j}`} data={cell} />
-          ) : null;
-        })}
-      </tr>
-    );
+    const rowList = [];
+    for (const j in rowRendererList) {
+      const [cellIndex, Cell] = rowRendererList[j];
+      if (cellIndex === null) {
+        rowList.push(<Cell key={`td-${index}-${j}`} row={row} />);
+      } else {
+        rowList.push(
+          <Cell key={`td-${index}-${j}`} data={row[cellIndex]} row={row} />
+        );
+      }
+    }
+
+    return <tr className={classes}>{rowList}</tr>;
   };
 
   return (

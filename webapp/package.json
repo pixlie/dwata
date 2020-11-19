@@ -8,8 +8,8 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "dayjs": "^1.9.3",
     "lodash": "^4.17.15",
-    "node-sass": "^4.14.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-markdown": "^4.3.1",
@@ -21,7 +21,7 @@
   "scripts": {
     "build:tailwind": "postcss src/style/index.tailwind.css -o src/style/index.css",
     "watch:tailwind": "postcss -w src/style/index.tailwind.css -o src/style/index.css",
-    "start": "PORT=12122 run-p watch:tailwind start:react",
+    "start": "PORT=39283 run-p watch:tailwind start:react",
     "start:react": "react-scripts start",
     "prebuild": "npm run build:tailwind",
     "build": "react-scripts build",

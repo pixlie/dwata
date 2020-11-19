@@ -39,6 +39,12 @@ export default () => {
           key={`th-${tableColumnName}`}
         />
       );
+      headList.push(
+        <th
+          key={`th-${col.tableName}-exp`}
+          className="border border-gray-400 px-2 py-1 text-left"
+        ></th>
+      );
     } else {
       headList.push(
         <TableHeadItem
@@ -50,5 +56,5 @@ export default () => {
     }
   }
 
-  return <tr className="border-b-4 h-10">{headList}</tr>;
+  return <tr className="bg-gray-100 border-b-4 h-10">{headList}</tr>;
 };

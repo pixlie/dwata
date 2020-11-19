@@ -1,7 +1,7 @@
 from json.decoder import JSONDecodeError
 
-from utils.response import RapidJSONResponse, web_error
-from utils.query_builder import QueryBuilder
+from utils.http import RapidJSONResponse, web_error
+from database.query_builder import QueryBuilder
 
 
 async def data_post(request):

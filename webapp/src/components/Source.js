@@ -1,22 +1,12 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import { useSource } from "services/store";
 import TableList from "components/TableList";
-import ProductGuide from "components/ProductGuide";
 
 const SourceItem = ({ source, sourceType, index }) => {
   const [state, setState] = useState({
     isOpen: true,
-    productGuidePingPosition: null,
   });
-  const firstSourceRef = useRef(null);
-  useEffect(() => {
-    firstSourceRef.current &&
-      index === 0 &&
-      setState({
-        productGuidePingPosition: firstSourceRef.current.getBoundingClientRect(),
-      });
-  }, []);
 
   if (source.properties["is_system_db"]) {
     return null;
@@ -30,7 +20,7 @@ const SourceItem = ({ source, sourceType, index }) => {
 
   return (
     <Fragment>
-      <div className="relative" ref={firstSourceRef}>
+      <div className="relative">
         <div
           className="block p-2 pl-3 border-b cursor-default"
           onClick={handleClickSource}
@@ -40,14 +30,12 @@ const SourceItem = ({ source, sourceType, index }) => {
               <i className="fas fa-database" />
             </span>
           ) : null}
-          <strong>{source.label}</strong>&nbsp;
+          <span className="font-semibold tracking-wide">{source.label}</span>
+          &nbsp;
           <span className="inline-block bg-green-200 text-sm px-2 rounded">
             {source.provider}
           </span>
         </div>
-        {state.productGuidePingPosition ? (
-          <ProductGuide guideFor="source" />
-        ) : null}
       </div>
 
       {state.isOpen ? (
@@ -79,19 +67,19 @@ export default () => {
         <span className="text-lg text-yellow-200 text-center mr-3">
           <i className="fas fa-star" />
         </span>
-        <strong className="text-gray-500">Starred</strong>
+        <span className="font-semibold text-gray-500">Starred</span>
       </div>
       <div className="block p-2 pl-3 border-b">
         <span className="text-lg text-orange-200 text-center mr-3">
           <i className="fas fa-folder" />
         </span>
-        <strong className="text-gray-500">Orders</strong>
+        <span className="font-semibold text-gray-500">Orders</span>
       </div>
       <div className="block p-2 pl-3 border-b">
         <span className="text-lg text-gray-200 text-center mr-3">
           <i className="fas fa-folder" />
         </span>
-        <strong className="text-gray-500">Customers</strong>
+        <span className="font-semibold text-gray-500">Customers</span>
       </div>
 
       {sourceRows

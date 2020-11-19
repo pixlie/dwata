@@ -1,0 +1,64 @@
+---
+- name: Setup dwata with Git
+
+  # Specify the hosts you want to target
+  hosts: all
+
+  vars:
+    projects_root: /home/vagrant
+    project_repo_url: https://github.com/brainless/dwata.git
+    python_path: /usr/bin/python3
+    project_name: "dwata"
+
+  tasks:
+    - name: Fetch and unarchive the built webapp from dwata.com
+      unarchive:
+        remote_src: yes
+        src: "https://dwata.com/dwata_webapp_26f881478134d267.tgz"
+        dest: "/var/www/html"
+      become: yes
+      become_user: "root"
+
+    - name: Install/update Python requirements for backend
+      pip:
+        requirements: "{{ projects_root }}/{{ project_name }}/backend/requirements.txt"
+        chdir: "{{ projects_root }}/{{ project_name }}/backend"
+        virtualenv_python: "/usr/bin/python3"
+        virtualenv: "{{ projects_root }}/{{ project_name }}/backend/.venv"
+
+    - name: Copy nginx config files
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/nginx/sites-available/"
+        remote_src: yes
+      with_items:
+        - "{{ projects_root }}/{{ project_name }}/system/nginx/{{ project_name }}_local.conf"
+      become: yes
+      become_user: "root"
+
+    - name: Symlink nginx config files to sites-enabled
+      file:
+        src: "/etc/nginx/sites-available/{{ item }}"
+        dest: "/etc/nginx/sites-enabled/{{ item }}"
+        state: link
+      with_items:
+        - "{{ project_name }}_local.conf"
+      become: yes
+      become_user: "root"
+
+    - name: Remove default nginx server config
+      file:
+        path: "/etc/nginx/sites-enabled/default"
+        state: absent
+      become: yes
+      become_user: "root"
+
+    - name: Copy uvicorn systemd service
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/systemd/system/uvicorn.service"
+        remote_src: yes
+      with_items:
+        - "{{ projects_root }}/{{ project_name }}/system/uvicorn/{{ project_name }}_local.service"
+      become: yes
+      become_user: "root"

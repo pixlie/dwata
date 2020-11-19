@@ -271,7 +271,6 @@ p {
 button {
   background-color: transparent;
   background-image: none;
-  padding: 0;
 }
 
 /**
@@ -457,8 +456,6 @@ video {
   height: auto;
 }
 
-/*tailwind start components */
-
 .container {
   width: 100%;
 }
@@ -486,8 +483,6 @@ video {
     max-width: 1280px;
   }
 }
-
-/*tailwind end components */
 
 .bg-white {
   --bg-opacity: 1;
@@ -693,6 +688,10 @@ video {
   height: 4rem;
 }
 
+.h-full {
+  height: 100%;
+}
+
 .text-lg {
   font-size: 1.125rem;
 }
@@ -795,6 +794,14 @@ video {
   margin-left: 1.5rem;
 }
 
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mb-12 {
+  margin-bottom: 3rem;
+}
+
 .max-w-xl {
   max-width: 36rem;
 }
@@ -809,6 +816,10 @@ video {
 
 .max-w-screen-xl {
   max-width: 1280px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
 }
 
 .p-2 {
@@ -882,6 +893,17 @@ video {
   position: absolute;
 }
 
+.relative {
+  position: relative;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 .shadow-sm {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
@@ -948,6 +970,45 @@ video {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+@-webkit-keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    -webkit-animation-timing-function: cubic-bezier(0.8,0,1,1);
+            animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+
+  50% {
+    transform: none;
+    -webkit-animation-timing-function: cubic-bezier(0,0,0.2,1);
+            animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
+
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap");
 
 @import url("https://cdn-images.mailchimp.com/embedcode/slim-10_7.css");
@@ -1012,7 +1073,11 @@ h4 {
   height: 100%;
 }
 
+@media (min-width: 640px) {
+}
+
 @media (min-width: 768px) {
+
   .md\:flex {
     display: flex;
   }
@@ -1074,6 +1139,7 @@ h4 {
 }
 
 @media (min-width: 1024px) {
+
   .lg\:block {
     display: block;
   }
@@ -1105,4 +1171,7 @@ h4 {
   .lg\:w-auto {
     width: auto;
   }
+}
+
+@media (min-width: 1280px) {
 }

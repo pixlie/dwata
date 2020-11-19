@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 
 import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
-import { Hx } from "components/LayoutHelpers";
 
 export default () => {
   const [state, setState] = useState({
@@ -37,7 +36,7 @@ export default () => {
     const checked = selectedColumLabels.includes(columnLabel);
 
     return (
-      <div>
+      <div className="border-b hover:bg-gray-200">
         <input
           className="inline-block ml-4"
           type="checkbox"
@@ -47,8 +46,8 @@ export default () => {
           id={`col-sl-${tableName}.${column.name}`}
         />
         <label
-          className={`inline-block font-display font-medium text-sm leading-loose ml-4 ${
-            checked ? "text-gray-700" : "text-gray-500"
+          className={`inline-block font-medium text-sm leading-loose ml-4 ${
+            checked ? "text-gray-600" : "text-gray-500"
           }`}
           htmlFor={`col-sl-${tableName}.${column.name}`}
         >
@@ -77,7 +76,9 @@ export default () => {
           <span className="text-lg text-white ml-2 mr-3">
             <i className="fas fa-table" />
           </span>
-          <span className="inline-block font-bold text-white">{tableName}</span>
+          <span className="inline-block font-semibold text-white">
+            {tableName}
+          </span>
         </div>
 
         {currentTable.table_name === tableName
@@ -95,8 +96,8 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded shadow-md w-64"
-      style={{ top: "4rem", right: "1rem" }}
+      className="fixed bg-white border-2 border-t-0 shadow-md w-64"
+      style={{ top: "3.5rem", right: "1rem" }}
     >
       {selectedTables.map((x) => (
         <TableItem key={`col-tbl-${x.table_name}`} tableName={x.table_name} />

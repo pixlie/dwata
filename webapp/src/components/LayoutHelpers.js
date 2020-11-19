@@ -35,7 +35,7 @@ export const Hx = ({ x = "3", children }) => {
   return React.createElement(
     `h${x}`,
     {
-      className: `font-display font-medium text-gray-700 pl-3 ${xSizeClass[x]}`,
+      className: `font-medium text-gray-700 pl-3 ${xSizeClass[x]}`,
     },
     children
   );
@@ -61,33 +61,44 @@ export const Button = ({
   theme = "primary",
   active = false,
   disabled = false,
-  padding = "px-3",
+  padding = "px-2",
   margin = "mx-1",
   rounded = "rounded",
   attributes,
   children,
 }) => {
-  let classes = `inline-block font-display font-semibold leading-loose shadow hover:shadow-sm focus:outline-none ${rounded} ${padding} ${margin}`;
+  let themeClasses = "",
+    sizeClasses = "";
   if (theme === "primary") {
-    classes =
-      classes + " bg-blue-400 text-gray-800 hover:bg-blue-700 hover:text-white";
+    themeClasses =
+      "bg-blue-300 text-gray-800 hover:bg-blue-700 hover:text-white";
+  } else if (theme === "success") {
+    themeClasses =
+      "bg-green-400 text-gray-700 hover:bg-green-700 hover:text-white";
   } else if (theme === "secondary") {
-    classes =
-      classes + " bg-gray-300 text-gray-700 hover:bg-gray-700 hover:text-white";
+    themeClasses =
+      "bg-gray-300" +
+      (disabled
+        ? " text-gray-500"
+        : " text-gray-700 hover:bg-gray-700 hover:text-white");
   } else if (theme === "info") {
-    classes =
-      classes +
-      (active ? " bg-yellow-400" : " bg-yellow-200") +
+    themeClasses =
+      (active ? "bg-yellow-400" : "bg-yellow-200") +
       " text-gray-700 hover:bg-yellow-700 hover:text-white";
   } else if (theme === "link") {
-    classes = "inline-block font-bold underline";
+    themeClasses = "inline-block underline";
   }
 
-  if (["sm", "md", "lg"].includes(size)) {
-    classes = classes + ` text-${size}`;
+  if (size === "sm") {
+    sizeClasses = "text-xs leading-5";
   } else {
-    classes = classes + " text-md";
+    sizeClasses = "text-sm leading-6";
   }
+
+  const classes =
+    "inline-block shadow focus:outline-none" +
+    (disabled ? " " : " hover:shadow-none ") +
+    `${rounded} ${padding} ${margin} ${themeClasses} ${sizeClasses}`;
 
   return (
     <button className={classes} {...attributes} disabled={disabled}>
@@ -137,7 +148,7 @@ export const ColumnHead = ({
   children,
 }) => {
   let classes =
-    "label inline-block px-2 rounded font-display font-medium text-sm leading-relaxed cursor-pointer text-gray-700 hover:text-gray-900";
+    "inline-block font-medium text-sm leading-normal text-gray-700 hover:text-gray-900 px-2 shadow rounded cursor-pointer";
   classes = classes + ` ${tableColorBlackOnLight(tableColor)}`;
   if (order) {
     if (order === "asc") {
@@ -148,7 +159,7 @@ export const ColumnHead = ({
   }
 
   return (
-    <th className="mb-4 text-left">
+    <th className="border border-gray-400 px-2 py-1 text-left">
       <span className={classes} {...attributes}>
         {label}
       </span>
@@ -160,7 +171,7 @@ export const ColumnHead = ({
 export const Panel = ({ title, hasSearch, hasTabs, children }) => (
   <div className="bg-white shadow-md border rounded">
     <div className="bg-gray-200">
-      <span className="block text-2xl font-bold px-4 py-2">{title}</span>
+      <span className="block text-2xl font-semibold px-4 py-2">{title}</span>
     </div>
     {hasSearch ? (
       <div className="panel-block">

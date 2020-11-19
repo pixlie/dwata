@@ -1,0 +1,26 @@
+---
+- name: Setup Vagrant Debian box to allow root login
+
+  # Specify the hosts you want to target
+  hosts: all
+
+  tasks:
+    - name: Soften sshd configuration
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{item.regexp}}"
+        line: "{{item.line}}"
+        state: present
+      with_items:
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin yes"
+      become: yes
+      become_user: "root"
+
+    - name: Restart sshd
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: sshd
+      become: yes
+      become_user: "root"

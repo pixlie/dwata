@@ -17,6 +17,7 @@ const initialState = {
 
   tableColors: {},
 
+  isRowSelectable: false,
   isReady: false,
   isFetching: false,
   fetchNeeded: false,
@@ -271,6 +272,7 @@ export const querySpecificationObject = (state, payload) => ({
   count: payload.count,
   limit: payload.limit,
   offset: payload.offset,
+
   isReady: true,
   isFetching: false,
   fetchNeeded: false,
@@ -285,7 +287,7 @@ export const getQuerySpecificationPayload = (querySpecification) => ({
   limit: querySpecification.limit,
 });
 
-const useStore = create((set) => ({
+export default create((set) => ({
   ...loadFromLocalStorage(),
 
   initiateQuerySpecification: (key, payload) =>
@@ -365,5 +367,3 @@ const useStore = create((set) => ({
       };
     }),
 }));
-
-export default useStore;

@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react";
 
 import { FeatureImageBox, Hero, Hx } from "components/LayoutHelpers";
 import SignupEarlyAccess from "components/SignupEarlyAccess";
-import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v4_Header_Search.gif";
+import RelatedAndFiltersTour1 from "assets/Product_Tour/Product_tour_v5_Header_Search.gif";
 import RelatedAndFiltersTour2 from "assets/Product_Tour/Product_tour_v4_Merge.gif";
 import RelatedAndFiltersTour3 from "assets/Product_Tour/Product_tour_v4_Merge_Columns.gif";
 import RelatedAndFiltersTour5 from "assets/Product_Tour/Related_and_Filters_Tour_5.png";
@@ -20,12 +20,25 @@ export default () => {
             Manage Databases
             <br /> without knowing SQL
           </Hx>
-          <p className="max-w-screen-md text-3xl">
-            <strong>dwata</strong> has an easy to use, Spreadsheet like
-            interface that is familiar to anyone. Even for complex related data,{" "}
-            <strong>dwata</strong> takes care of all the SQL/code so you don't
-            have to, even for complex queries.
+          <p className="max-w-screen-md text-2xl">
+            <strong>dwata</strong> is an easy to use, Spreadsheet like software
+            for your database. It takes care of all the SQL, even for complex
+            tables or queries. It runs <strong>on-premise</strong> for complete
+            privacy.
           </p>
+
+          <div
+            className="relative w-full overflow-hidden mt-8 mb-12"
+            style={{ paddingTop: "56.2%" }}
+          >
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/EzZ0v5QKsiY"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
 
           <p className="my-8">
             <a

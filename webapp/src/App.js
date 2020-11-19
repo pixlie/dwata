@@ -1,40 +1,60 @@
-import React from "react";
+import React, { Fragment, useEffect } from "react";
 
 import { QueryContext } from "utils";
-import { useQueryContext } from "services/store";
+import { useGlobal, useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
 import Navbar from "components/Navbar";
-// import Source from "components/Source";
-// import Sidebar from "components/Sidebar";
+import Login from "screens/Login";
 import Home from "components/Home";
+import Admin from "components/Admin";
 import Grid from "components/Grid";
-import Notes from "components/Notes";
-// import Actions from "components/Actions";
-import Report from "components/Report";
 import Detail from "components/Detail";
+import Notes from "components/Notes";
+import Report from "components/Report";
 
-export default () => {
-  const mainApp = useQueryContext((state) => state["main"]);
-
+const AuthenticatedInner = ({ mainApp }) => {
   return (
-    <QueryContext.Provider value={mainApp}>
-      <Navbar />
-      <div className="block clear-both" style={{ paddingBottom: "57px" }} />
+    <Fragment>
       <Detail />
       <Notes />
-      {/* <Sidebar><Source /></Sidebar> */}
 
       {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
         <Grid />
       ) : null}
-
       {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
         <Report />
       ) : null}
-
+      {mainApp && mainApp.appType === globalConstants.APP_NAME_ADMIN ? (
+        <Admin />
+      ) : null}
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
         <Home />
       ) : null}
+    </Fragment>
+  );
+};
+
+export default () => {
+  const mainApp = useQueryContext((state) => state["main"]);
+  const refreshCoreSettings = useGlobal((state) => state.refreshCoreSettings);
+  const currentUser = useGlobal((state) => state.currentUser);
+  const access = useGlobal((state) => state.access);
+
+  useEffect(() => {
+    refreshCoreSettings();
+  }, []);
+
+  return (
+    <QueryContext.Provider value={mainApp}>
+      <Navbar />
+      <div className="block clear-both" style={{ paddingBottom: "52px" }} />
+
+      {access.isAuthenticationNeeded &&
+      (!currentUser || !currentUser.isAuthenticated) ? (
+        <Login />
+      ) : (
+        <AuthenticatedInner mainApp={mainApp} />
+      )}
     </QueryContext.Provider>
   );
 };

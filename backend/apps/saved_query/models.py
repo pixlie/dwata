@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import MetaData, Table, Column, Integer, String, Text, DateTime
 
-from utils.response import RapidJSONEncoder
+from utils.http import RapidJSONEncoder
 
 
 metadata = MetaData()

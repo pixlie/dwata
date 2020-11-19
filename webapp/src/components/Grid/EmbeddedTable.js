@@ -4,6 +4,11 @@ import { QueryContext } from "utils";
 import EmbeddedTableHead from "./EmbeddedTableHead";
 import EmbeddedTableBody from "./EmbeddedTableBody";
 
+/**
+ * This component creates a new context inside which we display an embedded table.
+ * Embedded grids have less functionality but are otherwise visually similar to a regular Grid.
+ *
+ */
 export default ({ embedContext }) => {
   const queryContext = useContext(QueryContext);
   const ctx = {
@@ -16,7 +21,7 @@ export default ({ embedContext }) => {
     <QueryContext.Provider value={ctx}>
       <Fragment>
         <div>
-          <table className="border">
+          <table className="font-content tracking-normal bg-white border-collapse">
             <thead>
               <EmbeddedTableHead />
             </thead>

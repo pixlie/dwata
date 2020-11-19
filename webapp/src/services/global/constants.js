@@ -1,5 +1,11 @@
-export const APP_NAME_HOME = "home_app";
-export const APP_NAME_BROWSER = "browser_app";
-export const APP_NAME_FUNNEL = "funnel_app";
-export const APP_NAME_REPORT = "report_app";
-export const APP_NAME_CALENDAR = "calendar_app";
+export const APP_NAME_HOME = "APP_NAME_HOME";
+export const APP_NAME_ADMIN = "APP_NAME_ADMIN";
+export const APP_NAME_BROWSER = "APP_NAME_BROWSER";
+export const APP_NAME_FUNNEL = "APP_NAME_FUNNEL";
+export const APP_NAME_REPORT = "APP_NAME_REPORT";
+export const APP_NAME_CALENDAR = "APP_NAME_CALENDAR";
+
+export const OBJECT_CREATE = "OBJECT_CREATE";
+export const OBJECT_READ = "OBJECT_READ";
+export const OBJECT_UPDATE = "OBJECT_UPDATE";
+export const OBJECT_DELETE = "OBJECT_DELETE";

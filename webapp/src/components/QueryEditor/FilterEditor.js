@@ -3,7 +3,6 @@ import React, { Fragment, useContext, useState } from "react";
 import { QueryContext, tableColorWhiteOnMedium } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
-import { Hx } from "components/LayoutHelpers";
 import FilterItem from "./FilterItem";
 
 export default () => {
@@ -103,13 +102,15 @@ export default () => {
           key={`opt-${tableName}`}
           className={`w-full px-2 ${tableColorWhiteOnMedium(
             tableColors[tableName]
-          )} cursor-pointer rounded rounded-b-none`}
+          )} cursor-pointer`}
           onClick={handleTableSelect}
         >
           <span className="text-lg text-white ml-2 mr-3">
             <i className="fas fa-table" />
           </span>
-          <span className="inline-block font-bold text-white">{tableName}</span>
+          <span className="inline-block font-semibold text-white">
+            {tableName}
+          </span>
         </div>
 
         {currentTable.table_name === tableName ? (
@@ -133,8 +134,8 @@ export default () => {
 
   return (
     <div
-      className="fixed bg-white border rounded shadow-md w-64"
-      style={{ top: "4rem", right: "1rem" }}
+      className="fixed bg-white border-2 border-t-0 shadow-md w-64"
+      style={{ top: "3.5rem", right: "1rem" }}
     >
       {selectedTables.map((x) => (
         <TableItem key={`fl-tbl-${x.table_name}`} tableName={x.table_name} />

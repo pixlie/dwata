@@ -1,7 +1,7 @@
 from importlib import import_module
 from json.decoder import JSONDecodeError
 
-from utils.response import RapidJSONResponse, web_error
+from utils.http import RapidJSONResponse, web_error
 
 
 async def app_get(_):

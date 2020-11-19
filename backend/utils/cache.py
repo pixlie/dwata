@@ -2,7 +2,7 @@ from datetime import datetime
 import aioredis
 import rapidjson
 
-from utils.response import RapidJSONEncoder
+from .http import RapidJSONEncoder
 
 
 async def cache_to_redis(cache_key, cache_value):
