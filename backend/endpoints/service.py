@@ -1,7 +1,7 @@
 from starlette.exceptions import HTTPException
 from starlette.background import BackgroundTask
 
-from utils.response import RapidJSONResponse
+from utils.http import RapidJSONResponse
 from utils.settings import get_all_sources, get_source_settings
 from utils.cache import read_from_redis, cache_to_redis
 from services import all_services
@@ -10,8 +10,9 @@ from services import all_services
 async def service_fetch(request):
     source_label = request.path_params["source_label"]
     resource_name = request.path_params["resource_name"]
-    requested_source = [x for x in get_all_sources() if x[0] == source_label][0]
-    source_settings = get_source_settings(source_label=source_label)
+    all_sources = await get_all_sources()
+    requested_source = [x for x in all_sources if x[0] == source_label][0]
+    source_settings = await get_source_settings(source_label=source_label)
     service = all_services[requested_source[2]](**source_settings)
 
     async with service.client_factory() as session:

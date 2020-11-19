@@ -13,30 +13,28 @@ export default () => {
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const tableColors = querySpecification.tableColors;
   const headList = [];
-  let selectedTableNames = [],
-    selectedTableColumNames = [],
+  let selectedTableColumNames = [],
     _columns = [];
+
   if ("isEmbedded" in queryContext && queryContext.isEmbedded) {
-    selectedTableNames = [
-      ...new Set(
-        querySpecification.embeddedColumns[queryContext.embeddedDataIndex].map(
-          (x) => x.tableName
-        )
-      ),
-    ];
     selectedTableColumNames = querySpecification.embeddedColumns[
       queryContext.embeddedDataIndex
     ].map((x) => x.label);
     _columns =
       querySpecification.embeddedColumns[queryContext.embeddedDataIndex];
   } else {
-    selectedTableNames = [
-      ...new Set(querySpecification.columns.map((x) => x.tableName)),
-    ];
     selectedTableColumNames = querySpecification.columns.map((x) => x.label);
     _columns = querySpecification.columns;
   }
 
+  if (querySpecification.isRowSelectable) {
+    headList.push(
+      <th
+        key="th-row-sel"
+        className="border border-gray-400 px-2 py-1 text-left"
+      />
+    ); // This is for the row selector
+  }
   for (const [i, col] of _columns.entries()) {
     const tableColumnName = col.label;
     if (!selectedTableColumNames.includes(tableColumnName)) {

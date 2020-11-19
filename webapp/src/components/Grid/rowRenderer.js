@@ -1,13 +1,34 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useContext } from "react";
+import _ from "lodash";
+import dayjs from "dayjs";
 
+import * as globalConstants from "services/global/constants";
+import { QueryContext } from "utils";
+import {
+  useData,
+  useSchema,
+  useQuerySpecification,
+  useSelected,
+} from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import { useQueryContext } from "services/store";
 
-export default (schema, tableColumns, querySpecification) => {
+export default () => {
+  const queryContext = useContext(QueryContext);
+  const gridData = useData((state) => state[queryContext.key]);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
+  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
   const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+  const toggleSelection = useSelected((state) => state.toggleSelection);
+  const selectedRowList = useSelected(
+    (state) => state[queryContext.key].selectedList
+  );
+  const { columns } = gridData;
 
   const rowList = [];
-  const date_time_options = {
+  /* const date_time_options = {
     year: "numeric",
     month: "numeric",
     day: "numeric",
@@ -15,24 +36,25 @@ export default (schema, tableColumns, querySpecification) => {
     minute: "numeric",
     second: "numeric",
     hour12: false,
-  };
-  const contentTextSize = "text-sm";
+  }; */
+  const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-300";
+  const paddingClasses = "px-2 py-1";
 
   const createRowExpandCell = (tableColumn, colIndex) => {
     const RowExpandCell = ({ data, row }) => {
       const handleClick = () => {
-        const [tableName, columnName] = tableColumn.split(".");
-        console.log(row);
+        const [tableName] = tableColumn.split(".");
         toggleDetailItem({
           sourceLabel: querySpecification.sourceLabel,
           tableName: tableName,
           pk: row[colIndex],
+          operation: globalConstants.OBJECT_READ,
         });
       };
 
       return (
-        <td className="px-2 py-1 border border-gray-300">
+        <td className={`${paddingClasses} ${borderClasses}`}>
           <span
             className="text-sm text-blue-600 cursor-pointer"
             onClick={handleClick}
@@ -46,18 +68,45 @@ export default (schema, tableColumns, querySpecification) => {
     return RowExpandCell;
   };
 
+  const createRowSelectorCell = () => {
+    const RowSelectorCell = ({ row }) => {
+      const handleRowSelect = (event) => {
+        event.preventDefault();
+        toggleSelection(queryContext.key, row);
+      };
+
+      return (
+        <td className={`${paddingClasses} ${borderClasses}`}>
+          <input
+            type="checkbox"
+            onChange={handleRowSelect}
+            checked={selectedRowList.findIndex((x) => _.isEqual(x, row)) !== -1}
+          />
+        </td>
+      );
+    };
+
+    return RowSelectorCell;
+  };
+
   const DefaultCell = ({ data }) => (
-    <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>{data}</td>
+    <td
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+    >
+      {data}
+    </td>
   );
+
   const PrimaryKeyCell = ({ data }) => (
     <th
-      className={`px-2 py-1 ${borderClasses} ${contentTextSize} text-gray-600`}
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses} text-gray-600`}
     >
       {data}
     </th>
   );
+
   const BooleanCell = ({ data }) => (
-    <td className={`px-2 py-1 ${borderClasses}`}>
+    <td className={`${paddingClasses} ${borderClasses}`}>
       {data === true || data === false ? (
         <Fragment>
           {data === true ? (
@@ -81,29 +130,34 @@ export default (schema, tableColumns, querySpecification) => {
       )}
     </td>
   );
-  const JSONCell = () => <td>{"{}"}</td>;
+
+  const JSONCell = () => (
+    <td
+      className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses} text-gray-500`}
+    >
+      json
+    </td>
+  );
+
   const TimeStampCell = ({ data }) => {
-    try {
-      return (
-        <td>
-          {new Intl.DateTimeFormat("en-GB", date_time_options).format(
-            new Date(data * 1000)
-          )}
-        </td>
-      );
-    } catch (error) {
-      if (error instanceof RangeError) {
-        return <td>{data}</td>;
-      }
-    }
+    return (
+      <td
+        className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+      >
+        {!!data ? dayjs(data).format("DD MMMM YYYY") : "-"}
+      </td>
+    );
   };
+
   const CharCell = ({ data }) => {
     const maxLengthToShow = 40;
     const handleClick = () => {};
 
     if (data && data.length > maxLengthToShow) {
       return (
-        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
+        <td
+          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+        >
           <span
             className={`inline-block max-w-sm h-12 overflow-hidden`}
             onClick={handleClick}
@@ -114,34 +168,42 @@ export default (schema, tableColumns, querySpecification) => {
       );
     } else {
       return (
-        <td className={`px-2 py-1 ${borderClasses} ${contentTextSize}`}>
+        <td
+          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+        >
           {data}
         </td>
       );
     }
   };
 
-  for (const [i, col] of tableColumns.entries()) {
+  if (querySpecification.isRowSelectable) {
+    rowList.push([null, createRowSelectorCell()]);
+  }
+  for (const [i, col] of columns.entries()) {
     /* if (!selectedColumLabels.includes(col)) {
       rowList.push([i, null]);
       continue;
     } */
-    const columnSchema = getColumnSchema(schema, col);
+    const columnSchema = getColumnSchema(schema.rows, col);
     if (columnSchema.is_primary_key) {
       rowList.push([i, PrimaryKeyCell]);
       rowList.push([null, createRowExpandCell(col, i)]);
     } else if (columnSchema.has_foreign_keys) {
       rowList.push([i, DefaultCell]);
-    } else if (columnSchema.ui_hints.includes("is_meta")) {
-      rowList.push([i, DefaultCell]);
     } else if (columnSchema.type === "JSONB" || columnSchema.type === "JSON") {
       rowList.push([i, JSONCell]);
     } else if (columnSchema.type === "BOOLEAN") {
       rowList.push([i, BooleanCell]);
-    } else if (columnSchema.type === "TIMESTAMP") {
+    } else if (
+      columnSchema.type === "TIMESTAMP" ||
+      columnSchema.type === "DATETIME"
+    ) {
       rowList.push([i, TimeStampCell]);
     } else if (columnSchema.type === "VARCHAR") {
       rowList.push([i, CharCell]);
+    } else if (columnSchema.ui_hints.includes("is_meta")) {
+      rowList.push([i, DefaultCell]);
     } else {
       rowList.push([i, DefaultCell]);
     }

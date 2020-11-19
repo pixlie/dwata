@@ -1,7 +1,7 @@
 import React, { useState, useContext, Fragment } from "react";
 
 import { QueryContext } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import { useData, useQuerySpecification } from "services/store";
 import ProductGuide from "components/ProductGuide";
 import rowRenderer from "./rowRenderer";
 import EmbeddedTable from "./EmbeddedTable";
@@ -16,21 +16,18 @@ export default () => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
-  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
 
   // useEffect(() => {
   //   if (isReady && showPinnedRecords) {
   //     fetchPins();
   //   }
   // }, [isReady, showPinnedRecords, fetchPins]);
-  let columns = null,
-    rows = null,
+  let rows = null,
     embedded = null,
-    selectedRowList = null,
     pins = [],
     showPinnedRecords = false;
   if (data) {
-    ({ columns, rows, selectedRowList, embedded } = data);
+    ({ rows, embedded } = data);
   }
   const embeddedTableNames = [
     ...new Set(
@@ -40,31 +37,7 @@ export default () => {
     ),
   ];
 
-  const rowRendererList = rowRenderer(schema.rows, columns, querySpecification);
-
-  const RowSelectorCell = ({ row }) => {
-    const handleRowSelect = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      // toggleRowSelection(row[0]);
-    };
-
-    const stopPropagation = (event) => {
-      event.stopPropagation();
-    };
-
-    return (
-      <td onClick={handleRowSelect}>
-        <input
-          className="checkbox"
-          type="checkbox"
-          onClick={stopPropagation}
-          onChange={handleRowSelect}
-          checked={selectedRowList.includes(row[0])}
-        />
-      </td>
-    );
-  };
+  const rowRendererList = rowRenderer();
 
   const RowWithoutEmbed = ({ row, index, pinned = false }) => {
     // This is a normal grid row that does not show embedded grid inside it.
@@ -72,9 +45,6 @@ export default () => {
     classes = classes + (pinned ? " is-pin" : "");
 
     const rowList = [];
-    {
-      /* <RowSelectorCell row={row} /> */
-    }
     for (const j in rowRendererList) {
       const [cellIndex, Cell] = rowRendererList[j];
       if (cellIndex === null) {
@@ -95,9 +65,6 @@ export default () => {
     classes = classes + (pinned ? " is-pin" : "");
 
     const rowList = [];
-    {
-      /* <RowSelectorCell row={row} /> */
-    }
     for (const j in rowRendererList) {
       const [cellIndex, Cell] = rowRendererList[j];
       if (Cell === null) {
@@ -171,7 +138,6 @@ export default () => {
             {index === state.selectedRowIndex &&
             state.selectedEmbeddedDataIndex !== null ? (
               <EmbeddedTable
-                parentRecordIndex={index}
                 embedContext={{
                   embeddedDataIndex: state.selectedEmbeddedDataIndex,
                   parentRow: row,

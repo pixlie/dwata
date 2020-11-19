@@ -7,8 +7,9 @@ from faker import Faker
 from faker.providers import address, company, phone_number, lorem, internet
 
 sys.path.append(os.getcwd())
-from utils.settings import get_source_settings, get_source_database
-from utils.database import connect_database
+from utils.settings import get_source_settings
+from database.schema import infer_schema
+from database.connect import connect_database
 
 fake = Faker()
 fake.add_provider(address)
@@ -80,11 +81,11 @@ def fake_value():
 
 async def generate_fake():
     source_label = "myteeshop"
-    source_settings = get_source_settings(source_label=source_label)
+    source_settings = await get_source_settings(source_label=source_label)
     engine, conn = await connect_database(db_url=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
-    schema = await get_source_database(
+    schema = await infer_schema(
         source_settings=source_settings,
         meta=meta
     )

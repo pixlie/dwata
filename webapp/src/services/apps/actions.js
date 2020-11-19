@@ -1,18 +1,50 @@
 import axios from "axios";
 
-import { dataItemURL } from "services/urls";
+import { dataItemURL, workerExecuteURL } from "services/urls";
 
 export const saveNote = async (querySpecification, payload, pk) => {
   const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_note`;
-  const url = pk !== null ? `${baseURL}/${pk}` : baseURL;
+  const url = !!pk ? `${baseURL}/${pk}` : baseURL;
 
   await axios({
-    method: pk !== null ? "put" : "post",
+    method: !!pk ? "put" : "post",
     url,
     data: {
       query_specification: querySpecification,
       content: payload,
     },
+  });
+};
+
+export const saveDataSource = async (payload, pk) => {
+  const baseURL = `${dataItemURL}/dwata_meta/dwata_meta_data_sources`;
+  const url = !!pk ? `${baseURL}/${pk}` : baseURL;
+
+  await axios({
+    method: !!pk ? "put" : "post",
+    url,
+    data: Object.keys(payload).reduce((acc, x) => {
+      if (payload[x] instanceof Object && "is_dwata_field" in payload[x]) {
+        return {
+          ...acc,
+          [x]: payload[x].payload,
+        };
+      }
+      return {
+        ...acc,
+        [x]: payload[x],
+      };
+    }, {}),
+  });
+};
+
+export const refreshTables = async (payload) => {
+  const url = `${workerExecuteURL}/tables/refresh`;
+
+  await axios({
+    method: "post",
+    url,
+    data: payload,
   });
 };
 

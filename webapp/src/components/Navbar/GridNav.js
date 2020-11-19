@@ -9,8 +9,9 @@ import {
 } from "services/store";
 import { Button } from "components/LayoutHelpers";
 import ProductGuide from "components/ProductGuide";
+import ActionButton from "./ActionButton";
 
-const GridStats = () => {
+const GridStats = ({ size = "md" }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -31,12 +32,19 @@ const GridStats = () => {
   ];
   const tableColors = querySpecification.tableColors;
 
+  let sizeClasses = "";
+  if (size === "sm") {
+    sizeClasses = "text-xs font-medium leading-5";
+  } else {
+    sizeClasses = "text-sm font-medium leading-6";
+  }
+
   return (
     <Fragment>
       {mainTableNames.map((x) => (
         <span
           key={`grd-hd-tbl-${x}`}
-          className={`inline-block text-xl font-semibold px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+          className={`inline-block px-2 mr-2 rounded ${sizeClasses} ${tableColorWhiteOnMedium(
             tableColors[x]
           )} text-white cursor-default`}
         >
@@ -49,7 +57,7 @@ const GridStats = () => {
           {embeddedTableNames.map((x) => (
             <span
               key={`grd-hd-tbl-${x}`}
-              className={`inline-block text-md font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
+              className={`inline-block text-xs font-medium px-2 mr-2 rounded ${tableColorWhiteOnMedium(
                 tableColors[x]
               )} text-white cursor-default`}
             >
@@ -63,8 +71,16 @@ const GridStats = () => {
   );
 };
 
-export default ({ toggleActions, togglePinnedRecords }) => {
+export default ({
+  showRelated = true,
+  size = "md",
+  toggleActions,
+  togglePinnedRecords,
+}) => {
   const queryContext = useContext(QueryContext);
+  const querySpecification = useQuerySpecification(
+    (state) => state[queryContext.key]
+  );
   // const showPinnedRecords = useGlobal((state) => state.showPinnedRecords);
   const toggleColumnSelector = useQueryContext(
     (state) => state.toggleColumnSelector
@@ -101,8 +117,25 @@ export default ({ toggleActions, togglePinnedRecords }) => {
   };
 
   return (
-    <div className="flex items-center">
-      {/* <Button
+    <div className="flex">
+      <div className="block lg:inline-block items-center flex-grow">
+        <GridStats size={size} />
+      </div>
+
+      <div className="block lg:inline-block items-center">
+        {querySpecification.actions &&
+          querySpecification.actions.map((actionSpecification, i) => (
+            <ActionButton
+              key={`gr-nv-ac-${i}`}
+              {...actionSpecification}
+              size={
+                actionSpecification.size !== undefined
+                  ? actionSpecification.size
+                  : size
+              }
+            />
+          ))}
+        {/* <Button
         theme="secondary"
         active={selectedRowList.length > 0}
         disabled={selectedRowList.length === 0}
@@ -113,7 +146,7 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         </span>
         &nbsp; Actions
       </Button> */}
-      {/* <Button
+        {/* <Button
         attributes={{ onClick: handlePinClick }}
         active={showPinnedRecords === true}
         theme="secondary"
@@ -121,29 +154,36 @@ export default ({ toggleActions, togglePinnedRecords }) => {
         <i className="fas fa-thumbtack" />
         &nbsp; Pins
       </Button> */}
-      <div className="block lg:inline-block items-center flex-grow">
-        <GridStats />
-      </div>
 
-      <div className="block lg:inline-block items-center">
-        <span className="relative">
-          <Button
-            theme="secondary"
-            attributes={{
-              onClick: handleMergeClick,
-            }}
-          >
-            Related
-          </Button>
-          <ProductGuide guideFor="relatedButton" />
-        </span>
+        {showRelated ? (
+          <span className="relative">
+            <Button
+              size={size}
+              theme="secondary"
+              attributes={{
+                onClick: handleMergeClick,
+              }}
+            >
+              <i className="fas fa-link" /> Related
+            </Button>
+            <ProductGuide guideFor="relatedButton" />
+          </span>
+        ) : null}
 
-        <Button theme="secondary" attributes={{ onClick: handleColumnsClick }}>
-          Columns
+        <Button
+          size={size}
+          theme="secondary"
+          attributes={{ onClick: handleColumnsClick }}
+        >
+          <i className="fas fa-eye" /> Columns
         </Button>
 
-        <Button theme="secondary" attributes={{ onClick: handleFiltersClick }}>
-          Filters
+        <Button
+          size={size}
+          theme="secondary"
+          attributes={{ onClick: handleFiltersClick }}
+        >
+          <i className="fas fa-search" /> Filters
         </Button>
       </div>
     </div>
