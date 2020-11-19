@@ -19,7 +19,7 @@ class DatabaseSettings(object):
         searched = next((x for x in self.__results if x[2] == item), None)
         if searched is None:
             raise KeyError
-        return rapidjson.loads(searched[3])
+        return searched[3]
 
     def items(self):
         for x in self.__results:

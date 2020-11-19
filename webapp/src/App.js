@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 
 import { QueryContext } from "utils";
 import { useGlobal, useQueryContext } from "services/store";
@@ -36,14 +36,21 @@ const AuthenticatedInner = ({ mainApp }) => {
 
 export default () => {
   const mainApp = useQueryContext((state) => state["main"]);
+  const refreshCoreSettings = useGlobal((state) => state.refreshCoreSettings);
   const currentUser = useGlobal((state) => state.currentUser);
+  const access = useGlobal((state) => state.access);
+
+  useEffect(() => {
+    refreshCoreSettings();
+  }, []);
 
   return (
     <QueryContext.Provider value={mainApp}>
       <Navbar />
       <div className="block clear-both" style={{ paddingBottom: "52px" }} />
 
-      {!currentUser || !currentUser.isAuthenticated ? (
+      {access.isAuthenticationNeeded &&
+      (!currentUser || !currentUser.isAuthenticated) ? (
         <Login />
       ) : (
         <AuthenticatedInner mainApp={mainApp} />
