@@ -41,7 +41,7 @@ export default () => {
         },
       ],
     });
-  }, []);
+  }, [initiateQuerySpecification]);
 
   const handleCreateClick = () => {
     toggleDetailItem({
@@ -51,19 +51,19 @@ export default () => {
     });
   };
 
-  const Actions = ({}) => {
-    return (
-      <Button margin="" size="sm" attributes={{ onClick: handleClickRefresh }}>
-        Refresh tables
-      </Button>
-    );
-  };
+  // const Actions = () => {
+  //   return (
+  //     <Button margin="" size="sm" attributes={{ onClick: handleClickRefresh }}>
+  //       Refresh tables
+  //     </Button>
+  //   );
+  // };
 
-  const handleClickRefresh = async () => {
-    await refreshTables({
-      sourceLabel: "",
-    });
-  };
+  // const handleClickRefresh = async () => {
+  //   await refreshTables({
+  //     sourceLabel: "",
+  //   });
+  // };
 
   return (
     <div>

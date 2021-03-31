@@ -51,7 +51,7 @@ export default () => {
   const fetchSource = useSource((state) => state.fetchSource);
   useEffect(() => {
     fetchSource();
-  }, []);
+  }, [fetchSource]);
   /* const [state, setState] = useState({
     sourceIndex: null,
   }); */

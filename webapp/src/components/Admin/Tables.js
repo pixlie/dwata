@@ -23,7 +23,7 @@ export default () => {
       ],
       fetchNeeded: true,
     });
-  }, []);
+  }, [initiateQuerySpecification]);
 
   return (
     <div>

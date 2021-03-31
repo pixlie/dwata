@@ -42,7 +42,7 @@ export default () => {
 
   useEffect(() => {
     refreshCoreSettings();
-  }, []);
+  }, [refreshCoreSettings]);
 
   return (
     <QueryContext.Provider value={mainApp}>

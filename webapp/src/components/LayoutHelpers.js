@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useEffect } from "react";
 
-import { tableColorWhiteOnMedium, tableColorBlackOnLight } from "utils";
+import { tableColorBlackOnLight } from "utils";
 
 export const Hero = ({
   size = "",

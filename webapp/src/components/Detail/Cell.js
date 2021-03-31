@@ -1,5 +1,4 @@
 import React, { Fragment } from "react";
-import { parse } from "uuid";
 
 export default (columnDefinition, sourceLabel) => {
   const date_time_options = {

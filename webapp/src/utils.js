@@ -1,7 +1,5 @@
 import React from "react";
 
-const matchPath = () => ({});
-
 export const transformData = (columns, row) =>
   row.reduce(
     (acc, cur, i) => ({

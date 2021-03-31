@@ -1,11 +1,12 @@
 import React from "react";
 
-import { useQuerySpecification, useQueryContext } from "services/store";
+// import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
 // import SavedQuerySpecifications from "components/SavedQuerySpecifications";
-import * as globalConstants from "services/global/constants";
+// import * as globalConstants from "services/global/constants";
 import { Hx, Button } from "components/LayoutHelpers";
 
+/*
 const ReportItem = ({ item }) => {
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
@@ -34,6 +35,7 @@ const ReportItem = ({ item }) => {
 
   return <Button attributes={{ onClick: handleClick }}>Add KPI</Button>;
 };
+*/
 
 const sampleActivityList = [
   {
