@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const GoogleSignInButton = ({}) => {
+const GoogleSignInButton = () => {
   const GOOGLE_BUTTON_ID = "id-google-button";
 
   const onSuccess = (googleUser) => {

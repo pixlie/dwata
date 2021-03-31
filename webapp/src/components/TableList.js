@@ -52,7 +52,7 @@ export default ({ sourceLabel, sourceType }) => {
   const fetchSchema = useSchema((state) => state.fetchSchema);
   useEffect(() => {
     fetchSchema(sourceLabel);
-  }, [sourceLabel]);
+  }, [sourceLabel, fetchSchema]);
 
   if (!schema || !schema.isReady) {
     return null;

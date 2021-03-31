@@ -23,4 +23,4 @@ dramatiq = {extras = ["rabbitmq", "watch"],version = "*"}
 python-benedict = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "=>3.6"

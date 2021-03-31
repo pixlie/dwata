@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useQueryContext, useGlobal } from "services/store";
+import { useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
@@ -8,7 +8,6 @@ import HomeNav from "./HomeNav";
 export default ({ isSourceFetching, toggleSidebar }) => {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
-  const showNotes = useGlobal((state) => state.showNotes);
 
   const handleHome = (event) => {
     event.preventDefault();

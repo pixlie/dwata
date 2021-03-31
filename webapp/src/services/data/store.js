@@ -1,6 +1,5 @@
 import create from "zustand";
 import axios from "axios";
-import _ from "lodash";
 
 import { dataURL, dataItemURL } from "services/urls";
 import useQuerySpecification, {

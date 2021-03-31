@@ -46,7 +46,7 @@ export default () => {
 
   useEffect(() => {
     initiateQuerySpecification("notes", notesQS);
-  }, []);
+  }, [initiateQuerySpecification, notesQS]);
 
   if (
     !isNotesVisible ||

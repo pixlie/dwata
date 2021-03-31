@@ -2,7 +2,7 @@ import create from "zustand";
 import axios from "axios";
 
 import { transformData } from "utils";
-import { appURL, dataItemURL } from "services/urls";
+import { appURL } from "services/urls";
 
 const initialState = {
   isNoteAppEnabled: false, // Is the notes app enabled - as in it's backend is setup
