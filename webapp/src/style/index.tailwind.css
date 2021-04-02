@@ -1,7 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans&family=Montserrat:wght@400;500;600;700&display=swap");
 @import "../../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
 @import "../../node_modules/@fortawesome/fontawesome-free/css/solid.css";
 @import "../../node_modules/@fortawesome/fontawesome-free/css/regular.css";
+@import "./fonts.openSans.css";
+@import "./fonts.montserrat.css";
 
 @tailwind base;
 @tailwind components;

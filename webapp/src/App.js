@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import { useEffect } from "react";
 
 import { QueryContext } from "utils";
 import { useGlobal, useQueryContext } from "services/store";
@@ -14,7 +14,7 @@ import Report from "components/Report";
 
 const AuthenticatedInner = ({ mainApp }) => {
   return (
-    <Fragment>
+    <>
       <Detail />
       <Notes />
 
@@ -30,11 +30,11 @@ const AuthenticatedInner = ({ mainApp }) => {
       {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
         <Home />
       ) : null}
-    </Fragment>
+    </>
   );
 };
 
-export default () => {
+const App = () => {
   const mainApp = useQueryContext((state) => state["main"]);
   const refreshCoreSettings = useGlobal((state) => state.refreshCoreSettings);
   const currentUser = useGlobal((state) => state.currentUser);
@@ -58,3 +58,5 @@ export default () => {
     </QueryContext.Provider>
   );
 };
+
+export default App;
