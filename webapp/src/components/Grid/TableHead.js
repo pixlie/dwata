@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import TableHeadItem from "./TableHeadItem";
 
-export default () => {
+const TableHead = () => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -29,10 +29,7 @@ export default () => {
 
   if (querySpecification.isRowSelectable) {
     headList.push(
-      <th
-        key="th-row-sel"
-        className="border border-gray-400 px-2 py-1 text-left"
-      />
+      <th key="th-row-sel" className="border border-gray-300 px-2 text-left" />
     ); // This is for the row selector
   }
   for (const [i, col] of _columns.entries()) {
@@ -54,7 +51,7 @@ export default () => {
       headList.push(
         <th
           key={`th-${col.tableName}-exp`}
-          className="border border-gray-400 px-2 py-1 text-left"
+          className="border border-gray-300 px-2 text-left"
         ></th>
       );
     } else {
@@ -72,3 +69,5 @@ export default () => {
 
   return <tr className="bg-gray-100 h-10">{headList}</tr>;
 };
+
+export default TableHead;

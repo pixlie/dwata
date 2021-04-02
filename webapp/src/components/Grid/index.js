@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from "react";
+import { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useQuerySpecification } from "services/store";
@@ -11,7 +11,7 @@ import FilterEditor from "components/QueryEditor/FilterEditor";
 import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
 
-export default ({ showHeader = true, showPaginator = true } = {}) => {
+const Grid = ({ showHeader = true, showPaginator = true } = {}) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -24,7 +24,7 @@ export default ({ showHeader = true, showPaginator = true } = {}) => {
 
   return (
     <Loader>
-      <Fragment>
+      <>
         <div>
           <table className="font-content tracking-normal bg-white border-collapse">
             <thead>{showHeader ? <TableHead /> : null}</thead>
@@ -41,7 +41,9 @@ export default ({ showHeader = true, showPaginator = true } = {}) => {
         {queryContext.isColumnSelectorOpen ? <ColumnSelector /> : null}
         {queryContext.isFilterEditorOpen ? <FilterEditor /> : null}
         {queryContext.isMergeUIOpen ? <MergeData /> : null}
-      </Fragment>
+      </>
     </Loader>
   );
 };
+
+export default Grid;
