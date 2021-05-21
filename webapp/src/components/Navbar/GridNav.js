@@ -71,12 +71,12 @@ const GridStats = ({ size = "md" }) => {
   );
 };
 
-export default ({
+function GridNav({
   showRelated = true,
   size = "md",
   toggleActions,
   togglePinnedRecords,
-}) => {
+}) {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -188,4 +188,6 @@ export default ({
       </div>
     </div>
   );
-};
+}
+
+export default GridNav;

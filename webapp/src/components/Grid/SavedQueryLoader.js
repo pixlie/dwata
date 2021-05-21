@@ -40,7 +40,7 @@ const InnerLoader = ({ children }) => {
   );
 };
 
-export default ({ children }) => {
+function SavedQueryLoader({ children }) {
   // We made this small separate component just for the separate useEffect used here
   const queryContext = useContext(QueryContext);
   const fetchData = useData((state) => state.fetchData);
@@ -60,4 +60,6 @@ export default ({ children }) => {
   }
 
   return <InnerLoader>{children}</InnerLoader>;
-};
+}
+
+export default SavedQueryLoader;
