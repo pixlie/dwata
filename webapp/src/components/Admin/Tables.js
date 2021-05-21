@@ -5,7 +5,7 @@ import { useQuerySpecification } from "services/store";
 import { Hx } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
-export default () => {
+const AdminTables = () => {
   const key = "data-sources";
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
@@ -37,3 +37,5 @@ export default () => {
     </div>
   );
 };
+
+export default AdminTables;

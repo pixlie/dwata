@@ -136,31 +136,13 @@ const rowRenderer = (
   };
 
   const CharCell = ({ data }) => {
-    const maxLengthToShow = 40;
-    const handleClick = () => {};
-
-    if (data && data.length > maxLengthToShow) {
-      return (
-        <td
-          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
-        >
-          <span
-            className={`inline-block max-w-sm h-12 overflow-hidden`}
-            onClick={handleClick}
-          >
-            {data}
-          </span>
-        </td>
-      );
-    } else {
-      return (
-        <td
-          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
-        >
-          {data}
-        </td>
-      );
-    }
+    return (
+      <td
+        className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+      >
+        {data}
+      </td>
+    );
   };
 
   if (querySpecification.isRowSelectable) {

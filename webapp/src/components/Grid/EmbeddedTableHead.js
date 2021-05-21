@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
 import TableHeadItem from "./TableHeadItem";
 
-export default () => {
+const EmbeddedTableHead = () => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -42,7 +42,7 @@ export default () => {
       headList.push(
         <th
           key={`th-${col.tableName}-exp`}
-          className="border border-gray-400 px-2 py-1 text-left"
+          className="border border-gray-300 px-2 py-1 text-left"
         ></th>
       );
     } else {
@@ -56,5 +56,7 @@ export default () => {
     }
   }
 
-  return <tr className="bg-gray-100 border-b-4 h-10">{headList}</tr>;
+  return <tr className="bg-gray-100 border-b-2 h-10">{headList}</tr>;
 };
+
+export default EmbeddedTableHead;

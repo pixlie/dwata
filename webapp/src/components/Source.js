@@ -45,7 +45,7 @@ const SourceItem = ({ source, sourceType, index }) => {
   );
 };
 
-export default () => {
+const Source = () => {
   const isReady = useSource((state) => state.isReady);
   const sourceRows = useSource((state) => state.rows);
   const fetchSource = useSource((state) => state.fetchSource);
@@ -101,3 +101,5 @@ export default () => {
     </Fragment>
   );
 };
+
+export default Source;
