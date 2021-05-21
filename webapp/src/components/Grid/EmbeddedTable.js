@@ -9,7 +9,7 @@ import EmbeddedTableBody from "./EmbeddedTableBody";
  * Embedded grids have less functionality but are otherwise visually similar to a regular Grid.
  *
  */
-export default ({ embedContext }) => {
+function EmbeddedTable({ embedContext }) {
   const queryContext = useContext(QueryContext);
   const ctx = {
     isEmbedded: true,
@@ -34,4 +34,6 @@ export default ({ embedContext }) => {
       </>
     </QueryContext.Provider>
   );
-};
+}
+
+export default EmbeddedTable;

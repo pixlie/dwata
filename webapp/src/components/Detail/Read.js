@@ -68,7 +68,7 @@ const ViewInner = ({ item, columns }) => {
   );
 };
 
-export default ({ item, index }) => {
+function Read({ item, index }) {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -132,4 +132,6 @@ export default ({ item, index }) => {
       <ViewInner item={item} columns={schemaTable.columns} />
     </div>
   );
-};
+}
+
+export default Read;
