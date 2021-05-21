@@ -43,7 +43,7 @@ const guideText = {
   ),
 };
 
-export default ({ guideFor }) => {
+function ProductGuide({ guideFor }) {
   const setActiveProductGuideFor = useGlobal(
     (state) => state.setActiveProductGuideFor
   );
@@ -102,4 +102,6 @@ export default ({ guideFor }) => {
       {showProductGuideFor === null ? <Ping /> : null}
     </Fragment>
   );
-};
+}
+
+export default ProductGuide;

@@ -5,7 +5,7 @@ import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
 
-export default ({ isSourceFetching, toggleSidebar }) => {
+function Navbar({ isSourceFetching, toggleSidebar }) {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
 
@@ -83,4 +83,6 @@ export default ({ isSourceFetching, toggleSidebar }) => {
       </div>
     </nav>
   );
-};
+}
+
+export default Navbar;

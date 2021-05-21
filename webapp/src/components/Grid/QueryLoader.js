@@ -3,7 +3,7 @@ import React, { useEffect, useContext, Fragment } from "react";
 import { QueryContext } from "utils";
 import { useSchema, useData, useQuerySpecification } from "services/store";
 
-export default ({ children }) => {
+function QueryLoader({ children }) {
   // We made this small separate component just for the separate useEffect used here
   const queryContext = useContext(QueryContext);
   const fetchSchema = useSchema((state) => state.fetchSchema);
@@ -39,4 +39,6 @@ export default ({ children }) => {
   }
 
   return <Fragment>{children}</Fragment>;
-};
+}
+
+export default QueryLoader;

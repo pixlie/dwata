@@ -4,12 +4,12 @@ import { QueryContext } from "utils";
 import { useData, useQuerySpecification, useSelected } from "services/store";
 import { Button } from "components/LayoutHelpers";
 
-export default ({
+function ActionButton({
   label,
   size = "md",
   isEnabledWhen = () => false,
   handler = () => {},
-}) => {
+}) {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -31,4 +31,6 @@ export default ({
       {label}
     </Button>
   );
-};
+}
+
+export default ActionButton;
