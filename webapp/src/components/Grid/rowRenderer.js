@@ -1,32 +1,18 @@
-import React, { Fragment, useContext } from "react";
 import _ from "lodash";
 import dayjs from "dayjs";
 
 import * as globalConstants from "services/global/constants";
-import { QueryContext } from "utils";
-import {
-  useData,
-  useSchema,
-  useQuerySpecification,
-  useSelected,
-} from "services/store";
 import { getColumnSchema } from "services/querySpecification/getters";
-import { useQueryContext } from "services/store";
 
-export default () => {
-  const queryContext = useContext(QueryContext);
-  const gridData = useData((state) => state[queryContext.key]);
-  const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
-  );
-  const schema = useSchema((state) => state[querySpecification.sourceLabel]);
-  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
-  const toggleSelection = useSelected((state) => state.toggleSelection);
-  const selectedRowList = useSelected(
-    (state) => state[queryContext.key].selectedList
-  );
-  const { columns } = gridData;
-
+const rowRenderer = (
+  queryContextKey,
+  columns,
+  querySpecification,
+  schema,
+  toggleDetailItem,
+  toggleSelection,
+  selectedRowList
+) => {
   const rowList = [];
   /* const date_time_options = {
     year: "numeric",
@@ -39,7 +25,7 @@ export default () => {
   }; */
   const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-300";
-  const paddingClasses = "px-2 py-1";
+  const paddingClasses = "px-1 py-1";
 
   const createRowExpandCell = (tableColumn, colIndex) => {
     const RowExpandCell = ({ data, row }) => {
@@ -72,7 +58,7 @@ export default () => {
     const RowSelectorCell = ({ row }) => {
       const handleRowSelect = (event) => {
         event.preventDefault();
-        toggleSelection(queryContext.key, row);
+        toggleSelection(queryContextKey, row);
       };
 
       return (
@@ -108,7 +94,7 @@ export default () => {
   const BooleanCell = ({ data }) => (
     <td className={`${paddingClasses} ${borderClasses}`}>
       {data === true || data === false ? (
-        <Fragment>
+        <>
           {data === true ? (
             <span className="inline-block bg-green-200 text-sm px-1 rounded">
               <span className="text-green-600 text-sm">
@@ -124,7 +110,7 @@ export default () => {
               &nbsp;No
             </span>
           )}
-        </Fragment>
+        </>
       ) : (
         <i />
       )}
@@ -150,31 +136,13 @@ export default () => {
   };
 
   const CharCell = ({ data }) => {
-    const maxLengthToShow = 40;
-    const handleClick = () => {};
-
-    if (data && data.length > maxLengthToShow) {
-      return (
-        <td
-          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
-        >
-          <span
-            className={`inline-block max-w-sm h-12 overflow-hidden`}
-            onClick={handleClick}
-          >
-            {data}
-          </span>
-        </td>
-      );
-    } else {
-      return (
-        <td
-          className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
-        >
-          {data}
-        </td>
-      );
-    }
+    return (
+      <td
+        className={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}
+      >
+        {data}
+      </td>
+    );
   };
 
   if (querySpecification.isRowSelectable) {
@@ -211,3 +179,5 @@ export default () => {
 
   return rowList;
 };
+
+export default rowRenderer;

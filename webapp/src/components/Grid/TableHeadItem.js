@@ -1,4 +1,4 @@
-import React, { useContext, Fragment } from "react";
+import { useContext } from "react";
 
 import { QueryContext } from "utils";
 import { useSchema, useQuerySpecification } from "services/store";
@@ -25,7 +25,7 @@ const ColumnHeadSpecification = ({ tableColumnName }) => {
   );
 };
 
-export default ({ tableColumnName, label, tableColor, index }) => {
+const TableHeadItem = ({ tableColumnName, label, tableColor, index }) => {
   const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
@@ -52,11 +52,13 @@ export default ({ tableColumnName, label, tableColor, index }) => {
       }}
       tableColor={tableColor}
     >
-      <Fragment>
+      <>
         {activeColumnHeadSpecification === tableColumnName ? (
           <ColumnHeadSpecification tableColumnName={tableColumnName} />
         ) : null}
-      </Fragment>
+      </>
     </ColumnHead>
   );
 };
+
+export default TableHeadItem;

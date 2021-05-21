@@ -82,7 +82,7 @@ const KPIBox = ({ value, metric, tags }) => (
   </div>
 );
 
-export default () => {
+const Home = () => {
   return (
     <div className="flex items-stretch">
       <div
@@ -117,3 +117,5 @@ export default () => {
     </div>
   );
 };
+
+export default Home;

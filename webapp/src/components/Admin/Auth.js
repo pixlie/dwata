@@ -2,7 +2,7 @@ import React from "react";
 
 import { Hx } from "components/LayoutHelpers";
 
-export default () => {
+const Auth = () => {
   return (
     <div className="rounded">
       <Hx x="3">Authentication</Hx>
@@ -15,3 +15,5 @@ export default () => {
     </div>
   );
 };
+
+export default Auth;

@@ -20,7 +20,7 @@ const GoogleSignInButton = ({}) => {
   return <div id={GOOGLE_BUTTON_ID} />;
 };
 
-export default () => {
+const Authentication = () => {
   const [state, setState] = useState({
     isApiReady: false,
   });
@@ -54,3 +54,5 @@ export default () => {
 
   return <div>{state.isApiReady ? <GoogleSignInButton /> : null}</div>;
 };
+
+export default Authentication;

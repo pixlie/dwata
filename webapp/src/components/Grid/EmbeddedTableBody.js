@@ -1,7 +1,13 @@
-import React, { Fragment, useContext } from "react";
+import { useContext } from "react";
 
 import { QueryContext, transformData } from "utils";
-import { useData, useSchema, useQuerySpecification } from "services/store";
+import {
+  useData,
+  useSchema,
+  useQuerySpecification,
+  useQueryContext,
+  useSelected,
+} from "services/store";
 import rowRenderer from "./rowRenderer";
 
 const generateFilter = (
@@ -34,13 +40,18 @@ const generateFilter = (
   };
 };
 
-export default () => {
+const EmbeddedTableBody = () => {
   const queryContext = useContext(QueryContext);
   const data = useData((state) => state[queryContext.key]);
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
   const schema = useSchema((state) => state[querySpecification.sourceLabel]);
+  const toggleDetailItem = useQueryContext((state) => state.toggleDetailItem);
+  const toggleSelection = useSelected((state) => state.toggleSelection);
+  const selectedRowList = useSelected(
+    (state) => state[queryContext.key].selectedList
+  );
   let embedded = [];
 
   if (data) {
@@ -55,9 +66,13 @@ export default () => {
   );
 
   const rowRendererList = rowRenderer(
-    schema.rows,
+    queryContext.key,
     embedded[queryContext.embeddedDataIndex].columns,
-    querySpecification
+    querySpecification,
+    schema,
+    toggleDetailItem,
+    toggleSelection,
+    selectedRowList
   );
 
   const Row = ({ row, index }) => {
@@ -79,12 +94,14 @@ export default () => {
   };
 
   return (
-    <Fragment>
+    <>
       {embedded[queryContext.embeddedDataIndex].rows
         .filter(filterByParent)
         .map((row, i) => (
           <Row key={`tr-${i}`} row={row} index={i} />
         ))}
-    </Fragment>
+    </>
   );
 };
+
+export default EmbeddedTableBody;

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import { useContext } from "react";
 
 import { QueryContext } from "utils";
 import EmbeddedTableHead from "./EmbeddedTableHead";
@@ -19,7 +19,7 @@ export default ({ embedContext }) => {
 
   return (
     <QueryContext.Provider value={ctx}>
-      <Fragment>
+      <>
         <div>
           <table className="font-content tracking-normal bg-white border-collapse">
             <thead>
@@ -31,7 +31,7 @@ export default ({ embedContext }) => {
             </tbody>
           </table>
         </div>
-      </Fragment>
+      </>
     </QueryContext.Provider>
   );
 };

@@ -64,7 +64,7 @@ const sideNavItems = [
   },
 ];
 
-export default () => {
+const Admin = () => {
   const [state, setState] = useState({
     currentTab: "account",
   });
@@ -99,3 +99,5 @@ export default () => {
     </div>
   );
 };
+
+export default Admin;

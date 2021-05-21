@@ -3,7 +3,7 @@ import React from "react";
 import { Section, Hx } from "components/LayoutHelpers";
 import { pinRecords } from "services/apps/actions";
 
-export default () => {
+const Actions = () => {
   if (!isReady || !isVisible) {
     return null;
   }
@@ -64,3 +64,5 @@ export default withRouter(
   })(Actions)
 );
 */
+
+export default Actions;

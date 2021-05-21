@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 
 import { tableColorBlackOnLight } from "utils";
 
@@ -123,7 +123,7 @@ export const ButtonGroup = ({
   }
 
   return (
-    <Fragment>
+    <>
       {buttons.map((button, i) => (
         <Button
           key={`btgr-${i}`}
@@ -136,7 +136,7 @@ export const ButtonGroup = ({
           {button.inner}
         </Button>
       ))}
-    </Fragment>
+    </>
   );
 };
 
@@ -159,7 +159,7 @@ export const ColumnHead = ({
   }
 
   return (
-    <th className="border border-gray-400 px-2 py-1 text-left">
+    <th className="border border-gray-300 px-2 text-left">
       <span className={classes} {...attributes}>
         {label}
       </span>

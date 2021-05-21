@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import * as globalConstants from "services/global/constants";
 import {
@@ -44,9 +44,9 @@ export default () => {
     fetchNeeded: true,
   };
 
-  useEffect(() => {
-    initiateQuerySpecification("notes", notesQS);
-  }, [initiateQuerySpecification, notesQS]);
+  // useEffect(() => {
+  //   initiateQuerySpecification("notes", notesQS);
+  // }, [initiateQuerySpecification, notesQS]);
 
   if (
     !isNotesVisible ||

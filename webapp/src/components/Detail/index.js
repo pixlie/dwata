@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import { useContext } from "react";
 
 import * as globalConstants from "services/global/constants";
 import { QueryContext } from "utils";
@@ -24,5 +24,5 @@ export default () => {
     details.push(<View key={`dt-vi-${i}`} item={x} index={i} />);
   }
 
-  return <Fragment>{details}</Fragment>;
+  return <>{details}</>;
 };

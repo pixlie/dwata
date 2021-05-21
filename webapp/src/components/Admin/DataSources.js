@@ -8,7 +8,7 @@ import GridNav from "components/Navbar/GridNav";
 import { Hx, Button } from "components/LayoutHelpers";
 import Grid from "components/Grid";
 
-export default () => {
+const DataSource = () => {
   const key = "data-sources";
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
@@ -83,3 +83,5 @@ export default () => {
     </div>
   );
 };
+
+export default DataSource;
