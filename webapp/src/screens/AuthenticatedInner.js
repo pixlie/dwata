@@ -44,7 +44,7 @@ const AuthenticatedInner = ({ mainApp }) => {
           <Report />
         </Route>
 
-        <Route path="/admin">
+        <Route path="/manage">
           <Admin />
         </Route>
 

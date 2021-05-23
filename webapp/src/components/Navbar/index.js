@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
 import { useQueryContext } from "services/store";
 import * as globalConstants from "services/global/constants";
@@ -7,14 +7,6 @@ import HomeNav from "./HomeNav";
 
 function Navbar() {
   const mainApp = useQueryContext((state) => state["main"]);
-  const setContext = useQueryContext((state) => state.setContext);
-
-  const handleHome = (event) => {
-    event.preventDefault();
-    setContext("main", {
-      appType: globalConstants.APP_NAME_HOME,
-    });
-  };
 
   /* const handleNotesClick = () => {
     showNotes();
@@ -27,17 +19,16 @@ function Navbar() {
       aria-label="main navigation"
     >
       <div className="mx-4">
-        <a
+        <Link
           className={`font-semibold text-lg ${
             mainApp && mainApp.appType === globalConstants.APP_NAME_HOME
               ? "text-gray-700"
               : "text-gray-500"
           }`}
-          href="/"
-          onClick={handleHome}
+          to="/"
         >
           Home
-        </a>
+        </Link>
       </div>
 
       <div className="block lg:inline-block lg:mt-0 px-4">&nbsp;</div>

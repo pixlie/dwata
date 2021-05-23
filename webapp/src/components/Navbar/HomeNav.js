@@ -6,8 +6,8 @@ export default () => {
       <div className="block lg:inline-block items-center flex-grow"></div>
 
       <div className="block lg:inline-block items-center">
-        <Button theme="secondary" linkTo="/admin/">
-          Admin
+        <Button theme="secondary" linkTo="/manage/">
+          Manage
         </Button>
       </div>
     </div>
