@@ -1,21 +1,7 @@
 import React, { useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import { tableColorBlackOnLight } from "utils";
-
-export const Hero = ({
-  size = "",
-  textCentered = false,
-  style = {},
-  children,
-}) => (
-  <section className={`hero ${size}`} style={style}>
-    <div className="hero-body">
-      <div className={`container${textCentered ? " has-text-centered" : null}`}>
-        {children}
-      </div>
-    </div>
-  </section>
-);
 
 export const Section = ({ size = "", style = {}, children }) => (
   <section className={`section ${size}`} style={style}>
@@ -41,20 +27,6 @@ export const Hx = ({ x = "3", children }) => {
   );
 };
 
-export const Box = ({ title, message, children }) => {
-  return (
-    <div className="box">
-      {title ? (
-        <Hx x="4" titleclassName="subtitle">
-          {title}
-        </Hx>
-      ) : null}
-      {message ? <p>{message}</p> : null}
-      {children}
-    </div>
-  );
-};
-
 export const Button = ({
   label,
   size = "md",
@@ -64,6 +36,7 @@ export const Button = ({
   padding = "px-2",
   margin = "mx-1",
   rounded = "rounded",
+  linkTo = undefined,
   attributes,
   children,
 }) => {
@@ -100,44 +73,21 @@ export const Button = ({
     (disabled ? " " : " hover:shadow-none ") +
     `${rounded} ${padding} ${margin} ${themeClasses} ${sizeClasses}`;
 
-  return (
-    <button className={classes} {...attributes} disabled={disabled}>
-      {label}
-      {children}
-    </button>
-  );
-};
-
-export const ButtonGroup = ({
-  size = "medium",
-  theme = "primary",
-  hasGap = false,
-  attributes,
-  buttons,
-}) => {
-  const rounded = Array(buttons.length).fill("rounded");
-  if (!hasGap) {
-    rounded.fill("");
-    rounded[0] = "rounded-l";
-    rounded[buttons.length - 1] = "rounded-r";
+  if (linkTo !== undefined) {
+    return (
+      <Link className={classes} {...attributes} disabled={disabled} to={linkTo}>
+        {label}
+        {children}
+      </Link>
+    );
+  } else {
+    return (
+      <button className={classes} {...attributes} disabled={disabled}>
+        {label}
+        {children}
+      </button>
+    );
   }
-
-  return (
-    <>
-      {buttons.map((button, i) => (
-        <Button
-          key={`btgr-${i}`}
-          rounded={rounded[i]}
-          label={button.label}
-          theme={theme}
-          margin={!hasGap ? "" : "mr-2"}
-          attributes={{ ...attributes, ...button.attributes }}
-        >
-          {button.inner}
-        </Button>
-      ))}
-    </>
-  );
 };
 
 export const ColumnHead = ({

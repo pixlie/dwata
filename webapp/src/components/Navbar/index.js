@@ -5,7 +5,7 @@ import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
 
-function Navbar({ isSourceFetching, toggleSidebar }) {
+function Navbar() {
   const mainApp = useQueryContext((state) => state["main"]);
   const setContext = useQueryContext((state) => state.setContext);
 

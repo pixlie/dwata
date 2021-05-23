@@ -1,38 +1,10 @@
 import { useEffect } from "react";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import { QueryContext } from "utils";
 import { useGlobal, useQueryContext } from "services/store";
-import * as globalConstants from "services/global/constants";
-import Navbar from "components/Navbar";
 import Login from "screens/Login";
-import Home from "components/Home";
-import Admin from "components/Admin";
-import Grid from "components/Grid";
-import Detail from "components/Detail";
-import Notes from "components/Notes";
-import Report from "components/Report";
-
-const AuthenticatedInner = ({ mainApp }) => {
-  return (
-    <>
-      <Detail />
-      <Notes />
-
-      {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
-        <Grid />
-      ) : null}
-      {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
-        <Report />
-      ) : null}
-      {mainApp && mainApp.appType === globalConstants.APP_NAME_ADMIN ? (
-        <Admin />
-      ) : null}
-      {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
-        <Home />
-      ) : null}
-    </>
-  );
-};
+import AuthenticatedInner from "screens/AuthenticatedInner";
 
 const App = () => {
   const mainApp = useQueryContext((state) => state["main"]);
@@ -44,18 +16,29 @@ const App = () => {
     refreshCoreSettings();
   }, [refreshCoreSettings]);
 
-  return (
-    <QueryContext.Provider value={mainApp}>
-      <Navbar />
-      <div className="block clear-both" style={{ paddingBottom: "52px" }} />
+  useEffect(() => {
+    if (
+      access.isAuthenticationNeeded &&
+      (!currentUser || !currentUser.isAuthenticated)
+    ) {
+      // redirect to login
+    }
+  }, []);
 
-      {access.isAuthenticationNeeded &&
-      (!currentUser || !currentUser.isAuthenticated) ? (
-        <Login />
-      ) : (
-        <AuthenticatedInner mainApp={mainApp} />
-      )}
-    </QueryContext.Provider>
+  return (
+    <BrowserRouter>
+      <QueryContext.Provider value={mainApp}>
+        <Switch>
+          <Route path="/auth/login" exact>
+            <Login />
+          </Route>
+
+          <Route path="/">
+            <AuthenticatedInner mainApp={mainApp} />
+          </Route>
+        </Switch>
+      </QueryContext.Provider>
+    </BrowserRouter>
   );
 };
 
