@@ -1,15 +1,23 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "chrome",
-            "request": "attach",
-            "port": 9222,
-            "name": "Launch Chrome against localhost",
-            "webRoot": "${workspaceFolder}/src"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "port": 9222,
+      "name": "Chromium debug",
+      "webRoot": "${workspaceFolder}/src",
+      "runtimeArgs": [
+        "--incognito",
+        "--new-window",
+        "--remote-debugging-port=9222",
+        "--user-data-dir=/home/brainless/Workspaces/chromium",
+        "http://dwata.devel"
+      ],
+      "runtimeExecutable": "/usr/bin/chromium"
+    }
+  ]
 }

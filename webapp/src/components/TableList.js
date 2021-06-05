@@ -1,4 +1,5 @@
-import React, { useEffect, Fragment } from "react";
+import { useEffect, Fragment } from "react";
+import { useHistory } from "react-router-dom";
 
 import {
   useSchema,
@@ -8,15 +9,18 @@ import {
 import * as globalConstants from "services/global/constants";
 import { Hx } from "components/LayoutHelpers";
 
-const BrowserItem = ({ item, sourceLabel, sourceType }) => {
+function TableItem({ item, sourceLabel }) {
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
   );
+  const history = useHistory();
   const setContext = useQueryContext((state) => state.setContext);
-  // const urlBase = sourceType === "database" ? "/browse" : "/service";
 
   const handleClick = (event) => {
     event.preventDefault();
+    event.stopPropagation();
+    // We set the query specification of the "main" app here to
+    //  select data for the source and table that is clicked
     initiateQuerySpecification("main", {
       sourceLabel,
       select: [
@@ -30,6 +34,7 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
     setContext("main", {
       appType: globalConstants.APP_NAME_BROWSER,
     });
+    history.push("/explore/");
   };
 
   return (
@@ -38,16 +43,20 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
       onClick={handleClick}
     >
       <span className="text-sm text-gray-600 text-center ml-6 mr-3">
-        <i className="fas fa-table" />
+        <a href="/explore/" onClick={handleClick}>
+          <i className="fas fa-table" />
+        </a>
       </span>
       <span className="text-xs font-medium tracking-normal text-blue-700">
-        {item.table_name}
+        <a href="/explore/" onClick={handleClick}>
+          {item.table_name}
+        </a>
       </span>
     </div>
   );
-};
+}
 
-export default ({ sourceLabel, sourceType }) => {
+function TableList({ sourceLabel, sourceType }) {
   const schema = useSchema((state) => state[sourceLabel]);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   useEffect(() => {
@@ -63,7 +72,7 @@ export default ({ sourceLabel, sourceType }) => {
       {schema.rows
         .filter((s) => s.properties.is_system_table === false)
         .map((s, i) => (
-          <BrowserItem
+          <TableItem
             key={`sr-${i}`}
             item={s}
             sourceLabel={sourceLabel}
@@ -76,7 +85,7 @@ export default ({ sourceLabel, sourceType }) => {
         {schema.rows
           .filter((s) => s.properties.is_system_table === true)
           .map((s, i) => (
-            <BrowserItem
+            <TableItem
               key={`sr-${i}`}
               item={s}
               sourceLabel={sourceLabel}
@@ -86,4 +95,6 @@ export default ({ sourceLabel, sourceType }) => {
       </div>
     </Fragment>
   );
-};
+}
+
+export default TableList;

@@ -1,8 +1,6 @@
-import React from "react";
-
 import { Hx } from "components/LayoutHelpers";
 
-const Account = () => {
+function Account() {
   return (
     <div className="rounded">
       <Hx x="3">Account</Hx>
@@ -53,6 +51,6 @@ const Account = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Account;

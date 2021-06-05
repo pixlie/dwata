@@ -3,7 +3,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { useSource } from "services/store";
 import TableList from "components/TableList";
 
-const SourceItem = ({ source, sourceType, index }) => {
+const SourceItem = ({ source, sourceType }) => {
   const [state, setState] = useState({
     isOpen: true,
   });
@@ -52,10 +52,6 @@ const Source = () => {
   useEffect(() => {
     fetchSource();
   }, [fetchSource]);
-  /* const [state, setState] = useState({
-    sourceIndex: null,
-  }); */
-  // const {sourceIndex} = state;
 
   if (!isReady) {
     return null;
@@ -92,12 +88,6 @@ const Source = () => {
             sourceType="database"
           />
         ))}
-
-      {/* <Panel title="Services">
-        {sourceList.isReady ? sourceList.rows.filter(x => x.type === "service").map((s, i) => (
-          <SourceItem s={s} i={count_database + i} sourceType="service" key={`sr-${count_database + i}`} />
-        )) : null}
-      </Panel> */}
     </Fragment>
   );
 };

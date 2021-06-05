@@ -1,10 +1,11 @@
+from starlette.requests import Request
 from json.decoder import JSONDecodeError
 
 from utils.http import RapidJSONResponse, web_error
 from database.query_builder import QueryBuilder
 
 
-async def data_post(request):
+async def data_explore(request: Request) -> RapidJSONResponse:
     """
     This method fetches actual data from one or more sources, given a specification for columns, joins, limits,
     etc. This method is a POST method because the query specification can become large.

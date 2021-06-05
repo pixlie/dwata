@@ -41,11 +41,18 @@ export default create((set) => ({
 
   setContext: (appName, context) =>
     saveToLocalStorage(appName, context) &&
-    set(() => ({
+    set((state) => ({
+      ...state,
       [appName]: {
         key: appName,
         ...context,
       },
+    })),
+
+  unSetContext: (appName) =>
+    set((state) => ({
+      ...state,
+      [appName]: undefined,
     })),
 
   toggleDetailItem: (item) =>

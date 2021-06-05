@@ -1,6 +1,5 @@
 from sqlalchemy import MetaData
 
-from database.select import Select
 from utils.database import get_unavailable_columns
 from database.connect import connect_database
 from utils.settings import get_source_settings
@@ -15,14 +14,14 @@ example_spec = {
 
 
 class QueryBuilder(object):
-    query_specification = None
-    unavailable_columns = None
+    query_specification: dict = None
+    unavailable_columns: list = None
 
     database_engine = None
     database_conn = None
     database_meta = None
 
-    def __init__(self, query_specification):
+    def __init__(self, query_specification: dict):
         self.query_specification = query_specification
 
     async def prepare(self):
@@ -34,6 +33,7 @@ class QueryBuilder(object):
         self.unavailable_columns = get_unavailable_columns(settings, self.database_meta)
 
     async def results(self):
+        from database.select import Select
         await self.prepare()
         root_select = Select(qb=self)
         columns, rows, query_sql = root_select.execute()

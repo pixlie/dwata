@@ -1,7 +1,7 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { QueryContext } from "utils";
-import { useQuerySpecification } from "services/store";
+import { useQueryContext, useQuerySpecification } from "services/store";
 import QueryLoader from "./QueryLoader";
 import SavedQueryLoader from "./SavedQueryLoader";
 import TableHead from "./TableHead";
@@ -16,11 +16,22 @@ const Grid = ({ showHeader = true, showPaginator = true } = {}) => {
   const querySpecification = useQuerySpecification(
     (state) => state[queryContext.key]
   );
+  const unSetContext = useQueryContext((store) => store.unSetContext);
 
   const Loader =
     !!querySpecification && !!querySpecification.isSavedQuery
       ? SavedQueryLoader
       : QueryLoader;
+
+  useEffect(() => {
+    return () => {
+      if (queryContext.key === "main") {
+        // We are in the "main" app, we need to unload this app
+        //  as navbar shows extra options depending on this app
+        unSetContext("main");
+      }
+    };
+  }, []);
 
   return (
     <Loader>

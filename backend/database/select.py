@@ -2,14 +2,15 @@ import sqlalchemy
 from sqlalchemy import or_, join, select, func
 
 from database.schema import column_definition
+from database.query_builder import QueryBuilder
 
 
 class Select(object):
-    qb = None
+    qb: QueryBuilder = None
     merge_one_to_many = False
     default_per_page = 25
     is_root = False
-    select_root_table_name = None  # This is the starting table of any Select, including embedded ones
+    select_root_table_name: str = None  # This is the starting table of any Select, including embedded ones
 
     tables_and_columns = None
     requested_tables_in_order = None
@@ -17,10 +18,10 @@ class Select(object):
 
     embedded_selects = None  # The list of embedded Select(s) that the current Select has
     embedded_tables = None  # The list of table names in the embedded Select(s)
-    parent_select = None
+    parent_select: "Select" = None
     parent_join = None
 
-    def __init__(self, qb, table_name=None, parent_select=None, parent_join=None):
+    def __init__(self, qb: QueryBuilder, table_name: str = None, parent_select: "Select" = None, parent_join=None):
         self.qb = qb
         self.parent_select = parent_select
         self.pending_joins = {}

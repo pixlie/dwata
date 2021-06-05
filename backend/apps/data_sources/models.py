@@ -1,6 +1,5 @@
 from datetime import datetime
-from sqlalchemy import MetaData, Table, Column, Integer, String, Text, DateTime
-from sqlalchemy.dialects.sqlite import JSON
+from sqlalchemy import MetaData, Table, Column, Integer, String, JSON, DateTime
 
 
 metadata = MetaData()

@@ -1,30 +1,14 @@
 import { Switch, Route } from "react-router-dom";
 
-import * as globalConstants from "services/global/constants";
 import Navbar from "components/Navbar";
 import Home from "components/Home";
-import Admin from "components/Admin";
+import Admin from "screens/Admin";
 import Grid from "components/Grid";
 import Detail from "components/Detail";
 import Notes from "components/Notes";
 import Report from "components/Report";
 
 const AuthenticatedInner = ({ mainApp }) => {
-  /*
-  {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
-    <Grid />
-  ) : null}
-  {mainApp && mainApp.appType === globalConstants.APP_NAME_REPORT ? (
-    <Report />
-  ) : null}
-  {mainApp && mainApp.appType === globalConstants.APP_NAME_ADMIN ? (
-    <Admin />
-  ) : null}
-  {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
-    <Home />
-  ) : null}
-  */
-
   return (
     <>
       <Navbar />
@@ -36,7 +20,7 @@ const AuthenticatedInner = ({ mainApp }) => {
             <Detail />
             <Notes />
 
-            <Grid />
+            <Grid containerName="main" />
           </>
         </Route>
 

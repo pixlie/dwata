@@ -8,7 +8,7 @@ from utils.exceptions import web_exception_handlers
 from utils.app import DwataAppMiddleware
 from endpoints.source import source_get
 from endpoints.schema import schema_get
-from endpoints.data import data_post
+from endpoints.data import data_explore
 from endpoints.item import item_get, item_post, item_put
 from endpoints.service import service_fetch
 from endpoints.worker import worker_background, worker_execute
@@ -28,7 +28,7 @@ handlers = [
     Route(r"/api/schema/{source_label:str}", schema_get, methods=["GET"]),
 
     # Requesting actual data, this is POST request since the request payload is JSON object
-    Route(r"/api/data", data_post, methods=["GET", "POST"]),
+    Route(r"/api/data", data_explore, methods=["GET", "POST"]),
 
     # Handlers to work on single items, usually accesses using a PK
     Route(r"/api/item/{source_label:str}/{table_name:str}/{item_pk:int}", item_get, methods=["GET"]),
