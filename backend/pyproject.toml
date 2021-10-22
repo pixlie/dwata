@@ -19,6 +19,8 @@ aioredis = "^2.0.0"
 python-benedict = "^0.24.3"
 sqlalchemy-migrate = "^0.13.0"
 black = "^21.9b0"
+python-dotenv = "^0.19.1"
+PyJWT = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 

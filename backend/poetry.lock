@@ -322,6 +322,20 @@ docs = ["Sphinx (>=4)", "furo (>=2021.7.5b38)", "proselint (>=0.10.2)", "sphinx-
 test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock (>=3.6)"]
 
 [[package]]
+name = "pyjwt"
+version = "2.3.0"
+description = "JSON Web Token implementation in Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+crypto = ["cryptography (>=3.3.1)"]
+dev = ["sphinx", "sphinx-rtd-theme", "zope.interface", "cryptography (>=3.3.1)", "pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)", "mypy", "pre-commit"]
+docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
+tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
+
+[[package]]
 name = "python-benedict"
 version = "0.24.3"
 description = "python-benedict is a dict subclass with keylist/keypath support, normalized I/O operations (base64, csv, ini, json, pickle, plist, query-string, toml, xml, yaml) and many utilities... for humans, obviously."
@@ -360,6 +374,17 @@ description = "Strict separation of settings from code."
 category = "main"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "python-dotenv"
+version = "0.19.1"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.extras]
+cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-fsutil"
@@ -625,7 +650,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8e5cf32b559b690d4b97877a71c35b129860017b72bac2ebdbd9a95f915bd371"
+content-hash = "26ad7d8ad55cd56361d7f258baed29316a3535f76637d4eb55a0c8ec6bd99c95"
 
 [metadata.files]
 aiohttp = [
@@ -902,6 +927,10 @@ platformdirs = [
     {file = "platformdirs-2.4.0-py3-none-any.whl", hash = "sha256:8868bbe3c3c80d42f20156f22e7131d2fb321f5bc86a2a345375c6481a67021d"},
     {file = "platformdirs-2.4.0.tar.gz", hash = "sha256:367a5e80b3d04d2428ffa76d33f124cf11e8fff2acdaa9b43d545f5c7d661ef2"},
 ]
+pyjwt = [
+    {file = "PyJWT-2.3.0-py3-none-any.whl", hash = "sha256:e0c4bb8d9f0af0c7f5b1ec4c5036309617d03d56932877f2f7a0beeb5318322f"},
+    {file = "PyJWT-2.3.0.tar.gz", hash = "sha256:b888b4d56f06f6dcd777210c334e69c737be74755d3e5e9ee3fe67dc18a0ee41"},
+]
 python-benedict = [
     {file = "python-benedict-0.24.3.tar.gz", hash = "sha256:f9d7b41cbe7fe79b3df0c12285eacf297a157fa7b5d9da461132908ab13c390f"},
     {file = "python_benedict-0.24.3-py3-none-any.whl", hash = "sha256:408bd271ce2b83ca030283285a6fe7c987b9b67a469cf2b731417245e93cd2db"},
@@ -913,6 +942,10 @@ python-dateutil = [
 python-decouple = [
     {file = "python-decouple-3.5.tar.gz", hash = "sha256:68e4b3fcc97e24bc90eecc514852d0bf970f4ff031f5f7a6728ddafa9afefcaf"},
     {file = "python_decouple-3.5-py3-none-any.whl", hash = "sha256:011d3f785367c54a72cf8a07d3a7a48bb8cc1a0f8e6c70353ca5767ebf7c8c9d"},
+]
+python-dotenv = [
+    {file = "python-dotenv-0.19.1.tar.gz", hash = "sha256:14f8185cc8d494662683e6914addcb7e95374771e707601dfc70166946b4c4b8"},
+    {file = "python_dotenv-0.19.1-py2.py3-none-any.whl", hash = "sha256:bbd3da593fc49c249397cbfbcc449cf36cb02e75afc8157fcc6a81df6fb7750a"},
 ]
 python-fsutil = [
     {file = "python-fsutil-0.5.0.tar.gz", hash = "sha256:02a347540d10c1616390a536ced73fd67df8d01c499f497d0ab3de3fbb236f0e"},
