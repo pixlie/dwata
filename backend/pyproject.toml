@@ -17,6 +17,8 @@ loguru = "^0.5.3"
 aiohttp = "^3.7.4"
 aioredis = "^2.0.0"
 python-benedict = "^0.24.3"
+sqlalchemy-migrate = "^0.13.0"
+black = "^21.9b0"
 
 [tool.poetry.dev-dependencies]
 
