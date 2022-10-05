@@ -1,15 +1,18 @@
 from urllib.parse import urlparse
 
-from utils.config import get_settings
+from utils.config import settings
 
 
 async def get_all_sources():
     from services import all_services
-    settings = await get_settings()
+
+    await settings.initialize_databases()
 
     databases = [
-        [label, "database", db.scheme, {}] for (label, db) in [
-            (label, urlparse(value["db_url"])) for label, value in settings.DATABASES.items()
+        [label, "database", db.scheme, {}]
+        for (label, db) in [
+            (label, urlparse(value["db_url"]))
+            for label, value in settings.DATABASES.items()
         ]
     ] + [["dwata_meta", "database", "sqlite", {"is_system_db": True}]]
 
@@ -17,18 +20,14 @@ async def get_all_sources():
     for sname in all_services.keys():
         if hasattr(settings, sname.upper()):
             for label, value in getattr(settings, sname.upper()).items():
-                services.append(
-                    [label, "service", sname]
-                )
+                services.append([label, "service", sname])
     return databases + services
 
 
 async def get_source_settings(source_label):
     if source_label == "dwata_meta":
-        return {
-            "db_url": "sqlite:///dwata_meta.db"
-        }
-    settings = await get_settings()
+        return {"db_url": "sqlite:///dwata_meta.db"}
+    await settings.initialize_databases()
     all_sources = await get_all_sources()
     requested_source = [x for x in all_sources if x[0] == source_label][0]
     if requested_source[1] == "database":

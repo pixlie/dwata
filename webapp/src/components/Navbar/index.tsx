@@ -1,20 +1,24 @@
 import React from "react";
 
-import { useQueryContext } from "services/store";
-import * as globalConstants from "services/global/constants";
+// import { useQueryContext } from "services/store";
+// import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
 
-function Navbar({ isSourceFetching, toggleSidebar }) {
-  const mainApp = useQueryContext((state) => state["main"]);
-  const setContext = useQueryContext((state) => state.setContext);
+interface IPropTypes {
+  toggleSidebar: () => void;
+}
 
-  const handleHome = (event) => {
-    event.preventDefault();
-    setContext("main", {
-      appType: globalConstants.APP_NAME_HOME,
-    });
-  };
+function Navbar() {
+  // const mainApp = useQueryContext((state) => state["main"]);
+  // const setContext = useQueryContext((state) => state.setContext);
+
+  // const handleHome = (event) => {
+  //   event.preventDefault();
+  //   setContext("main", {
+  //     appType: globalConstants.APP_NAME_HOME,
+  //   });
+  // };
 
   /* const handleNotesClick = () => {
     showNotes();
@@ -27,15 +31,7 @@ function Navbar({ isSourceFetching, toggleSidebar }) {
       aria-label="main navigation"
     >
       <div className="mx-4">
-        <a
-          className={`font-semibold text-lg ${
-            mainApp && mainApp.appType === globalConstants.APP_NAME_HOME
-              ? "text-gray-700"
-              : "text-gray-500"
-          }`}
-          href="/"
-          onClick={handleHome}
-        >
+        <a className={`font-semibold text-lg`} href="/">
           Home
         </a>
       </div>
@@ -74,12 +70,12 @@ function Navbar({ isSourceFetching, toggleSidebar }) {
       </div>
 
       <div className="block lg:inline-block flex-grow">
-        {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
+        {/* {mainApp && mainApp.appType === globalConstants.APP_NAME_BROWSER ? (
           <GridNav />
-        ) : null}
-        {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
+        ) : null} */}
+        {/* {mainApp && mainApp.appType === globalConstants.APP_NAME_HOME ? (
           <HomeNav />
-        ) : null}
+        ) : null} */}
       </div>
     </nav>
   );
