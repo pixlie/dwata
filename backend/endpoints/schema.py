@@ -1,6 +1,6 @@
 from starlette.background import BackgroundTask
 
-from utils.http import RapidJSONResponse
+from utils.http import OrJSONResponse
 from utils.settings import get_all_sources, get_source_settings
 from database.schema import infer_schema
 from services import all_services
@@ -18,7 +18,7 @@ async def schema_get(request):
         cache_key = "schema.{}".format(source_label)
         cache_value = await read_from_redis(cache_key=cache_key)
         if cache_value:
-            return RapidJSONResponse(cache_value)
+            return OrJSONResponse(cache_value)
         response = await infer_schema(
             source_settings=source_settings,
             table_name=table_name
@@ -28,10 +28,10 @@ async def schema_get(request):
             cache_key=cache_key,
             cache_value=response
         )
-        return RapidJSONResponse(response, background=task)
+        return OrJSONResponse(response, background=task)
     elif requested_source[1] == "service":
         integration = all_services[requested_source[2]](**source_settings)
-        return RapidJSONResponse({
+        return OrJSONResponse({
             "columns": ["table_name", "columns"],
             "rows": [[x, []] for x in integration.resources.keys()]
         })

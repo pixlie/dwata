@@ -12,7 +12,6 @@ uvicorn = "^0.15.0"
 python-decouple = "^3.5"
 databases = {extras = ["postgresql"], version = "^0.5.3"}
 aiosqlite = "^0.17.0"
-python-rapidjson = "^1.5"
 loguru = "^0.5.3"
 aiohttp = "^3.7.4"
 aioredis = "^2.0.0"
@@ -22,6 +21,7 @@ black = "^21.9b0"
 python-dotenv = "^0.19.1"
 PyJWT = "^2.3.0"
 psycopg2 = "^2.9.3"
+orjson = "^3.8.0"
 
 [tool.poetry.dev-dependencies]
 

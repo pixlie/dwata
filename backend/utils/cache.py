@@ -1,16 +1,11 @@
 from datetime import datetime
 import aioredis
-import rapidjson
-
-from .http import RapidJSONEncoder
+import orjson
 
 
 async def cache_to_redis(cache_key, cache_value):
     redis = await aioredis.Redis.from_url("redis://localhost")
-    await redis.set("result-{}".format(cache_key), RapidJSONEncoder().encode((
-        cache_value,
-        datetime.utcnow()
-    )).encode("utf-8"))
+    await redis.set("result-{}".format(cache_key), orjson.dumps(cache_value))
 
 
 async def read_from_redis(cache_key, fresh_within=600, raw_value=False):
@@ -21,6 +16,6 @@ async def read_from_redis(cache_key, fresh_within=600, raw_value=False):
     if raw_value:
         return cache_value
     else:
-        cache_value = rapidjson.loads(cache_value)
+        cache_value = orjson.loads(cache_value)
         if (datetime.utcnow() - datetime.fromisoformat(cache_value[1])).total_seconds() < fresh_within:
             return cache_value[0]

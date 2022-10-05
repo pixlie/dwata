@@ -6,13 +6,13 @@ from sqlalchemy import MetaData, select
 from sqlalchemy.exc import IntegrityError
 from json.decoder import JSONDecodeError
 
-from utils.http import RapidJSONResponse, web_error
+from utils.http import OrJSONResponse, web_error
 from utils.database import get_unavailable_columns
 from database.connect import connect_database
 from utils.settings import get_source_settings
 
 
-async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
+async def item_get(request: Request) -> Union[Response, OrJSONResponse]:
     """
     This method fetches a single row of data given the source_id, table_name and primary key id.
     There are tables which do not have a primary key and in those case an index might be used.
@@ -56,7 +56,7 @@ async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
     if record is None:
         return Response("", status_code=404)
 
-    return RapidJSONResponse(
+    return OrJSONResponse(
         dict(
             item=dict(zip(exc.keys(), record)),
             query_sql=str(sel_obj.compile(engine, compile_kwargs={"literal_binds": True})),
@@ -64,7 +64,7 @@ async def item_get(request: Request) -> Union[Response, RapidJSONResponse]:
     )
 
 
-async def item_post(request: Request) -> Union[Response, RapidJSONResponse]:
+async def item_post(request: Request) -> Union[Response, OrJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     settings = await get_source_settings(source_label=source_label)
@@ -104,7 +104,7 @@ async def item_post(request: Request) -> Union[Response, RapidJSONResponse]:
     ins_obj = table_to_insert.insert().values(**payload)
     try:
         exc = conn.execute(ins_obj)
-        return RapidJSONResponse({
+        return OrJSONResponse({
             "status": "success",
             "lastrowid": exc.lastrowid,
             "rowcount": exc.rowcount,
@@ -115,7 +115,7 @@ async def item_post(request: Request) -> Union[Response, RapidJSONResponse]:
             return Response("", status_code=404)
 
 
-async def item_put(request: Request) -> Union[Response, RapidJSONResponse]:
+async def item_put(request: Request) -> Union[Response, OrJSONResponse]:
     source_label = request.path_params["source_label"]
     table_name = request.path_params["table_name"]
     item_pk = request.path_params["item_pk"]
@@ -156,7 +156,7 @@ async def item_put(request: Request) -> Union[Response, RapidJSONResponse]:
     ).values(**payload)
     try:
         exc = conn.execute(upd_obj)
-        return RapidJSONResponse({
+        return OrJSONResponse({
             "status": "success",
             "lastrowid": exc.lastrowid,
             "rowcount": exc.rowcount,

@@ -1,15 +1,16 @@
 from datetime import datetime
 from starlette.requests import Request
 from starlette.exceptions import HTTPException
-from utils.http import RapidJSONResponse, RapidJSONEncoder
 from benedict import benedict
+import orjson
 
+from utils.http import OrJSONResponse
 from database.dwata_meta import dwata_meta_db
 from .models import settings
 from .hierarchy import hierarchy
 
 
-async def settings_get(request: Request) -> RapidJSONResponse:
+async def settings_get(request: Request) -> OrJSONResponse:
     """Get all the settings by a hierarchy"""
     label_root = request.path_params["label_root"]
     query = settings.select().where(
@@ -29,7 +30,7 @@ async def settings_get(request: Request) -> RapidJSONResponse:
         ]
     rows = [value_type_convert(x) for x in all_settings]
 
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "columns": [
             "id", "label", "value", "created_at", "modified_at",
         ],
@@ -51,7 +52,7 @@ def verify_hierarchy(path: str, value):
         raise Exception("payload value data type mistatch")
 
 
-async def settings_set(request: Request) -> RapidJSONResponse:
+async def settings_set(request: Request) -> OrJSONResponse:
     """
     Set a setting by its label and value
     For simplicity we allow only one path to be set, path uses "/" as separator
@@ -63,9 +64,9 @@ async def settings_set(request: Request) -> RapidJSONResponse:
     except Exception as e:
         raise HTTPException(
             status_code=400,
-            detail=RapidJSONEncoder().encode({
+            detail=orjson.dumps({
                 "error": e.args[0]
-            }).encode("utf-8")
+            }).decode()
         )
 
     query = settings.insert().values(
@@ -74,6 +75,6 @@ async def settings_set(request: Request) -> RapidJSONResponse:
         created_at=datetime.utcnow()
     )
     last_insert_id = await dwata_meta_db.execute(query=query)
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "id": last_insert_id
     })

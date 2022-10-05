@@ -1,6 +1,6 @@
 from json.decoder import JSONDecodeError
 
-from utils.http import RapidJSONResponse, web_error
+from utils.http import OrJSONResponse, web_error
 from database.query_builder import QueryBuilder
 
 
@@ -22,7 +22,7 @@ async def data_post(request):
 
     qb = QueryBuilder(query_specification)
     columns, rows, count, query_sql, embedded = await qb.results()
-    return RapidJSONResponse(
+    return OrJSONResponse(
         dict(
             select=query_specification["select"],
             columns=columns,

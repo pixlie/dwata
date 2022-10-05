@@ -2,7 +2,7 @@ import importlib
 from starlette.exceptions import HTTPException
 from starlette.background import BackgroundTask
 
-from utils.http import RapidJSONResponse
+from utils.http import OrJSONResponse
 
 
 STATUS_QUEUED = "status_queued"
@@ -22,7 +22,7 @@ async def worker_background(request):
 
     payload = await request.json()
     task = BackgroundTask(getattr(worker, worker_name), **payload)
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "status": STATUS_QUEUED,
     }, background=task)
 
@@ -41,4 +41,4 @@ async def worker_execute(request):
 
     payload = await request.json()
     response = await getattr(worker, worker_name)(**payload)
-    return RapidJSONResponse(response)
+    return OrJSONResponse(response)

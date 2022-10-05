@@ -1,7 +1,7 @@
 from importlib import import_module
 from json.decoder import JSONDecodeError
 
-from utils.http import RapidJSONResponse, web_error
+from utils.http import OrJSONResponse, web_error
 
 
 async def app_get(_):
@@ -9,7 +9,7 @@ async def app_get(_):
     Get the list of dwata provided capabilities that have been configured
     """
     # Todo: this is a hack, please update in [ch162]
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "columns": [
             "label", "is_enabled", "config"
         ],
@@ -58,7 +58,7 @@ async def app_setup(request):
 
     setup_params["source_label"] = "dwata_meta"
     await getattr(module, "setup_app")(**setup_params)
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "status": "success"
     })
 
@@ -86,6 +86,6 @@ async def app_uninstall(request):
             )
 
     await getattr(module, "uninstall_app")(**uninstall_params)
-    return RapidJSONResponse({
+    return OrJSONResponse({
         "status": "success"
     })

@@ -1,7 +1,7 @@
 from starlette.exceptions import HTTPException
 from starlette.background import BackgroundTask
 
-from utils.http import RapidJSONResponse
+from utils.http import OrJSONResponse
 from utils.settings import get_all_sources, get_source_settings
 from utils.cache import read_from_redis, cache_to_redis
 from services import all_services
@@ -20,7 +20,7 @@ async def service_fetch(request):
         cache_key = "{}.{}.{}".format(source_label, resource_name, resource.url)
         cache_value = await read_from_redis(cache_key=cache_key)
         if cache_value:
-            return RapidJSONResponse(cache_value)
+            return OrJSONResponse(cache_value)
 
         async with session.get(resource.url) as resp:
             if resource.response_data_type == "json":
@@ -35,7 +35,7 @@ async def service_fetch(request):
                         "rows": rows
                     }
                 )
-                return RapidJSONResponse({
+                return OrJSONResponse({
                     "columns": columns,
                     "rows": rows
                 }, background=task)

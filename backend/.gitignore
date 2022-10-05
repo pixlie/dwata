@@ -106,3 +106,6 @@ db-migrations/migrate.cfg
 
 # Admin meta SQLite DB
 dwata_meta.db
+
+# Local environment settings
+.env
