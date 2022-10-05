@@ -41,7 +41,7 @@ def column_definition(col, col_def):
                 #  then more likely to be a title
                 # Perhaps and import text, like title
                 hints.append("is_title")
-            if data_type == "TEXT" or (data_type in types_with_length and col_def.type.length > 200):
+            if data_type == "TEXT" or (data_type in types_with_length and (col_def.type.length is None or col_def.type.length > 200)):
                 # Perhaps and import text, like title
                 hints.append("is_text_lg")
         return hints

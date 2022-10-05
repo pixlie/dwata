@@ -6,7 +6,7 @@ from .http import RapidJSONEncoder
 
 
 async def cache_to_redis(cache_key, cache_value):
-    redis = await aioredis.create_redis_pool("redis://localhost")
+    redis = await aioredis.Redis.from_url("redis://localhost")
     await redis.set("result-{}".format(cache_key), RapidJSONEncoder().encode((
         cache_value,
         datetime.utcnow()
@@ -14,8 +14,8 @@ async def cache_to_redis(cache_key, cache_value):
 
 
 async def read_from_redis(cache_key, fresh_within=600, raw_value=False):
-    redis = await aioredis.create_redis_pool("redis://localhost")
-    cache_value = await redis.get("result-{}".format(cache_key), encoding="utf-8")
+    redis = await aioredis.Redis.from_url("redis://localhost")
+    cache_value = await redis.get("result-{}".format(cache_key))
     if cache_value is None:
         return cache_value
     if raw_value:

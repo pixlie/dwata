@@ -21,6 +21,7 @@ sqlalchemy-migrate = "^0.13.0"
 black = "^21.9b0"
 python-dotenv = "^0.19.1"
 PyJWT = "^2.3.0"
+psycopg2 = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 

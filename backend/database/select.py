@@ -395,10 +395,19 @@ class Select(object):
         dm = self.qb.database_meta
         conn = self.qb.database_conn
 
+        try:
+            pk = getattr(dm.tables[self.select_root_table_name].c, "id")
+            selection = [func.count(pk)]
+        except AttributeError:
+            pk = ",".join([".".join(x) for x in [
+                    [self.select_root_table_name, p.name] for p in dm.tables[
+                    self.select_root_table_name
+                ].primary_key
+            ]])
+            selection = [func.count(pk)]
+        
         # We use a separate query to count the total number of rows in the given query
-        columns, _select = self.prepare(override_columns=[
-            func.count(getattr(dm.tables[self.select_root_table_name].c, "id"))
-        ], apply_order=False, apply_limit=False, apply_offset=False)
+        columns, _select = self.prepare(override_columns=selection, apply_order=False, apply_limit=False, apply_offset=False)
         return conn.execute(_select).scalar()
 
     def get_subquery_parent_id_list(self, sel_obj):
