@@ -28,7 +28,7 @@ class QueryBuilder(object):
     async def prepare(self):
         source_label = self.query_specification["source_label"]
         settings = await get_source_settings(source_label=source_label)
-        self.database_engine, self.database_conn = await connect_database(db_url=settings["db_url"])
+        self.database_engine, self.database_conn = connect_database(db_url=settings["db_url"])
         self.database_meta = MetaData(bind=self.database_engine)
         self.database_meta.reflect()
         self.unavailable_columns = get_unavailable_columns(settings, self.database_meta)

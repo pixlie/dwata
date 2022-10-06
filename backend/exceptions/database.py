@@ -9,3 +9,7 @@ class DatabaseDriverNotInstalledException(DwataException):
     def __init__(self, error_code, message_code=None, message=None):
         self.error_code = error_code
         self.message = message
+
+
+class DatabaseNotFound(Exception):
+    pass

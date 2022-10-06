@@ -21,7 +21,7 @@ async def refresh(source_label_list):
         data_source = await dwata_meta_db.fetch_one(data_sources.select().where(
             data_sources.c.label == source_label
         ))
-        engine, conn = await connect_database(db_url=source_settings["db_url"])
+        engine, conn = connect_database(db_url=source_settings["db_url"])
         meta = MetaData(bind=engine)
         meta.reflect()
 

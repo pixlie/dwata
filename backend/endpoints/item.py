@@ -28,7 +28,7 @@ async def item_get(request: Request) -> Union[Response, OrJSONResponse]:
             return Response("", status_code=404)
     settings = await get_source_settings(source_label=source_label)
 
-    engine, conn = await connect_database(db_url=settings["db_url"])
+    engine, conn = connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
@@ -69,7 +69,7 @@ async def item_post(request: Request) -> Union[Response, OrJSONResponse]:
     table_name = request.path_params["table_name"]
     settings = await get_source_settings(source_label=source_label)
 
-    engine, conn = await connect_database(db_url=settings["db_url"])
+    engine, conn = connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])
@@ -121,7 +121,7 @@ async def item_put(request: Request) -> Union[Response, OrJSONResponse]:
     item_pk = request.path_params["item_pk"]
     settings = await get_source_settings(source_label=source_label)
 
-    engine, conn = await connect_database(db_url=settings["db_url"])
+    engine, conn = connect_database(db_url=settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
     unavailable_columns = get_unavailable_columns(source_settings=settings, meta=meta).get(table_name, [])

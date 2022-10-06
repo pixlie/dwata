@@ -4,7 +4,7 @@ from sqlalchemy.exc import OperationalError
 from exceptions.database import DatabaseDriverNotInstalledException
 
 
-async def connect_database(db_url=None):
+def connect_database(db_url=None):
     try:
         engine = create_engine(db_url)
     except ModuleNotFoundError as e:

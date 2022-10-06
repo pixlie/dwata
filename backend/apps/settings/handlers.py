@@ -5,37 +5,54 @@ from benedict import benedict
 import orjson
 
 from utils.http import OrJSONResponse
-from database.dwata_meta import dwata_meta_db
-from .models import settings
+from utils.config import settings
+from utils.dwata_models import dwata_settings
 from .hierarchy import hierarchy
+
+
+required_dwata_backend_env_settings = [
+    "DATABASES",
+    "REQUEST_ORIGINS",
+    "AUTHENTICATION_METHODS"
+]
 
 
 async def settings_get(request: Request) -> OrJSONResponse:
     """Get all the settings by a hierarchy"""
     label_root = request.path_params["label_root"]
-    query = settings.select().where(
-        settings.c.label.like("{}%".format(label_root))
+    if label_root == "dwata/backend/env":
+        # dwata/backend/env is the set of .env settings in the backend without which the backend
+        #  cannot function
+        for x in required_dwata_backend_env_settings:
+            if not hasattr(settings, x) or getattr(settings, x) is None or not len(getattr(settings, x)):
+                return OrJSONResponse({
+                    "status": "not_ready"
+                })
+        return OrJSONResponse({
+            "status": "ready"
+        })
+
+    query = dwata_settings.select().where(
+        dwata_settings.c.label.like("{}%".format(label_root))
     )
-    all_settings = await dwata_meta_db.fetch_all(query=query)
-    benedict_hierarchy: benedict = benedict(hierarchy, keypath_separator="/")
-
-    def value_type_convert(row):
-        converted = row[2] if benedict_hierarchy[row[1]] is str else benedict_hierarchy[row[1]](row[2])
-        return [
-            row[0],
-            row[1],
-            converted,
-            row[3],
-            row[4]
-        ]
-    rows = [value_type_convert(x) for x in all_settings]
-
-    return OrJSONResponse({
-        "columns": [
-            "id", "label", "value", "created_at", "modified_at",
-        ],
-        "rows": rows
-    })
+    # all_settings = await dwata_meta_db.fetch_all(query=query)
+    # benedict_hierarchy: benedict = benedict(hierarchy, keypath_separator="/")
+    #
+    # def value_type_convert(row):
+    #     converted = row[2] if benedict_hierarchy[row[1]] is str else benedict_hierarchy[row[1]](row[2])
+    #     return [
+    #         row[0],
+    #         row[1],
+    #         converted,
+    #     ]
+    # rows = [value_type_convert(x) for x in all_settings]
+    #
+    # return OrJSONResponse({
+    #     "columns": [
+    #         "id", "label", "value",
+    #     ],
+    #     "rows": rows
+    # })
 
 
 def verify_hierarchy(path: str, value):
@@ -69,7 +86,7 @@ async def settings_set(request: Request) -> OrJSONResponse:
             }).decode()
         )
 
-    query = settings.insert().values(
+    query = dwata_settings.insert().values(
         label=request_payload["path"],
         value=request_payload["value"],
         created_at=datetime.utcnow()

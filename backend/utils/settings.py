@@ -1,20 +1,19 @@
 from urllib.parse import urlparse
 
 from utils.config import settings
+from exceptions.database import DatabaseNotFound
 
 
 async def get_all_sources():
     from services import all_services
 
-    await settings.initialize_databases()
-
     databases = [
-        [label, "database", db.scheme, {}]
-        for (label, db) in [
-            (label, urlparse(value["db_url"]))
-            for label, value in settings.DATABASES.items()
+        [f"{db.path[1:]}@{db.hostname}", "database", db.scheme, {}]
+        for db in [
+            urlparse(db_url)
+            for db_url in settings.DATABASES
         ]
-    ] + [["dwata_meta", "database", "sqlite", {"is_system_db": True}]]
+    ]
 
     services = []
     for sname in all_services.keys():
@@ -25,12 +24,15 @@ async def get_all_sources():
 
 
 async def get_source_settings(source_label):
-    if source_label == "dwata_meta":
-        return {"db_url": "sqlite:///dwata_meta.db"}
-    await settings.initialize_databases()
     all_sources = await get_all_sources()
     requested_source = [x for x in all_sources if x[0] == source_label][0]
+
     if requested_source[1] == "database":
-        return settings.DATABASES[requested_source[0]]
+        db_path, db_host = requested_source[0].split("@")
+        for db_url in settings.DATABASES:
+            db_parts = urlparse(db_url)
+            if db_parts.path == db_path and db_parts.hostname == db_host:
+                return db_url
+        raise DatabaseNotFound()
     elif requested_source[1] == "service":
         return getattr(settings, requested_source[2].upper())[requested_source[0]]

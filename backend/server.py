@@ -4,7 +4,6 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
 
-from database.dwata_meta import dwata_meta_db
 from utils.config import settings
 from utils.exceptions import web_exception_handlers
 from utils.app import DwataAppMiddleware
@@ -80,15 +79,14 @@ middlewares = [
     Middleware(DwataAppMiddleware),
     Middleware(
         CORSMiddleware,
-        allow_origins=[settings.REQUEST_ORIGINS],
+        allow_origins=settings.REQUEST_ORIGINS,
+        allow_methods=["OPTION", "GET", "POST", "PUT", "PATCH"]
     ),
     Middleware(AuthenticationMiddleware, backend=BearerTokenAuthBackend()),
 ]
 
 app = Starlette(
     debug=settings.DEBUG,
-    on_startup=[dwata_meta_db.connect],
-    on_shutdown=[dwata_meta_db.disconnect],
     routes=handlers,
     middleware=middlewares,
     exception_handlers=web_exception_handlers,

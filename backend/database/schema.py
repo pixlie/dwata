@@ -91,7 +91,7 @@ def infer_relations_matrix(source_settings, meta):
 
 
 async def infer_schema(source_settings, table_name=None, meta=None):
-    engine, conn = await connect_database(db_url=source_settings["db_url"])
+    engine, conn = connect_database(db_url=source_settings["db_url"])
     if meta is None:
         meta = MetaData(bind=engine)
         meta.reflect()
