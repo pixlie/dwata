@@ -2,7 +2,7 @@ import create from "zustand";
 
 import apiClient from "utils/apiClient";
 
-interface IStore {
+interface ICurrentUserStore {
   isAuthenticatied: boolean;
   isFetching: boolean;
   fetchError?: object;
@@ -11,11 +11,11 @@ interface IStore {
   fetchCurrentUser: () => void;
 }
 
-const useCurrentUser = create<IStore>((set) => ({
+const useCurrentUser = create<ICurrentUserStore>((set) => ({
   isAuthenticatied: false,
   isFetching: false,
 
-  fetchCurrentUser: async () => {
+  fetchCurrentUser: async function () {
     try {
       const response = await apiClient.get("/api/auth/me");
       console.log(response);

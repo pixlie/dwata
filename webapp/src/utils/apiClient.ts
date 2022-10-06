@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_ROOT,
+  baseURL: process.env.REACT_APP_API_ROOT || "/api",
 });
 
 // Timeout in 3 seconds by default
