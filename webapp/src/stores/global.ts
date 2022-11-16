@@ -8,6 +8,8 @@ import { settingsRootURL } from "services/urls";
  * mechanisms available (set in the backend), databases or sources available (set in the backend).
  */
 interface IGlobalStore {
+  setupIsIncompleteError: boolean;
+  isAuthenticated: boolean;
   isFetching: boolean;
   isReacy: boolean;
 
@@ -15,6 +17,8 @@ interface IGlobalStore {
 }
 
 const useGlobal = create<IGlobalStore>((set, get) => ({
+  setupIsIncompleteError: false,
+  isAuthenticated: false,
   isFetching: false,
   isReacy: false,
 
