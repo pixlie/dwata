@@ -5,8 +5,9 @@ from starlette.middleware.authentication import AuthenticationMiddleware
 from starlette.routing import Route
 
 from utils.config import settings
-from utils.exceptions import web_exception_handlers
-from utils.app import DwataAppMiddleware
+from utils.exceptions import exception_handlers
+from middlewares.app import DwataAppMiddleware
+from middlewares.setup import SetupMiddleware
 from utils.auth_backend import BearerTokenAuthBackend
 from endpoints.source import source_get
 from endpoints.schema import schema_get
@@ -15,12 +16,15 @@ from endpoints.item import item_get, item_post, item_put
 from endpoints.service import service_fetch
 from endpoints.worker import worker_background, worker_execute
 from apps.settings.handlers import settings_get, settings_set
+from apps.auth.handlers import authenticate_with_google
 
 
 handlers = [
     # Get a list of settings (labels, values) given the label path
-    Route(r"/api/settings/{label_root:path}", settings_get, methods=["GET"]),
-    Route(r"/api/settings", settings_set, methods=["POST", "PUT"]),
+    Route(r"/api/settings/{label_root:path}", settings_get, methods=["OPTIONS", "GET"]),
+    Route(r"/api/settings", settings_set, methods=["OPTIONS", "POST", "PUT"]),
+    # Authentication, currently only Sign in with Google
+    Route(r"/api/auth/google", authenticate_with_google, methods=["POST"]),
     # Finding out what data sources exist
     Route(r"/api/source", source_get, methods=["GET"]),
     # Asking for the schema of databases/tables
@@ -76,11 +80,14 @@ handlers = [
 ]
 
 middlewares = [
+    Middleware(SetupMiddleware),
     Middleware(DwataAppMiddleware),
     Middleware(
         CORSMiddleware,
-        allow_origins=settings.REQUEST_ORIGINS,
-        allow_methods=["OPTION", "GET", "POST", "PUT", "PATCH"]
+        # allow_origins=settings.REQUEST_ORIGINS,
+        allow_origins=["*"],
+        allow_methods=["OPTION", "GET", "POST", "PUT", "PATCH", "DELETE"],
+        allow_headers=["*"]
     ),
     Middleware(AuthenticationMiddleware, backend=BearerTokenAuthBackend()),
 ]
@@ -88,6 +95,6 @@ middlewares = [
 app = Starlette(
     debug=settings.DEBUG,
     routes=handlers,
+    exception_handlers=exception_handlers,
     middleware=middlewares,
-    exception_handlers=web_exception_handlers,
 )

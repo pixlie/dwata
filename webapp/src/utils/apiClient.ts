@@ -3,7 +3,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import useGlobal from "stores/global";
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_ROOT || "/api",
+  baseURL: `${process.env.REACT_APP_API_HOST_PROTOCOL}${process.env.REACT_APP_API_HOST}\:${process.env.REACT_APP_API_PORT}${process.env.REACT_APP_API_ROOT}`,
 });
 
 // Timeout in 3 seconds by default
