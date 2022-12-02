@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import axios from "axios";
+import shallow from "zustand/shallow";
 
+import { googleClientId } from "utils/variables";
+import useGlobal from "stores/global";
 import Navbar from "components/Navbar";
 import Home from "components/Home";
 import Admin from "components/Admin";
@@ -10,7 +15,7 @@ import Notes from "components/Notes";
 import Setup from "screens/Setup";
 import apiClient from "utils/apiClient";
 import * as responsesStatus from "utils/responseStatus";
-// import AuthCheck from "components/Auth/Check";
+import Authentication from "screens/Authentication";
 
 function AuthEnabledRoutes() {
   return (
@@ -21,26 +26,49 @@ function AuthEnabledRoutes() {
       <Detail />
       <Notes />
 
-      <Switch>
-        <Route path="/browse">
-          <Grid />
-        </Route>
-
-        <Route path="/admin">
-          <Admin />
-        </Route>
-
-        <Route path="/" exact>
-          <Home />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route path="/browse" element={<Grid />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/" element={<Home />} />
+      </Routes>
     </>
   );
 }
 
-function App() {
+function CheckAuthentication(): JSX.Element {
+  const { isAuthenticated, isReady, initiate } = useGlobal(
+    (store) => ({
+      isAuthenticated: store.isAuthenticated,
+      isReady: store.isReady,
+      initiate: store.initiate,
+    }),
+    shallow
+  );
+  const navigate = useNavigate();
+
+  useEffect(
+    function () {
+      initiate();
+    },
+    [initiate]
+  );
+
+  useEffect(
+    function () {
+      if (isReady && !isAuthenticated) {
+        navigate("/login");
+      }
+    },
+    [isAuthenticated, isReady]
+  );
+
+  return <></>;
+}
+
+function App(): JSX.Element {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [isReady, setIsReady] = useState<boolean>(false);
+  const [fetchError, setFetchError] = useState<object>();
 
   useEffect(function () {
     async function inner() {
@@ -49,12 +77,23 @@ function App() {
        * cannot function
        */
 
-      const response = await apiClient.get("/settings/dwata/backend/env");
-      setIsFetching(false);
-      if (response.data.status === responsesStatus.statusNotReady) {
-        setIsReady(false);
-      } else if (response.data.status === responsesStatus.statusReady) {
-        setIsReady(true);
+      try {
+        const response = await apiClient.get("/settings/dwata/backend/env");
+        setIsFetching(false);
+        if (response.data.status === responsesStatus.statusNotReady) {
+          setIsReady(false);
+        } else if (response.data.status === responsesStatus.statusReady) {
+          setIsReady(true);
+        }
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 500) {
+              setIsFetching(false);
+              setFetchError(error.response);
+            }
+          }
+        }
       }
     }
 
@@ -63,32 +102,34 @@ function App() {
 
   if (isFetching) {
     return <p>Loading...</p>;
-  }
-
-  if (!isReady) {
-    return (
-      <>
-        <p>
-          You have not set the initial settings in <pre>dwata/backend/.env</pre>
-        </p>
-        <p>
-          Please copy <pre>dwata/backend/.env.copy</pre> as a new file{" "}
-          <pre>dwata/backend/.env</pre> and set the values as in comments
-        </p>
-      </>
-    );
+  } else if (!isReady) {
+    if (fetchError) {
+      return (
+        <>
+          <p>
+            You have not set the initial settings in{" "}
+            <pre>dwata/backend/.env</pre>
+          </p>
+          <p>
+            Please copy <pre>dwata/backend/.env.copy</pre> as a new file{" "}
+            <pre>dwata/backend/.env</pre> and set the values as in comments
+          </p>
+        </>
+      );
+    }
   }
 
   return (
-    <Router>
-      <Route path="/setup">
-        <Setup />
-      </Route>
-
-      <Route path="">
-        <AuthEnabledRoutes />
-      </Route>
-    </Router>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/setup" element={<Setup />} />
+          <Route path="/login" element={<Authentication />} />
+          <Route path="" element={<CheckAuthentication />} />
+          <Route path="" element={<AuthEnabledRoutes />} />
+        </Routes>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 

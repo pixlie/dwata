@@ -1,9 +1,14 @@
 import { GoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
 
-import StandalonePage from "userInterface/standalonePage";
+import useGlobal from "stores/global";
 import apiClient from "utils/apiClient";
+import StandalonePage from "userInterface/standalonePage";
 
 function Authentication(): JSX.Element {
+  const navigate = useNavigate();
+  const setAuthentication = useGlobal((store) => store.setAuthentication);
+
   return (
     <StandalonePage title="Please login">
       <GoogleLogin
@@ -17,6 +22,9 @@ function Authentication(): JSX.Element {
                 "accessToken",
                 credentialResponse.credential
               );
+
+              setAuthentication(true, { emailAddress: response.data.email });
+              navigate("/");
             }
           }
         }}

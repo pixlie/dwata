@@ -1,8 +1,8 @@
 import create from "zustand";
-import axios from "axios";
 
 import { transformData } from "utils";
 import { schemaURL } from "services/urls";
+import apiClient from "utils/apiClient";
 
 const initialState = {
   columns: [],
@@ -46,13 +46,9 @@ export default create((set, get) => ({
         [sourceLabel]: initiateFetch(),
       }));
 
-    try {
-      const response = await axios.get(`${schemaURL}/${sourceLabel}`);
-      set(() => ({
-        [sourceLabel]: completeFetch(response.data),
-      }));
-    } catch (error) {
-      console.log("Could not fetch schema. Try again later.");
-    }
+    const response = await apiClient.get(`${schemaURL}/${sourceLabel}`);
+    set(() => ({
+      [sourceLabel]: completeFetch(response.data),
+    }));
   },
 }));
