@@ -2,7 +2,6 @@ import base64
 import binascii
 from starlette.authentication import (
     AuthenticationBackend,
-    AuthenticationError,
     AuthCredentials,
 )
 from starlette.requests import Request
@@ -24,7 +23,7 @@ class BearerTokenAuthBackend(AuthenticationBackend):
                 return
             decoded = base64.b64decode(credentials).decode("ascii")
         except (ValueError, UnicodeDecodeError, binascii.Error):
-            raise AuthenticationError("Invalid bearer token")
+            return
 
         payload = jwt.decode(decoded, settings.SECRET, algorithms=["HS256"])
         return AuthCredentials(["authenticated"]), AuthenticatedUser(id=payload["id"])

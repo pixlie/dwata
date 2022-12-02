@@ -5,7 +5,6 @@ from benedict import benedict
 import orjson
 
 from utils.http import OrJSONResponse
-from utils.config import settings
 from utils.dwata_models import dwata_settings
 from .hierarchy import hierarchy
 
@@ -13,28 +12,19 @@ from .hierarchy import hierarchy
 required_dwata_backend_env_settings = [
     "DATABASES",
     "REQUEST_ORIGINS",
-    "AUTHENTICATION_METHODS"
+    "AUTHENTICATION_METHODS",
+    "ADMIN_EMAILS"
 ]
 
 
 async def settings_get(request: Request) -> OrJSONResponse:
     """Get all the settings by a hierarchy"""
     label_root = request.path_params["label_root"]
-    if label_root == "dwata/backend/env":
-        # dwata/backend/env is the set of .env settings in the backend without which the backend
-        #  cannot function
-        for x in required_dwata_backend_env_settings:
-            if not hasattr(settings, x) or getattr(settings, x) is None or not len(getattr(settings, x)):
-                return OrJSONResponse({
-                    "status": "not_ready"
-                })
-        return OrJSONResponse({
-            "status": "ready"
-        })
-
     query = dwata_settings.select().where(
         dwata_settings.c.label.like("{}%".format(label_root))
     )
+    return OrJSONResponse({})
+
     # all_settings = await dwata_meta_db.fetch_all(query=query)
     # benedict_hierarchy: benedict = benedict(hierarchy, keypath_separator="/")
     #
