@@ -14,7 +14,6 @@ import Detail from "components/Detail";
 import Notes from "components/Notes";
 import Setup from "screens/Setup";
 import apiClient from "utils/apiClient";
-import * as responsesStatus from "utils/responseStatus";
 import Authentication from "screens/Authentication";
 
 function AuthEnabledRoutes() {
@@ -68,7 +67,6 @@ function CheckAuthentication(): JSX.Element {
 function App(): JSX.Element {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [isReady, setIsReady] = useState<boolean>(false);
-  const [fetchError, setFetchError] = useState<object>();
 
   useEffect(function () {
     async function inner() {
@@ -79,18 +77,16 @@ function App(): JSX.Element {
 
       try {
         const response = await apiClient.get("/settings/dwata/backend/env");
+        console.log(response);
+
         setIsFetching(false);
-        if (response.data.status === responsesStatus.statusNotReady) {
-          setIsReady(false);
-        } else if (response.data.status === responsesStatus.statusReady) {
-          setIsReady(true);
-        }
+        setIsReady(true);
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            if (error.response.status === 500) {
+            if (error.response.status === 400) {
               setIsFetching(false);
-              setFetchError(error.response);
+              setIsReady(false);
             }
           }
         }
@@ -103,20 +99,17 @@ function App(): JSX.Element {
   if (isFetching) {
     return <p>Loading...</p>;
   } else if (!isReady) {
-    if (fetchError) {
-      return (
-        <>
-          <p>
-            You have not set the initial settings in{" "}
-            <pre>dwata/backend/.env</pre>
-          </p>
-          <p>
-            Please copy <pre>dwata/backend/.env.copy</pre> as a new file{" "}
-            <pre>dwata/backend/.env</pre> and set the values as in comments
-          </p>
-        </>
-      );
-    }
+    return (
+      <>
+        <p>
+          You have not set the initial settings in <pre>dwata/backend/.env</pre>
+        </p>
+        <p>
+          Please copy <pre>dwata/backend/.env.copy</pre> as a new file{" "}
+          <pre>dwata/backend/.env</pre> and set the values as in comments
+        </p>
+      </>
+    );
   }
 
   return (
