@@ -2,7 +2,7 @@ from starlette.requests import Request
 from google.auth import jwt
 import orjson
 
-from utils.config import settings
+from utils.env_settings import settings
 from utils.cache import get_redis
 from utils.http import OrJSONResponse
 

@@ -7,7 +7,7 @@ from starlette.authentication import (
 from starlette.requests import Request
 import jwt
 
-from utils.config import settings
+from utils.env_settings import settings
 from apps.auth.user import AuthenticatedUser
 
 

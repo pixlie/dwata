@@ -11,7 +11,9 @@ from endpoints.worker import worker_background, worker_execute
 
 routes = [
     # Get a list of settings (labels, values) given the label path
-    Route(r"/api/settings/{label_root:path}", settings_get, methods=["OPTIONS", "GET"]),
+    Route(
+        r"/api/settings/{settings_path:path}", settings_get, methods=["OPTIONS", "GET"]
+    ),
     Route(r"/api/settings", settings_set, methods=["OPTIONS", "POST", "PUT"]),
     # Authentication, currently only Sign in with Google
     Route(r"/api/auth/google", authenticate_with_google, methods=["POST"]),

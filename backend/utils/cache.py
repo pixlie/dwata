@@ -2,7 +2,7 @@ from datetime import datetime
 import aioredis
 import orjson
 
-from utils.config import settings
+from utils.env_settings import settings
 
 
 async def cache_to_redis(cache_key, cache_value):

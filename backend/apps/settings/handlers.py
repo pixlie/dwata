@@ -5,24 +5,19 @@ from benedict import benedict
 import orjson
 
 from utils.http import OrJSONResponse
-from utils.dwata_models import dwata_settings
+from utils.env_settings import settings
+from database.connect import connect_database
+from .models import dwata_db_settings
 from .hierarchy import hierarchy
-
-
-required_dwata_backend_env_settings = [
-    "DATABASES",
-    "REQUEST_ORIGINS",
-    "AUTHENTICATION_METHODS",
-    "ADMIN_EMAILS"
-]
 
 
 async def settings_get(request: Request) -> OrJSONResponse:
     """Get all the settings by a hierarchy"""
-    label_root = request.path_params["label_root"]
-    query = dwata_settings.select().where(
-        dwata_settings.c.label.like("{}%".format(label_root))
+    settings_path = request.path_params["settings_path"]
+    query = dwata_db_settings.select().where(
+        dwata_db_settings.c.label.like("{}%".format(settings_path))
     )
+    # db = connect_database(db_url=settings.DATABASES)
     return OrJSONResponse({})
 
     # all_settings = await dwata_meta_db.fetch_all(query=query)
@@ -70,18 +65,13 @@ async def settings_set(request: Request) -> OrJSONResponse:
         verify_hierarchy(path=request_payload["path"], value=request_payload["value"])
     except Exception as e:
         raise HTTPException(
-            status_code=400,
-            detail=orjson.dumps({
-                "error": e.args[0]
-            }).decode()
+            status_code=400, detail=orjson.dumps({"error": e.args[0]}).decode()
         )
 
     query = dwata_settings.insert().values(
         label=request_payload["path"],
         value=request_payload["value"],
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
     )
     last_insert_id = await dwata_meta_db.execute(query=query)
-    return OrJSONResponse({
-        "id": last_insert_id
-    })
+    return OrJSONResponse({"id": last_insert_id})

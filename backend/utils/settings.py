@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 
-from utils.config import settings
+from utils.env_settings import settings
 from exceptions.database import DatabaseNotFound
 
 
@@ -9,10 +9,7 @@ async def get_all_sources():
 
     databases = [
         [f"{db.path[1:]}@{db.hostname}", "database", db.scheme, {}]
-        for db in [
-            urlparse(db_url)
-            for db_url in settings.DATABASES
-        ]
+        for db in [urlparse(db_url) for db_url in settings.DATABASES]
     ]
 
     services = []
