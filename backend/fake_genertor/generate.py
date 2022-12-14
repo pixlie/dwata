@@ -25,7 +25,11 @@ def handle_column(name, attributes):
             if attributes["length"] < 20:
                 if name == "country" and attributes["length"] == 2:
                     return fake.country_code
-        if "length" not in attributes or attributes["length"] is None or attributes["length"] >= 20:
+        if (
+            "length" not in attributes
+            or attributes["length"] is None
+            or attributes["length"] >= 20
+        ):
             if "name" in name:
                 if "company" in name:
                     return lambda: "{} {}".format(fake.company(), fake.company_suffix())
@@ -82,17 +86,23 @@ def fake_value():
 async def generate_fake():
     source_label = "myteeshop"
     source_settings = await get_source_settings(source_label=source_label)
-    engine, conn = await connect_database(db_url=source_settings["db_url"])
+    engine, conn = await connect_database(db_label=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
-    schema = await infer_schema(
-        source_settings=source_settings,
-        meta=meta
-    )
+    schema = await infer_schema(source_settings=source_settings, meta=meta)
     for row in schema["rows"]:
         if len([col for col in row[2] if "is_meta" not in col["ui_hints"]]) < 3:
             continue
-        if len([col for col in row[2] if not col["is_nullable"] and col["foreign_keys"]]) > 0:
+        if (
+            len(
+                [
+                    col
+                    for col in row[2]
+                    if not col["is_nullable"] and col["foreign_keys"]
+                ]
+            )
+            > 0
+        ):
             continue
         print(row[0])
         col_names = [col["name"] for col in row[2]]
@@ -108,8 +118,6 @@ async def generate_fake():
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    tasks = [
-        loop.create_task(generate_fake())
-    ]
+    tasks = [loop.create_task(generate_fake())]
     loop.run_until_complete(asyncio.wait(tasks))
     loop.close()

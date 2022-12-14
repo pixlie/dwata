@@ -3,7 +3,6 @@ from sqlalchemy import MetaData
 
 from utils.settings import get_all_sources, get_source_settings
 from database.connect import connect_database
-from database.dwata_meta import dwata_meta_db
 from apps.data_sources.models import data_sources
 from apps.tables.models import tables
 
@@ -18,10 +17,10 @@ async def refresh(source_label_list):
         if requested_source[1] != "database":
             return False
 
-        data_source = await dwata_meta_db.fetch_one(data_sources.select().where(
-            data_sources.c.label == source_label
-        ))
-        engine, conn = connect_database(db_url=source_settings["db_url"])
+        data_source = await dwata_meta_db.fetch_one(
+            data_sources.select().where(data_sources.c.label == source_label)
+        )
+        engine, conn = connect_database(db_label=source_settings["db_url"])
         meta = MetaData(bind=engine)
         meta.reflect()
 
@@ -30,12 +29,10 @@ async def refresh(source_label_list):
                 data_source_id=data_source["id"],
                 table_name=name,
                 attributes=[],
-                created_at=datetime.utcnow()
+                created_at=datetime.utcnow(),
             )
             await dwata_meta_db.execute(query)
 
         conn.close()
 
-    return {
-        "status": "success"
-    }
+    return {"status": "success"}

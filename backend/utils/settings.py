@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 
 from utils.env_settings import settings
-from exceptions.database import DatabaseNotFound
+from exceptions.database import DatabaseException
 
 
 async def get_all_sources():
@@ -30,6 +30,6 @@ async def get_source_settings(source_label):
             db_parts = urlparse(db_url)
             if db_parts.path == db_path and db_parts.hostname == db_host:
                 return db_url
-        raise DatabaseNotFound()
+        raise DatabaseException()
     elif requested_source[1] == "service":
         return getattr(settings, requested_source[2].upper())[requested_source[0]]

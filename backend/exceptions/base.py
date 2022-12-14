@@ -1,4 +1,6 @@
+import typing
 from starlette.exceptions import HTTPException
+import orjson
 
 from utils.http import OrJSONResponse
 
@@ -12,9 +14,17 @@ class ExceptionBase(HTTPException):
         self.status_code = status_code
         self.error_code = error_code
         self.detail = detail
+        super().__init__(status_code=status_code, detail=detail)
 
-    def json_response(self):
+    def json_response(self, headers: typing.Optional[dict] = None):
         return OrJSONResponse(
-            {"detail": {"error_code": self.error_code, "message": self.detail}},
+            {"error": {"error_code": self.error_code, "detail": self.detail}},
             status_code=self.status_code,
+            headers=self.headers,
         )
+
+    def get_dict(self):
+        return {
+            "status": "error",
+            "error": {"error_code": self.error_code, "detail": self.detail},
+        }

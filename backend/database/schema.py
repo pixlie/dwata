@@ -6,7 +6,9 @@ from utils.database import get_system_tables, get_unavailable_columns
 
 def get_table_properties(source_settings, meta):
     system_tables = get_system_tables(source_settings=source_settings)
-    relations_matrix = infer_relations_matrix(source_settings=source_settings, meta=meta)
+    relations_matrix = infer_relations_matrix(
+        source_settings=source_settings, meta=meta
+    )
 
     def inner(name):
         default = {
@@ -18,6 +20,7 @@ def get_table_properties(source_settings, meta):
         if name in relations_matrix:
             default["related_tables"] = relations_matrix[name]
         return default
+
     return inner
 
 
@@ -27,9 +30,11 @@ def column_definition(col, col_def):
 
     def ui_hints():
         hints = []
-        if (col_def.primary_key or
-                len(col_def.foreign_keys) > 0 or
-                data_type in ["INET", "TIMESTAMP", "DATE"]):
+        if (
+            col_def.primary_key
+            or len(col_def.foreign_keys) > 0
+            or data_type in ["INET", "TIMESTAMP", "DATE"]
+        ):
             hints.append("is_meta")
         elif col.lower()[-3:] in ["_id", "_pk", "_fk"]:
             hints.append("is_meta")
@@ -41,7 +46,10 @@ def column_definition(col, col_def):
                 #  then more likely to be a title
                 # Perhaps and import text, like title
                 hints.append("is_title")
-            if data_type == "TEXT" or (data_type in types_with_length and (col_def.type.length is None or col_def.type.length > 200)):
+            if data_type == "TEXT" or (
+                data_type in types_with_length
+                and (col_def.type.length is None or col_def.type.length > 200)
+            ):
                 # Perhaps and import text, like title
                 hints.append("is_text_lg")
         return hints
@@ -54,12 +62,12 @@ def column_definition(col, col_def):
         "is_nullable": col_def.nullable,
         "has_foreign_keys": len(col_def.foreign_keys) > 0,
         "foreign_keys": [
-            {
-                "table": str(x.column.table),
-                "column": str(x.column.name)
-            } for x in col_def.foreign_keys
-        ] if len(col_def.foreign_keys) > 0 else None,
-        "ui_hints": ui_hints()
+            {"table": str(x.column.table), "column": str(x.column.name)}
+            for x in col_def.foreign_keys
+        ]
+        if len(col_def.foreign_keys) > 0
+        else None,
+        "ui_hints": ui_hints(),
     }
 
 
@@ -91,31 +99,38 @@ def infer_relations_matrix(source_settings, meta):
 
 
 async def infer_schema(source_settings, table_name=None, meta=None):
-    engine, conn = connect_database(db_url=source_settings["db_url"])
+    engine, conn = connect_database(db_label=source_settings["db_url"])
     if meta is None:
         meta = MetaData(bind=engine)
         meta.reflect()
-    unavailable_columns = get_unavailable_columns(source_settings=source_settings, meta=meta)
+    unavailable_columns = get_unavailable_columns(
+        source_settings=source_settings, meta=meta
+    )
     table_properties = get_table_properties(source_settings=source_settings, meta=meta)
 
     if table_name and table_name in meta.tables.keys():
         columns = [
-            column_definition(col, col_def) for col, col_def in meta.tables[table_name].columns.items()
+            column_definition(col, col_def)
+            for col, col_def in meta.tables[table_name].columns.items()
             if col not in unavailable_columns.get(table_name, [])
         ]
         conn.close()
         return columns
     else:
-        tables = sorted([
-            (
-                name, table_properties(name=name), [
-                    column_definition(col, col_def) for col, col_def in schema.columns.items()
-                    if col not in unavailable_columns.get(name, [])
-                ]
-            ) for name, schema in meta.tables.items()
-        ], key=lambda x: x[0])
+        tables = sorted(
+            [
+                (
+                    name,
+                    table_properties(name=name),
+                    [
+                        column_definition(col, col_def)
+                        for col, col_def in schema.columns.items()
+                        if col not in unavailable_columns.get(name, [])
+                    ],
+                )
+                for name, schema in meta.tables.items()
+            ],
+            key=lambda x: x[0],
+        )
         conn.close()
-        return {
-            "columns": ["table_name", "properties", "columns"],
-            "rows": tables
-        }
+        return {"columns": ["table_name", "properties", "columns"], "rows": tables}

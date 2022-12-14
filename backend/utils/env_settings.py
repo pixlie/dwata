@@ -11,6 +11,7 @@ class Settings(object):
     ] or None
     SECRET = os.getenv("SECRET")
     DATABASES = [x for x in os.getenv("DATABASES").split(",") if x != ""]
+    DATABASE_LABELS = [x for x in os.getenv("DATABASE_LABELS").split(",") if x != ""]
     REDIS_HOST = os.getenv("REDIS_HOST")
     AUTHENTICATION_METHODS = [
         x for x in os.getenv("AUTHENTICATION_METHODS").split(",") if x != ""

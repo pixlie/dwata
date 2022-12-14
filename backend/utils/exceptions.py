@@ -9,4 +9,4 @@ async def handle_exception(request: Request, exc: ExceptionBase):
     return exc.json_response()
 
 
-exception_handlers = {ExceptionBase: handle_exception, 500: handle_exception}
+exception_handlers = {ExceptionBase: handle_exception}

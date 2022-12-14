@@ -7,18 +7,39 @@ import orjson
 from utils.http import OrJSONResponse
 from utils.env_settings import settings
 from database.connect import connect_database
+from exceptions.database import DatabaseException
 from .models import dwata_db_settings
 from .hierarchy import hierarchy
 
 
 async def settings_get(request: Request) -> OrJSONResponse:
-    """Get all the settings by a hierarchy"""
+    """
+    Get all the settings by a hierarchy. A hierarchy is simply a path that tells us how to extract the settings.
+    Settings starting with `dwata` are core settings, and will include information from `.env` file like list of DBs.
+
+    Each actual DB (as in `.env`) can have its own settings (in a `dwata_db_settings` table in that DB).
+    These can be accessed using the db name in the hierarchy path, like `example_db`.
+    """
     settings_path = request.path_params["settings_path"]
-    query = dwata_db_settings.select().where(
-        dwata_db_settings.c.label.like("{}%".format(settings_path))
-    )
-    # db = connect_database(db_url=settings.DATABASES)
-    return OrJSONResponse({})
+
+    if settings_path == "dwata":
+        response = {"databases": {}}
+        for i, db_label in enumerate(settings.DATABASE_LABELS):
+            try:
+                connect_database(db_label=db_label)
+                response["databases"][db_label] = {"status": "ok"}
+            except DatabaseException as error:
+                response["databases"][db_label] = error.get_dict()
+        return OrJSONResponse(response)
+    else:
+        db_label = settings_path.split("/")[0]
+        if db_label in settings.DATABASE_LABELS:
+            query = dwata_db_settings.select().where(
+                dwata_db_settings.c.label.like("{}%".format(settings_path))
+            )
+            _, db_conn = connect_database(db_label=db_label)
+            db_conn.execute(query)
+        return OrJSONResponse({})
 
     # all_settings = await dwata_meta_db.fetch_all(query=query)
     # benedict_hierarchy: benedict = benedict(hierarchy, keypath_separator="/")
