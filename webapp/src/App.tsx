@@ -1,68 +1,14 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
-import shallow from "zustand/shallow";
 
-import { googleClientId } from "utils/variables";
-import useGlobal from "stores/global";
 import Navbar from "components/Navbar";
-import Home from "components/Home";
-import Admin from "components/Admin";
-import Grid from "components/Grid";
-import Detail from "components/Detail";
-import Notes from "components/Notes";
 import Setup from "screens/Setup";
 import apiClient from "utils/apiClient";
-import Authentication from "screens/Authentication";
-
-function AuthEnabledRoutes() {
-  return (
-    <>
-      <Navbar />
-      <div className="block clear-both" style={{ paddingBottom: "52px" }} />
-
-      <Detail />
-      <Notes />
-
-      <Routes>
-        <Route path="/browse" element={<Grid />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </>
-  );
-}
-
-function CheckAuthentication(): JSX.Element {
-  const { isAuthenticated, isReady, initiate } = useGlobal(
-    (store) => ({
-      isAuthenticated: store.isAuthenticated,
-      isReady: store.isReady,
-      initiate: store.initiate,
-    }),
-    shallow
-  );
-  const navigate = useNavigate();
-
-  useEffect(
-    function () {
-      initiate();
-    },
-    [initiate]
-  );
-
-  useEffect(
-    function () {
-      if (isReady && !isAuthenticated) {
-        navigate("/login");
-      }
-    },
-    [isAuthenticated, isReady]
-  );
-
-  return <></>;
-}
+import GoogleAuth from "screens/Authentication/GoogleAuth";
+import InitAuthentication from "components/Auth/InitAuthentication";
+import InitGlobalSettings from "components/Settings/InitGlobalSettings";
+import RoutesPostAuth from "screens/Authentication/RoutesPostAuth";
 
 function App(): JSX.Element {
   const [isFetching, setIsFetching] = useState<boolean>(true);
@@ -76,15 +22,17 @@ function App(): JSX.Element {
        */
 
       try {
-        const response = await apiClient.get("/settings/dwata/backend/env");
-        console.log(response);
+        const response = await apiClient.get("/settings/dwata");
 
         setIsFetching(false);
         setIsReady(true);
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            if (error.response.status === 400) {
+            if (
+              error.response.status === 400 ||
+              error.response.status === 500
+            ) {
               setIsFetching(false);
               setIsReady(false);
             }
@@ -113,16 +61,17 @@ function App(): JSX.Element {
   }
 
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/setup" element={<Setup />} />
-          <Route path="/login" element={<Authentication />} />
-          <Route path="" element={<CheckAuthentication />} />
-          <Route path="" element={<AuthEnabledRoutes />} />
-        </Routes>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <BrowserRouter>
+      <InitAuthentication />
+      <InitGlobalSettings />
+      <Navbar />
+
+      <Routes>
+        <Route path="/setup" element={<Setup />} />
+        <Route path="/auth" element={<GoogleAuth />} />
+        <Route path="*" element={<RoutesPostAuth />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

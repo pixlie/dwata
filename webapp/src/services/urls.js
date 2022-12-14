@@ -1,13 +1,11 @@
-export const apiRoot = `/api`;
-
-export const sourceURL = `${apiRoot}/source`;
+export const sourceURL = `/source`;
 export const schemaURL = `/schema`;
-export const dataURL = `${apiRoot}/data`;
-export const apiDataURL = `${apiRoot}/service`;
-export const dataItemURL = `${apiRoot}/item`;
-export const appURL = `${apiRoot}/app`;
+export const dataURL = `/data`;
+export const apiDataURL = `/service`;
+export const dataItemURL = `/item`;
+export const appURL = `/app`;
 
-export const workerBackgroundURL = `${apiRoot}/background`;
-export const workerExecuteURL = `${apiRoot}/execute`;
+export const workerBackgroundURL = `/background`;
+export const workerExecuteURL = `/execute`;
 
-export const settingsRootURL = `${apiRoot}/settings`;
+export const settingsRootURL = `/settings`;

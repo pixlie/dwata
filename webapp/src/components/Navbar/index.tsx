@@ -24,6 +24,8 @@ function Navbar() {
     showNotes();
   }; */
 
+  console.log("Navbar");
+
   return (
     <nav
       className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 px-6 py-3 z-10"
