@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 
-import { useSource } from "services/store";
+import useSources from "stores/sources";
 import TableList from "components/TableList";
 
 const SourceItem = ({ source, sourceType, index }) => {
@@ -46,9 +46,9 @@ const SourceItem = ({ source, sourceType, index }) => {
 };
 
 const Source = () => {
-  const isReady = useSource((state) => state.isReady);
-  const sourceRows = useSource((state) => state.rows);
-  const fetchSource = useSource((state) => state.fetchSource);
+  const isReady = useSources((state) => state.isReady);
+  const sourceRows = useSources((state) => state.rows);
+  const fetchSource = useSources((state) => state.fetchSource);
   useEffect(() => {
     fetchSource();
   }, [fetchSource]);

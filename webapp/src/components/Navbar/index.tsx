@@ -1,15 +1,12 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 // import { useQueryContext } from "services/store";
 // import * as globalConstants from "services/global/constants";
 import GridNav from "./GridNav";
 import HomeNav from "./HomeNav";
 
-interface IPropTypes {
-  toggleSidebar: () => void;
-}
-
-function Navbar() {
+function Navbar(): JSX.Element {
   // const mainApp = useQueryContext((state) => state["main"]);
   // const setContext = useQueryContext((state) => state.setContext);
 
@@ -24,8 +21,6 @@ function Navbar() {
     showNotes();
   }; */
 
-  console.log("Navbar");
-
   return (
     <nav
       className="fixed top-0 w-screen flex items-center bg-white border-b border-gray-300 px-6 py-3 z-10"
@@ -33,9 +28,9 @@ function Navbar() {
       aria-label="main navigation"
     >
       <div className="mx-4">
-        <a className={`font-semibold text-lg`} href="/">
+        <Link className={`font-semibold text-lg cursor-pointer`} to="/">
           Home
-        </a>
+        </Link>
       </div>
 
       <div className="block lg:inline-block lg:mt-0 px-4">&nbsp;</div>

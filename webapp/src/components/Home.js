@@ -1,5 +1,3 @@
-import React from "react";
-
 // import { useQuerySpecification, useQueryContext } from "services/store";
 import Source from "components/Source";
 // import SavedQuerySpecifications from "components/SavedQuerySpecifications";
@@ -94,17 +92,6 @@ const Home = () => {
       </div>
 
       <div className="flex-1 px-2">
-        <Hx x="3">Recent activity</Hx>
-        <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
-          Coming soon
-        </div>
-        {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
-        {sampleActivityList.map((x, i) => (
-          <ActivityBox key={`ac-${i}`} {...x} />
-        ))}
-      </div>
-
-      <div className="flex-1 max-w-sm">
         <Hx x="3">KPIs</Hx>
         <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
           Coming soon
@@ -113,6 +100,17 @@ const Home = () => {
         <KPIBox value={3128} metric="Product views" tags={["last 24 hours"]} />
         <KPIBox value={84} metric="Abandoned carts" tags={["last 24 hours"]} />
         <Button size="large">Add KPI</Button>
+      </div>
+
+      <div className="flex-1 max-w-xl">
+        <Hx x="3">Recent activity</Hx>
+        <div className="bg-yellow-200 m-2 p-2 px-4 text-sm rounded">
+          Coming soon
+        </div>
+        {/* <SavedQuerySpecifications context={{ key: "saved_queries" }} /> */}
+        {sampleActivityList.map((x, i) => (
+          <ActivityBox key={`ac-${i}`} {...x} />
+        ))}
       </div>
     </div>
   );

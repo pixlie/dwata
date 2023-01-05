@@ -1,16 +1,18 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useGlobal from "stores/global";
 import shallow from "zustand/shallow";
 
 function InitGlobalSettings(): null {
-  const { setupIsIncomplete, isFetching, initiate } = useGlobal(
+  const { hasSettingsError, isFetching, initiate } = useGlobal(
     (store) => ({
-      setupIsIncomplete: store.setupIsIncomplete,
+      hasSettingsError: store.hasSettingsError,
       isFetching: store.isFetching,
       initiate: store.initiate,
     }),
     shallow
   );
+  const navigate = useNavigate();
 
   useEffect(
     function () {
@@ -19,7 +21,14 @@ function InitGlobalSettings(): null {
     [initiate]
   );
 
-  useEffect(function () {}, [setupIsIncomplete, isFetching]);
+  useEffect(
+    function () {
+      if (!isFetching && hasSettingsError) {
+        navigate("/setup/settings-error");
+      }
+    },
+    [hasSettingsError, isFetching]
+  );
 
   return null;
 }

@@ -4,6 +4,13 @@ import { transformData } from "utils";
 import { sourceURL } from "services/urls";
 import apiClient from "utils/apiClient";
 
+interface ISourcesStore {
+  columns: string[];
+  rows: string[];
+  isFetching: boolean;
+  isReady: boolean;
+}
+
 const initialState = {
   columns: [],
   rows: [],
@@ -11,18 +18,14 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = () => ({
-  isFetching: true,
-});
-
-const completeFetch = (payload) => ({
+const completeFetch = (payload: ISourcesStore) => ({
   columns: payload.columns,
   rows: payload.rows.map((row) => transformData(payload.columns, row)),
   isFetching: false,
   isReady: true,
 });
 
-export default create((set, get) => ({
+const useSources = create<ISourcesStore>((set, get) => ({
   ...initialState,
 
   fetchSource: async () => {
@@ -30,8 +33,9 @@ export default create((set, get) => ({
       return;
     }
 
-    set(() => ({
-      ...initiateFetch(),
+    set((state) => ({
+      ...state,
+      isFetching: true,
     }));
 
     try {
@@ -44,3 +48,5 @@ export default create((set, get) => ({
     }
   },
 }));
+
+export default useSources;

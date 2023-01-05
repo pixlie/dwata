@@ -2,13 +2,14 @@ import create from "zustand";
 
 import apiClient from "utils/apiClient";
 import { settingsRootURL } from "services/urls";
+import axios from "axios";
 
 /**
  * The Global store has information regarding the overall functioning of dwata, like what are the authentication
  * mechanisms available (set in the backend), databases or sources available (set in the backend).
  */
 interface IGlobalStore {
-  setupIsIncomplete: boolean;
+  hasSettingsError: boolean;
   dwataRootSettings?: object;
 
   isFetching: boolean;
@@ -17,7 +18,7 @@ interface IGlobalStore {
 }
 
 const useGlobal = create<IGlobalStore>((set, get) => ({
-  setupIsIncomplete: false,
+  hasSettingsError: false,
   isFetching: false,
 
   initiate: async function () {
@@ -35,9 +36,20 @@ const useGlobal = create<IGlobalStore>((set, get) => ({
       set((state) => ({
         ...state,
         isFetching: false,
+        hasSettingsError: false,
+        dwataRootSettings: response.data,
       }));
-    } catch (err) {
-      console.log("Could not fetch sources. Try again later.");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          if (error.response.status === 400 || error.response.status === 500) {
+            set((state) => ({
+              isFetching: false,
+              hasSettingsError: true,
+            }));
+          }
+        }
+      }
     }
   },
 }));
