@@ -8,8 +8,7 @@ async def get_all_sources():
     from services import all_services
 
     databases = [
-        [f"{db.path[1:]}@{db.hostname}", "database", db.scheme, {}]
-        for db in [urlparse(db_url) for db_url in settings.DATABASES]
+        (db_label, "database", "", {}) for db_label in settings.DATABASE_LABELS
     ]
 
     services = []
