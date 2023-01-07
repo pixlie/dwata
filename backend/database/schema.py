@@ -98,21 +98,21 @@ def infer_relations_matrix(source_settings, meta):
     return tables
 
 
-async def infer_schema(source_settings, table_name=None, meta=None):
-    engine, conn = connect_database(db_label=source_settings["db_url"])
+async def infer_schema(db_label, db_url, table_name=None, meta=None):
+    engine, conn = connect_database(db_label=db_label)
     if meta is None:
         meta = MetaData(bind=engine)
         meta.reflect()
-    unavailable_columns = get_unavailable_columns(
-        source_settings=source_settings, meta=meta
-    )
-    table_properties = get_table_properties(source_settings=source_settings, meta=meta)
+    # unavailable_columns = get_unavailable_columns(
+    #     source_settings=db_url, meta=meta
+    # )
+    table_properties = get_table_properties(source_settings=db_url, meta=meta)
 
     if table_name and table_name in meta.tables.keys():
         columns = [
             column_definition(col, col_def)
             for col, col_def in meta.tables[table_name].columns.items()
-            if col not in unavailable_columns.get(table_name, [])
+            # if col not in unavailable_columns.get(table_name, [])
         ]
         conn.close()
         return columns
@@ -125,7 +125,7 @@ async def infer_schema(source_settings, table_name=None, meta=None):
                     [
                         column_definition(col, col_def)
                         for col, col_def in schema.columns.items()
-                        if col not in unavailable_columns.get(name, [])
+                        # if col not in unavailable_columns.get(name, [])
                     ],
                 )
                 for name, schema in meta.tables.items()

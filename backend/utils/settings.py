@@ -19,16 +19,18 @@ async def get_all_sources():
     return databases + services
 
 
-async def get_source_settings(source_label):
+async def get_source_settings(source_label: str):
     all_sources = await get_all_sources()
     requested_source = [x for x in all_sources if x[0] == source_label][0]
 
     if requested_source[1] == "database":
-        db_path, db_host = requested_source[0].split("@")
-        for db_url in settings.DATABASES:
-            db_parts = urlparse(db_url)
-            if db_parts.path == db_path and db_parts.hostname == db_host:
+        for i, db_label in enumerate(settings.DATABASE_LABELS):
+            if db_label == source_label:
+                db_url = settings.DATABASES[i]
                 return db_url
-        raise DatabaseException()
+        raise DatabaseException(
+            error_code="db.not_found",
+            detail=f"The database with label {source_label} is not in the file `backend/.env`",
+        )
     elif requested_source[1] == "service":
         return getattr(settings, requested_source[2].upper())[requested_source[0]]

@@ -89,7 +89,7 @@ async def generate_fake():
     engine, conn = await connect_database(db_label=source_settings["db_url"])
     meta = MetaData(bind=engine)
     meta.reflect()
-    schema = await infer_schema(source_settings=source_settings, meta=meta)
+    schema = await infer_schema(db_url=source_settings, meta=meta)
     for row in schema["rows"]:
         if len([col for col in row[2] if "is_meta" not in col["ui_hints"]]) < 3:
             continue

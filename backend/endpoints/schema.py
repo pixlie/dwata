@@ -1,7 +1,7 @@
 from starlette.background import BackgroundTask
+from starlette.responses import JSONResponse
 from starlette.authentication import requires
 
-from utils.http import OrJSONResponse
 from utils.settings import get_all_sources, get_source_settings
 from database.schema import infer_schema
 from services import all_services
@@ -10,7 +10,7 @@ from utils.cache import read_from_redis, cache_to_redis
 
 @requires("authenticated")
 async def schema_get(request):
-    source_label = request.path_params["source_label"]
+    source_label: str = request.path_params["source_label"]
     all_sources = await get_all_sources()
     requested_source = [x for x in all_sources if x[0] == source_label][0]
     source_settings = await get_source_settings(source_label=source_label)
@@ -20,15 +20,15 @@ async def schema_get(request):
         cache_key = "schema.{}".format(source_label)
         cache_value = await read_from_redis(cache_key=cache_key)
         if cache_value:
-            return OrJSONResponse(cache_value)
+            return JSONResponse(cache_value)
         response = await infer_schema(
-            source_settings=source_settings, table_name=table_name
+            db_label=source_label, db_url=source_settings, table_name=table_name
         )
         task = BackgroundTask(cache_to_redis, cache_key=cache_key, cache_value=response)
-        return OrJSONResponse(response, background=task)
+        return JSONResponse(response, background=task)
     elif requested_source[1] == "service":
         integration = all_services[requested_source[2]](**source_settings)
-        return OrJSONResponse(
+        return JSONResponse(
             {
                 "columns": ["table_name", "columns"],
                 "rows": [[x, []] for x in integration.resources.keys()],
