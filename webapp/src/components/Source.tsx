@@ -1,16 +1,19 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 
-import useSources from "stores/sources";
+import useSource from "stores/source";
 import TableList from "components/TableList";
+import { ISource } from "utils/types";
 
-const SourceItem = ({ source, sourceType, index }) => {
+interface IPropTypes {
+  source: ISource;
+  index: number;
+}
+
+const SourceItem = ({ source, index }: IPropTypes) => {
   const [state, setState] = useState({
     isOpen: true,
   });
 
-  if (source.properties["is_system_db"]) {
-    return null;
-  }
   const handleClickSource = () => {
     setState((state) => ({
       ...state,
@@ -19,13 +22,13 @@ const SourceItem = ({ source, sourceType, index }) => {
   };
 
   return (
-    <Fragment>
+    <>
       <div className="relative">
         <div
-          className="block p-2 pl-3 border-b cursor-default"
+          className="block p-2 pl-3 border-b cursor-pointer"
           onClick={handleClickSource}
         >
-          {sourceType === "database" ? (
+          {source.type === "database" ? (
             <span className="text-lg text-gray-600 text-center mr-3">
               <i className="fas fa-database" />
             </span>
@@ -39,16 +42,16 @@ const SourceItem = ({ source, sourceType, index }) => {
       </div>
 
       {state.isOpen ? (
-        <TableList sourceLabel={source.label} sourceType={sourceType} />
+        <TableList sourceLabel={source.label} sourceType={source.type} />
       ) : null}
-    </Fragment>
+    </>
   );
 };
 
-const Source = () => {
-  const isReady = useSources((state) => state.isReady);
-  const sourceRows = useSources((state) => state.rows);
-  const fetchSource = useSources((state) => state.fetchSource);
+function Source(): JSX.Element {
+  const isReady = useSource((state) => state.isReady);
+  const sourceRows = useSource((state) => state.rows);
+  const fetchSource = useSource((state) => state.fetchSource);
   useEffect(() => {
     fetchSource();
   }, [fetchSource]);
@@ -58,12 +61,12 @@ const Source = () => {
   // const {sourceIndex} = state;
 
   if (!isReady) {
-    return null;
+    return <></>;
   }
 
   return (
-    <Fragment>
-      <div className="block p-2 pl-3 border-b">
+    <>
+      {/* <div className="block p-2 pl-3 border-b">
         <span className="text-lg text-yellow-200 text-center mr-3">
           <i className="fas fa-star" />
         </span>
@@ -80,7 +83,7 @@ const Source = () => {
           <i className="fas fa-folder" />
         </span>
         <span className="font-semibold text-gray-500">Customers</span>
-      </div>
+      </div> */}
 
       {sourceRows
         .filter((x) => x.type === "database")
@@ -89,7 +92,7 @@ const Source = () => {
             key={`sr-${source.label}`}
             index={i}
             source={source}
-            sourceType="database"
+            sourceType={source.type}
           />
         ))}
 
@@ -98,8 +101,8 @@ const Source = () => {
           <SourceItem s={s} i={count_database + i} sourceType="service" key={`sr-${count_database + i}`} />
         )) : null}
       </Panel> */}
-    </Fragment>
+    </>
   );
-};
+}
 
 export default Source;

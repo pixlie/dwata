@@ -3,6 +3,16 @@ import create from "zustand";
 import { transformData } from "utils";
 import { sourceURL } from "services/urls";
 import apiClient from "utils/apiClient";
+import { ISource } from "utils/types";
+
+interface ISourcesStore {
+  columns: string[];
+  rows: ISource[];
+  isFetching: boolean;
+  isReady: boolean;
+
+  fetchSource: () => void;
+}
 
 const initialState = {
   columns: [],
@@ -11,18 +21,19 @@ const initialState = {
   isReady: false,
 };
 
-const initiateFetch = () => ({
-  isFetching: true,
-});
+interface ISourcesAPIPayload {
+  columns: string[];
+  rows: string[];
+}
 
-const completeFetch = (payload) => ({
+const completeFetch = (payload: ISourcesAPIPayload) => ({
   columns: payload.columns,
   rows: payload.rows.map((row) => transformData(payload.columns, row)),
   isFetching: false,
   isReady: true,
 });
 
-export default create((set, get) => ({
+const useSource = create<ISourcesStore>((set, get) => ({
   ...initialState,
 
   fetchSource: async () => {
@@ -30,8 +41,9 @@ export default create((set, get) => ({
       return;
     }
 
-    set(() => ({
-      ...initiateFetch(),
+    set((state) => ({
+      ...state,
+      isFetching: true,
     }));
 
     try {
@@ -44,3 +56,5 @@ export default create((set, get) => ({
     }
   },
 }));
+
+export default useSource;

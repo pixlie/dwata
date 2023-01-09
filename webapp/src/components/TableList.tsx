@@ -1,21 +1,29 @@
-import React, { useEffect, Fragment } from "react";
+import React, { useEffect } from "react";
 
-import {
-  useSchema,
-  useQueryContext,
-  useQuerySpecification,
-} from "services/store";
+import { useQueryContext, useQuerySpecification } from "services/store";
+import useSchema from "stores/schema";
 import * as globalConstants from "services/global/constants";
 import { Hx } from "components/LayoutHelpers";
+import { SourceType } from "utils/types";
 
-const BrowserItem = ({ item, sourceLabel, sourceType }) => {
+interface IBrowserItemPropTypes {
+  item: any;
+  sourceLabel: string;
+  sourceType: string;
+}
+
+const BrowserItem = ({
+  item,
+  sourceLabel,
+  sourceType,
+}: IBrowserItemPropTypes) => {
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
   );
   const setContext = useQueryContext((state) => state.setContext);
   // const urlBase = sourceType === "database" ? "/browse" : "/service";
 
-  const handleClick = (event) => {
+  function handleClick(event: React.MouseEvent) {
     event.preventDefault();
     initiateQuerySpecification("main", {
       sourceLabel,
@@ -30,7 +38,7 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
     setContext("main", {
       appType: globalConstants.APP_NAME_BROWSER,
     });
-  };
+  }
 
   return (
     <div
@@ -47,21 +55,29 @@ const BrowserItem = ({ item, sourceLabel, sourceType }) => {
   );
 };
 
-export default ({ sourceLabel, sourceType }) => {
-  const schema = useSchema((state) => state[sourceLabel]);
+interface IPropTypes {
+  sourceLabel: string;
+  sourceType: SourceType;
+}
+
+function TableList({ sourceLabel, sourceType }: IPropTypes): JSX.Element {
+  const schema = useSchema((store) =>
+    store.rows.filter((x) => x.table_name === sourceLabel)
+  );
+  const isReady = useSchema((store) => store.isReady);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   useEffect(() => {
     fetchSchema(sourceLabel);
   }, [sourceLabel, fetchSchema]);
 
-  if (!schema || !schema.isReady) {
-    return null;
+  if (!schema || !isReady) {
+    return <></>;
   }
 
   return (
-    <Fragment>
-      {schema.rows
-        .filter((s) => s.properties.is_system_table === false)
+    <>
+      {schema
+        // .filter((s) => s.properties.is_system_table === false)
         .map((s, i) => (
           <BrowserItem
             key={`sr-${i}`}
@@ -73,8 +89,8 @@ export default ({ sourceLabel, sourceType }) => {
 
       <div className="bg-gray-100 pt-4 py-1">
         <Hx x="6">System tables</Hx>
-        {schema.rows
-          .filter((s) => s.properties.is_system_table === true)
+        {schema
+          // .filter((s) => s.properties.is_system_table === true)
           .map((s, i) => (
             <BrowserItem
               key={`sr-${i}`}
@@ -84,6 +100,8 @@ export default ({ sourceLabel, sourceType }) => {
             />
           ))}
       </div>
-    </Fragment>
+    </>
   );
-};
+}
+
+export default TableList;
