@@ -1,6 +1,7 @@
+from starlette.responses import JSONResponse
 from json.decoder import JSONDecodeError
 
-from utils.http import OrJSONResponse, web_error
+from utils.http import web_error
 from database.query_builder import QueryBuilder
 
 
@@ -17,12 +18,12 @@ async def data_post(request):
     except JSONDecodeError:
         return web_error(
             error_code="request.json_decode_error",
-            message="We could not handle that request, perhaps something is wrong with the server."
+            message="We could not handle that request, perhaps something is wrong with the server.",
         )
 
     qb = QueryBuilder(query_specification)
     columns, rows, count, query_sql, embedded = await qb.results()
-    return OrJSONResponse(
+    return JSONResponse(
         dict(
             select=query_specification["select"],
             columns=columns,

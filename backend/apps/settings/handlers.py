@@ -1,10 +1,10 @@
 from datetime import datetime
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from starlette.exceptions import HTTPException
 from benedict import benedict
-import orjson
+import json
 
-from utils.http import OrJSONResponse
 from utils.env_settings import settings
 from database.connect import connect_database
 from exceptions.database import DatabaseException
@@ -12,7 +12,7 @@ from .models import dwata_db_settings
 from .hierarchy import hierarchy
 
 
-async def settings_get(request: Request) -> OrJSONResponse:
+async def settings_get(request: Request) -> JSONResponse:
     """
     Get all the settings by a hierarchy. A hierarchy is simply a path that tells us how to extract the settings.
     Settings starting with `dwata` are core settings, and will include information from `.env` file like list of DBs.
@@ -30,7 +30,7 @@ async def settings_get(request: Request) -> OrJSONResponse:
                 response["databases"][db_label] = {"status": "ok"}
             except DatabaseException as error:
                 response["databases"][db_label] = error.get_dict()
-        return OrJSONResponse(response)
+        return JSONResponse(response)
     else:
         db_label = settings_path.split("/")[0]
         if db_label in settings.DATABASE_LABELS:
@@ -39,7 +39,7 @@ async def settings_get(request: Request) -> OrJSONResponse:
             )
             _, db_conn = connect_database(db_label=db_label)
             db_conn.execute(query)
-        return OrJSONResponse({})
+        return JSONResponse({})
 
     # all_settings = await dwata_meta_db.fetch_all(query=query)
     # benedict_hierarchy: benedict = benedict(hierarchy, keypath_separator="/")
@@ -75,7 +75,7 @@ def verify_hierarchy(path: str, value):
         raise Exception("payload value data type mistatch")
 
 
-async def settings_set(request: Request) -> OrJSONResponse:
+async def settings_set(request: Request) -> JSONResponse:
     """
     Set a setting by its label and value
     For simplicity we allow only one path to be set, path uses "/" as separator
@@ -85,9 +85,7 @@ async def settings_set(request: Request) -> OrJSONResponse:
     try:
         verify_hierarchy(path=request_payload["path"], value=request_payload["value"])
     except Exception as e:
-        raise HTTPException(
-            status_code=400, detail=orjson.dumps({"error": e.args[0]}).decode()
-        )
+        raise HTTPException(status_code=400, detail=json.dumps({"error": e.args[0]}))
 
     query = dwata_settings.insert().values(
         label=request_payload["path"],
@@ -95,4 +93,4 @@ async def settings_set(request: Request) -> OrJSONResponse:
         created_at=datetime.utcnow(),
     )
     last_insert_id = await dwata_meta_db.execute(query=query)
-    return OrJSONResponse({"id": last_insert_id})
+    return JSONResponse({"id": last_insert_id})

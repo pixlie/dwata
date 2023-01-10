@@ -1,13 +1,13 @@
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 from google.auth import jwt
-import orjson
+import json
 
 from utils.env_settings import settings
 from utils.cache import get_redis
-from utils.http import OrJSONResponse
 
 
-async def authenticate_with_google(request: Request) -> OrJSONResponse:
+async def authenticate_with_google(request: Request) -> JSONResponse:
     """
     In order to authenticate with Google, we check for an email address where Google is authoritative.
     We use Sign in with Google widget in the frontend, and it returns a JWT.
@@ -34,7 +34,7 @@ async def authenticate_with_google(request: Request) -> OrJSONResponse:
     if supported_email:
         redis = await get_redis()
         await redis.set(
-            "auth/{}".format(request_payload["credential"]), orjson.dumps(cached)
+            "auth/{}".format(request_payload["credential"]), json.dumps(cached)
         )
 
-    return OrJSONResponse(cached)
+    return JSONResponse(cached)
