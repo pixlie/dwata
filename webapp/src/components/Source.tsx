@@ -9,7 +9,7 @@ interface IPropTypes {
   index: number;
 }
 
-const SourceItem = ({ source, index }: IPropTypes) => {
+function SourceItem({ source, index }: IPropTypes): JSX.Element {
   const [state, setState] = useState({
     isOpen: true,
   });
@@ -43,10 +43,12 @@ const SourceItem = ({ source, index }: IPropTypes) => {
 
       {state.isOpen ? (
         <TableList sourceLabel={source.label} sourceType={source.type} />
-      ) : null}
+      ) : (
+        <></>
+      )}
     </>
   );
-};
+}
 
 function Source(): JSX.Element {
   const isReady = useSource((state) => state.isReady);
@@ -88,12 +90,7 @@ function Source(): JSX.Element {
       {sourceRows
         .filter((x) => x.type === "database")
         .map((source, i) => (
-          <SourceItem
-            key={`sr-${source.label}`}
-            index={i}
-            source={source}
-            sourceType={source.type}
-          />
+          <SourceItem key={`sr-${source.label}`} index={i} source={source} />
         ))}
 
       {/* <Panel title="Services">

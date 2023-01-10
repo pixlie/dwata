@@ -5,20 +5,23 @@ import { schemaURL } from "services/urls";
 import apiClient from "utils/apiClient";
 import { ISchema } from "utils/types";
 
-interface ISchemaStore {
+interface IDBSchema {
   columns: string[];
   rows: ISchema[];
   isFetching: boolean;
   isReady: boolean;
+}
+
+interface ISchemaStore {
+  schemas: {
+    [sourceLabel: string]: IDBSchema;
+  };
 
   fetchSchema: (sourceLabel: string) => void;
 }
 
 const initialState = {
-  columns: [],
-  rows: [],
-  isFetching: false,
-  isReady: false,
+  schemas: {},
 };
 
 interface ISchemaAPIPayload {
@@ -26,12 +29,14 @@ interface ISchemaAPIPayload {
   rows: string[];
 }
 
-const completeFetch = (payload: ISchemaAPIPayload) => ({
-  columns: payload.columns,
-  rows: payload.rows.map((row) => transformData(payload.columns, row)),
-  isFetching: false,
-  isReady: true,
-});
+function completeFetch(payload: ISchemaAPIPayload): IDBSchema {
+  return {
+    columns: payload.columns,
+    rows: payload.rows.map((row) => transformData(payload.columns, row)),
+    isFetching: false,
+    isReady: true,
+  };
+}
 
 const useSchema = create<ISchemaStore>((set, get) => ({
   ...initialState,
@@ -40,7 +45,7 @@ const useSchema = create<ISchemaStore>((set, get) => ({
     if (!sourceLabel) {
       return;
     }
-    if (get().isFetching) {
+    if (get().schemas[sourceLabel] && get().schemas[sourceLabel].isFetching) {
       return;
     }
     set((state) => ({
@@ -50,8 +55,12 @@ const useSchema = create<ISchemaStore>((set, get) => ({
 
     try {
       const response = await apiClient.get(`${schemaURL}/${sourceLabel}`);
-      set(() => ({
-        ...completeFetch(response.data),
+      set((store) => ({
+        ...store,
+        schemas: {
+          ...store.schemas,
+          [sourceLabel]: completeFetch(response.data),
+        },
       }));
     } catch (err) {
       console.log("Could not fetch schema. Try again later.");

@@ -15,7 +15,7 @@ function RoutesPostAuth(): JSX.Element {
       <Notes />
 
       <Routes>
-        <Route path="/browse" element={<Grid />} />
+        <Route path="/browse/*" element={<Grid />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/" element={<Home />} />
       </Routes>

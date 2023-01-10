@@ -1,20 +1,20 @@
 import { useContext } from "react";
 
 import { QueryContext } from "utils";
-import { useQuerySpecification } from "services/store";
+import useQuerySpecification from "stores/querySpecification";
 import QueryLoader from "./QueryLoader";
 import SavedQueryLoader from "./SavedQueryLoader";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
-import ColumnSelector from "components/QueryEditor/ColumnSelector";
-import FilterEditor from "components/QueryEditor/FilterEditor";
-import MergeData from "components/QueryEditor/MergeData";
+// import ColumnSelector from "components/QueryEditor/ColumnSelector";
+// import FilterEditor from "components/QueryEditor/FilterEditor";
+// import MergeData from "components/QueryEditor/MergeData";
 import Paginator from "components/QueryEditor/Paginator";
 
-const Grid = ({ showHeader = true, showPaginator = true } = {}) => {
-  const queryContext = useContext(QueryContext);
+function Grid({ showHeader = true, showPaginator = true } = {}): JSX.Element {
+  // const queryContext = useContext(QueryContext);
   const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
+    (store) => store.specifications && store.specifications["main"]
   );
 
   const Loader =
@@ -38,12 +38,12 @@ const Grid = ({ showHeader = true, showPaginator = true } = {}) => {
           {showPaginator ? <Paginator /> : null}
         </div>
 
-        {queryContext.isColumnSelectorOpen ? <ColumnSelector /> : null}
+        {/* {queryContext.isColumnSelectorOpen ? <ColumnSelector /> : null}
         {queryContext.isFilterEditorOpen ? <FilterEditor /> : null}
-        {queryContext.isMergeUIOpen ? <MergeData /> : null}
+        {queryContext.isMergeUIOpen ? <MergeData /> : null} */}
       </>
     </Loader>
   );
-};
+}
 
 export default Grid;

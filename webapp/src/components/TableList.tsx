@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useQueryContext, useQuerySpecification } from "services/store";
+import useQuerySpecification from "stores/querySpecification";
 import useSchema from "stores/schema";
 import * as globalConstants from "services/global/constants";
 import { Hx } from "components/LayoutHelpers";
@@ -20,8 +21,9 @@ const BrowserItem = ({
   const initiateQuerySpecification = useQuerySpecification(
     (state) => state.initiateQuerySpecification
   );
-  const setContext = useQueryContext((state) => state.setContext);
+  // const setContext = useQueryContext((state) => state.setContext);
   // const urlBase = sourceType === "database" ? "/browse" : "/service";
+  const navigate = useNavigate();
 
   function handleClick(event: React.MouseEvent) {
     event.preventDefault();
@@ -35,9 +37,10 @@ const BrowserItem = ({
       ],
       fetchNeeded: true,
     });
-    setContext("main", {
-      appType: globalConstants.APP_NAME_BROWSER,
-    });
+    // setContext("main", {
+    //   appType: globalConstants.APP_NAME_BROWSER,
+    // });
+    navigate(`/browse/${sourceLabel}/${item.table_name}`);
   }
 
   return (
@@ -61,22 +64,19 @@ interface IPropTypes {
 }
 
 function TableList({ sourceLabel, sourceType }: IPropTypes): JSX.Element {
-  const schema = useSchema((store) =>
-    store.rows.filter((x) => x.table_name === sourceLabel)
-  );
-  const isReady = useSchema((store) => store.isReady);
+  const schema = useSchema((store) => store.schemas[sourceLabel]);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   useEffect(() => {
     fetchSchema(sourceLabel);
   }, [sourceLabel, fetchSchema]);
 
-  if (!schema || !isReady) {
+  if (!schema || !schema.isReady) {
     return <></>;
   }
 
   return (
     <>
-      {schema
+      {schema.rows
         // .filter((s) => s.properties.is_system_table === false)
         .map((s, i) => (
           <BrowserItem
@@ -87,9 +87,9 @@ function TableList({ sourceLabel, sourceType }: IPropTypes): JSX.Element {
           />
         ))}
 
-      <div className="bg-gray-100 pt-4 py-1">
+      {/* <div className="bg-gray-100 pt-4 py-1">
         <Hx x="6">System tables</Hx>
-        {schema
+        {schema.rows
           // .filter((s) => s.properties.is_system_table === true)
           .map((s, i) => (
             <BrowserItem
@@ -99,7 +99,7 @@ function TableList({ sourceLabel, sourceType }: IPropTypes): JSX.Element {
               sourceType={sourceType}
             />
           ))}
-      </div>
+      </div> */}
     </>
   );
 }

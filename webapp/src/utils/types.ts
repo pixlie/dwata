@@ -19,3 +19,8 @@ export interface ISchema {
   properties: ISchemaProperties;
   columns: ISchemaColumn[];
 }
+
+export interface IDatabaseTable {
+  label: string;
+  tableName: string;
+}
