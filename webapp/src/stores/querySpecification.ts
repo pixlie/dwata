@@ -1,26 +1,6 @@
 import create from "zustand";
 import _ from "lodash";
-import { IDatabaseTable } from "utils/types";
-
-interface IQuerySpecification {
-  sourceLabel: string;
-  select: IDatabaseTable[];
-  columns?: string[];
-  embeddedColumns?: string[];
-
-  filterBy?: {
-    [key: string]: string;
-  };
-  orderBy?: {
-    [key: string]: string;
-  };
-  count?: number;
-  limit?: number;
-  offset?: number;
-
-  isSavedQuery?: boolean;
-  fetchNeeded?: boolean;
-}
+import { IQuerySpecification, IDatabaseTable } from "utils/types";
 
 const initialState = {
   sourceLabel: null,

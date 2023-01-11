@@ -20,6 +20,28 @@ export interface ISchema {
   columns: ISchemaColumn[];
 }
 
+export interface IQuerySpecification {
+  sourceLabel: string;
+  tableName?: string; // Used to retrieve single row of data from a table
+  pk?: number | string; // Used to retrieve single row of data from a table
+  select: IDatabaseTable[];
+  columns?: string[];
+  embeddedColumns?: string[];
+
+  filterBy?: {
+    [key: string]: string;
+  };
+  orderBy?: {
+    [key: string]: string;
+  };
+  count?: number;
+  limit?: number;
+  offset?: number;
+
+  isSavedQuery?: boolean;
+  fetchNeeded?: boolean;
+}
+
 export interface IDatabaseTable {
   label: string;
   tableName: string;

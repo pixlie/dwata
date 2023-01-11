@@ -1,22 +1,27 @@
-import React, { useEffect, useContext, Fragment } from "react";
+import { useEffect } from "react";
 
-import { QueryContext } from "utils";
-import { useSchema, useData, useQuerySpecification } from "services/store";
+import { useData } from "services/store";
+import useSchema from "stores/schema";
+import useQuerySpecification from "stores/querySpecification";
 
-function QueryLoader({ children }) {
+interface IPropTypes {
+  children: JSX.Element;
+}
+
+function QueryLoader({ children }: IPropTypes) {
   // We made this small separate component just for the separate useEffect used here
-  const queryContext = useContext(QueryContext);
+  // const queryContext = useContext(QueryContext);
   const fetchSchema = useSchema((state) => state.fetchSchema);
   const fetchData = useData((state) => state.fetchData);
   const querySpecification = useQuerySpecification(
-    (state) => state[queryContext.key]
+    (store) => store.specifications["main"]
   );
-  const schema = useSchema((state) =>
+  const schema = useSchema((store) =>
     !!querySpecification && !!querySpecification.sourceLabel
-      ? state[querySpecification.sourceLabel]
+      ? store.schemas[querySpecification.sourceLabel]
       : null
   );
-  const data = useData((state) => state[queryContext.key]);
+  const data = useData((state) => state["main"]);
 
   useEffect(() => {
     if (!!querySpecification && !!querySpecification.sourceLabel) {
@@ -38,7 +43,7 @@ function QueryLoader({ children }) {
     return <div>Loading data...</div>;
   }
 
-  return <Fragment>{children}</Fragment>;
+  return <>{children}</>;
 }
 
 export default QueryLoader;
