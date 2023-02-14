@@ -7,7 +7,7 @@ authors = ["Sumit Datta <sumitdatta@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 SQLAlchemy = "^1.4.26"
-starlette = "^0.22.0"
+starlette = "^0.25.0"
 uvicorn = "^0.15.0"
 python-decouple = "^3.5"
 databases = {extras = ["postgresql"], version = "^0.5.3"}
