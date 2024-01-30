@@ -1,0 +1,20 @@
+pub static DATA_SOURCES: &str = r#"
+"id","label","path"
+1,"products","products"
+2,"orders","orders"
+3,"line_items","line_items"
+4,"shipments","shipments"
+10,"users","users"
+11,"carts","carts"
+20,"cart_items","cart_items"
+"#;
+
+pub static LABELS: &str = r#"
+"id","label","path"
+1,"sales","sales"
+2,"support","support"
+3,"engineering","engineering"
+4,"marketing","marketing"
+5,"product","product"
+6,"shipping","shipping"
+"#;

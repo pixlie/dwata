@@ -1,7 +1,8 @@
 import { Component, For, onMount } from "solid-js";
 
 import { useDataSource } from "../../stores/dataSource";
-import SourceItem from "./SourceItem";
+import SidebarItem from "../navigation/SidebarItem";
+import SidebarHeading from "../navigation/SidebarHeading";
 
 const SourceList: Component = () => {
   const [dsStore, { loadDataSources }] = useDataSource();
@@ -11,13 +12,14 @@ const SourceList: Component = () => {
   });
 
   return (
-    <div class="flex flex-col">
-      <div class="mt-4 block px-3 font-bold text-gray-500">Data sources</div>
+    <>
+      <SidebarHeading label="Data Sources" icon="fa-solid fa-database" />
 
       <For each={dsStore.sources}>
-        {(dataSource) => <SourceItem label={dataSource.label} />}
+        {(item) => <SidebarItem label={item.label} icon="fa-solid fa-table" />}
       </For>
-    </div>
+      <div class="mt-4 border-b border-gray-800" />
+    </>
   );
 };
 

@@ -3,14 +3,18 @@
 
 mod data_sources;
 mod error;
+mod sample_data;
+mod labels;
 
-use data_sources::commands::load_data_sources;
+use crate::data_sources::commands::load_data_sources;
+use crate::labels::commands::load_labels;
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             load_data_sources,
+            load_labels
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,5 @@
 import { Component, createMemo } from "solid-js";
-import { A, useLocation } from "@solidjs/router";
+import { useLocation } from "@solidjs/router";
 
 interface INavigationButtonProps {
   label: string;
@@ -14,16 +14,14 @@ const NavigationButtom: Component<INavigationButtonProps> = (props) => {
   const classes = createMemo(
     () =>
       `${
-        currentPath() === props.path
-          ? "bg-gray-900 text-white"
-          : "text-gray-300"
-      } hover:bg-gray-700 hover:text-white rounded-md px-3 py-1.5 text-sm font-medium`
+        currentPath() === props.path && "underline"
+      } bg-gray-900 hover:bg-gray-700 text-white rounded-md px-3 py-1.5 text-sm font-medium`
   );
 
   return (
-    <A href={props.path} class={classes()}>
+    <a href={props.path} class={classes()}>
       {props.label}
-    </A>
+    </a>
   );
 };
 

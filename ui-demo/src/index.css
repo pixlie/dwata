@@ -1,3 +1,7 @@
+@import "../node_modules/@fortawesome/fontawesome-free/css/fontawesome.css";
+@import "../node_modules/@fortawesome/fontawesome-free/css/solid.css";
+@import "../node_modules/@fortawesome/fontawesome-free/css/regular.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
