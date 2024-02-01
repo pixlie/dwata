@@ -1,5 +1,5 @@
-use crate::labels::Label;
 use crate::error::DwataError;
+use crate::labels::Label;
 use crate::sample_data;
 
 #[tauri::command]

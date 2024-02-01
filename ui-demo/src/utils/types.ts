@@ -4,7 +4,7 @@ interface IDataSource {
   path: string;
 }
 
-interface IChatRoom {
+interface ILabel {
   id: number;
   label: string;
   path: string;
@@ -18,9 +18,32 @@ interface IColumn {
   autoIncrement?: boolean;
 }
 
+type TDataSourceName = string;
+type TTableName = string;
+type TColumnName = string;
+type TRowValue = any;
+
 interface ISort {
-  column: string;
+  columnIndex: number; // index of columns in select array
   direction: "asc" | "desc";
 }
 
-export type { IDataSource, IChatRoom, IColumn, ISort };
+interface IQuery {
+  source: TDataSourceName;
+  select: Array<[TColumnName, TTableName, TDataSourceName]>;
+  visibleColumnIndices?: Array<number>; // index of columns in select array
+  sorting?: Array<ISort>;
+  areRowsSelectable?: boolean;
+}
+
+export type {
+  IDataSource,
+  ILabel as IChatRoom,
+  IColumn,
+  ISort,
+  TDataSourceName,
+  TTableName,
+  TColumnName,
+  TRowValue,
+  IQuery,
+};

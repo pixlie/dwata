@@ -1,28 +1,26 @@
 import { Component, JSX } from "solid-js";
-import { IColumn, ISort } from "../../utils/types";
+import { useSchema } from "../../stores/schema";
 
-interface IPropTypes {
-  columns: Array<IColumn>;
-  visible?: Array<string>;
-  sorting?: Array<ISort>;
-  areRowsSelectable?: boolean;
-}
-
-const GridHead: Component<IPropTypes> = (props) => {
+const GridHead: Component = (props) => {
+  const [_, { getColumn }] = useSchema();
   const headList: Array<JSX.Element> = [];
   if (!!props.areRowsSelectable) {
     headList.push(<th class="border border-gray-300 px-2 text-left" />);
   }
 
   for (const [i, column] of props.columns.entries()) {
-    if (column.isPrimaryKey) {
+    const colSpec = getColumn(props.sourceName, props.tableName, column);
+    if (!colSpec) {
+      continue;
+    }
+    if (colSpec.isPrimaryKey) {
       headList.push(
-        <th class="border border-gray-300 px-2 text-left">{column.label}</th>
+        <th class="border border-gray-300 px-2 text-left">{colSpec.label}</th>
       );
       headList.push(<th class="border border-gray-300 px-2 text-left"></th>);
     } else {
       headList.push(
-        <th class="border border-gray-300 px-2 text-left">{column.label}</th>
+        <th class="border border-gray-300 px-2 text-left">{colSpec.label}</th>
       );
     }
   }

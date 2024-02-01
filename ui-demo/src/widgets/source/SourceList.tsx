@@ -16,7 +16,13 @@ const SourceList: Component = () => {
       <SidebarHeading label="Data Sources" icon="fa-solid fa-database" />
 
       <For each={dsStore.sources}>
-        {(item) => <SidebarItem label={item.label} icon="fa-solid fa-table" />}
+        {(item) => (
+          <SidebarItem
+            label={item.label}
+            icon="fa-solid fa-table"
+            path={`/browse/select[${item.path}]`}
+          />
+        )}
       </For>
       <div class="mt-4 border-b border-gray-800" />
     </>
