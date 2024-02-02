@@ -22,28 +22,34 @@ type TDataSourceName = string;
 type TTableName = string;
 type TColumnName = string;
 type TRowValue = any;
-
-interface ISort {
-  columnIndex: number; // index of columns in select array
-  direction: "asc" | "desc";
-}
+type TSort = "asc" | "desc";
+type TColumnSpec = [TColumnName, TTableName, TDataSourceName];
 
 interface IQuery {
   source: TDataSourceName;
-  select: Array<[TColumnName, TTableName, TDataSourceName]>;
+  select: Array<TColumnSpec>;
   visibleColumnIndices?: Array<number>; // index of columns in select array
-  sorting?: Array<ISort>;
+  sorting?: { [columnIndex: number]: TSort };
   areRowsSelectable?: boolean;
+}
+
+interface IQueryResult {
+  isFetching: boolean;
+  data: {
+    columns: Array<TColumnSpec>;
+    rows: Array<Array<TRowValue>>;
+  };
+  errors: Array<string>;
 }
 
 export type {
   IDataSource,
   ILabel as IChatRoom,
   IColumn,
-  ISort,
   TDataSourceName,
   TTableName,
   TColumnName,
   TRowValue,
   IQuery,
+  IQueryResult,
 };

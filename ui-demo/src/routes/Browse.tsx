@@ -1,27 +1,21 @@
 import { useParams } from "@solidjs/router";
 import { Component, createSignal } from "solid-js";
-import { invoke } from "@tauri-apps/api/core";
 import {
   IQuery,
   TColumnName,
   TDataSourceName,
-  TRowValue,
   TTableName,
 } from "../utils/types";
 import Grid from "../widgets/grid/Grid";
 import { QueryProvider } from "../stores/query";
-
-interface IData {
-  columns: Array<TColumnName>;
-  rows: Array<Array<TRowValue>>;
-}
+import Loader from "../widgets/browse/Loader";
+import { QueryResultProvider } from "../stores/queryResult";
 
 const Browse: Component = () => {
   const [query, setQuery] = createSignal<IQuery>({
     source: "__default__",
     select: [],
   });
-  const [data, setData] = createSignal<IData>();
   const params = useParams();
   const tables = params.tables;
 
@@ -42,20 +36,21 @@ const Browse: Component = () => {
             ]
         ),
     });
-    // We invoke the Tauri API to get the data
-    invoke("get_data", { select: query().select }).then((result) => {
-      setData(result as IData);
-    });
   }
   console.log(query());
 
-  if (!data()) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <QueryProvider initial={query()}>
-      <Grid columns={data()!.columns} rows={data()!.rows} />
+      <QueryResultProvider
+        initial={{
+          isFetching: true,
+          data: { columns: [], rows: [] },
+          errors: [],
+        }}
+      >
+        <Loader />
+        <Grid />
+      </QueryResultProvider>
     </QueryProvider>
   );
 };
