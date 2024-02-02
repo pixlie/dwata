@@ -22,15 +22,14 @@ type TDataSourceName = string;
 type TTableName = string;
 type TColumnName = string;
 type TRowValue = any;
-type TSort = "asc" | "desc";
+type TOrder = "asc" | "desc";
 type TColumnSpec = [TColumnName, TTableName, TDataSourceName];
 
 interface IQuery {
   source: TDataSourceName;
   select: Array<TColumnSpec>;
-  visibleColumnIndices?: Array<number>; // index of columns in select array
-  sorting?: { [columnIndex: number]: TSort };
-  areRowsSelectable?: boolean;
+  ordering?: { [columnIndex: number]: TOrder };
+  filtering?: { [columnIndex: number]: string };
 }
 
 interface IQueryResult {

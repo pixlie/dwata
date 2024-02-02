@@ -33,9 +33,12 @@ const makeStore = () => {
         tableName: TTableName,
         columnName: TColumnName
       ): IColumn | undefined => {
-        return store.columns[sourceName][tableName].find(
-          (col) => col.name === columnName
-        );
+        return sourceName in store.columns &&
+          tableName in store.columns[sourceName]
+          ? store.columns[sourceName][tableName].find(
+              (col) => col.name === columnName
+            )
+          : undefined;
       },
     },
   ] as const; // `as const` forces tuple type inference
@@ -50,7 +53,7 @@ interface IProviderPropTypes {
   children: JSX.Element;
 }
 
-export const UserProvider: Component<IProviderPropTypes> = (props) => {
+export const SchemaProvider: Component<IProviderPropTypes> = (props) => {
   return (
     <SchemaContext.Provider value={schemaStore}>
       {props.children}
