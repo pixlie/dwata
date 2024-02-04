@@ -3,13 +3,15 @@ import { createStore } from "solid-js/store";
 import {
   IColumn,
   TColumnName,
+  TColumnSpec,
   TDataSourceName,
   TTableName,
 } from "../utils/types";
+import { invoke } from "@tauri-apps/api/core";
 
 interface IStore {
   sources: Array<TDataSourceName>;
-  tables: { [sourceName: TDataSourceName]: Array<string> };
+  tables: { [sourceName: TDataSourceName]: Array<TTableName> };
   columns: {
     [sourceName: TDataSourceName]: {
       [tableName: TTableName]: Array<IColumn>;
@@ -27,8 +29,13 @@ const makeStore = () => {
   return [
     store,
     {
-      loadSchema: async () => {},
-      getColumn: (
+      loadSchema: () => {
+        // We use the Tauri API to load schema
+        invoke("load_schema").then((result) => {
+          setStore(result as IStore);
+        });
+      },
+      getColumnSpec: (
         sourceName: TDataSourceName,
         tableName: TTableName,
         columnName: TColumnName
@@ -39,6 +46,24 @@ const makeStore = () => {
               (col) => col.name === columnName
             )
           : undefined;
+      },
+      getSpecListForColumnList: (
+        columns: Array<TColumnSpec>
+      ): Array<IColumn | undefined> => {
+        return columns.map((col) =>
+          col[2] in store.columns && col[1] in store.columns[col[2]]
+            ? store.columns[col[2]][col[1]].find((x) => x.name === col[0])
+            : undefined
+        );
+      },
+      getAllColumnNameListForTableSource: (
+        tableName: TTableName,
+        sourceName: TDataSourceName
+      ): Array<TColumnName> => {
+        return sourceName in store.columns &&
+          tableName in store.columns[sourceName]
+          ? store.columns[sourceName][tableName].map((x) => x.name)
+          : [];
       },
     },
   ] as const; // `as const` forces tuple type inference

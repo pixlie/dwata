@@ -2,20 +2,21 @@ import { Component, createComputed } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { useQueryResult } from "../../stores/queryResult";
 import {
-  IQueryResult,
+  IResult,
   TColumnName,
   TDataSourceName,
   TTableName,
 } from "../../utils/types";
 import { useParams } from "@solidjs/router";
+import { useSchema } from "../../stores/schema";
 
 const Loader: Component = () => {
-  const [queryResult] = useQueryResult();
-  const [_, { setQuery, setQueryResult }] = useQueryResult();
+  const [queryResult, { setQuery, setQueryResult }] = useQueryResult();
+  const [_, { getAllColumnNameListForTableSource }] = useSchema();
   const params = useParams();
+  const sourceName = "__default__";
 
   createComputed(() => {
-    console.log("params", params);
     const tables = params.tables;
     const selectString = "select[";
     if (tables.startsWith(selectString) && tables.endsWith("]")) {
@@ -25,23 +26,27 @@ const Loader: Component = () => {
         select: tables
           .slice(selectString.length, -1)
           .split(",")
-          .map(
-            (s) =>
-              ["*", s, "__default__"] as [
-                TColumnName,
-                TTableName,
-                TDataSourceName,
-              ]
-          ),
+          .flatMap((tableName) => {
+            return getAllColumnNameListForTableSource(
+              tableName,
+              sourceName
+            )?.map(
+              (columnName) =>
+                [columnName, tableName, sourceName] as [
+                  TColumnName,
+                  TTableName,
+                  TDataSourceName,
+                ]
+            );
+          })
+          .filter((x) => x !== undefined),
       });
 
       if (!!queryResult.query) {
-        console.log("invoking", queryResult.query.select);
         // We invoke the Tauri API to get the data
         invoke("load_data", { select: queryResult.query.select }).then(
           (result) => {
-            setQueryResult(result as IQueryResult);
-            console.log("result", result);
+            setQueryResult(result as IResult);
           }
         );
       }

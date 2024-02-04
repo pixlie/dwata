@@ -11,9 +11,8 @@ interface ILabel {
 }
 
 interface IColumn {
-  label: string;
   name: string;
-  tableName: string;
+  label?: string;
   isPrimaryKey?: boolean;
   autoIncrement?: boolean;
 }
@@ -27,18 +26,28 @@ type TColumnSpec = [TColumnName, TTableName, TDataSourceName];
 
 interface IQuery {
   source: TDataSourceName;
-  select: Array<TColumnSpec>;
+  select: Array<TColumnSpec>; // When we have a query like `SELECT *` we expand all columns
   ordering?: { [columnIndex: number]: TOrder };
   filtering?: { [columnIndex: number]: string };
 }
 
-interface IQueryResult {
+interface IResult {
   isFetching: boolean;
   data: {
     columns: Array<TColumnSpec>;
     rows: Array<Array<TRowValue>>;
   };
   errors: Array<string>;
+}
+
+interface IQueryResult {
+  isReady: boolean;
+  isFetching: boolean;
+  query?: IQuery;
+  result?: IResult;
+
+  areRowsSelectable?: boolean;
+  visibleColumnIndices?: Array<number>; // index of columns in select array
 }
 
 export type {
@@ -48,7 +57,9 @@ export type {
   TDataSourceName,
   TTableName,
   TColumnName,
+  TColumnSpec,
   TRowValue,
   IQuery,
+  IResult,
   IQueryResult,
 };

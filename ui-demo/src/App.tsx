@@ -5,12 +5,14 @@ import { UserProvider } from "./stores/user";
 import Sidebar from "./widgets/navigation/Sidebar";
 import ChatBar from "./widgets/navigation/ChatBar";
 import { SchemaProvider } from "./stores/schema";
+import SchemaLoader from "./widgets/SchemaLoader";
 
 const App: Component<RouteSectionProps> = (props) => {
   return (
     <>
       <UserProvider>
         <SchemaProvider>
+          <SchemaLoader />
           <NavigationBar />
 
           <div class="flex flex-row bg-gray-300">

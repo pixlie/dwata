@@ -1,19 +1,9 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { IQuery, IQueryResult } from "../utils/types";
-
-interface IStore {
-  isReady: boolean;
-  isFetching: boolean;
-  query?: IQuery;
-  result?: IQueryResult;
-
-  areRowsSelectable?: boolean;
-  visibleColumnIndices?: Array<number>; // index of columns in select array
-}
+import { IQuery, IQueryResult, IResult } from "../utils/types";
 
 const makeStore = () => {
-  const [store, setStore] = createStore<IStore>({
+  const [store, setStore] = createStore<IQueryResult>({
     isReady: false,
     isFetching: false,
   });
@@ -22,10 +12,15 @@ const makeStore = () => {
     store,
     {
       setQuery: (query: IQuery) => {
+        for (const column in query.select) {
+          if (column[0] === "*") {
+            // We have to expande into all columns from schema
+          }
+        }
         setStore("query", query);
       },
-      setQueryResult: (result: IQueryResult) => {
-        setStore(result);
+      setQueryResult: (result: IResult) => {
+        setStore("result", result);
       },
     },
   ] as const; // `as const` forces tuple type inference

@@ -3,7 +3,7 @@ import GridHead from "./GridHead";
 
 const Grid: Component = () => {
   return (
-    <table class="font-content border-collapse bg-white tracking-normal">
+    <table class="w-full">
       <GridHead />
     </table>
   );
