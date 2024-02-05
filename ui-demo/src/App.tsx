@@ -16,7 +16,7 @@ const App: Component<RouteSectionProps> = (props) => {
           <NavigationBar />
 
           <div class="flex flex-row bg-gray-300">
-            <div class="h-screen w-80 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
+            <div class="h-screen w-64 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
               <Sidebar />
             </div>
 
