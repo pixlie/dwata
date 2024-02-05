@@ -1,28 +1,44 @@
 import { Component } from "solid-js";
-import { IColumn, TColumnPath } from "../../utils/types";
+import { IColumn } from "../../utils/types";
 
-interface IPropTypes {
-  columnSpec: TColumnPath;
-  column: IColumn;
+interface ICellPropTypes {
   data: any;
 }
 
-const GridRow: Component<IPropTypes> = (props) => {
+const createGridRow = (
+  columns: Array<IColumn | undefined>
+): Array<Component<ICellPropTypes>> => {
   const contentTextSizeClasses = "text-sm";
-  const borderClasses = "border border-gray-300";
+  const borderClasses = "border border-gray-700";
   const paddingClasses = "px-1 py-1";
 
-  if (props.column.isPrimaryKey) {
-    return <></>;
-  }
-
-  return (
+  const DefaultCell: Component<ICellPropTypes> = (innerProps) => (
     <td class={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses}`}>
-      {props.data}
+      {innerProps.data}
     </td>
   );
+
+  const PrimaryKeyCell: Component<ICellPropTypes> = (innerProps) => (
+    <td
+      class={`${paddingClasses} ${borderClasses} ${contentTextSizeClasses} text-gray-600`}
+    >
+      {innerProps.data}
+    </td>
+  );
+
+  const cellList: Array<Component<ICellPropTypes>> = [];
+  for (const column of columns) {
+    if (!column) {
+      // TODO: Remove this when columns no longer has `undefined` items
+      cellList.push(() => null);
+    } else if (column.isPrimaryKey) {
+      cellList.push(PrimaryKeyCell);
+    } else {
+      cellList.push(DefaultCell);
+    }
+  }
+
+  return cellList;
 };
 
-const createGridRow = (columns: Array<IColumn>) => {};
-
-export default GridRow;
+export default createGridRow;

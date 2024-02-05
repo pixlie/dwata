@@ -20,7 +20,12 @@ const makeStore = () => {
         setStore("query", query);
       },
       setQueryResult: (result: IResult) => {
-        setStore("result", result);
+        setStore({
+          ...store,
+          isReady: true,
+          isFetching: true,
+          result,
+        });
       },
     },
   ] as const; // `as const` forces tuple type inference

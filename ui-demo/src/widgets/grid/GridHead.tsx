@@ -3,9 +3,10 @@ import { useSchema } from "../../stores/schema";
 import { useQueryResult } from "../../stores/queryResult";
 
 const GridHead: Component = () => {
-  const [_, { getSpecListForColumnList: getColumns }] = useSchema();
+  const [_, { getColumnListForColumnPathList }] = useSchema();
   const [queryResult] = useQueryResult();
-  const thClass = "px-2 py-1 cursor-pointer hover:bg-gray-800 font-semibold";
+  const thClass =
+    "px-2 py-1 cursor-pointer hover:bg-gray-800 font-semibold border border-gray-700";
 
   const headList: Array<JSX.Element> = [];
   if (!!queryResult.areRowsSelectable) {
@@ -20,7 +21,9 @@ const GridHead: Component = () => {
     );
   }
 
-  const columnsSpec = createMemo(() => getColumns(queryResult.query!.select));
+  const columnsSpec = createMemo(() =>
+    getColumnListForColumnPathList(queryResult.query!.select)
+  );
 
   for (const [_, columnSpec] of columnsSpec().entries()) {
     if (!columnSpec) {

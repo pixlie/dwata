@@ -35,7 +35,7 @@ const makeStore = () => {
           setStore(result as IStore);
         });
       },
-      geTColumnPath: (
+      getColumnPath: (
         sourceName: TDataSourceName,
         tableName: TTableName,
         columnName: TColumnName
@@ -47,9 +47,10 @@ const makeStore = () => {
             )
           : undefined;
       },
-      getSpecListForColumnList: (
+      getColumnListForColumnPathList: (
         columns: Array<TColumnPath>
       ): Array<IColumn | undefined> => {
+        // TODO: Improve the function to return Array<IColumn> only
         return columns.map((col) =>
           col[2] in store.columns && col[1] in store.columns[col[2]]
             ? store.columns[col[2]][col[1]].find((x) => x.name === col[0])

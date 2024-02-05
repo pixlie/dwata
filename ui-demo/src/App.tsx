@@ -16,15 +16,15 @@ const App: Component<RouteSectionProps> = (props) => {
           <NavigationBar />
 
           <div class="flex flex-row bg-gray-300">
-            <div class="h-screen w-80 border-r-2 border-gray-800 bg-gray-900 pt-16">
+            <div class="h-screen w-80 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
               <Sidebar />
             </div>
 
-            <div class="h-screen grow bg-zinc-900 p-4 pt-16">
+            <div class="h-screen flex-auto bg-zinc-900 p-4 pt-16">
               {props.children}
             </div>
 
-            <div class="h-screen w-80 border-l-2 border-gray-800 bg-zinc-900 pt-16">
+            <div class="h-screen w-80 flex-none border-l-2 border-gray-800 bg-zinc-900 pt-16">
               <ChatBar />
             </div>
           </div>
