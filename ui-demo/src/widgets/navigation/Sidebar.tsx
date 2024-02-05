@@ -2,7 +2,6 @@ import { Component } from "solid-js";
 
 import SidebarHeading from "./SidebarHeading";
 import SourceList from "../source/SourceList";
-import LabelList from "../label/LabelList";
 
 const Sidebar: Component = () => {
   return (
@@ -25,7 +24,6 @@ const Sidebar: Component = () => {
       />
       <div class="mt-4 border-b border-gray-800" />
       <SourceList />
-      <LabelList />
       <SidebarHeading
         label="Settings"
         icon="fa-solid fa-cog"

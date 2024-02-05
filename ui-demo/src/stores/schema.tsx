@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import {
   IColumn,
   TColumnName,
-  TColumnSpec,
+  TColumnPath,
   TDataSourceName,
   TTableName,
 } from "../utils/types";
@@ -35,7 +35,7 @@ const makeStore = () => {
           setStore(result as IStore);
         });
       },
-      getColumnSpec: (
+      geTColumnPath: (
         sourceName: TDataSourceName,
         tableName: TTableName,
         columnName: TColumnName
@@ -48,7 +48,7 @@ const makeStore = () => {
           : undefined;
       },
       getSpecListForColumnList: (
-        columns: Array<TColumnSpec>
+        columns: Array<TColumnPath>
       ): Array<IColumn | undefined> => {
         return columns.map((col) =>
           col[2] in store.columns && col[1] in store.columns[col[2]]

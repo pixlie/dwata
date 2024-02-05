@@ -27,12 +27,14 @@ const NavigationBar: Component = () => {
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-2">
               {/* <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" --> */}
-              <NavigationButtom label="Organisations" path="/apps" />
+              {/* <NavigationButtom label="Organisations" path="/apps" /> */}
               {/* <NavigationButtom label="Tasks" path="/settings" /> */}
             </div>
           </div>
         </div>
         <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          <NavigationButtom label="Focus: #product" path="/labs" />
+          {/* <NavigationButtom label="Global filter: Jan 2024" path="/labs" /> */}
           <button
             type="button"
             class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -86,7 +88,7 @@ const NavigationBar: Component = () => {
               >
                 {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
                 <DropdownItem label="Your Profile" />
-                {/* <DropdownItem label="Team" /> */}
+                <DropdownItem label="Switch Organization" />
                 {/* <DropdownItem label="Settings" /> */}
               </div>
             )}

@@ -22,11 +22,11 @@ type TTableName = string;
 type TColumnName = string;
 type TRowValue = any;
 type TOrder = "asc" | "desc";
-type TColumnSpec = [TColumnName, TTableName, TDataSourceName];
+type TColumnPath = [TColumnName, TTableName, TDataSourceName];
 
 interface IQuery {
   source: TDataSourceName;
-  select: Array<TColumnSpec>; // When we have a query like `SELECT *` we expand all columns
+  select: Array<TColumnPath>; // When we have a query like `SELECT *` we expand all columns
   ordering?: { [columnIndex: number]: TOrder };
   filtering?: { [columnIndex: number]: string };
 }
@@ -34,7 +34,7 @@ interface IQuery {
 interface IResult {
   isFetching: boolean;
   data: {
-    columns: Array<TColumnSpec>;
+    columns: Array<TColumnPath>;
     rows: Array<Array<TRowValue>>;
   };
   errors: Array<string>;
@@ -57,7 +57,7 @@ export type {
   TDataSourceName,
   TTableName,
   TColumnName,
-  TColumnSpec,
+  TColumnPath,
   TRowValue,
   IQuery,
   IResult,
