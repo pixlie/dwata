@@ -1,6 +1,8 @@
+use serde::{Deserialize, Serialize};
+
 pub mod commands;
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Label {
     id: i64,
     label: String,
