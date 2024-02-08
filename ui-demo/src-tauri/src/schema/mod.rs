@@ -43,11 +43,28 @@ pub enum ColumnDataType {
     UUID,
 }
 
+// #[derive(Debug, Deserialize, Serialize)]
+// pub enum NeedsSSH {
+//     No,
+//     Yes(SSHConnection),
+// }
+
+// #[derive(Debug, Deserialize, Serialize)]
+// pub struct SSHConnection {
+//     username: String,
+//     password: Option<String>,
+//     private_key: Option<PathBuf>,
+//     ssh_key_password: Option<String>,
+//     port: u8,
+// }
+
 #[derive(Debug, Deserialize, Serialize)]
-pub enum Protocol {
-    Http,
-    Https,
-    Ssh(SSHConnection),
+pub struct DatabaseConnection {
+    // needs_ssh: NeedsSSH,
+    host: String,
+    username: String,
+    password: String,
+    port: u8,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -55,24 +72,6 @@ pub struct Database {
     name: String,
     label: Option<String>,
     connection: DatabaseConnection,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct SSHConnection {
-    username: String,
-    password: Option<String>,
-    private_key: Option<PathBuf>,
-    ssh_key_password: Option<String>,
-    port: u8,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct DatabaseConnection {
-    protocol: Protocol,
-    host: String,
-    username: String,
-    password: String,
-    port: u8,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

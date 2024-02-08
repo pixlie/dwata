@@ -1,7 +1,7 @@
 import { Component } from "solid-js";
 
 interface IPropTypes {
-  type?: "text" | "email" | "password";
+  type: "text" | "email" | "password";
   label?: string;
   placeholder?: string;
   value?: string | number;
@@ -21,7 +21,7 @@ const TextInput: Component<IPropTypes> = (props) => {
         <input
           type={props.type || "text"}
           required={props.isRequired}
-          class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 placeholder:text-gray-400 outline-none focus:bg-yellow-100 hover:bg-yellow-100"
+          class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 outline-none placeholder:text-gray-400 hover:bg-yellow-100 focus:bg-yellow-100"
           placeholder={props.placeholder}
           value={props.value || ""}
           onChange={(e) => props.onChange?.(e.currentTarget.value)}

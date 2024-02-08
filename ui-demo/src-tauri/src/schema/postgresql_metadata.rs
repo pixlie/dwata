@@ -1,6 +1,5 @@
 use crate::error::DwataError;
 use crate::schema::{Database, TableSchema};
-use std::collections::HashMap;
 
 pub fn get_databases() -> Vec<Database> {
     let mut databases: Vec<Database> = vec![];

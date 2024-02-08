@@ -1,3 +1,5 @@
+import { JSX } from "solid-js";
+
 interface IDataSource {
   id: number;
   label: string;
@@ -50,6 +52,37 @@ interface IQueryResult {
   visibleColumnIndices?: Array<number>; // index of columns in select array
 }
 
+// Only required in Database form
+interface IDatabaseFormData {
+  id?: string;
+  name: string;
+  label?: string;
+  // needsSsh: boolean;
+  host: string;
+  username: string;
+  password: string;
+  port: number;
+}
+
+interface IDatabase {
+  name: string;
+  label?: string;
+}
+
+interface IAPI {}
+
+interface IFolder {}
+
+interface IWorkspace {
+  databaseList: Array<IDatabase>;
+  apiList: Array<IAPI>;
+  folderList: Array<IFolder>;
+}
+
+interface IProviderPropTypes {
+  children: JSX.Element;
+}
+
 export type {
   IDataSource,
   ILabel as IChatRoom,
@@ -62,4 +95,8 @@ export type {
   IQuery,
   IResult,
   IQueryResult,
+  IWorkspace,
+  IDatabase,
+  IDatabaseFormData,
+  IProviderPropTypes,
 };
