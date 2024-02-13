@@ -55,13 +55,13 @@ interface IQueryResult {
 // Only required in Database form
 interface IDatabaseFormData {
   id?: string;
+  username: string;
+  password?: string;
+  host: string;
+  port?: number;
   name: string;
   label?: string;
   // needsSsh: boolean;
-  host: string;
-  username: string;
-  password: string;
-  port: number;
 }
 
 interface IDatabase {

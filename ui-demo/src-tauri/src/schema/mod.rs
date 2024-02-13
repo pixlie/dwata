@@ -1,6 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::path::PathBuf;
 
 pub mod commands;
 mod postgresql_metadata;
@@ -41,37 +39,6 @@ pub enum ColumnDataType {
     JSONB,
     INet(TypeINet),
     UUID,
-}
-
-// #[derive(Debug, Deserialize, Serialize)]
-// pub enum NeedsSSH {
-//     No,
-//     Yes(SSHConnection),
-// }
-
-// #[derive(Debug, Deserialize, Serialize)]
-// pub struct SSHConnection {
-//     username: String,
-//     password: Option<String>,
-//     private_key: Option<PathBuf>,
-//     ssh_key_password: Option<String>,
-//     port: u8,
-// }
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct DatabaseConnection {
-    // needs_ssh: NeedsSSH,
-    host: String,
-    username: String,
-    password: String,
-    port: u8,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Database {
-    name: String,
-    label: Option<String>,
-    connection: DatabaseConnection,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -1,13 +1,5 @@
 use crate::error::DwataError;
-use crate::schema::{Database, TableSchema};
-
-pub fn get_databases() -> Vec<Database> {
-    let mut databases: Vec<Database> = vec![];
-    let sql = r#"
-    SELECT datname FROM pg_database WHERE NOT datistemplate ORDER BY datname ASC
-    "#;
-    databases
-}
+use crate::schema::TableSchema;
 
 // pub fn estimated_row_count() -> usize {
 //     let sql = r#"

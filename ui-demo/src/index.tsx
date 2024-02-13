@@ -6,13 +6,15 @@ import "./index.css";
 import App from "./App";
 import Home from "./routes/Home";
 import Browse from "./routes/Browse";
-import Settings from "./routes/Settings";
+import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 
 render(
   () => (
     <Router root={App}>
       <Route path={"/browse/:tables?"} component={Browse} />
-      <Route path={"/settings"} component={Settings} />
+      <Route path={"/settings"} component={SettingsWrapper}>
+        <SettingsRoutes />
+      </Route>
       <Route path={"/"} component={Home} />
     </Router>
   ),
