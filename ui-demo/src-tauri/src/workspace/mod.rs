@@ -1,7 +1,8 @@
+pub mod commands;
+
 use crate::data_sources::DataSource;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use url::Url;
 
 // #[derive(Debug, Deserialize, Serialize)]
 // pub struct Organisation {
@@ -10,7 +11,7 @@ use url::Url;
 // }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct MainConfig {
+pub struct Config {
     // organisations: Vec<Organisation>,
     data_source_list: Vec<DataSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.

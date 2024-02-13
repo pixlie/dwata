@@ -1,99 +1,77 @@
 import { Component, createMemo, createSignal, onMount } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
-import { IDatabase, IDatabaseFormData } from "../../utils/types";
+import { IDatabaseFormData } from "../../utils/types";
 import { useParams } from "@solidjs/router";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 
-interface IForm {
-  isSaving: boolean;
-  isFetching: boolean;
-  payload?: IDatabaseFormData;
-}
-
 interface IState {
   isEditing: boolean;
+  isSaving: boolean;
+  isFetching: boolean;
 }
 
 const DatabaseForm: Component = () => {
-  const [state, setState] = createSignal<IState>();
-  const [form, setForm] = createSignal<IForm>({
+  const [state, setState] = createSignal<IState>({
+    isEditing: false,
     isFetching: false,
     isSaving: false,
   });
+  const [form, setForm] = createSignal<IDatabaseFormData>();
   const params = useParams();
 
   console.log(params);
   onMount(() => {
-    setForm((state) => ({
-      ...state,
-      payload: {
-        username: "postgres",
-        // password: ,
-        host: "localhost",
-        port: 5432,
-        name: "hearth",
-      },
-    }));
+    setForm({
+      username: "postgres",
+      // password: ,
+      host: "localhost",
+      port: 5432,
+      name: "test",
+    });
   });
 
   const visibleName = createMemo(() => {
-    return !!form()?.payload?.label
-      ? `- ${form()?.payload?.label}`
-      : !!form()?.payload?.name
-        ? `- ${form()?.payload?.name}`
+    return !!form()?.label
+      ? `- ${form()?.label}`
+      : !!form()?.name
+        ? `- ${form()?.name}`
         : "";
   });
 
   const handleConnect = async () => {
-    console.log(form());
-    const response = await invoke("check_database_connection", {
-      username: form()?.payload?.username,
-      password: form()?.payload?.password,
-      host: form()?.payload?.host,
-      port: `${form()?.payload?.port}`,
-      database: form()?.payload?.name,
+    const response = await invoke("add_data_source", {
+      username: form()?.username,
+      password: form()?.password,
+      host: form()?.host,
+      port: `${form()?.port}`,
+      database: form()?.name,
     });
-    console.log(response as boolean);
+    console.log(response as string);
   };
 
   return (
     <div class="rounded-md  bg-zinc-700 p-2">
       <Heading size="sm">Database {visibleName()}</Heading>
 
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Host"
-        value={form()?.payload?.host}
-      />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Port"
-        value={form()?.payload?.port}
-      />
+      <TextInput type="text" isRequired label="DB Host" value={form()?.host} />
+      <TextInput type="text" isRequired label="DB Port" value={form()?.port} />
       <TextInput
         type="text"
         isRequired
         label="DB Username"
-        value={form()?.payload?.username}
+        value={form()?.username}
       />
       <TextInput
         type="text"
         isRequired
         label="DB Password"
-        value={form()?.payload?.password}
+        value={form()?.password}
       />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Name"
-        value={form()?.payload?.name}
-      />
+      <TextInput type="text" isRequired label="DB Name" value={form()?.name} />
 
-      <Button label="Connect" onClick={handleConnect} />
+      <Button label="Test connection and save" onClick={handleConnect} />
     </div>
   );
 };

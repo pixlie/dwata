@@ -9,10 +9,10 @@ mod sample_data;
 mod schema;
 mod workspace;
 
-use crate::data_sources::commands::check_database_connection;
 use crate::labels::commands::load_labels;
 use crate::query_result::commands::load_data;
 use crate::schema::commands::load_schema;
+use crate::workspace::commands::add_data_source;
 
 fn main() {
     tauri::Builder::default()
@@ -22,7 +22,7 @@ fn main() {
             load_labels,
             load_schema,
             load_data,
-            check_database_connection
+            add_data_source
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
