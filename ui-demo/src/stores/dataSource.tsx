@@ -1,17 +1,15 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { IDataSource } from "../utils/types";
+import { IDataSource } from "../api_types/IDataSource";
 import { invoke } from "@tauri-apps/api/core";
 
 interface IStore {
   sources: Array<IDataSource>;
-  isFetching: boolean;
 }
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     sources: [],
-    isFetching: false,
   });
 
   return [

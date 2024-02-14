@@ -41,7 +41,7 @@ const DatabaseForm: Component = () => {
   });
 
   const handleConnect = async () => {
-    const response = await invoke("add_data_source", {
+    const response = await invoke("create_data_source", {
       username: form()?.username,
       password: form()?.password,
       host: form()?.host,

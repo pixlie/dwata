@@ -1,11 +1,5 @@
 import { JSX } from "solid-js";
 
-interface IDataSource {
-  id: number;
-  label: string;
-  path: string;
-}
-
 interface ILabel {
   id: number;
   label: string;
@@ -64,27 +58,15 @@ interface IDatabaseFormData {
   // needsSsh: boolean;
 }
 
-interface IDatabase {
-  name: string;
-  label?: string;
-}
-
 interface IAPI {}
 
 interface IFolder {}
-
-interface IWorkspace {
-  databaseList: Array<IDatabase>;
-  apiList: Array<IAPI>;
-  folderList: Array<IFolder>;
-}
 
 interface IProviderPropTypes {
   children: JSX.Element;
 }
 
 export type {
-  IDataSource,
   ILabel as IChatRoom,
   IColumn,
   TDataSourceName,
@@ -95,8 +77,6 @@ export type {
   IQuery,
   IResult,
   IQueryResult,
-  IWorkspace,
-  IDatabase,
   IDatabaseFormData,
   IProviderPropTypes,
 };
