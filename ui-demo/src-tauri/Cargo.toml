@@ -23,6 +23,7 @@ sqlx = { version = "0.7.3", features = ["runtime-tokio", "tls-native-tls", "post
 ron = "0.8.1"
 url = { version = "2.5.0", features = ["serde"] }
 sha2 = "0.10.8"
+ts-rs = "7.1.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

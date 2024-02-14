@@ -1,33 +1,25 @@
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{DataSource, Database};
 use crate::error::DwataError;
+use crate::workspace::helpers::{load_config, load_config_file};
 use crate::workspace::Config;
 use std::fs;
-use std::path::Path;
+use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
 #[tauri::command]
-pub async fn add_data_source(
+pub async fn create_data_source(
     app_handle: AppHandle,
+    _database_type: Option<&str>,
     username: &str,
     password: Option<&str>,
     host: &str,
     port: Option<&str>,
     database: &str,
 ) -> Result<String, DwataError> {
-    let mut config_file_path = app_handle.path().config_dir().unwrap();
-    config_file_path.push("dwata");
-    if Path::new(&config_file_path).try_exists().is_err() {
-        fs::create_dir(&config_file_path).unwrap();
-    }
-    config_file_path.push("default.ron");
-    let mut config: Config = match fs::read_to_string(&config_file_path) {
-        Ok(content) => ron::from_str(content.as_str()).unwrap(),
-        Err(_) => Config {
-            data_source_list: vec![],
-            folder_list: vec![],
-        },
-    };
+    let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
+    let config_file_path = load_config_file(&config_dir);
+    let mut config: Config = load_config(&config_dir);
     match check_database_connection(username, password, host, port, database).await {
         Ok(_) => {
             let database: Database = Database::new(username, password, host, port, database);
@@ -43,4 +35,10 @@ pub async fn add_data_source(
         }
         Err(e) => Err(e),
     }
+}
+
+#[tauri::command]
+pub fn read_config(app_handle: AppHandle) -> Result<Config, DwataError> {
+    let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
+    Ok(load_config(&config_dir))
 }

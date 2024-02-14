@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use std::path::PathBuf;
+use ts_rs::TS;
 
 pub mod commands;
 pub mod helpers;
@@ -47,14 +48,30 @@ pub struct DatabaseAuthentication {
     password: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(
+    export,
+    rename = "IDatabase",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
 pub struct Database {
     name: String,
+    #[serde(skip_serializing)]
+    #[ts(skip)]
     connection: DatabaseConnection,
+    #[serde(skip_serializing)]
+    #[ts(skip)]
     authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(
+    export,
+    rename = "IDataSourceType",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
 pub enum DataSourceType {
     PostgreSQL(Database),
     MySQL(Database),
@@ -63,7 +80,13 @@ pub enum DataSourceType {
     MongoDB(Database),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(
+    export,
+    rename = "IDataSource",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
 pub struct DataSource {
     id: String,
     label: Option<String>,

@@ -12,7 +12,7 @@ mod workspace;
 use crate::labels::commands::load_labels;
 use crate::query_result::commands::load_data;
 use crate::schema::commands::load_schema;
-use crate::workspace::commands::add_data_source;
+use crate::workspace::commands::{create_data_source, read_config};
 
 fn main() {
     tauri::Builder::default()
@@ -22,7 +22,8 @@ fn main() {
             load_labels,
             load_schema,
             load_data,
-            add_data_source
+            create_data_source,
+            read_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
