@@ -6,13 +6,6 @@ interface ILabel {
   path: string;
 }
 
-interface IColumn {
-  name: string;
-  label?: string;
-  isPrimaryKey?: boolean;
-  autoIncrement?: boolean;
-}
-
 type TDataSourceName = string;
 type TTableName = string;
 type TColumnName = string;
@@ -58,17 +51,12 @@ interface IDatabaseFormData {
   // needsSsh: boolean;
 }
 
-interface IAPI {}
-
-interface IFolder {}
-
 interface IProviderPropTypes {
   children: JSX.Element;
 }
 
 export type {
   ILabel as IChatRoom,
-  IColumn,
   TDataSourceName,
   TTableName,
   TColumnName,

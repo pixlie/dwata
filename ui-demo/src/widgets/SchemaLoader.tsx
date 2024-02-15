@@ -1,11 +1,15 @@
 import { Component, onMount } from "solid-js";
 import { useSchema } from "../stores/schema";
 
-const SchemaLoader: Component = () => {
-  const [_, { loadSchema }] = useSchema();
+interface IPropTypes {
+  dataSourceId: string;
+}
+
+const SchemaLoader: Component<IPropTypes> = (props) => {
+  const [_, { readSchemaFromAPI }] = useSchema();
 
   onMount(() => {
-    loadSchema();
+    readSchemaFromAPI(props.dataSourceId);
   });
 
   return <></>;

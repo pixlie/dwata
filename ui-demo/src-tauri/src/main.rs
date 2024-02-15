@@ -11,19 +11,18 @@ mod workspace;
 
 use crate::labels::commands::load_labels;
 use crate::query_result::commands::load_data;
-use crate::schema::commands::load_schema;
+use crate::schema::commands::read_schema;
 use crate::workspace::commands::{create_data_source, read_config};
 
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            // load_data_sources,
+            read_config,
             load_labels,
-            load_schema,
+            read_schema,
             load_data,
             create_data_source,
-            read_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
+use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
 use ts_rs::TS;
 
-pub mod commands;
 pub mod helpers;
 
 // #[derive(Debug, Deserialize, Serialize)]
@@ -35,6 +35,12 @@ pub struct DatabaseTCPSocket {
     port: Option<u32>,
 }
 
+impl DatabaseTCPSocket {
+    pub fn get_host_port(&self) -> (String, Option<u32>) {
+        (self.host.clone(), self.port.clone())
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub enum DatabaseConnection {
     File(PathBuf), // For embedded database
@@ -48,13 +54,14 @@ pub struct DatabaseAuthentication {
     password: Option<String>,
 }
 
+impl DatabaseAuthentication {
+    pub fn get_username_password(&self) -> (String, Option<String>) {
+        (self.username.clone(), self.password.clone())
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "IDatabase",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Database {
     name: String,
     #[serde(skip_serializing)]
@@ -65,13 +72,30 @@ pub struct Database {
     authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
 }
 
+impl Database {
+    pub fn get_connection_url(&self) -> Option<String> {
+        let (host, port) = match &self.connection {
+            DatabaseConnection::TCPSocket(socket) => socket.get_host_port(),
+            _ => return None,
+        };
+        let (username, password) = &self.authentication.get_username_password();
+        let opt_port = match port {
+            Some(x) => format!(":{}", x),
+            None => "".to_string(),
+        };
+        let opt_password = match password {
+            Some(x) => format!(":{}", x),
+            None => "".to_string(),
+        };
+        let database = &self.name;
+        Some(format!(
+            "postgres://{username}{opt_password}@{host}{opt_port}/{database}"
+        ))
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "IDataSourceType",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub enum DataSourceType {
     PostgreSQL(Database),
     MySQL(Database),
@@ -80,17 +104,25 @@ pub enum DataSourceType {
     MongoDB(Database),
 }
 
+impl DataSourceType {
+    pub fn get_database(&self) -> Option<&Database> {
+        match self {
+            DataSourceType::PostgreSQL(db) => Some(db),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "IDataSource",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DataSource {
     id: String,
     label: Option<String>,
     source: DataSourceType,
+}
+
+pub enum DataSourceConnection {
+    PostgreSQL(sqlx::PgPool),
 }
 
 impl DataSource {
@@ -113,6 +145,29 @@ impl DataSource {
 
     pub fn get_id(&self) -> String {
         self.id.clone()
+    }
+
+    pub fn get_database(&self) -> Option<&Database> {
+        match &self.source {
+            DataSourceType::PostgreSQL(db) => Some(&db),
+            _ => None,
+        }
+    }
+
+    pub async fn get_connection(&self) -> Option<DataSourceConnection> {
+        match self.get_database().unwrap().get_connection_url() {
+            Some(conn_url) => {
+                match PgPoolOptions::new()
+                    .max_connections(5)
+                    .connect(conn_url.as_str())
+                    .await
+                {
+                    Ok(pool) => Some(DataSourceConnection::PostgreSQL(pool)),
+                    Err(_) => None,
+                }
+            }
+            None => None,
+        }
     }
 }
 

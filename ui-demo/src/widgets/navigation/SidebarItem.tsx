@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { IDataSource } from "../../api_types/IDataSource";
+import { DataSource } from "../../api_types/DataSource";
 
 interface IPropTypes {
-  item: IDataSource;
+  item: DataSource;
 }
 
 const SidebarItem: Component<IPropTypes> = (props) => {

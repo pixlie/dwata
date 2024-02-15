@@ -1,6 +1,10 @@
 use crate::error::DwataError;
+use crate::schema::postgresql_metadata::get_table_schema;
 use crate::schema::ColumnDataType::Boolean;
 use crate::schema::{Column, IsForeignKey, Schema, TableSchema};
+use crate::workspace::helpers::load_config;
+use std::path::PathBuf;
+use tauri::{AppHandle, Manager};
 
 fn get_column(name: &str) -> Column {
     Column {
@@ -15,10 +19,14 @@ fn get_column(name: &str) -> Column {
 }
 
 #[tauri::command]
-pub fn load_schema() -> Result<Schema, DwataError> {
-    let source_name = "__default__".to_string();
-    Ok(Schema {
-        sources: vec![source_name.clone()],
+pub async fn read_schema(
+    app_handle: AppHandle,
+    data_source_id: &str,
+) -> Result<Schema, DwataError> {
+    let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
+    let config = load_config(&config_dir);
+
+    let ret = Ok(Schema {
         tables: vec![TableSchema {
             name: "products".to_string(),
             columns: vec![
@@ -32,5 +40,13 @@ pub fn load_schema() -> Result<Schema, DwataError> {
             primary_key: None,
             foreign_keys: vec![],
         }],
-    })
+    });
+
+    match config.get_data_source(data_source_id) {
+        Some(ds) => {
+            println!("{:?}", get_table_schema(ds, "calendar").await);
+            ret
+        }
+        None => Err(DwataError::CouldNotConnectToDatabase),
+    }
 }

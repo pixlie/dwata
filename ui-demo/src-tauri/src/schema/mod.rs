@@ -1,15 +1,17 @@
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 pub mod commands;
 mod postgresql_metadata;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct TypeInteger {
     byte_size: Option<u8>, // Can represent SMALLINT, INT, BIGINT, etc.
-    auto_increment: bool,  // Can represent SMALLSERIAL, SERIAL, BIGSERIAL, etc.
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct TypeFloat {
     byte_size: Option<u8>,
 }
@@ -26,34 +28,40 @@ pub struct TypeArray {
     variable_length: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub enum ColumnDataType {
     SignedInteger(TypeInteger),
     // UnsignedInteger(TypeInteger),
     Float(TypeFloat),
-    CharArray(TypeArray),
+    // CharArray(TypeArray),
     Boolean,
-    BitArray(TypeArray),
-    ByteArray(TypeArray),
+    // BitArray(TypeArray),
+    // ByteArray(TypeArray),
     JSON,
     JSONB,
-    INet(TypeINet),
+    // INet(TypeINet),
     UUID,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ForeignKey {
     foreign_table: String,
     foreign_column: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub enum IsForeignKey {
     No,
     Yes(ForeignKey),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Column {
     name: String,
     label: Option<String>,
@@ -64,7 +72,9 @@ pub struct Column {
     is_foreign_key: IsForeignKey,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct TableSchema {
     name: String,
     columns: Vec<Column>,
@@ -72,8 +82,9 @@ pub struct TableSchema {
     foreign_keys: Vec<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Schema {
-    sources: Vec<String>,
     tables: Vec<TableSchema>,
 }

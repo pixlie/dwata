@@ -2,4 +2,5 @@
 pub enum DwataError {
     DatabaseNotFound,
     CouldNotConnectToDatabase,
+    CouldNotQueryDatabase,
 }
