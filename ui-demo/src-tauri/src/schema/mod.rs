@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 pub mod commands;
+pub mod metadata;
 mod postgresql_metadata;
 
 #[derive(Debug, Deserialize, Serialize, TS)]

@@ -3,8 +3,25 @@ import { Component, For, createMemo, onMount } from "solid-js";
 // import SidebarItem from "../navigation/SidebarItem";
 import SidebarHeading from "../navigation/SidebarHeading";
 import { useWorkspace } from "../../stores/workspace";
-import { SchemaProvider } from "../../stores/schema";
+import { SchemaProvider, useSchema } from "../../stores/schema";
 import SchemaLoader from "../SchemaLoader";
+import SidebarItem from "../navigation/SidebarItem";
+
+const TableList: Component = () => {
+  const [schema] = useSchema();
+
+  const tables = createMemo(() => {
+    if (!schema.isFetching && !!schema.isReady) {
+      return schema.tables;
+    }
+  });
+
+  return (
+    <>
+      <For each={tables()}>{(table) => <SidebarItem name={table.name} />}</For>
+    </>
+  );
+};
 
 const SourceList: Component = () => {
   const [workspace, { readConfigFromAPI }] = useWorkspace();
@@ -14,12 +31,7 @@ const SourceList: Component = () => {
   });
 
   const dataSources = createMemo(() => {
-    if (!workspace.isFetching && workspace.isReady) {
-      console.log(
-        workspace.isFetching,
-        workspace.isReady,
-        workspace.dataSourceList
-      );
+    if (!workspace.isFetching && !!workspace.isReady) {
       return workspace.dataSourceList;
     }
     return undefined;
@@ -37,6 +49,8 @@ const SourceList: Component = () => {
               <SidebarHeading label={label} icon="fa-solid fa-database" />
               <SchemaProvider>
                 <SchemaLoader dataSourceId={dataSource.id} />
+
+                <TableList />
               </SchemaProvider>
             </>
           );

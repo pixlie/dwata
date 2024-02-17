@@ -1,5 +1,5 @@
 use crate::error::DwataError;
-use crate::schema::postgresql_metadata::get_table_schema;
+use crate::schema::metadata::{get_table_schema, get_tables};
 use crate::schema::ColumnDataType::Boolean;
 use crate::schema::{Column, IsForeignKey, Schema, TableSchema};
 use crate::workspace::helpers::load_config;
@@ -26,26 +26,21 @@ pub async fn read_schema(
     let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
     let config = load_config(&config_dir);
 
-    let ret = Ok(Schema {
-        tables: vec![TableSchema {
-            name: "products".to_string(),
-            columns: vec![
-                get_column("id"),
-                get_column("name"),
-                get_column("price"),
-                get_column("description"),
-                get_column("category"),
-                get_column("image_url"),
-            ],
-            primary_key: None,
-            foreign_keys: vec![],
-        }],
-    });
-
+    let mut schema = Schema { tables: vec![] };
     match config.get_data_source(data_source_id) {
         Some(ds) => {
-            println!("{:?}", get_table_schema(ds, "calendar").await);
-            ret
+            let tables = get_tables(ds).await;
+            for table_name in tables {
+                let table_schema = TableSchema {
+                    name: table_name.clone(),
+                    columns: vec![],
+                    primary_key: None,
+                    foreign_keys: vec![],
+                };
+                schema.tables.push(table_schema);
+                let _table_schema = get_table_schema(ds, table_name.clone()).await;
+            }
+            Ok(schema)
         }
         None => Err(DwataError::CouldNotConnectToDatabase),
     }

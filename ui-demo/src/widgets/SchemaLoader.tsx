@@ -9,7 +9,9 @@ const SchemaLoader: Component<IPropTypes> = (props) => {
   const [_, { readSchemaFromAPI }] = useSchema();
 
   onMount(() => {
-    readSchemaFromAPI(props.dataSourceId);
+    if (!!props.dataSourceId) {
+      readSchemaFromAPI(props.dataSourceId);
+    }
   });
 
   return <></>;

@@ -22,7 +22,6 @@ const makeStore = () => {
       readConfigFromAPI: async () => {
         // We invoke the Tauri API to load workspace
         const response = await invoke("read_config");
-        console.log(response as Config);
         setStore({
           ...(response as Config),
           isReady: true,

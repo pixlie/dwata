@@ -2,7 +2,7 @@ import { Component, createMemo, createSignal, onMount } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
 import { IDatabaseFormData } from "../../utils/types";
-import { useParams } from "@solidjs/router";
+// import { useParams } from "@solidjs/router";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 
@@ -19,9 +19,8 @@ const DatabaseForm: Component = () => {
     isSaving: false,
   });
   const [form, setForm] = createSignal<IDatabaseFormData>();
-  const params = useParams();
+  // const params = useParams();
 
-  console.log(params);
   onMount(() => {
     setForm({
       username: "postgres",
@@ -41,14 +40,13 @@ const DatabaseForm: Component = () => {
   });
 
   const handleConnect = async () => {
-    const response = await invoke("create_data_source", {
+    const response = await invoke("read_schema", {
       username: form()?.username,
       password: form()?.password,
       host: form()?.host,
       port: `${form()?.port}`,
       database: form()?.name,
     });
-    console.log(response as string);
   };
 
   return (

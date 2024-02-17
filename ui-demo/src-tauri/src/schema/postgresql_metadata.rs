@@ -1,6 +1,7 @@
-use crate::data_sources::{DataSource, DataSourceConnection};
 use crate::error::DwataError;
 use crate::schema::TableSchema;
+use serde::{Deserialize, Serialize};
+use sqlx::postgres::{types::Oid, PgRow};
 use sqlx::Row;
 
 // pub fn estimated_row_count() -> usize {
@@ -11,7 +12,7 @@ use sqlx::Row;
 
 pub async fn get_postgres_table_schema(
     connection: &sqlx::PgPool,
-    table_name: &str,
+    table_name: String,
 ) -> Result<TableSchema, DwataError> {
     let table_schema: TableSchema = TableSchema {
         name: table_name.to_string(),
@@ -31,8 +32,8 @@ pub async fn get_postgres_table_schema(
         .await
     {
         Ok(results) => {
-            for row in results {
-                println!("{:?}", row.try_get(0));
+            for _row in results {
+                // println!("{:?}", row.try_column(0));
             }
             Ok(table_schema)
             // Err(DwataError::CouldNotQueryDatabase)
@@ -41,20 +42,28 @@ pub async fn get_postgres_table_schema(
     }
 }
 
-pub async fn get_table_schema(
-    data_source: &DataSource,
-    table_name: &str,
-) -> Result<TableSchema, DwataError> {
-    match data_source.get_connection().await {
-        Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
-            get_postgres_table_schema(&pg_pool, table_name).await
-        }
-        _ => Err(DwataError::CouldNotConnectToDatabase),
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct PostgreSQLObject {
+    oid: Oid,
+    schema: String,
+    name: String,
+    object_type: String,
+    owner: String,
+    comment: Option<String>,
+}
+
+impl PostgreSQLObject {
+    pub fn filter_table(&self) -> bool {
+        self.object_type == "table".to_string()
+    }
+
+    pub fn get_name(&self) -> String {
+        self.name.clone()
     }
 }
 
-pub async fn get_postgres_objects(connection: &sqlx::PgPool) {
-    /// Taken from https://github.com/sosedoff/pgweb/blob/master/pkg/statements/sql/objects.sql
+pub async fn get_postgres_objects(connection: &sqlx::PgPool) -> Vec<PostgreSQLObject> {
+    // Taken from https://github.com/sosedoff/pgweb/blob/master/pkg/statements/sql/objects.sql
     let sql = r#"
     WITH all_objects AS (
       SELECT
@@ -69,7 +78,7 @@ pub async fn get_postgres_objects(connection: &sqlx::PgPool) {
           WHEN 'S' THEN 'sequence'
           WHEN 's' THEN 'special'
           WHEN 'f' THEN 'foreign_table'
-        END AS type,
+        END AS object_type,
         pg_catalog.pg_get_userbyid(c.relowner) AS owner,
         pg_catalog.obj_description(c.oid) AS comment
       FROM
@@ -102,4 +111,16 @@ pub async fn get_postgres_objects(connection: &sqlx::PgPool) {
     SELECT * FROM all_objects
     ORDER BY 2, 3
     "#;
+    sqlx::query(sql)
+        .map(|row: PgRow| PostgreSQLObject {
+            oid: row.get("oid"),
+            schema: row.get("schema"),
+            name: row.get("name"),
+            object_type: row.get("object_type"),
+            owner: row.get("owner"),
+            comment: row.get("comment"),
+        })
+        .fetch_all(connection)
+        .await
+        .unwrap_or_else(|_| vec![])
 }

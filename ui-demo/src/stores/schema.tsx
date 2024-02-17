@@ -25,13 +25,17 @@ const makeStore = () => {
   return [
     store,
     {
-      readSchemaFromAPI: (data_source_id: string) => {
+      readSchemaFromAPI: async (dataSourceId: string) => {
         // We use the Tauri API to load schema
-        invoke("read_schema", { dataSourceId: data_source_id }).then(
-          (result) => {
-            setStore(result as IStore);
-          }
-        );
+        setStore("isFetching", true);
+        if (!!dataSourceId) {
+          const result = await invoke("read_schema", { dataSourceId });
+          setStore({
+            ...(result as IStore),
+            isFetching: false,
+            isReady: true,
+          });
+        }
       },
       // getColumnPath: (
       //   sourceName: TDataSourceName,
