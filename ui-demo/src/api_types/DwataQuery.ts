@@ -2,7 +2,7 @@
 import type { ColumnPath } from "./ColumnPath";
 import type { QueryOrder } from "./QueryOrder";
 
-export interface Query {
+export interface DwataQuery {
   select: Array<ColumnPath>;
   ordering: Record<number, QueryOrder> | null;
   filtering: Record<number, string> | null;

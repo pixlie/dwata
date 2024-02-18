@@ -1,18 +1,12 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import {
-  // TColumnName,
-  TColumnPath,
-  TDataSourceId,
-  TTableName,
-} from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
-// import { Column } from "../api_types/Column";
 import { Schema } from "../api_types/Schema";
 import { Column } from "../api_types/Column";
+import { ColumnPath } from "../api_types/ColumnPath";
 
 interface IStore {
-  schemaForAllSources: { [source: TDataSourceId]: Schema };
+  schemaForAllSources: { [dataSourceId: string]: Schema };
   isFetching: boolean;
   isReady: boolean;
 }
@@ -53,21 +47,22 @@ const makeStore = () => {
       //     : undefined;
       // },
       getColumnListForColumnPathList: (
-        columns: Array<TColumnPath>
+        columns: Array<ColumnPath>
       ): Array<Column | undefined> => {
         // TODO: Improve the function to return Array<IColumn> only
-        return columns.map((col) =>
-          col[2] in store.schemaForAllSources &&
-          col[1] in store.schemaForAllSources[col[2]].tables.keys()
-            ? store.schemaForAllSources[col[2]].tables
-                .find((tn) => tn.name === col[1])
-                ?.columns.find((cn) => cn.name === col[0])
+        return columns.map((columnPath) =>
+          columnPath.dataSourceId in store.schemaForAllSources &&
+          columnPath.tableName in
+            store.schemaForAllSources[columnPath.dataSourceId].tables.keys()
+            ? store.schemaForAllSources[columnPath.dataSourceId].tables
+                .find((tn) => tn.name === columnPath.tableName)
+                ?.columns.find((cn) => cn.name === columnPath.columnName)
             : undefined
         );
       },
       getAllColumnNameListForTableSource: (
-        tableName: TTableName,
-        dataSouceId: TDataSourceId
+        tableName: string,
+        dataSouceId: string
       ): Array<string> => {
         const table =
           dataSouceId in store.schemaForAllSources &&

@@ -6,10 +6,9 @@ import { useWorkspace } from "../../stores/workspace";
 import { useSchema } from "../../stores/schema";
 import SchemaLoader from "../SchemaLoader";
 import SidebarItem from "../navigation/SidebarItem";
-import { TDataSourceId } from "../../utils/types";
 
 interface IPropTypes {
-  dataSourceId: TDataSourceId;
+  dataSourceId: string;
 }
 
 const TableList: Component<IPropTypes> = (props) => {

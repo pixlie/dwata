@@ -1,38 +1,24 @@
+use super::{ColumnPath, DwataData, DwataQuery, QueryOrder};
 use crate::error::DwataError;
-use crate::query_result::{ColumnPath, Data, Query, QueryAndData};
-use crate::sample_data;
+use crate::workspace::helpers::load_config;
+use std::collections::HashMap;
+use std::path::PathBuf;
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
-pub fn load_data() -> Result<QueryAndData, DwataError> {
-    // Read the CSV file with sample data and respond as QueryResult
-    let mut csv = csv::ReaderBuilder::new().from_reader(sample_data::DATA_PRODUCTS.as_bytes());
-    let headers = csv.headers().unwrap().clone();
-    let rows = csv.records();
+pub async fn load_data(
+    app_handle: AppHandle,
+    select: Vec<ColumnPath>,
+    ordering: Option<HashMap<u8, QueryOrder>>,
+    filtering: Option<HashMap<u8, String>>,
+) -> Result<DwataData, DwataError> {
+    let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
+    let config = load_config(&config_dir);
 
-    let result: QueryAndData = QueryAndData {
-        query: Query::default(),
-        data: Data {
-            columns: headers
-                .iter()
-                .map(|x| ColumnPath {
-                    column_name: x.to_string(),
-                    table_name: "products".to_string(),
-                    data_source_id: "__default__".to_string(),
-                })
-                .collect(),
-            rows: rows
-                .map(|row| {
-                    row.unwrap()
-                        .iter()
-                        .map(|cell| cell.to_string())
-                        .collect::<Vec<String>>()
-                })
-                .collect(),
-        },
-        errors: vec![],
+    let query: DwataQuery = DwataQuery {
+        select,
+        ordering,
+        filtering,
     };
-
-    let sql = "SELECT ";
-
-    Ok(result)
+    Ok(query.get_data(config).await)
 }

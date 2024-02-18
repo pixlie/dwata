@@ -1,10 +1,12 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { QueryAndData } from "../api_types/QueryAndData";
-import { Query } from "../api_types/Query";
-import { Data } from "../api_types/Data";
+import { DwataQuery } from "../api_types/DwataQuery";
+import { DwataData } from "../api_types/DwataData";
 
-interface IStore extends QueryAndData {
+interface IStore {
+  query: DwataQuery;
+  data: DwataData;
+  errors: string[];
   isReady: boolean;
   isFetching: boolean;
 }
@@ -18,7 +20,7 @@ const makeStore = () => {
     },
     data: {
       columns: [],
-      rows: [],
+      columnWiseData: [],
     },
     errors: [],
     isReady: false,
@@ -28,7 +30,7 @@ const makeStore = () => {
   return [
     store,
     {
-      setQuery: (query: Query) => {
+      setQuery: (query: DwataQuery) => {
         for (const column in query.select) {
           if (column[0] === "*") {
             // We have to expande into all columns from schema
@@ -36,7 +38,7 @@ const makeStore = () => {
         }
         setStore("query", query);
       },
-      setQueryResult: (data: Data) => {
+      setQueryResult: (data: DwataData) => {
         setStore({
           ...store,
           isReady: true,

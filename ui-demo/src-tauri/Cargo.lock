@@ -4931,6 +4931,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
+ "sqlx-postgres",
  "tauri",
  "tauri-build",
  "tauri-plugin-shell",

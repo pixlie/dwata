@@ -1,3 +1,5 @@
+use crate::query_result::postgresql::PostgreSQLQueryBuilder;
+use crate::query_result::{DwataQuery, QueryBuilder};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
@@ -111,6 +113,19 @@ impl DataSourceType {
             _ => None,
         }
     }
+
+    pub fn get_query_builder(
+        &self,
+        query: &DwataQuery,
+        data_source_id: String,
+    ) -> Option<QueryBuilder> {
+        match self {
+            DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
+                PostgreSQLQueryBuilder::new(query, data_source_id),
+            )),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
@@ -168,6 +183,10 @@ impl DataSource {
             }
             None => None,
         }
+    }
+
+    pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
+        self.source.get_query_builder(query, self.id.clone())
     }
 }
 

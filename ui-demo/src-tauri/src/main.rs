@@ -7,7 +7,7 @@ mod data_sources;
 mod error;
 mod labels;
 mod query_result;
-mod sample_data;
+
 mod schema;
 mod workspace;
 
