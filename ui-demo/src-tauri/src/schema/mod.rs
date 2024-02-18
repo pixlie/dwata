@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 pub mod commands;
 pub mod metadata;
-mod postgresql_metadata;
+pub mod postgresql;
 
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
@@ -23,10 +23,11 @@ pub enum TypeINet {
     V6,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct TypeArray {
-    length: usize,
-    variable_length: bool,
+    length: Option<i32>,
+    // variable_length: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
@@ -35,7 +36,7 @@ pub enum ColumnDataType {
     SignedInteger(TypeInteger),
     // UnsignedInteger(TypeInteger),
     Float(TypeFloat),
-    // CharArray(TypeArray),
+    CharArray(TypeArray),
     Boolean,
     // BitArray(TypeArray),
     // ByteArray(TypeArray),
@@ -43,6 +44,8 @@ pub enum ColumnDataType {
     JSONB,
     // INet(TypeINet),
     UUID,
+    Text,
+    Unknown,
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
@@ -67,9 +70,10 @@ pub struct Column {
     name: String,
     label: Option<String>,
     data_type: ColumnDataType,
+    is_nullable: bool,
     is_auto_increment: bool,
     is_primary_key: bool,
-    is_index: bool,
+    is_indexed: bool,
     is_foreign_key: IsForeignKey,
 }
 

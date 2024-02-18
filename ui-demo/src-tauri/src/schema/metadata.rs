@@ -1,23 +1,23 @@
+use super::{postgresql, Column};
 use crate::data_sources::{DataSource, DataSourceConnection};
-use crate::error::DwataError;
-use crate::schema::{postgresql_metadata, TableSchema};
 
-pub async fn get_table_schema(
-    data_source: &DataSource,
-    table_name: String,
-) -> Result<TableSchema, DwataError> {
+pub async fn get_table_columns(data_source: &DataSource, table_name: String) -> Vec<Column> {
     match data_source.get_connection().await {
         Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
-            postgresql_metadata::get_postgres_table_schema(&pg_pool, table_name).await
+            let columns = postgresql::metadata::get_postgres_columns(&pg_pool, table_name).await;
+            columns
+                .iter()
+                .map(|column| column.get_generic_column())
+                .collect()
         }
-        _ => Err(DwataError::CouldNotConnectToDatabase),
+        _ => vec![],
     }
 }
 
-pub async fn get_tables(data_source: &DataSource) -> Vec<String> {
+pub async fn get_table_names(data_source: &DataSource) -> Vec<String> {
     match data_source.get_connection().await {
         Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
-            let db_objects = postgresql_metadata::get_postgres_objects(&pg_pool).await;
+            let db_objects = postgresql::metadata::get_postgres_objects(&pg_pool).await;
             db_objects
                 .iter()
                 .filter(|item| item.filter_table())

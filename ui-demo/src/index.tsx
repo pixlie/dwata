@@ -11,7 +11,7 @@ import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 render(
   () => (
     <Router root={App}>
-      <Route path={"/browse/:tables?"} component={Browse} />
+      <Route path={"/browse/:sourceTables"} component={Browse} />
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>

@@ -6,8 +6,9 @@ export interface Column {
   name: string;
   label: string | null;
   dataType: ColumnDataType;
+  isNullable: boolean;
   isAutoIncrement: boolean;
   isPrimaryKey: boolean;
-  isIndex: boolean;
+  isIndexed: boolean;
   isForeignKey: IsForeignKey;
 }

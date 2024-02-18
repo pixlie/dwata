@@ -1,12 +1,12 @@
 import { Component } from "solid-js";
-import { IColumn } from "../../utils/types";
+import { Column } from "../../api_types/Column";
 
 interface ICellPropTypes {
   data: any;
 }
 
 const createGridRow = (
-  columns: Array<IColumn | undefined>
+  columns: Array<Column | undefined>
 ): Array<Component<ICellPropTypes>> => {
   const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-700";

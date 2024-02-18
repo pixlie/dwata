@@ -1,9 +1,26 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { IQuery, IQueryResult, IResult } from "../utils/types";
+import { QueryAndData } from "../api_types/QueryAndData";
+import { Query } from "../api_types/Query";
+import { Data } from "../api_types/Data";
+
+interface IStore extends QueryAndData {
+  isReady: boolean;
+  isFetching: boolean;
+}
 
 const makeStore = () => {
-  const [store, setStore] = createStore<IQueryResult>({
+  const [store, setStore] = createStore<IStore>({
+    query: {
+      select: [],
+      ordering: null,
+      filtering: null,
+    },
+    data: {
+      columns: [],
+      rows: [],
+    },
+    errors: [],
     isReady: false,
     isFetching: false,
   });
@@ -11,7 +28,7 @@ const makeStore = () => {
   return [
     store,
     {
-      setQuery: (query: IQuery) => {
+      setQuery: (query: Query) => {
         for (const column in query.select) {
           if (column[0] === "*") {
             // We have to expande into all columns from schema
@@ -19,12 +36,12 @@ const makeStore = () => {
         }
         setStore("query", query);
       },
-      setQueryResult: (result: IResult) => {
+      setQueryResult: (data: Data) => {
         setStore({
           ...store,
           isReady: true,
           isFetching: true,
-          result,
+          data,
         });
       },
     },

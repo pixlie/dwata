@@ -16,7 +16,7 @@ pub async fn check_database_connection(
         Some(x) => format!(":{}", x),
         None => "".to_string(),
     };
-    let conn_url = format!("postgres://{username}{opt_password}@{host}{opt_port}/{database}");
+    let conn_url = format!("postgresql://{username}{opt_password}@{host}{opt_port}/{database}");
 
     let conn = PgPoolOptions::new()
         .max_connections(5)

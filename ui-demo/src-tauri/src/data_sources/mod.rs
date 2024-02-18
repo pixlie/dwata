@@ -89,7 +89,7 @@ impl Database {
         };
         let database = &self.name;
         Some(format!(
-            "postgres://{username}{opt_password}@{host}{opt_port}/{database}"
+            "postgresql://{username}{opt_password}@{host}{opt_port}/{database}"
         ))
     }
 }

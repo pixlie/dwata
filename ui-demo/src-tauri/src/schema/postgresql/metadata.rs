@@ -1,7 +1,5 @@
-use crate::error::DwataError;
-use crate::schema::TableSchema;
-use serde::{Deserialize, Serialize};
-use sqlx::postgres::{types::Oid, PgRow};
+use super::{PostgreSQLColumn, PostgreSQLObject};
+use sqlx::postgres::PgRow;
 use sqlx::Row;
 
 // pub fn estimated_row_count() -> usize {
@@ -10,56 +8,30 @@ use sqlx::Row;
 //     "#;
 // }
 
-pub async fn get_postgres_table_schema(
+pub async fn get_postgres_columns(
     connection: &sqlx::PgPool,
     table_name: String,
-) -> Result<TableSchema, DwataError> {
-    let table_schema: TableSchema = TableSchema {
-        name: table_name.to_string(),
-        columns: vec![],
-        primary_key: None,
-        foreign_keys: vec![],
-    };
+) -> Vec<PostgreSQLColumn> {
     let sql = r#"
     SELECT column_name, data_type, is_nullable, character_maximum_length, character_set_catalog, column_default,
     pg_catalog.col_description(('"' || $1::text || '"."' || $2::text || '"')::regclass::oid, ordinal_position) as comment
     FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2
     "#;
-    match sqlx::query(sql)
+    sqlx::query(sql)
         .bind("public")
         .bind(table_name)
+        .map(|row: PgRow| PostgreSQLColumn {
+            column_name: row.get("column_name"),
+            data_type: row.get("data_type"),
+            is_nullable: row.get("is_nullable"),
+            character_maximum_length: row.get("character_maximum_length"),
+            character_set_catalog: row.get("character_set_catalog"),
+            column_default: row.get("column_default"),
+            comment: row.get("comment"),
+        })
         .fetch_all(connection)
         .await
-    {
-        Ok(results) => {
-            for _row in results {
-                // println!("{:?}", row.try_column(0));
-            }
-            Ok(table_schema)
-            // Err(DwataError::CouldNotQueryDatabase)
-        }
-        Err(_) => Err(DwataError::CouldNotQueryDatabase),
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
-pub struct PostgreSQLObject {
-    oid: Oid,
-    schema: String,
-    name: String,
-    object_type: String,
-    owner: String,
-    comment: Option<String>,
-}
-
-impl PostgreSQLObject {
-    pub fn filter_table(&self) -> bool {
-        self.object_type == "table".to_string()
-    }
-
-    pub fn get_name(&self) -> String {
-        self.name.clone()
-    }
+        .unwrap_or_else(|_| vec![])
 }
 
 pub async fn get_postgres_objects(connection: &sqlx::PgPool) -> Vec<PostgreSQLObject> {
