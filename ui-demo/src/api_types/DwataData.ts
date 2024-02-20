@@ -3,5 +3,5 @@ import type { ColumnPath } from "./ColumnPath";
 
 export interface DwataData {
   columns: Array<ColumnPath>;
-  columnWiseData: Array<Array<string>>;
+  rowsOfColumns: Array<Array<string>>;
 }

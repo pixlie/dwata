@@ -42,6 +42,7 @@ const Loader: Component = () => {
           filtering: { ...queryResult.query.filtering },
         });
         setQueryResult(response as DwataData);
+        console.log(response);
       }
     }
   });

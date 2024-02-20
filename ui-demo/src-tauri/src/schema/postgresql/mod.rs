@@ -60,4 +60,12 @@ impl PostgreSQLColumn {
             is_foreign_key: IsForeignKey::No,
         }
     }
+
+    pub fn is_column_named(&self, name: String) -> bool {
+        self.column_name == name
+    }
+
+    pub fn get_data_type(&self) -> String {
+        self.data_type.clone()
+    }
 }

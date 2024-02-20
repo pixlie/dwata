@@ -14,7 +14,7 @@ pub fn load_config_file(config_dir: &PathBuf) -> PathBuf {
 
 pub fn load_config(config_dir: &PathBuf) -> Config {
     let config_file_path = load_config_file(config_dir);
-    let mut config: Config = match fs::read_to_string(&config_file_path) {
+    let config: Config = match fs::read_to_string(&config_file_path) {
         Ok(content) => ron::from_str(content.as_str()).unwrap(),
         Err(_) => Config {
             data_source_list: vec![],

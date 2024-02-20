@@ -12,6 +12,7 @@ pub async fn get_postgres_columns(
     connection: &sqlx::PgPool,
     table_name: String,
 ) -> Vec<PostgreSQLColumn> {
+    // Taken from https://github.com/sosedoff/pgweb/blob/master/pkg/statements/sql/table_schema.sql
     let sql = r#"
     SELECT column_name, data_type, is_nullable, character_maximum_length, character_set_catalog, column_default,
     pg_catalog.col_description(('"' || $1::text || '"."' || $2::text || '"')::regclass::oid, ordinal_position) as comment

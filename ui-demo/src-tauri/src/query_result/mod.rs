@@ -18,6 +18,12 @@ pub struct ColumnPath {
     dsi: String,
 }
 
+impl PartialEq for ColumnPath {
+    fn eq(&self, other: &Self) -> bool {
+        self.tn == other.tn && self.cn == other.cn
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
@@ -37,10 +43,8 @@ pub struct DwataQuery {
 
 impl DwataQuery {
     pub async fn get_data(&self, config: Config) -> DwataData {
-        let data: DwataData = DwataData {
-            columns: self.select.clone(),
-            column_wise_data: vec![],
-        };
+        // let mut data_by_sources: Vec<DataBySource> = vec![];
+        let mut data_by_row: Vec<Vec<String>> = vec![];
         for column_path in &self.select {
             let data_source = config.get_data_source(column_path.dsi.as_str());
             match data_source {
@@ -48,7 +52,9 @@ impl DwataQuery {
                     QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
                         Some(conn_type) => match conn_type {
                             DataSourceConnection::PostgreSQL(conn) => {
-                                let _column_wise_data = builder.get_data(&conn).await;
+                                builder
+                                    .get_data(&conn, &mut data_by_row, &self.select)
+                                    .await;
                             }
                         },
                         None => {}
@@ -57,7 +63,10 @@ impl DwataQuery {
                 _ => {}
             }
         }
-        data
+        DwataData {
+            columns: self.select.clone(),
+            rows_of_columns: data_by_row,
+        }
     }
 }
 
@@ -66,13 +75,13 @@ impl DwataQuery {
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DwataData {
     columns: Vec<ColumnPath>,
-    column_wise_data: Vec<Vec<String>>,
+    rows_of_columns: Vec<Vec<String>>,
 }
 
-pub struct ColumnWiseData {
+pub struct DataBySource {
     data_source_id: String,
     columns: Vec<ColumnPath>,
-    data: HashMap<String, Vec<String>>,
+    data: Vec<Vec<String>>,
 }
 
 pub enum QueryBuilder {
