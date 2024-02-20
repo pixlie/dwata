@@ -52,10 +52,11 @@ const makeStore = () => {
         // TODO: Improve the function to return Array<IColumn> only
         return columns.map((columnPath) =>
           columnPath.dsi in store.schemaForAllSources &&
-          columnPath.tn in
-            store.schemaForAllSources[columnPath.dsi].tables.keys()
+          store.schemaForAllSources[columnPath.dsi].tables.findIndex(
+            (x) => x.name === columnPath.tn
+          ) !== -1
             ? store.schemaForAllSources[columnPath.dsi].tables
-                .find((tn) => tn.name === columnPath.tn)
+                .find((x) => x.name === columnPath.tn)
                 ?.columns.find((cn) => cn.name === columnPath.cn)
             : undefined
         );

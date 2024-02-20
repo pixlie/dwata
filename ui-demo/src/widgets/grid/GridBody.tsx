@@ -12,7 +12,7 @@ const GridBody: Component = () => {
   );
 
   const rowList = createMemo(() =>
-    queryResult.isReady ? queryResult.result?.data.rows : []
+    queryResult.isReady ? queryResult.data.rowsOfColumns : []
   );
 
   return (

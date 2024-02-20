@@ -87,11 +87,13 @@ impl PostgreSQLQueryBuilder {
                                     pg_row
                                         .try_get::<Option<i32>, &str>(column_name.as_str())
                                         .unwrap()
+                                        .unwrap()
                                 ),
                                 "character varying" => format!(
                                     "{:?}",
                                     pg_row
                                         .try_get::<Option<&str>, &str>(column_name.as_str())
+                                        .unwrap()
                                         .unwrap()
                                 ),
                                 "boolean" => format!(
@@ -99,11 +101,13 @@ impl PostgreSQLQueryBuilder {
                                     pg_row
                                         .try_get::<Option<bool>, &str>(column_name.as_str())
                                         .unwrap()
+                                        .unwrap()
                                 ),
                                 "text" => format!(
                                     "{:?}",
                                     pg_row
                                         .try_get::<Option<&str>, &str>(column_name.as_str())
+                                        .unwrap()
                                         .unwrap()
                                 ),
                                 _ => "".to_string(),

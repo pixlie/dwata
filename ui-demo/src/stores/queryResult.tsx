@@ -6,6 +6,7 @@ import { DwataData } from "../api_types/DwataData";
 interface IStore {
   query: DwataQuery;
   data: DwataData;
+  areRowsSelectable: boolean;
   errors: string[];
   isReady: boolean;
   isFetching: boolean;
@@ -20,8 +21,9 @@ const makeStore = () => {
     },
     data: {
       columns: [],
-      columnWiseData: [],
+      rowsOfColumns: [],
     },
+    areRowsSelectable: false,
     errors: [],
     isReady: false,
     isFetching: false,
