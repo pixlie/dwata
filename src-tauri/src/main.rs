@@ -8,6 +8,8 @@ mod error;
 mod labels;
 mod query_result;
 
+mod chat;
+mod llm_manager;
 mod schema;
 mod workspace;
 
