@@ -1,5 +1,6 @@
+use super::metadata::{get_table_columns, get_table_names};
+use super::helpers::get_schema_summary;
 use crate::error::DwataError;
-use crate::schema::metadata::{get_table_columns, get_table_names};
 use crate::schema::{Schema, TableSchema};
 use crate::workspace::helpers::load_config;
 use std::path::PathBuf;
@@ -26,8 +27,12 @@ pub async fn read_schema(
                 };
                 schema.tables.push(table_schema);
             }
+            println!("{}", get_schema_summary(ds).await);
             Ok(schema)
         }
         None => Err(DwataError::CouldNotConnectToDatabase),
     }
 }
+
+
+pub async fn read_schema_summary() {}

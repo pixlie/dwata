@@ -9,11 +9,12 @@ mod labels;
 mod query_result;
 
 mod chat;
-mod llm_manager;
+mod saved_query;
 mod schema;
 mod workspace;
 
 fn main() {
+    chat::helpers::parse_sql();
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
