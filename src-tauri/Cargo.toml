@@ -26,7 +26,8 @@ sha2 = "0.10.8"
 ts-rs = "7.1.1"
 sqlx-postgres = "0.7.3"
 async-openai = "0.18.3"
-chrono = "0.4.34"
+chrono = { version = "0.4.34", features = ["serde"] }
+sqlparser = "0.43.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
