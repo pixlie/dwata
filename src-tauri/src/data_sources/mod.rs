@@ -62,15 +62,10 @@ impl DatabaseAuthentication {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Database {
     name: String,
-    #[serde(skip_serializing)]
-    #[ts(skip)]
     connection: DatabaseConnection,
-    #[serde(skip_serializing)]
-    #[ts(skip)]
     authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
 }
 
@@ -96,8 +91,7 @@ impl Database {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum DataSourceType {
     PostgreSQL(Database),
     MySQL(Database),
@@ -126,14 +120,40 @@ impl DataSourceType {
             _ => None,
         }
     }
+
+    pub fn get_api_type(&self) -> &str {
+        match self {
+            DataSourceType::PostgreSQL(_) => "PostgreSQL",
+            DataSourceType::MySQL(_) => "MySQL",
+            DataSourceType::SQLite(_) => "SQLite",
+            _ => "",
+        }
+    }
+
+    pub fn get_api_name(&self) -> String {
+        match self {
+            DataSourceType::PostgreSQL(x) => x.name.clone(),
+            DataSourceType::MySQL(x) => x.name.clone(),
+            DataSourceType::SQLite(x) => x.name.clone(),
+            _ => "".to_string(),
+        }
+    }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DataSource {
     id: String,
     label: Option<String>,
     source: DataSourceType,
+}
+
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct APIDataSource {
+    id: String,
+    label: Option<String>,
+    source_type: String,
+    source_name: String,
 }
 
 pub enum DataSourceConnection {
@@ -187,6 +207,15 @@ impl DataSource {
 
     pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
         self.source.get_query_builder(query, self.id.clone())
+    }
+
+    pub fn get_api_data_source(&self) -> APIDataSource {
+        APIDataSource {
+            id: self.id.clone(),
+            label: self.label.clone(),
+            source_type: self.source.get_api_type().to_string(),
+            source_name: self.source.get_api_name(),
+        }
     }
 }
 

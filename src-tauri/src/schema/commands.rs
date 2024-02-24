@@ -1,5 +1,5 @@
-use super::metadata::{get_table_columns, get_table_names};
 use super::helpers::get_schema_summary;
+use super::metadata::{get_table_columns, get_table_names};
 use crate::error::DwataError;
 use crate::schema::{Schema, TableSchema};
 use crate::workspace::helpers::load_config;
@@ -34,5 +34,4 @@ pub async fn read_schema(
     }
 }
 
-
-pub async fn read_schema_summary() {}
+// pub async fn read_schema_summary(app_handle: AppHandle, data_source_id: &str) {}

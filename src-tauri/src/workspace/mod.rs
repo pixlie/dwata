@@ -3,7 +3,7 @@ use ts_rs::TS;
 pub mod commands;
 pub mod helpers;
 
-use crate::data_sources::DataSource;
+use crate::data_sources::{APIDataSource, DataSource};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -13,12 +13,19 @@ use std::path::PathBuf;
 //     server_uri: Url,
 // }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
     // organisations: Vec<Organisation>,
     data_source_list: Vec<DataSource>,
+    // api_list: Vec<>, // Stripe, Shopify, etc.
+    folder_list: Vec<PathBuf>, // CSV or Markdown files
+}
+
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct APIConfig {
+    data_source_list: Vec<APIDataSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
     #[ts(skip)]
     folder_list: Vec<PathBuf>, // CSV or Markdown files

@@ -2,9 +2,9 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 pub mod commands;
+pub mod helpers;
 pub mod metadata;
 pub mod postgresql;
-pub mod helpers;
 
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]

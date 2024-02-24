@@ -1,8 +1,8 @@
 use crate::data_sources::helpers::check_database_connection;
-use crate::data_sources::{DataSource, Database};
+use crate::data_sources::{APIDataSource, DataSource, Database};
 use crate::error::DwataError;
 use crate::workspace::helpers::{load_config, load_config_file};
-use crate::workspace::Config;
+use crate::workspace::{APIConfig, Config};
 use std::fs;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
@@ -38,7 +38,15 @@ pub async fn create_data_source(
 }
 
 #[tauri::command]
-pub fn read_config(app_handle: AppHandle) -> Result<Config, DwataError> {
+pub fn read_config(app_handle: AppHandle) -> Result<APIConfig, DwataError> {
     let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
-    Ok(load_config(&config_dir))
+    let config = load_config(&config_dir);
+    Ok(APIConfig {
+        data_source_list: config
+            .data_source_list
+            .iter()
+            .map(|x| x.get_api_data_source())
+            .collect::<Vec<APIDataSource>>(),
+        folder_list: config.folder_list,
+    })
 }
