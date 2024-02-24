@@ -5,13 +5,13 @@ import { Router, Route } from "@solidjs/router";
 import "./index.css";
 import App from "./App";
 import Home from "./routes/Home";
-import Browse from "./routes/Browse";
+import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 
 render(
   () => (
     <Router root={App}>
-      <Route path={"/browse/:sourceTables"} component={Browse} />
+      <Route path={"/browse"} component={QueryBrowser} />
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>

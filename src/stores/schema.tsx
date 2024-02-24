@@ -7,6 +7,8 @@ import { ColumnPath } from "../api_types/ColumnPath";
 
 interface IStore {
   schemaForAllSources: { [dataSourceId: string]: Schema };
+
+  lastFetchedAt?: Date;
   isFetching: boolean;
   isReady: boolean;
 }
@@ -23,12 +25,17 @@ const makeStore = () => {
     {
       readSchemaFromAPI: async (dataSourceId: string) => {
         // We use the Tauri API to load schema
-        if (!!dataSourceId) {
+        const WAIT_SECONDS = 10000;
+        const timePassed = !!store.lastFetchedAt
+          ? new Date() - store.lastFetchedAt
+          : WAIT_SECONDS;
+        if (!!dataSourceId && timePassed >= WAIT_SECONDS) {
           setStore("isFetching", true);
           const result = await invoke("read_schema", { dataSourceId });
           setStore("schemaForAllSources", dataSourceId, result as Schema);
           setStore((state) => ({
             ...state,
+            lastFetchedAt: new Date(),
             isFetching: false,
             isReady: true,
           }));

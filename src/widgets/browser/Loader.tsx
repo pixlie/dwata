@@ -1,17 +1,21 @@
 import { Component, createComputed } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { useQueryResult } from "../../stores/queryResult";
-import { useParams } from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import { useSchema } from "../../stores/schema";
 import { DwataData } from "../../api_types/DwataData";
 
 const Loader: Component = () => {
   const [queryResult, { setQuery, setQueryResult }] = useQueryResult();
   const [_, { getAllColumnNameListForTableSource }] = useSchema();
-  const params = useParams();
+  const [searchParams] = useSearchParams();
 
   createComputed(async () => {
-    const sourceTables = params.sourceTables;
+    const sourceTables = searchParams.query;
+    if (!sourceTables) {
+      return;
+    }
+
     const selectString = "select[";
     if (sourceTables.startsWith(selectString) && sourceTables.endsWith("]")) {
       // The URL parameter is a list of tables
