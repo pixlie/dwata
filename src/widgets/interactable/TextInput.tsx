@@ -6,7 +6,7 @@ interface IPropTypes {
   placeholder?: string;
   value?: string | number;
   isRequired?: boolean;
-  onChange?: (newValue: string | number) => void;
+  onInput?: (newValue: string | number) => void;
 }
 
 const TextInput: Component<IPropTypes> = (props) => {
@@ -24,7 +24,7 @@ const TextInput: Component<IPropTypes> = (props) => {
           class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 outline-none placeholder:text-gray-400 hover:bg-yellow-100 focus:bg-yellow-100"
           placeholder={props.placeholder}
           value={props.value || ""}
-          onChange={(e) => props.onChange?.(e.currentTarget.value)}
+          onInput={(e) => props.onInput?.(e.currentTarget.value)}
         />
       </div>
     </>

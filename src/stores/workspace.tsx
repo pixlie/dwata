@@ -2,9 +2,9 @@ import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { IProviderPropTypes } from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
-import { Config } from "../api_types/Config";
+import { APIConfig } from "../api_types/APIConfig";
 
-interface IStore extends Config {
+interface IStore extends APIConfig {
   isReady: boolean;
   isFetching: boolean;
 }
@@ -23,7 +23,7 @@ const makeStore = () => {
         // We invoke the Tauri API to load workspace
         const response = await invoke("read_config");
         setStore({
-          ...(response as Config),
+          ...(response as APIConfig),
           isReady: true,
           isFetching: false,
         });

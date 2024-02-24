@@ -22,8 +22,7 @@ const SourceList: Component = () => {
     <>
       <For each={dataSources()}>
         {(dataSource) => {
-          const name = Object.values(dataSource.source)[0].name;
-          const label = dataSource.label || name;
+          const label = dataSource.label || dataSource.sourceName;
 
           return (
             <>
