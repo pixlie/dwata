@@ -1,6 +1,8 @@
 use crate::data_sources::api_types::APIDataSource;
-// use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-// use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::query_result::postgresql::PostgreSQLQueryBuilder;
+use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::schema::postgresql::PostgreSQLObject;
+use crate::schema::{postgresql, DwataTable};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
@@ -110,18 +112,18 @@ impl DataSourceType {
         }
     }
 
-    // pub fn get_query_builder(
-    //     &self,
-    //     query: &DwataQuery,
-    //     data_source_id: String,
-    // ) -> Option<QueryBuilder> {
-    //     match self {
-    //         DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
-    //             PostgreSQLQueryBuilder::new(query, data_source_id),
-    //         )),
-    //         _ => None,
-    //     }
-    // }
+    pub fn get_query_builder(
+        &self,
+        query: &DwataQuery,
+        data_source_id: String,
+    ) -> Option<QueryBuilder> {
+        match self {
+            DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
+                PostgreSQLQueryBuilder::new(query, data_source_id),
+            )),
+            _ => None,
+        }
+    }
 
     pub fn get_api_type(&self) -> &str {
         match self {
@@ -198,9 +200,9 @@ impl DataSource {
         }
     }
 
-    // pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
-    //     self.source.get_query_builder(query, self.id.clone())
-    // }
+    pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
+        self.source.get_query_builder(query, self.id.clone())
+    }
 
     pub fn get_api_data_source(&self) -> APIDataSource {
         APIDataSource::new(
@@ -209,6 +211,26 @@ impl DataSource {
             self.source.get_api_type().to_string(),
             self.source.get_api_name(),
         )
+    }
+
+    pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<DwataTable> {
+        match self.get_connection().await {
+            Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
+                let db_objects = postgresql::metadata::get_postgres_objects(&pg_pool).await;
+                let tables = db_objects
+                    .iter()
+                    .filter(|item| item.filter_is_table())
+                    .collect::<Vec<&PostgreSQLObject>>();
+                let mut dwata_tables: Vec<DwataTable> = vec![];
+                for table in tables {
+                    dwata_tables.push(table.get_table(self, with_columns).await);
+                }
+                dwata_tables
+            }
+            _ => {
+                vec![]
+            }
+        }
     }
 }
 

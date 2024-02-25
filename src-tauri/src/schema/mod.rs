@@ -89,6 +89,16 @@ pub struct DwataTable {
     foreign_keys: Vec<String>,
 }
 
+impl DwataTable {
+    pub fn get_name(&self) -> String {
+        self.name.clone()
+    }
+
+    pub fn get_schema_name(&self) -> String {
+        self.schema_name.clone()
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]

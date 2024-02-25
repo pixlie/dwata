@@ -11,7 +11,7 @@ pub enum APIQueryOrder {
     Desc,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APISelectColumnsPath {
@@ -24,7 +24,7 @@ pub struct APISelectColumnsPath {
     filtering: Option<HashMap<u8, String>>,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APIDwataQuery {

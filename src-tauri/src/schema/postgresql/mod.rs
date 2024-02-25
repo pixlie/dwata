@@ -1,4 +1,8 @@
-use crate::schema::{ColumnDataType, DwataColumn, IsForeignKey, TypeArray, TypeInteger};
+use crate::data_sources::DataSource;
+use crate::schema::metadata::get_table_columns;
+use crate::schema::{
+    ColumnDataType, DwataColumn, DwataTable, IsForeignKey, TypeArray, TypeInteger,
+};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::Oid;
 
@@ -15,12 +19,30 @@ pub struct PostgreSQLObject {
 }
 
 impl PostgreSQLObject {
-    pub fn filter_table(&self) -> bool {
+    pub fn filter_is_table(&self) -> bool {
         self.object_type == "table".to_string()
     }
 
     pub fn get_name(&self) -> String {
         self.name.clone()
+    }
+
+    pub async fn get_table(
+        &self,
+        data_source: &DataSource,
+        with_columns: Option<bool>,
+    ) -> DwataTable {
+        let mut table = DwataTable {
+            name: self.name.clone(),
+            schema_name: self.schema.clone(),
+            columns: vec![],
+            primary_key: None,
+            foreign_keys: vec![],
+        };
+        if Some(true) == with_columns {
+            table.columns = get_table_columns(data_source, &table).await
+        }
+        table
     }
 }
 

@@ -19,14 +19,9 @@ pub struct Config {
 
 impl Config {
     pub fn get_data_source(&self, data_source_id: &str) -> Option<&DataSource> {
-        match self
-            .data_source_list
+        self.data_source_list
             .iter()
             .find(|x| x.get_id() == data_source_id)
-        {
-            Some(x) => Some(x),
-            None => None,
-        }
     }
 
     pub fn get_pretty_string(&self) -> String {

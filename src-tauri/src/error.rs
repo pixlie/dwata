@@ -3,4 +3,6 @@ pub enum DwataError {
     DatabaseNotFound,
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
+    CouldNotLockConfig,
+    CouldNotWriteConfig,
 }

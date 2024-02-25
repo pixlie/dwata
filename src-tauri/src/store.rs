@@ -1,8 +1,9 @@
 use crate::workspace::Config;
-use serde::{Deserialize, Serialize};
-use std::sync::Mutex;
+// use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
-#[derive(Deserialize, Serialize)]
+// #[derive(Deserialize, Serialize)]
 pub struct Store {
-    pub config: Mutex<Config>,
+    pub config: Arc<Mutex<Config>>,
 }
