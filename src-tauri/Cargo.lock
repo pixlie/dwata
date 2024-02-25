@@ -954,6 +954,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56ce8c6da7551ec6c462cbaf3bfbc75131ebbfa1c944aeaa9dab51ca1c5f0c3b"
 
 [[package]]
+name = "dwata"
+version = "0.0.1"
+dependencies = [
+ "async-openai",
+ "chrono",
+ "csv",
+ "include_dir",
+ "reqwest",
+ "ron",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sqlparser",
+ "sqlx",
+ "sqlx-postgres",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-shell",
+ "ts-rs",
+ "url",
+]
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4815,29 +4838,6 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
-
-[[package]]
-name = "ui-demo"
-version = "0.0.0"
-dependencies = [
- "async-openai",
- "chrono",
- "csv",
- "include_dir",
- "reqwest",
- "ron",
- "serde",
- "serde_json",
- "sha2",
- "sqlparser",
- "sqlx",
- "sqlx-postgres",
- "tauri",
- "tauri-build",
- "tauri-plugin-shell",
- "ts-rs",
- "url",
-]
 
 [[package]]
 name = "unicase"

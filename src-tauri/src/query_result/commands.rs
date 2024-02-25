@@ -1,4 +1,4 @@
-use super::{ColumnPath, DwataData, DwataQuery, QueryOrder};
+use super::{DwataData, DwataQuery, QueryOrder, SelectColumnsPath};
 use crate::error::DwataError;
 use crate::workspace::helpers::load_config;
 use std::collections::HashMap;
@@ -8,7 +8,7 @@ use tauri::{AppHandle, Manager};
 #[tauri::command]
 pub async fn load_data(
     app_handle: AppHandle,
-    select: Vec<ColumnPath>,
+    select: Vec<SelectColumnsPath>,
     ordering: Option<HashMap<u8, QueryOrder>>,
     filtering: Option<HashMap<u8, String>>,
 ) -> Result<DwataData, DwataError> {

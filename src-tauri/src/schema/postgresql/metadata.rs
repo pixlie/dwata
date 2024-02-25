@@ -1,4 +1,5 @@
 use super::{PostgreSQLColumn, PostgreSQLObject};
+use crate::schema::DwataTable;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,6 +11,7 @@ use sqlx::Row;
 
 pub async fn get_postgres_columns(
     connection: &sqlx::PgPool,
+    schema_name: String,
     table_name: String,
 ) -> Vec<PostgreSQLColumn> {
     // Taken from https://github.com/sosedoff/pgweb/blob/master/pkg/statements/sql/table_schema.sql
@@ -19,7 +21,7 @@ pub async fn get_postgres_columns(
     FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2
     "#;
     sqlx::query(sql)
-        .bind("public")
+        .bind(schema_name)
         .bind(table_name)
         .map(|row: PgRow| PostgreSQLColumn {
             column_name: row.get("column_name"),

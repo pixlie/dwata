@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+mod api_types;
 pub mod commands;
 pub mod postgresql;
 
@@ -9,36 +10,34 @@ use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::workspace::Config;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct ColumnPath {
-    cn: String,
-    tn: String,
-    dsi: String,
+#[derive(Debug, Clone)]
+pub struct SelectColumnsPath {
+    source: String,
+    schema: Option<String>,
+    table: Option<String>,
+    // Columns only from one logical table, not merging should be needed
+    columns: Vec<String>,
+    ordering: Option<HashMap<u8, QueryOrder>>,
+    filtering: Option<HashMap<u8, String>>,
 }
 
-impl PartialEq for ColumnPath {
+impl PartialEq for SelectColumnsPath {
     fn eq(&self, other: &Self) -> bool {
-        self.tn == other.tn && self.cn == other.cn
+        self.table == other.table && self.columns == other.columns
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum QueryOrder {
     Asc,
     Desc,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct DwataQuery {
-    select: Vec<ColumnPath>,
-    ordering: Option<HashMap<u8, QueryOrder>>,
-    filtering: Option<HashMap<u8, String>>,
+    // Each SelectColumnsPath represents the columns that are fetched within any tabular source
+    // without needing any merging
+    select: Vec<SelectColumnsPath>,
 }
 
 impl DwataQuery {
@@ -46,7 +45,7 @@ impl DwataQuery {
         // let mut data_by_sources: Vec<DataBySource> = vec![];
         let mut data_by_row: Vec<Vec<String>> = vec![];
         for column_path in &self.select {
-            let data_source = config.get_data_source(column_path.dsi.as_str());
+            let data_source = config.get_data_source(column_path.source.as_str());
             match data_source {
                 Some(ds) => match ds.get_query_builder(self).unwrap() {
                     QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
@@ -70,17 +69,15 @@ impl DwataQuery {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct DwataData {
-    columns: Vec<ColumnPath>,
+    columns: Vec<SelectColumnsPath>,
     rows_of_columns: Vec<Vec<String>>,
 }
 
 pub struct DataBySource {
     data_source_id: String,
-    columns: Vec<ColumnPath>,
+    columns: Vec<SelectColumnsPath>,
     data: Vec<Vec<String>>,
 }
 

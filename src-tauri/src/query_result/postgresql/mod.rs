@@ -1,4 +1,4 @@
-use crate::query_result::{ColumnPath, DwataQuery};
+use crate::query_result::{DwataQuery, SelectColumnsPath};
 use crate::schema::postgresql::metadata::get_postgres_columns;
 use crate::schema::postgresql::PostgreSQLColumn;
 use sqlx::postgres::PgRow;
@@ -7,25 +7,18 @@ use std::collections::HashMap;
 
 pub struct PostgreSQLQueryBuilder {
     data_source_id: String,
-    select: HashMap<String, Vec<String>>, // {[table_name]: Vec<column_name>}
-    columns: Vec<ColumnPath>,             // To track which column_paths we are getting results for
+    columns: Vec<SelectColumnsPath>, // To track which column_paths we are getting results for
 }
 
 impl PostgreSQLQueryBuilder {
     pub fn new(query: &DwataQuery, data_source_id: String) -> Self {
         let mut builder = PostgreSQLQueryBuilder {
             data_source_id: data_source_id.clone(),
-            select: HashMap::new(),
             columns: vec![],
         };
         // Find all columns (and tables) that are in this data source
         for column_path in &query.select {
-            if column_path.dsi == data_source_id {
-                builder
-                    .select
-                    .entry(column_path.tn.clone())
-                    .and_modify(|columns| columns.push(column_path.cn.clone()))
-                    .or_insert(vec![column_path.cn.clone()]);
+            if column_path.source == data_source_id {
                 builder.columns.push(column_path.clone());
             }
         }
@@ -43,7 +36,7 @@ impl PostgreSQLQueryBuilder {
     async fn get_column_types(
         &self,
         connection: &sqlx::PgPool,
-    ) -> HashMap<String, Vec<PostgreSQLColumn>> {
+    ) -> HashMap<(String, String), Vec<PostgreSQLColumn>> {
         let mut column_types: HashMap<String, Vec<PostgreSQLColumn>> = HashMap::new();
         for (table, _columns) in &self.select {
             column_types.insert(
@@ -58,7 +51,7 @@ impl PostgreSQLQueryBuilder {
         &self,
         connection: &sqlx::PgPool,
         data_by_row: &mut Vec<Vec<String>>,
-        requested_column_paths: &Vec<ColumnPath>,
+        requested_column_paths: &Vec<SelectColumnsPath>,
     ) {
         let column_types = self.get_column_types(connection).await;
         let select = self.get_select().clone();
@@ -71,8 +64,8 @@ impl PostgreSQLQueryBuilder {
                         .iter()
                         .position(|c| *c == column_path.clone())
                         .unwrap();
-                    let column_name = column_path.cn.clone();
-                    let opt_column_def = match column_types.get(&column_path.tn) {
+                    let column_name = column_path.columns.clone();
+                    let opt_column_def = match column_types.get(&column_path.table) {
                         Some(vec_of_columns) => vec_of_columns
                             .iter()
                             .find(|x| x.is_column_named(column_name.clone())),

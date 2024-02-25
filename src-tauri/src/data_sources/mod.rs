@@ -1,11 +1,13 @@
-use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::data_sources::api_types::APIDataSource;
+// use crate::query_result::postgresql::PostgreSQLQueryBuilder;
+// use crate::query_result::{DwataQuery, QueryBuilder};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
 use ts_rs::TS;
 
+pub mod api_types;
 pub mod helpers;
 
 // #[derive(Debug, Deserialize, Serialize)]
@@ -108,18 +110,18 @@ impl DataSourceType {
         }
     }
 
-    pub fn get_query_builder(
-        &self,
-        query: &DwataQuery,
-        data_source_id: String,
-    ) -> Option<QueryBuilder> {
-        match self {
-            DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
-                PostgreSQLQueryBuilder::new(query, data_source_id),
-            )),
-            _ => None,
-        }
-    }
+    // pub fn get_query_builder(
+    //     &self,
+    //     query: &DwataQuery,
+    //     data_source_id: String,
+    // ) -> Option<QueryBuilder> {
+    //     match self {
+    //         DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
+    //             PostgreSQLQueryBuilder::new(query, data_source_id),
+    //         )),
+    //         _ => None,
+    //     }
+    // }
 
     pub fn get_api_type(&self) -> &str {
         match self {
@@ -145,15 +147,6 @@ pub struct DataSource {
     id: String,
     label: Option<String>,
     source: DataSourceType,
-}
-
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct APIDataSource {
-    id: String,
-    label: Option<String>,
-    source_type: String,
-    source_name: String,
 }
 
 pub enum DataSourceConnection {
@@ -205,17 +198,17 @@ impl DataSource {
         }
     }
 
-    pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
-        self.source.get_query_builder(query, self.id.clone())
-    }
+    // pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
+    //     self.source.get_query_builder(query, self.id.clone())
+    // }
 
     pub fn get_api_data_source(&self) -> APIDataSource {
-        APIDataSource {
-            id: self.id.clone(),
-            label: self.label.clone(),
-            source_type: self.source.get_api_type().to_string(),
-            source_name: self.source.get_api_name(),
-        }
+        APIDataSource::new(
+            self.id.clone(),
+            self.label.clone(),
+            self.source.get_api_type().to_string(),
+            self.source.get_api_name(),
+        )
     }
 }
 

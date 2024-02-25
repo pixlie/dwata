@@ -67,7 +67,7 @@ pub enum IsForeignKey {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct Column {
+pub struct DwataColumn {
     name: String,
     label: Option<String>,
     data_type: ColumnDataType,
@@ -81,9 +81,10 @@ pub struct Column {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct TableSchema {
+pub struct DwataTable {
     name: String,
-    columns: Vec<Column>,
+    schema_name: String,
+    columns: Vec<DwataColumn>,
     primary_key: Option<String>,
     foreign_keys: Vec<String>,
 }
@@ -91,6 +92,6 @@ pub struct TableSchema {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct Schema {
-    tables: Vec<TableSchema>,
+pub struct DwataSchema {
+    tables: Vec<DwataTable>,
 }

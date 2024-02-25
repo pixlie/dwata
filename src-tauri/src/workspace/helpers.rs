@@ -17,6 +17,7 @@ pub fn load_config(config_dir: &PathBuf) -> Config {
     let config: Config = match fs::read_to_string(&config_file_path) {
         Ok(content) => ron::from_str(content.as_str()).unwrap(),
         Err(_) => Config {
+            path_to_config: config_dir.clone(),
             data_source_list: vec![],
             folder_list: vec![],
         },

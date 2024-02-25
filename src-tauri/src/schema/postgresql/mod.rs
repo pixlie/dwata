@@ -1,4 +1,4 @@
-use crate::schema::{Column, ColumnDataType, IsForeignKey, TypeArray, TypeInteger};
+use crate::schema::{ColumnDataType, DwataColumn, IsForeignKey, TypeArray, TypeInteger};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::Oid;
 
@@ -36,8 +36,8 @@ pub struct PostgreSQLColumn {
 }
 
 impl PostgreSQLColumn {
-    pub fn get_generic_column(&self) -> Column {
-        Column {
+    pub fn get_generic_column(&self) -> DwataColumn {
+        DwataColumn {
             name: self.column_name.clone(),
             label: None,
             data_type: match self.data_type.as_str() {
