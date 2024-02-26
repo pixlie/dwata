@@ -21,7 +21,7 @@ black = {extras = ["d"], version = "^22.10.0"}
 python-dotenv = "^0.19.1"
 PyJWT = "^2.3.0"
 psycopg2 = "^2.9.3"
-orjson = "^3.8.0"
+orjson = "^3.9.15"
 google-auth = "^2.14.1"
 
 [tool.poetry.dev-dependencies]
