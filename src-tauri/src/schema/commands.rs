@@ -1,4 +1,3 @@
-use super::helpers::get_schema_summary;
 use crate::error::DwataError;
 use crate::schema::api_types::APIGridSchema;
 use crate::store::Store;
@@ -15,7 +14,6 @@ pub async fn read_schema(
         Some(ds) => {
             let mut tables = ds.get_tables(Some(true)).await;
             schema.append(&mut tables);
-            // println!("{}", get_schema_summary(ds).await);
             Ok(schema)
         }
         None => Err(DwataError::CouldNotConnectToDatabase),

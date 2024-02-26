@@ -1,12 +1,12 @@
-use super::{DwataQuery, SelectColumnsPath};
+use super::DwataQuery;
 use crate::error::DwataError;
-use crate::query_result::api_types::APIGridData;
+use crate::query_result::api_types::{APIGridData, APIGridQuery};
 use crate::store::Store;
 use tauri::State;
 
 #[tauri::command]
 pub async fn load_data(
-    select: Vec<SelectColumnsPath>,
+    select: Vec<APIGridQuery>,
     store: State<'_, Store>,
 ) -> Result<Vec<APIGridData>, DwataError> {
     let query: DwataQuery = DwataQuery { select };

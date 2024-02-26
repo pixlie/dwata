@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ts_rs::TS;
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Clone, Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub enum APIQueryOrder {
@@ -10,7 +10,7 @@ pub enum APIQueryOrder {
     Desc,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Clone, Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APIGridQuery {
@@ -23,6 +23,28 @@ pub struct APIGridQuery {
     filtering: Option<HashMap<u8, String>>,
 }
 
+impl APIGridQuery {
+    pub fn get_source_name(&self) -> String {
+        self.source.clone()
+    }
+
+    pub fn get_columns(&self) -> Vec<String> {
+        self.columns.clone()
+    }
+
+    pub fn get_schema_and_table_names(
+        &self,
+        default_schema_name: Option<String>,
+    ) -> (String, String) {
+        (
+            self.schema
+                .clone()
+                .unwrap_or_else(|| default_schema_name.unwrap_or_else(|| "public".to_string())),
+            self.table.clone().unwrap(),
+        )
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
@@ -30,5 +52,6 @@ pub struct APIGridData {
     source: String,
     schema: Option<String>,
     table: Option<String>,
-    rows: Vec<Vec<String>>,
+    #[ts(type = "any")]
+    rows: Vec<Vec<serde_json::Value>>,
 }

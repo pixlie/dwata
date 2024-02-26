@@ -1,6 +1,7 @@
 use crate::data_sources::api_types::APIDataSource;
+use crate::query_result::api_types::APIGridQuery;
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::query_result::QueryBuilder;
 use crate::schema::api_types::APIGridSchema;
 use crate::schema::postgresql;
 use crate::schema::postgresql::PostgreSQLObject;
@@ -113,15 +114,11 @@ impl DataSourceType {
         }
     }
 
-    pub fn get_query_builder(
-        &self,
-        query: &DwataQuery,
-        data_source_id: String,
-    ) -> Option<QueryBuilder> {
+    pub fn get_query_builder(&self, grid: &APIGridQuery) -> Option<QueryBuilder> {
         match self {
-            DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
-                PostgreSQLQueryBuilder::new(query, data_source_id),
-            )),
+            DataSourceType::PostgreSQL(_) => {
+                Some(QueryBuilder::PostgreSQL(PostgreSQLQueryBuilder::new(grid)))
+            }
             _ => None,
         }
     }
@@ -201,8 +198,8 @@ impl DataSource {
         }
     }
 
-    pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
-        self.source.get_query_builder(query, self.id.clone())
+    pub fn get_query_builder(&self, grid: &APIGridQuery) -> Option<QueryBuilder> {
+        self.source.get_query_builder(grid)
     }
 
     pub fn get_api_data_source(&self) -> APIDataSource {

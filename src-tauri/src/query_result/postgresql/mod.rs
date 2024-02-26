@@ -1,42 +1,31 @@
-use crate::query_result::{DwataQuery, SelectColumnsPath};
+use crate::query_result::api_types::APIGridQuery;
 use crate::schema::postgresql::metadata::get_postgres_columns;
 use crate::schema::postgresql::PostgreSQLColumn;
+use serde_json::{Number, Value};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 use std::collections::HashMap;
 
 pub struct PostgreSQLQueryBuilder {
-    data_source_id: String,
-    columns: Vec<SelectColumnsPath>, // To track which column_paths we are getting results for
+    grid: APIGridQuery,
 }
 
 impl PostgreSQLQueryBuilder {
-    pub fn new(query: &DwataQuery, data_source_id: String) -> Self {
-        let mut builder = PostgreSQLQueryBuilder {
-            data_source_id: data_source_id.clone(),
-            columns: vec![],
-        };
-        // Find all columns (and tables) that are in this data source
-        for column_path in &query.select {
-            if column_path.source == data_source_id {
-                builder.columns.push(column_path.clone());
-            }
-        }
+    pub fn new(grid: &APIGridQuery) -> Self {
+        let mut builder = PostgreSQLQueryBuilder { grid: grid.clone() };
         builder
     }
 
     pub fn get_select(&self) -> String {
         let mut sql: String = "SELECT ".to_string();
-        for column_path in &self.columns {
-            let (schema, table) = column_path.get_schema_and_table_names(None);
-            sql += format!(
-                "{} FROM {}.{}",
-                column_path.get_columns().join(", "),
-                schema,
-                table
-            )
-            .as_str();
-        }
+        let (schema, table) = self.grid.get_schema_and_table_names(None);
+        sql += format!(
+            "{} FROM {}.{}",
+            self.grid.get_columns().join(", "),
+            schema,
+            table
+        )
+        .as_str();
         sql
     }
 
@@ -45,8 +34,8 @@ impl PostgreSQLQueryBuilder {
         connection: &sqlx::PgPool,
     ) -> HashMap<(String, String), Vec<PostgreSQLColumn>> {
         let mut column_types: HashMap<(String, String), Vec<PostgreSQLColumn>> = HashMap::new();
-        for column_path in &self.columns {
-            let (schema, table) = column_path.get_schema_and_table_names(None);
+        for _column_name in &self.grid.get_columns() {
+            let (schema, table) = self.grid.get_schema_and_table_names(None);
             column_types.insert(
                 (schema.clone(), table.clone()),
                 get_postgres_columns(connection, schema, table).await,
@@ -55,59 +44,60 @@ impl PostgreSQLQueryBuilder {
         column_types
     }
 
-    pub async fn get_data(&self, connection: &sqlx::PgPool) -> Vec<Vec<String>> {
+    pub async fn get_data(&self, connection: &sqlx::PgPool) -> Vec<Vec<Value>> {
         let column_types = self.get_column_types(connection).await;
         let select = self.get_select().clone();
 
         sqlx::query(&select)
             .map(|pg_row: PgRow| {
-                let mut data_row: Vec<String> = vec![];
-                for column_path in &self.columns {
-                    for column_name in column_path.get_columns() {
-                        let opt_column_def =
-                            match column_types.get(&column_path.get_schema_and_table_names(None)) {
-                                Some(vec_of_columns) => vec_of_columns
-                                    .iter()
-                                    .find(|x| x.is_column_named(column_name.clone())),
-                                None => None,
+                let mut data_row: Vec<Value> = vec![];
+                for column_name in &self.grid.get_columns() {
+                    let opt_column_def =
+                        match column_types.get(&self.grid.get_schema_and_table_names(None)) {
+                            Some(vec_of_columns) => vec_of_columns
+                                .iter()
+                                .find(|x| x.is_column_named(column_name.clone())),
+                            None => None,
+                        };
+                    match opt_column_def {
+                        Some(column_def) => {
+                            let data_type = column_def.get_data_type();
+                            let cell = match data_type.as_str() {
+                                "integer" => {
+                                    match pg_row.try_get::<Option<i32>, &str>(column_name.as_str())
+                                    {
+                                        Ok(x_opt) => match x_opt {
+                                            Some(x) => Value::Number(Number::from(x)),
+                                            None => Value::Null,
+                                        },
+                                        Err(_) => Value::Null,
+                                    }
+                                }
+                                "character varying" | "text" => {
+                                    match pg_row.try_get::<Option<&str>, &str>(column_name.as_str())
+                                    {
+                                        Ok(x_opt) => match x_opt {
+                                            Some(x) => Value::String(x.to_string()),
+                                            None => Value::Null,
+                                        },
+                                        Err(_) => Value::Null,
+                                    }
+                                }
+                                "boolean" => {
+                                    match pg_row.try_get::<Option<bool>, &str>(column_name.as_str())
+                                    {
+                                        Ok(x_opt) => match x_opt {
+                                            Some(x) => Value::Bool(x),
+                                            None => Value::Null,
+                                        },
+                                        Err(_) => Value::Null,
+                                    }
+                                }
+                                _ => Value::Null,
                             };
-                        match opt_column_def {
-                            Some(column_def) => {
-                                let data_type = column_def.get_data_type();
-                                data_row.push(match data_type.as_str() {
-                                    "integer" => format!(
-                                        "{:?}",
-                                        pg_row
-                                            .try_get::<Option<i32>, &str>(column_name.as_str())
-                                            .unwrap()
-                                            .unwrap()
-                                    ),
-                                    "character varying" => format!(
-                                        "{:?}",
-                                        pg_row
-                                            .try_get::<Option<&str>, &str>(column_name.as_str())
-                                            .unwrap()
-                                            .unwrap()
-                                    ),
-                                    "boolean" => format!(
-                                        "{:?}",
-                                        pg_row
-                                            .try_get::<Option<bool>, &str>(column_name.as_str())
-                                            .unwrap()
-                                            .unwrap()
-                                    ),
-                                    "text" => format!(
-                                        "{:?}",
-                                        pg_row
-                                            .try_get::<Option<&str>, &str>(column_name.as_str())
-                                            .unwrap()
-                                            .unwrap()
-                                    ),
-                                    _ => "".to_string(),
-                                })
-                            }
-                            None => {}
+                            data_row.push(cell);
                         }
+                        None => {}
                     }
                 }
                 data_row
