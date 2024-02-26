@@ -1,4 +1,3 @@
-use crate::query_result::SelectColumnsPath;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ts_rs::TS;
@@ -14,7 +13,7 @@ pub enum APIQueryOrder {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct APISelectColumnsPath {
+pub struct APIGridQuery {
     source: String,
     schema: Option<String>,
     table: Option<String>,
@@ -27,14 +26,9 @@ pub struct APISelectColumnsPath {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct APIDwataQuery {
-    select: Vec<APISelectColumnsPath>,
-}
-
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct APIDwataData {
-    columns: Vec<APISelectColumnsPath>,
-    rows_of_columns: Vec<Vec<String>>,
+pub struct APIGridData {
+    source: String,
+    schema: Option<String>,
+    table: Option<String>,
+    rows: Vec<Vec<String>>,
 }

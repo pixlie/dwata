@@ -37,7 +37,7 @@ fn main() {
             workspace::commands::read_config,
             // labels::commands::load_labels,
             schema::commands::read_schema,
-            // query_result::commands::load_data,
+            query_result::commands::load_data,
             workspace::commands::create_data_source,
         ])
         .run(tauri::generate_context!())

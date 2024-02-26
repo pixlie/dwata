@@ -8,14 +8,6 @@ interface ILabel {
 
 type TRowValue = any;
 
-interface IQueryResult {
-  isReady: boolean;
-  isFetching: boolean;
-
-  areRowsSelectable?: boolean;
-  visibleColumnIndices?: Array<number>; // index of columns in select array
-}
-
 // Only required in Database form
 interface IDatabaseFormData {
   id?: string;

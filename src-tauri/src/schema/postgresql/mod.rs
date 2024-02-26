@@ -1,7 +1,7 @@
 use crate::data_sources::DataSource;
-use crate::schema::metadata::get_table_columns;
-use crate::schema::{
-    ColumnDataType, DwataColumn, DwataTable, IsForeignKey, TypeArray, TypeInteger,
+use crate::schema::api_types::{
+    APIGridColumn, APIGridColumnBuilder, APIGridSchema, APIGridSchemaBuilder, ColumnDataType,
+    IsForeignKey, TypeArray, TypeArrayBuilder, TypeInteger, TypeIntegerBuilder,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::Oid;
@@ -31,16 +31,14 @@ impl PostgreSQLObject {
         &self,
         data_source: &DataSource,
         with_columns: Option<bool>,
-    ) -> DwataTable {
-        let mut table = DwataTable {
-            name: self.name.clone(),
-            schema_name: self.schema.clone(),
-            columns: vec![],
-            primary_key: None,
-            foreign_keys: vec![],
-        };
+    ) -> APIGridSchema {
+        let table_builder = APIGridSchemaBuilder::default()
+            .source(data_source.get_id())
+            .name(Some(self.name.clone()))
+            .schema(Some(self.schema.clone()));
+        let mut table = table_builder.build().unwrap();
         if Some(true) == with_columns {
-            table.columns = get_table_columns(data_source, &table).await
+            table.get_columns(data_source).await;
         }
         table
     }
@@ -58,29 +56,35 @@ pub struct PostgreSQLColumn {
 }
 
 impl PostgreSQLColumn {
-    pub fn get_generic_column(&self) -> DwataColumn {
-        DwataColumn {
-            name: self.column_name.clone(),
-            label: None,
-            data_type: match self.data_type.as_str() {
-                "integer" => ColumnDataType::SignedInteger(TypeInteger { byte_size: None }),
-                "character varying" => ColumnDataType::CharArray(TypeArray {
-                    length: self.character_maximum_length,
-                }),
+    pub fn get_generic_column(&self) -> APIGridColumn {
+        APIGridColumnBuilder::default()
+            .name(self.column_name.clone())
+            .label(None)
+            .data_type(match self.data_type.as_str() {
+                "integer" => {
+                    ColumnDataType::SignedInteger(TypeIntegerBuilder::default().build().unwrap())
+                }
+                "character varying" => ColumnDataType::CharArray(
+                    TypeArrayBuilder::default()
+                        .length(self.character_maximum_length)
+                        .build()
+                        .unwrap(),
+                ),
                 "boolean" => ColumnDataType::Boolean,
                 "text" => ColumnDataType::Text,
                 _ => ColumnDataType::Unknown,
-            },
-            is_nullable: match self.is_nullable.as_str() {
+            })
+            .is_nullable(match self.is_nullable.as_str() {
                 "NO" => false,
                 "YES" => true,
                 _ => false,
-            },
-            is_auto_increment: false,
-            is_primary_key: false,
-            is_indexed: false,
-            is_foreign_key: IsForeignKey::No,
-        }
+            })
+            .is_auto_increment(false)
+            .is_primary_key(false)
+            .is_indexed(false)
+            .is_foreign_key(IsForeignKey::No)
+            .build()
+            .unwrap()
     }
 
     pub fn is_column_named(&self, name: String) -> bool {

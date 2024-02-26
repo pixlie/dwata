@@ -34,6 +34,7 @@ const SourceList: Component = () => {
                   !!searchParams.dataSouceId &&
                   dataSource.id == searchParams.dataSouceId
                 }
+                infoTag={dataSource.sourceType}
               />
             </>
           );

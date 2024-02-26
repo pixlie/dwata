@@ -1,4 +1,4 @@
-import { Component, onMount } from "solid-js";
+import { Component, createComputed } from "solid-js";
 import { useSchema } from "../stores/schema";
 
 interface IPropTypes {
@@ -8,9 +8,9 @@ interface IPropTypes {
 const SchemaLoader: Component<IPropTypes> = (props) => {
   const [_, { readSchemaFromAPI }] = useSchema();
 
-  onMount(() => {
+  createComputed(async () => {
     if (!!props.dataSourceId) {
-      readSchemaFromAPI(props.dataSourceId);
+      await readSchemaFromAPI(props.dataSourceId);
     }
   });
 

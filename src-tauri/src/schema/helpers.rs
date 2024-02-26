@@ -1,17 +1,16 @@
 use crate::data_sources::DataSource;
-use crate::schema::metadata::get_table_columns;
 
 pub async fn get_schema_summary(data_source: &DataSource) -> String {
     let mut summary: String = "".to_string();
     let tables = data_source.get_tables(None).await;
-    for table in tables {
+    for mut table in tables {
+        let columns = table.get_columns(data_source).await;
         let this_table: String = format!(
             "- `{}` table with columns: ({})",
             table.get_name(),
-            get_table_columns(data_source, &table)
-                .await
+            columns
                 .iter()
-                .map(|col| format!("`{}`", col.name.clone()))
+                .map(|col| format!("`{}`", col.get_name()))
                 .collect::<Vec<String>>()
                 .join(", ")
         );

@@ -1,12 +1,12 @@
 import { Component } from "solid-js";
-import { Column } from "../../api_types/Column";
+import { APIGridSchema } from "../../api_types/APIGridSchema";
 
 interface ICellPropTypes {
   data: any;
 }
 
 const createGridRow = (
-  columns: Array<Column | undefined>
+  grids: Array<APIGridSchema>
 ): Array<Component<ICellPropTypes>> => {
   const contentTextSizeClasses = "text-sm";
   const borderClasses = "border border-gray-700";
@@ -27,14 +27,16 @@ const createGridRow = (
   );
 
   const cellList: Array<Component<ICellPropTypes>> = [];
-  for (const column of columns) {
-    if (!column) {
-      // TODO: Remove this when columns no longer has `undefined` items
-      cellList.push(() => null);
-    } else if (column.isPrimaryKey) {
-      cellList.push(PrimaryKeyCell);
-    } else {
-      cellList.push(DefaultCell);
+  for (const grid of grids) {
+    for (const column of grid.columns) {
+      if (!column) {
+        // TODO: Remove this when columns no longer has `undefined` items
+        cellList.push(() => null);
+      } else if (column.isPrimaryKey) {
+        cellList.push(PrimaryKeyCell);
+      } else {
+        cellList.push(DefaultCell);
+      }
     }
   }
 

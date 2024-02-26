@@ -1,20 +1,19 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
-import { Schema } from "../api_types/Schema";
-import { Column } from "../api_types/Column";
-import { ColumnPath } from "../api_types/ColumnPath";
+import { APIGridSchema } from "../api_types/APIGridSchema";
 
 interface IStore {
-  schemaForAllSources: { [dataSourceId: string]: Schema };
+  schemaForAllSources: { [dataSourceId: string]: Array<APIGridSchema> };
 
-  lastFetchedAt?: Date;
+  lastFetchedAt: { [dataSouceId: string]: number };
   isFetching: boolean;
   isReady: boolean;
 }
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
+    lastFetchedAt: {},
     isFetching: false,
     isReady: false,
     schemaForAllSources: {},
@@ -24,49 +23,55 @@ const makeStore = () => {
     store,
     {
       readSchemaFromAPI: async (dataSourceId: string) => {
-        // We use the Tauri API to load schema
-        const WAIT_SECONDS = 10000;
-        const timePassed = !!store.lastFetchedAt
-          ? new Date() - store.lastFetchedAt
-          : WAIT_SECONDS;
-        if (!!dataSourceId && timePassed >= WAIT_SECONDS) {
-          setStore("isFetching", true);
-          const result = await invoke("read_schema", { dataSourceId });
-          setStore("schemaForAllSources", dataSourceId, result as Schema);
-          setStore((state) => ({
-            ...state,
-            lastFetchedAt: new Date(),
-            isFetching: false,
-            isReady: true,
-          }));
+        const WAIT_SECONDS = 10;
+        // We check that if we have requested this schema then we waited at least WAIT_SECONDS before another request
+        if (
+          dataSourceId in store.lastFetchedAt &&
+          new Date().getSeconds() - store.lastFetchedAt[dataSourceId] <
+            WAIT_SECONDS
+        ) {
+          return;
         }
-      },
-      // getColumnPath: (
-      //   sourceName: TDataSourceName,
-      //   tableName: TTableName,
-      //   columnName: TColumnName
-      // ): Column | undefined => {
-      //   return sourceName in store.columns &&
-      //     tableName in store.columns[sourceName]
-      //     ? store.columns[sourceName][tableName].find(
-      //         (col) => col.name === columnName
-      //       )
-      //     : undefined;
-      // },
-      getColumnListForColumnPathList: (
-        columns: Array<ColumnPath>
-      ): Array<Column | undefined> => {
-        // TODO: Improve the function to return Array<IColumn> only
-        return columns.map((columnPath) =>
-          columnPath.dsi in store.schemaForAllSources &&
-          store.schemaForAllSources[columnPath.dsi].tables.findIndex(
-            (x) => x.name === columnPath.tn
-          ) !== -1
-            ? store.schemaForAllSources[columnPath.dsi].tables
-                .find((x) => x.name === columnPath.tn)
-                ?.columns.find((cn) => cn.name === columnPath.cn)
-            : undefined
+
+        if (!dataSourceId) {
+          return;
+        }
+
+        setStore("isFetching", true);
+        // We use the Tauri API to load schema
+        const result = await invoke("read_schema", { dataSourceId });
+        setStore(
+          "schemaForAllSources",
+          dataSourceId,
+          result as Array<APIGridSchema>
         );
+        setStore((state) => ({
+          ...state,
+          lastFetchedAt: {
+            ...state.lastFetchedAt,
+            [dataSourceId]: new Date().getSeconds(),
+          },
+          isFetching: false,
+          isReady: true,
+        }));
+      },
+
+      getSchemaForGrid: (
+        source: string,
+        schema: string | null,
+        table: string | null
+      ): APIGridSchema => {
+        if (source in store.schemaForAllSources) {
+          const index = store.schemaForAllSources[source].findIndex(
+            (x) =>
+              (schema === null || x.schema === schema) &&
+              (table === null || x.name === table)
+          );
+          if (index !== -1) {
+            return store.schemaForAllSources[source][index];
+          }
+        }
+        throw Error("grid_not_found");
       },
       getAllColumnNameListForTableSource: (
         tableName: string,
@@ -74,7 +79,7 @@ const makeStore = () => {
       ): Array<string> => {
         const table =
           dataSouceId in store.schemaForAllSources &&
-          store.schemaForAllSources[dataSouceId].tables.find(
+          store.schemaForAllSources[dataSouceId].find(
             (tn) => tn.name === tableName
           );
         return table ? table.columns.map((col) => col.name) : [];

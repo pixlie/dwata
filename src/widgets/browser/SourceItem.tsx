@@ -1,32 +1,31 @@
 import { Component } from "solid-js";
+import { APIGridSchema } from "../../api_types/APIGridSchema";
+import { useQueryResult } from "../../stores/queryResult";
 
-interface IPropTypes {
-  name: string;
-  label?: string;
-  path: string;
-  comment?: string;
-}
+interface IPropTypes extends APIGridSchema {}
 
 const SourceItem: Component<IPropTypes> = (props) => {
-  const icon = "fa-solid fa-table";
-  const label = props.label || props.name;
+  const [_, { setGrid }] = useQueryResult();
 
-  if (!!props.path) {
-    return (
-      <a
-        href={props.path}
-        class="ml-4 mr-2 block rounded-md px-2 py-0.5 text-gray-200 hover:bg-zinc-700"
-      >
-        <i class={`${icon} mr-1.5 text-sm text-gray-500`} />
-        {label}
-      </a>
-    );
-  }
+  const icon = "fa-solid fa-table";
+  const handleClick = () => {
+    setGrid({
+      source: props.source,
+      schema: props.schema,
+      table: props.name,
+      columns: props.columns.map((x) => x.name),
+      ordering: [],
+      filtering: [],
+    });
+  };
 
   return (
-    <div class="ml-4 mr-2 block rounded-md px-2 py-0.5 text-gray-200 hover:bg-zinc-700">
+    <div
+      class="ml-4 mr-2 block rounded-md px-2 py-0.5 text-gray-200 hover:bg-zinc-700 cursor-pointer"
+      onClick={handleClick}
+    >
       <i class={`${icon} mr-1.5 text-sm text-gray-500`} />
-      {label}
+      {props.name}
     </div>
   );
 };

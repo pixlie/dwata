@@ -14,21 +14,15 @@ const TableList: Component<ITableListPropTypes> = (props) => {
   const tables = createMemo(() => {
     if (!schema.isFetching && !!schema.isReady) {
       if (props.dataSourceId in schema.schemaForAllSources) {
-        return schema.schemaForAllSources[props.dataSourceId].tables;
+        return schema.schemaForAllSources[props.dataSourceId];
       }
     }
+    return [];
   });
 
   return (
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-      <For each={tables()}>
-        {(table) => (
-          <SourceItem
-            name={table.name}
-            path={`/browse?query=select[${props.dataSourceId}.${table.name}]`}
-          />
-        )}
-      </For>
+      <For each={tables()}>{(table) => <SourceItem {...table} />}</For>
     </div>
   );
 };

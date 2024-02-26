@@ -1,5 +1,4 @@
 use super::{PostgreSQLColumn, PostgreSQLObject};
-use crate::schema::DwataTable;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 

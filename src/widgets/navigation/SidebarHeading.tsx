@@ -5,9 +5,19 @@ interface IPropTypes {
   icon: string;
   href?: string;
   isActive?: boolean;
+  infoTag?: string;
 }
 
 const SidebarHeading: Component<IPropTypes> = (props) => {
+  const Tag = () =>
+    !!props.infoTag ? (
+      <div>
+        <span class="text-xs ml-2 bg-gray-500 text-gray-900 rounded-sm px-2">
+          {props.infoTag}
+        </span>
+      </div>
+    ) : null;
+
   if (!!props.href) {
     return (
       <a
@@ -19,6 +29,7 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
       >
         <i class={`${props.icon} w-6 text-gray-500`} />
         {props.label}
+        <Tag />
       </a>
     );
   } else {
@@ -26,6 +37,7 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
       <div class="my-2 block select-none cursor-default px-4 text-gray-500">
         <i class={`${props.icon} w-6 text-gray-500`} />
         {props.label}
+        <Tag />
       </div>
     );
   }

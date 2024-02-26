@@ -1,8 +1,9 @@
 use crate::data_sources::api_types::APIDataSource;
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::schema::api_types::APIGridSchema;
+use crate::schema::postgresql;
 use crate::schema::postgresql::PostgreSQLObject;
-use crate::schema::{postgresql, DwataTable};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
@@ -213,7 +214,7 @@ impl DataSource {
         )
     }
 
-    pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<DwataTable> {
+    pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<APIGridSchema> {
         match self.get_connection().await {
             Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
                 let db_objects = postgresql::metadata::get_postgres_objects(&pg_pool).await;
@@ -221,7 +222,7 @@ impl DataSource {
                     .iter()
                     .filter(|item| item.filter_is_table())
                     .collect::<Vec<&PostgreSQLObject>>();
-                let mut dwata_tables: Vec<DwataTable> = vec![];
+                let mut dwata_tables: Vec<APIGridSchema> = vec![];
                 for table in tables {
                     dwata_tables.push(table.get_table(self, with_columns).await);
                 }
