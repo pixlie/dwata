@@ -2,6 +2,7 @@ import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIGridQuery } from "../api_types/APIGridQuery";
 import { APIGridData } from "../api_types/APIGridData";
+import { invoke } from "@tauri-apps/api/core";
 
 interface IStore {
   query: Array<APIGridQuery>;
@@ -39,15 +40,29 @@ const makeStore = () => {
           setStore("query", [grid]);
         }
       },
+
       setQuery: (query: Array<APIGridQuery>) => {
         setStore("query", query);
       },
-      setQueryResult: (data: Array<APIGridData>) => {
+
+      fetchResults: async () => {
+        const data = await invoke("load_data", {
+          select: [
+            ...store.query.map((grid) => ({
+              source: grid.source,
+              schema: grid.schema,
+              table: grid.table,
+              columns: grid.columns,
+              ordering: null,
+              filtering: null,
+            })),
+          ],
+        });
         setStore({
           ...store,
           isReady: true,
           isFetching: true,
-          data,
+          data: data as Array<APIGridData>,
         });
       },
     },
