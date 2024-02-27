@@ -107,13 +107,6 @@ pub enum DataSourceType {
 }
 
 impl DataSourceType {
-    pub fn get_database(&self) -> Option<&Database> {
-        match self {
-            DataSourceType::PostgreSQL(db) => Some(db),
-            _ => None,
-        }
-    }
-
     pub fn get_query_builder(&self, grid: &APIGridQuery) -> Option<QueryBuilder> {
         match self {
             DataSourceType::PostgreSQL(_) => {

@@ -1,8 +1,8 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIGridQuery } from "../api_types/APIGridQuery";
-import { APIGridData } from "../api_types/APIGridData";
 import { invoke } from "@tauri-apps/api/core";
+import { APIGridData } from "../utils/types";
 
 interface IStore {
   query: Array<APIGridQuery>;

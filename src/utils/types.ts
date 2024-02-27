@@ -24,9 +24,17 @@ interface IProviderPropTypes {
   children: JSX.Element;
 }
 
+interface APIGridData {
+  source: string;
+  schema: string | null;
+  table: string | null;
+  rows: Array<Array<any>>;
+}
+
 export type {
   ILabel as IChatRoom,
   TRowValue,
   IDatabaseFormData,
   IProviderPropTypes,
+  APIGridData,
 };

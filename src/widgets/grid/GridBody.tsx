@@ -21,20 +21,18 @@ const GridBody: Component = () => {
 
   return (
     <tbody>
-      <tr class="text-white">
-        {gridList().length >= 1 &&
-          gridList()[0].rows.map((_, rowIndex) => (
-            <>
-              {cellList().map((Cell, cellIndex) => (
-                <Cell
-                  data={
-                    gridList().flatMap((grid) => grid.rows[rowIndex])[cellIndex]
-                  }
-                />
-              ))}
-            </>
-          ))}
-      </tr>
+      {gridList().length >= 1 &&
+        gridList()[0].rows.map((_, rowIndex) => (
+          <tr class="text-white">
+            {cellList().map((Cell, cellIndex) => (
+              <Cell
+                data={
+                  gridList().flatMap((grid) => grid.rows[rowIndex])[cellIndex]
+                }
+              />
+            ))}
+          </tr>
+        ))}
     </tbody>
   );
 };

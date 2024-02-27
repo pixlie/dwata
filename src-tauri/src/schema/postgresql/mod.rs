@@ -23,10 +23,6 @@ impl PostgreSQLObject {
         self.object_type == "table".to_string()
     }
 
-    pub fn get_name(&self) -> String {
-        self.name.clone()
-    }
-
     pub async fn get_table(
         &self,
         data_source: &DataSource,

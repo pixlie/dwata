@@ -108,10 +108,6 @@ impl APIGridSchema {
         self.name.clone().unwrap().clone()
     }
 
-    pub fn get_schema_name(&self) -> String {
-        self.schema.clone().unwrap().clone()
-    }
-
     pub async fn get_columns(&mut self, data_source: &DataSource) -> Vec<APIGridColumn> {
         if self.has_fetched_columns {
             self.columns.to_vec()
