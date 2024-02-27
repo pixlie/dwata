@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ts_rs::TS;
@@ -45,13 +46,11 @@ impl APIGridQuery {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, Builder)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APIGridData {
     source: String,
     schema: Option<String>,
     table: Option<String>,
-    #[ts(type = "any")]
     rows: Vec<Vec<serde_json::Value>>,
 }

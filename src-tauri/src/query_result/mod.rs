@@ -1,5 +1,5 @@
 use crate::data_sources::DataSourceConnection;
-use crate::query_result::api_types::{APIGridData, APIGridQuery};
+use crate::query_result::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::workspace::Config;
 use serde::{Deserialize, Serialize};
@@ -64,22 +64,30 @@ pub struct DwataQuery {
 
 impl DwataQuery {
     pub async fn get_data(&self, config: &Config) -> Vec<APIGridData> {
-        let data: Vec<APIGridData> = vec![];
+        let mut data: Vec<APIGridData> = vec![];
         for grid in &self.select {
             let data_source = config.get_data_source(grid.get_source_name().as_str());
-            match data_source {
-                Some(ds) => match ds.get_query_builder(grid).unwrap() {
-                    QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
-                        Some(conn_type) => match conn_type {
-                            DataSourceConnection::PostgreSQL(conn) => {
-                                builder.get_data(&conn).await;
-                            }
+            let (schema_name, table_name) = grid.get_schema_and_table_names(None);
+            let grid_data = APIGridDataBuilder::default()
+                .source(grid.get_source_name())
+                .schema(Some(schema_name))
+                .table(Some(table_name))
+                .rows(match data_source {
+                    Some(ds) => match ds.get_query_builder(grid).unwrap() {
+                        QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
+                            Some(conn_type) => match conn_type {
+                                DataSourceConnection::PostgreSQL(conn) => {
+                                    builder.get_data(&conn).await
+                                }
+                            },
+                            None => vec![],
                         },
-                        None => {}
                     },
-                },
-                _ => {}
-            }
+                    _ => vec![],
+                })
+                .build()
+                .unwrap();
+            data.push(grid_data);
         }
         data
     }
