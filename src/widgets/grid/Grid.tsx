@@ -4,7 +4,7 @@ import GridBody from "./GridBody";
 
 const Grid: Component = () => {
   return (
-    <table class="w-full">
+    <table class="max-w-full overflow-x-scroll">
       <GridHead />
       <GridBody />
     </table>

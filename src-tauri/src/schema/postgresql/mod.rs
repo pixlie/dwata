@@ -1,7 +1,7 @@
 use crate::data_sources::DataSource;
 use crate::schema::api_types::{
     APIGridColumn, APIGridColumnBuilder, APIGridSchema, APIGridSchemaBuilder, ColumnDataType,
-    IsForeignKey, TypeArray, TypeArrayBuilder, TypeInteger, TypeIntegerBuilder,
+    IsForeignKey, TypeArrayBuilder, TypeIntegerBuilder,
 };
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::Oid;

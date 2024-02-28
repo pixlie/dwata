@@ -8,25 +8,23 @@ import { SchemaProvider } from "./stores/schema";
 
 const App: Component<RouteSectionProps> = (props) => {
   return (
-    <>
+    <div class="w-full h-full">
       <UserProvider>
         <WorkspaceProvider>
           <SchemaProvider>
             <NavigationBar />
 
-            <div class="flex flex-row bg-gray-300">
-              <div class="h-screen w-64 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
+            <div class="flex flex-row bg-gray-300 w-full h-full">
+              <div class="w-64 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
                 <Sidebar />
               </div>
 
-              <div class="h-screen flex-auto bg-zinc-900 p-4 pt-16">
-                {props.children}
-              </div>
+              <div class="grow bg-zinc-900 p-4 pt-16">{props.children}</div>
             </div>
           </SchemaProvider>
         </WorkspaceProvider>
       </UserProvider>
-    </>
+    </div>
   );
 };
 

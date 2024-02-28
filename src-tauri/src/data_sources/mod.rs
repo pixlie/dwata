@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
-use ts_rs::TS;
 
 pub mod api_types;
 pub mod helpers;

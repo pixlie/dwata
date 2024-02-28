@@ -20,7 +20,7 @@ const GridBody: Component = () => {
   );
 
   return (
-    <tbody>
+    <tbody class="max-h-full overflow-y-scroll">
       {gridList().length >= 1 &&
         gridList()[0].rows.map((_, rowIndex) => (
           <tr class="text-white">

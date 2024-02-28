@@ -12,15 +12,14 @@ pub struct PostgreSQLQueryBuilder {
 
 impl PostgreSQLQueryBuilder {
     pub fn new(grid: &APIGridQuery) -> Self {
-        let mut builder = PostgreSQLQueryBuilder { grid: grid.clone() };
-        builder
+        PostgreSQLQueryBuilder { grid: grid.clone() }
     }
 
     pub fn get_select(&self) -> String {
         let mut sql: String = "SELECT ".to_string();
         let (schema, table) = self.grid.get_schema_and_table_names(None);
         sql += format!(
-            "{} FROM {}.{}",
+            "{} FROM {}.{} LIMIT 500",
             self.grid.get_columns().join(", "),
             schema,
             table

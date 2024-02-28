@@ -114,7 +114,7 @@ impl APIGridSchema {
         } else {
             match data_source.get_connection().await {
                 Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
-                    let mut columns = postgresql::metadata::get_postgres_columns(
+                    let columns = postgresql::metadata::get_postgres_columns(
                         &pg_pool,
                         self.schema.clone().unwrap(),
                         self.name.clone().unwrap(),

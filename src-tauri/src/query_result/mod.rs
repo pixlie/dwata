@@ -3,8 +3,6 @@ use crate::query_result::api_types::{APIGridData, APIGridDataBuilder, APIGridQue
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::workspace::Config;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use ts_rs::TS;
 
 pub mod api_types;
 pub mod commands;

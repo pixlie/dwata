@@ -1,12 +1,10 @@
-use ts_rs::TS;
+use crate::data_sources::DataSource;
+use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 pub mod api_types;
 pub mod commands;
 pub mod helpers;
-
-use crate::data_sources::DataSource;
-use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
