@@ -7,7 +7,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ChatThread {
     id: u32,
-    title: String,
+    title: Option<String>,
+    summary: Option<String>
 }
 
 #[derive(Debug, Deserialize, Serialize)]

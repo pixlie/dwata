@@ -1,3 +1,4 @@
+use crate::ai::AiIntegration;
 use crate::data_sources::DataSource;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -13,6 +14,7 @@ pub struct Config {
     data_source_list: Vec<DataSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
     folder_list: Vec<PathBuf>, // CSV or Markdown files
+    ai_integrations: Option<Vec<AiIntegration>>,
 }
 
 impl Config {

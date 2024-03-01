@@ -32,6 +32,15 @@ pub async fn create_data_source(
     }
 }
 
+pub async fn create_ai_integration(
+    ai_provider: &str,
+    api_key: &str,
+    display_label: Option<&str>,
+    store: State<'_, Store>,
+) -> Result<String, DwataError> {
+
+}
+
 #[tauri::command]
 pub async fn read_config(store: State<'_, Store>) -> Result<APIConfig, DwataError> {
     let guard = store.config.lock().await;

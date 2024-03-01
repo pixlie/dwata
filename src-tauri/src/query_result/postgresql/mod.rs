@@ -19,7 +19,7 @@ impl PostgreSQLQueryBuilder {
         let mut sql: String = "SELECT ".to_string();
         let (schema, table) = self.grid.get_schema_and_table_names(None);
         sql += format!(
-            "{} FROM {}.{} LIMIT 500",
+            "{} FROM {}.{} LIMIT 10",
             self.grid.get_columns().join(", "),
             schema,
             table

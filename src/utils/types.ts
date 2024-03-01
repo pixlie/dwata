@@ -20,6 +20,13 @@ interface IDatabaseFormData {
   // needsSsh: boolean;
 }
 
+interface IAiFormData {
+  id?: string;
+  aiProvider: string;
+  apiKey: string;
+  displayLabel?: string;
+}
+
 interface IProviderPropTypes {
   children: JSX.Element;
 }
@@ -35,6 +42,7 @@ export type {
   ILabel as IChatRoom,
   TRowValue,
   IDatabaseFormData,
+  IAiFormData,
   IProviderPropTypes,
   APIGridData,
 };

@@ -15,7 +15,7 @@ const SourceList: Component = () => {
     if (!workspace.isFetching && !!workspace.isReady) {
       return workspace.dataSourceList;
     }
-    return undefined;
+    return [];
   });
 
   return (

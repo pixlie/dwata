@@ -7,7 +7,13 @@ interface ISettingsSourceItemPropTypes extends APIDataSource {}
 const SettingsSourceItem: Component<ISettingsSourceItemPropTypes> = (props) => {
   return (
     <div class="p-4 bg-zinc-800 text-white rounded-md">
-      {props.sourceType}: {props.label || props.sourceName}
+      <i class="fa-solid fa-database w-6 text-gray-500" />
+      {props.label || props.sourceName}
+      <div>
+        <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
+          {props.sourceType}
+        </span>
+      </div>
     </div>
   );
 };
@@ -27,7 +33,7 @@ const SettingsSourceList: Component = () => {
   });
 
   return (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <For each={dataSources()}>
         {(dataSource) => <SettingsSourceItem {...dataSource} />}
       </For>

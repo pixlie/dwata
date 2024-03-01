@@ -1,8 +1,9 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, Ref, createSignal, onMount } from "solid-js";
 import Grid from "../widgets/grid/Grid";
 import Loader from "../widgets/browser/Loader";
 import { QueryResultProvider } from "../stores/queryResult";
 import TableBrowser from "../widgets/browser/TableBrowser";
+import Preamble from "../widgets/browser/Preamble";
 
 const QueryBrowser: Component = () => {
   let queryBrowserRef;
@@ -30,16 +31,19 @@ const QueryBrowser: Component = () => {
     <QueryResultProvider>
       <Loader />
 
-      <div class="relative h-full" ref={queryBrowserRef}>
-        <TableBrowser />
-        <Grid />
+      <div class="h-full flex flex-col relative" ref={queryBrowserRef}>
+        <div class="grow">
+          <Preamble />
+          <TableBrowser />
+          <Grid />
+        </div>
 
-        {/* <div class="mt-2 px-3">
+        <div class="mt-2 px-3">
           <span class="cursor-default select-none font-bold text-white">
             Ask AI
           </span>
           <textarea class="mt-2 h-24 w-full grow-0 rounded-md border border-gray-500 bg-zinc-800 p-3 text-gray-50"></textarea>
-        </div> */}
+        </div>
       </div>
     </QueryResultProvider>
   );

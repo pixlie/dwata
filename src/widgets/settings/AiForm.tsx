@@ -1,10 +1,9 @@
 import { Component, createMemo, createSignal } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
-import { IDatabaseFormData } from "../../utils/types";
-// import { useParams } from "@solidjs/router";
-import Button from "../interactable/Button";
+import { IAiFormData } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
+import Button from "../interactable/Button";
 
 interface IState {
   isEditing: boolean;
@@ -12,25 +11,24 @@ interface IState {
   isFetching: boolean;
 }
 
-const DatabaseForm: Component = () => {
+const AiForm: Component = () => {
   const [state, setState] = createSignal<IState>({
     isEditing: false,
     isFetching: false,
     isSaving: false,
   });
-  const [form, setForm] = createSignal<IDatabaseFormData>({
-    username: "postgres",
-    host: "localhost",
-    port: 5432,
-    name: "test",
+  const [form, setForm] = createSignal<IAiFormData>({
+    aiProvider: "OpenAI",
+    apiKey: "",
+    displayLabel: "personal",
   });
   // const params = useParams();
 
   const visibleName = createMemo(() => {
-    return !!form().label
-      ? `- ${form().label}`
-      : !!form().name
-        ? `- ${form().name}`
+    return !!form().displayLabel
+      ? `- ${form().displayLabel}`
+      : !!form().aiProvider
+        ? `- ${form().aiProvider}`
         : "";
   });
 
@@ -45,11 +43,9 @@ const DatabaseForm: Component = () => {
 
   const handleConnect = async () => {
     const response = await invoke("create_data_source", {
-      username: form().username,
-      password: form().password,
-      host: form().host,
-      port: `${form().port}`,
-      database: form().name,
+      aiProvider: form().aiProvider,
+      apiKey: form().apiKey,
+      accountLabel: form().displayLabel,
     });
   };
 
@@ -60,45 +56,27 @@ const DatabaseForm: Component = () => {
       <TextInput
         type="text"
         isRequired
-        label="DB Host"
-        value={form().host}
-        onInput={handleChange("host")}
+        label="AI Provider"
+        value={form().aiProvider}
+        onInput={handleChange("aiProvider")}
       />
 
       <div class="mt-4" />
       <TextInput
         type="text"
         isRequired
-        label="DB Port"
-        value={form().port}
-        onInput={handleChange("port")}
+        label="API Key"
+        value={form().apiKey}
+        onInput={handleChange("apiKey")}
       />
 
       <div class="mt-4" />
       <TextInput
         type="text"
         isRequired
-        label="DB Username"
-        value={form().username}
-        onInput={handleChange("username")}
-      />
-
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Password"
-        value={form().password}
-        onInput={handleChange("password")}
-      />
-
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Name"
-        value={form().name}
-        onInput={handleChange("name")}
+        label="Account Label"
+        value={form().displayLabel}
+        onInput={handleChange("displayLabel")}
       />
 
       <div class="mt-4" />
@@ -107,4 +85,4 @@ const DatabaseForm: Component = () => {
   );
 };
 
-export default DatabaseForm;
+export default AiForm;

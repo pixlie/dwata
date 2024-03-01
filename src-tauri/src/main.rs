@@ -11,7 +11,7 @@ mod error;
 // mod labels;
 mod query_result;
 
-// mod chat;
+mod chat;
 // mod saved_query;
 mod schema;
 mod store;

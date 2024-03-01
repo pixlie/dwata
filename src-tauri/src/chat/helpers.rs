@@ -1,7 +1,7 @@
 use sqlparser::dialect::GenericDialect;
 use sqlparser::parser::Parser;
 
-pub fn parse_sql() {
+pub fn parse_sql_example() {
     // From mixtral
     let sql = r#"
     SELECT
