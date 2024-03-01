@@ -40,6 +40,7 @@ const makeStore = () => {
         setStore("isFetching", true);
         // We use the Tauri API to load schema
         const result = await invoke("read_schema", { dataSourceId });
+        console.log("read_schema", result);
         setStore(
           "schemaForAllSources",
           dataSourceId,
@@ -73,6 +74,7 @@ const makeStore = () => {
         }
         throw Error("grid_not_found");
       },
+
       getAllColumnNameListForTableSource: (
         tableName: string,
         dataSouceId: string

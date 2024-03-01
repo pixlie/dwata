@@ -5,7 +5,7 @@ import { useQueryResult } from "../../stores/queryResult";
 interface IPropTypes extends APIGridSchema {}
 
 const SourceItem: Component<IPropTypes> = (props) => {
-  const [_, { setGrid }] = useQueryResult();
+  const [_, { setGrid, toggleTableBrowser }] = useQueryResult();
 
   const icon = "fa-solid fa-table";
   const handleClick = () => {
@@ -17,6 +17,7 @@ const SourceItem: Component<IPropTypes> = (props) => {
       ordering: [],
       filtering: [],
     });
+    toggleTableBrowser();
   };
 
   return (

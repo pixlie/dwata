@@ -27,20 +27,21 @@ const TableList: Component<ITableListPropTypes> = (props) => {
   );
 };
 
-const SourceBrowser: Component = () => {
+const TableBrowser: Component = () => {
   const [searchParams] = useSearchParams();
 
   if (!!searchParams.dataSourceId) {
     return (
       <>
         <SchemaLoader dataSourceId={searchParams.dataSourceId!} />
-        <div class="w-full mb-4">
+
+        <div class="w-full max-h-36 overflow-y-auto mb-4 border-gray-600 border py-2 bg-slate-900">
           <TableList dataSourceId={searchParams.dataSourceId!} />
         </div>
       </>
     );
   }
-  return <></>;
+  return null;
 };
 
-export default SourceBrowser;
+export default TableBrowser;

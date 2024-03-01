@@ -25,18 +25,16 @@ const SourceList: Component = () => {
           const label = dataSource.label || dataSource.sourceName;
 
           return (
-            <>
-              <SidebarHeading
-                label={label}
-                icon="fa-solid fa-database"
-                href={`/browse?dataSourceId=${dataSource.id}`}
-                isActive={
-                  !!searchParams.dataSouceId &&
-                  dataSource.id == searchParams.dataSouceId
-                }
-                infoTag={dataSource.sourceType}
-              />
-            </>
+            <SidebarHeading
+              label={label}
+              icon="fa-solid fa-database"
+              href={`/browse?dataSourceId=${dataSource.id}`}
+              isActive={
+                !!searchParams.dataSouceId &&
+                dataSource.id == searchParams.dataSouceId
+              }
+              infoTag={dataSource.sourceType}
+            />
           );
         }}
       </For>

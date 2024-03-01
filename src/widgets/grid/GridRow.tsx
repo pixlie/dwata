@@ -9,7 +9,7 @@ const createGridRow = (
   grids: Array<APIGridSchema>
 ): Array<Component<ICellPropTypes>> => {
   const contentTextSizeClasses = "text-sm";
-  const borderClasses = "border border-gray-700";
+  const borderClasses = "border-b border-gray-700 bg-gray-800";
   const paddingClasses = "px-1 py-1";
 
   const DefaultCell: Component<ICellPropTypes> = (innerProps) => (

@@ -5,8 +5,7 @@ import { useQueryResult } from "../../stores/queryResult";
 const GridHead: Component = () => {
   const [_, { getSchemaForGrid }] = useSchema();
   const [queryResult] = useQueryResult();
-  const thClass =
-    "px-2 py-1 cursor-pointer hover:bg-gray-800 font-semibold border border-gray-700";
+  const thClass = "px-4 py-2 cursor-pointer hover:bg-gray-800 font-semibold";
 
   if (!queryResult.query || !queryResult.query) {
     return (
@@ -19,7 +18,7 @@ const GridHead: Component = () => {
   const getHeadList = createMemo(() => {
     const headList: Array<JSX.Element> = [];
     if (!!queryResult.areRowsSelectable) {
-      headList.push(<th class={thClass} />);
+      headList.push(<th scope="col" class={thClass} />);
     }
 
     for (const gridQuery of queryResult.query) {
@@ -32,10 +31,18 @@ const GridHead: Component = () => {
 
         for (const columnSpec of gridSchema.columns)
           if (columnSpec.isPrimaryKey) {
-            headList.push(<th class={thClass}>{columnSpec.name}</th>);
-            headList.push(<th class={thClass}></th>);
+            headList.push(
+              <th scope="col" class={thClass}>
+                {columnSpec.name}
+              </th>
+            );
+            headList.push(<th scope="col" class={thClass}></th>);
           } else {
-            headList.push(<th class={thClass}>{columnSpec.name}</th>);
+            headList.push(
+              <th scope="col" class={thClass}>
+                {columnSpec.name}
+              </th>
+            );
           }
       } catch {
         continue;
@@ -44,7 +51,11 @@ const GridHead: Component = () => {
     return headList;
   });
 
-  return <tr class="bg-gray-700 text-left text-gray-100">{getHeadList()}</tr>;
+  return (
+    <thead class="text-xs uppercase bg-gray-700 text-gray-400">
+      <tr class="text-left text-gray-100">{getHeadList()}</tr>
+    </thead>
+  );
 };
 
 export default GridHead;

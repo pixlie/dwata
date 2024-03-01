@@ -11,6 +11,9 @@ interface IStore {
   errors: string[];
   isReady: boolean;
   isFetching: boolean;
+
+  // UI related
+  isTableBrowserOpen: boolean;
 }
 
 const makeStore = () => {
@@ -21,6 +24,9 @@ const makeStore = () => {
     errors: [],
     isReady: false,
     isFetching: false,
+
+    // UI related
+    isTableBrowserOpen: false,
   });
 
   return [
@@ -64,6 +70,14 @@ const makeStore = () => {
           isFetching: true,
           data: data as Array<APIGridData>,
         });
+      },
+
+      toggleTableBrowser: () => {
+        setStore("isTableBrowserOpen", !store.isTableBrowserOpen);
+      },
+
+      setTableBrowser: (state: boolean) => {
+        setStore("isTableBrowserOpen", state);
       },
     },
   ] as const; // `as const` forces tuple type inference

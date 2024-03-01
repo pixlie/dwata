@@ -17,3 +17,8 @@ div#root {
   height: 100vh;
   overflow: hidden;
 }
+
+table.dwata-grid tr td {
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
