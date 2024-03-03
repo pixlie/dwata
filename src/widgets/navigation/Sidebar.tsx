@@ -22,11 +22,6 @@ const Sidebar: Component = () => {
         icon="fa-solid fa-bookmark"
         href="/saved"
       />
-      <SidebarHeading
-        label="Query Browser"
-        icon="fa-solid fa-magnifying-glass"
-        href="/browse"
-      />
       <div class="mt-4 border-b border-gray-800" />
       <SourceList />
       <SidebarHeading

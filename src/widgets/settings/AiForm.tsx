@@ -42,7 +42,7 @@ const AiForm: Component = () => {
   };
 
   const handleConnect = async () => {
-    const response = await invoke("create_data_source", {
+    const response = await invoke("create_ai_integration", {
       aiProvider: form().aiProvider,
       apiKey: form().apiKey,
       accountLabel: form().displayLabel,
@@ -50,37 +50,41 @@ const AiForm: Component = () => {
   };
 
   return (
-    <div class="rounded-md  bg-zinc-700 p-6 max-w-screen-sm">
-      <Heading size="sm">Database {visibleName()}</Heading>
+    <div class="max-w-screen-sm">
+      <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
+        <Heading size="sm">AI Provider {visibleName()}</Heading>
+      </div>
 
-      <TextInput
-        type="text"
-        isRequired
-        label="AI Provider"
-        value={form().aiProvider}
-        onInput={handleChange("aiProvider")}
-      />
+      <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
+        <TextInput
+          type="text"
+          isRequired
+          label="AI Provider"
+          value={form().aiProvider}
+          onInput={handleChange("aiProvider")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="API Key"
-        value={form().apiKey}
-        onInput={handleChange("apiKey")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="API Key"
+          value={form().apiKey}
+          onInput={handleChange("apiKey")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="Account Label"
-        value={form().displayLabel}
-        onInput={handleChange("displayLabel")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="Account Label"
+          value={form().displayLabel}
+          onInput={handleChange("displayLabel")}
+        />
 
-      <div class="mt-4" />
-      <Button label="Test connection and save" onClick={handleConnect} />
+        <div class="mt-4" />
+        <Button label="Test connection and save" onClick={handleConnect} />
+      </div>
     </div>
   );
 };

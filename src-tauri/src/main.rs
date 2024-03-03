@@ -13,6 +13,7 @@ mod query_result;
 
 mod chat;
 // mod saved_query;
+mod ai;
 mod schema;
 mod store;
 mod workspace;
@@ -39,6 +40,7 @@ fn main() {
             schema::commands::read_schema,
             query_result::commands::load_data,
             workspace::commands::create_data_source,
+            workspace::commands::create_ai_integration
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

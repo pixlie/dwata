@@ -1,4 +1,5 @@
 pub mod helpers;
+pub mod providers;
 
 use serde::{Deserialize, Serialize};
 
@@ -7,9 +8,17 @@ pub struct HttpsApi {
     api_key: String,
 }
 
+impl HttpsApi {
+    pub fn new(api_key: &str) -> Self {
+        Self {
+            api_key: api_key.to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub enum AiProvider {
-    ChatGPT(HttpsApi),
+    OpenAI(HttpsApi),
     Groq(HttpsApi),
 }
 

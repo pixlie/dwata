@@ -20,6 +20,7 @@ pub fn load_config(config_dir: &PathBuf) -> Config {
             path_to_config: config_dir.clone(),
             data_source_list: vec![],
             folder_list: vec![],
+            ai_integrations: None,
         },
     };
     config
