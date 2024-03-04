@@ -2,7 +2,7 @@
 
 Dwata is a desktop app to chat with any AI model and get insights from your data. Chats are threaded, like in Discord and each thread can connect to a different AI model. Dwata can connect databases, APIs (like Stripe) or CSV files and send structure/data as prompt **when you** need.
 
-![Results from SQL query](docs/assets/Home_screen_recent_chat_threads.png?raw=true "Results from SQL query")
+![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads.png?raw=true "Recent chats with AI models")
 
 ## Introduction
 
