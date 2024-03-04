@@ -1,84 +1,59 @@
 # Dwata
 
-**No-code data exploration app which uses AI to get insights from business data. Use ChatGPT or self-hosted LLMs to query in plain English.**
+Dwata is a desktop app to chat with any AI model and get insights from your data. Chats are threaded, like in Discord and each thread can connect to a different AI model. Dwata can connect databases, APIs (like Stripe) or CSV files and send structure/data as prompt **when you** need.
 
-## Revamped product coming soon!
+![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads.png?raw=true "Recent chats with AI models")
 
-Hello! I am Sumit and I am focusing on Dwata again in in 2024. Dwata started off as a passion project for me to help anyone make sense of their business data. I am working to re-launch Dwata as a desktop app to empower anyone to explore their business data, collaborate with team members and get insights using AI.
+## Introduction
 
-Dwata can read all business data, no matter where they reside -
+Hello! I am Sumit and Dwata is a product that I have tried building a few times. I was focused on a GUI based product earlier but I feel AI models can be a better interface. I am working on this full-time since late 2023 and am close to the minimum viable product (MVP).
 
-- on databases like PostgreSQL, MySQL or MongoDB or
-- in SaaS products like Stripe or Shopify
-- in your own business software, accessible through an API
+## What does it solve?
 
-With Dwata, you can query visually through an **Excel/Airtable like GUI** from your desktop. Optionally, you can **run Large Language Models** on the cloud and query using **plain English**. ChatGPT integration is also available if you want.
+AI models have shown really good results in understanding human language and bridging the gap to interacting with computers. Dwata starts with chats and then allows you to (explicitly) add data or structure (of the data) to the chats. The response from AI will most probably have SQL or Python code which can then be used to get the insights needed.
 
-Collaborate with your team or AI bots using **built-in chat**. Share dynamic reports, documentation and notes on your business data. Focus on finding insights and not on learning SQL. Your business data never leaves your computer or cloud account (except if you use ChatGPT or similar SaaS AI).
+Dwata can check AI generated SQL to see if tables or columns referred are correct, else ask the AI again for corrections. When the SQL looks good, you can query your database from Dwata itself and see the results.
 
-The Dwata is being built as a desktop app (Windows, MacOS, Linux) and will be completely free to use and open source. Collaboration and AI features will be available with simple subscription.
+![Results from SQL query](docs/assets/Home_view_revamp_2024.png?raw=true "Results from SQL query")
 
-![Home Screen revamp 2024](docs/assets/Home_view_revamp_2024.png?raw=true "Home Screen revamp 2024")
+Similarly Python code (usually with Pandas) will also be executable from within Dwata. This is way out in the future as I first want to get the SQL part working minimally.
 
-## Earlier attempts' content follows...
+## What AI models can I connect to?
 
-![Home Screen](docs/assets/Home_view_v3.png?raw=true "Home Screen")
+I am adding support for these (API integrations):
 
-## What is dwata?
+- [OpenAI](https://platform.openai.com/docs/models) - GPT-4, GPT-4 Turbo, GPT-3.5 Turbo
+- [Groq](https://console.groq.com/docs/models) - LLaMA2-70b, Mixtral-8x7b
+- [Phind](https://www.phind.com/blog/introducing-phind-70b) - Phind-34B, Phind-70B (API behind waitlist)
+- [Anthropic](https://www.anthropic.com/product) - Claude (API behind waitlist)
+- [Ollama](https://github.com/ollama/ollama?tab=readme-ov-file#model-library) - Llama 2, Mistral, Phi-2 Gemma, etc.
 
-- Complete software for Business insights and operations
-- Query complex data **without any SQL or code**
-- Share business insights with entire team
-- Onboard team members easily to your Business process
-- Keep track of KPIs from any data source, compare Weekly/Monthly/Quarterly growth
-- Directly integrates with Stripe, Mailchimp, PayPal, Shippo, etc.
-- Build live Reports and Dashboards for customers/suppliers
+## SaaS models vs local/self-hosted models
 
-## Automatically infer (reflect) Database structure
+There are many available AI models at the moment and the catalog is growing. While companies like OpenAI or Anthropic only allow API based access to their private models, you can also use any of the open source (or source available) models running on your laptop or a cloud server. Ollama is a very good application for this purpose. This gives you privacy for your data since the AI model is running in your private compute environment.
 
-![Automatically infer Database structure](docs/assets/Screencast_DB_Reflect/DB_Reflect.gif?raw=true "Inferring Database structure")
-**Uses DB Reflection from SQLAlchemy**
+## Can I compare chat from different models?
 
-## Modern User Experience
+Yes! In Dwata, you start a chat thread with an AI model. Then you can go into the thread and select to `compare` to any number of other models.
 
-![Grid showing columns](docs/assets/Grid_view_v4.png?raw=true "Grid showing columns")
-**Show JOINed tables in a nice way**
+I am creating a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
 
-## Multi-table merge (1-1, 1-M Relations)
+## What data sources can Dwata connect to?
 
-![Merge related data](docs/assets/Grid_Merge_view_v4.png?raw=true "Merge related data")
-**There is not SQL to write, everything is visual!**
+Dwata will be able to read data from:
 
-## Automatically generates SQL
+- Databases like PostgreSQL, MySQL or MongoDB
+- SaaS products like Stripe or Shopify (API or CSV)
+- Your own custom software (CSV or API)
+- CSV files/folders
+- Email (IMAP)
 
-### JOIN, Sub-query, Grouping, Aggregates, etc.
+## Does Dwata read any of my private/business data?
 
-![Generates SQL for JOIN or Sub-query](docs/assets/Generated_SQL_v4.png?raw=true "Generates SQL for JOIN or Sub-query")
+No, the desktop app does not send me (or my company) any of your private data. I intend to add product analytics and error tracking but you will have explicit control over the analytics or error data I collect. You will see the the tracking data being sent to my server and can agree or disagree to participate.
 
-## Rich set of UI Elements
+## How will Dwata make money?
 
-![Boolean and large text fields](docs/assets/Detail_view_v4.png?raw=true "Boolean and large text fields")
-
-## Why would you use dwata?
-
-- Created with Sales, Marketing, Analyst or any non-Developer in mind
-- No need to invest in Django/Laravel/Rails/Express/... based admin
-- Complete auto-pilot software, does not need Developers' help to operate
-- Enable and encourage everyone to query Business insights and share
-
-**Building an admin application is an undifferentiated investment that does not add direct value to your customers.**
-
-## Some more details on what it does and how it works:
-
-- dwata scans MySQL/PostgreSQL/SQLite or MongoDB (coming soon)
-- **Automatically understands** data schema - Tables, Columns, Relations
-- Builds dynamic UI automatically with Grids, Widgets, Column view, etc.
-- Visually allows you to **Merge** related data, generates SQL for you!
-- Visually apply Aggregates, Averages, Grouping and many other functions (coming soon)
-- Can connect directly with Stripe, PayPal, Mailchimp, etc. (coming soon)
-- Has Widgets for everything from Numbers, Booleans, Large text
-- Dates, Timestamps, Geographic data (with Maps) coming soon
-- Full text search coming soon
-- Internal cache so Queries are not repeated unnecessarily
+Private collaboration: the desktop app is and will remain free (both in source code and price). If you want to share your reports, insights or action items with your team, then you will have to take a subscription (not available yet).
 
 **dwata is in early development stage.**
