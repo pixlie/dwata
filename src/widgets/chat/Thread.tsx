@@ -5,18 +5,28 @@ interface IPropTypes {
   title: string;
   summary: string;
   labels: Array<string> | null;
+  aiProvider: string;
+  aiModel: string;
 }
 
 const Thread: Component<IPropTypes> = (props) => {
   return (
     <div class="my-3 bg-zinc-800 p-3 rounded-md cursor-pointer">
-      <Heading size="base">{props.title}</Heading>
+      <Heading size="xl">{props.title}</Heading>
+      <div class="flex flex-row">
+        <div class="grow" />
+        <div>
+          <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-1 cursor-default">
+            {props.aiProvider} / {props.aiModel}
+          </span>
+        </div>
+      </div>
       <p class="text-zinc-400 text-sm">{props.summary}</p>
       {!!props.labels && props.labels.length && (
         <div class="mt-2">
           <For each={props.labels}>
             {(label) => (
-              <span class="inline-block text-sm text-zinc-600 px-2 mr-3 bg-zinc-900 rounded cursor-default">
+              <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-3 cursor-default">
                 {label}
               </span>
             )}
