@@ -1,4 +1,4 @@
-use crate::ai::helpers::check_ai_intro_message;
+// use crate::ai::helpers::check_ai_intro_message;
 use crate::ai::{AiProvider, HttpsApi};
 use crate::chat::ChatItem;
 use crate::data_sources::helpers::check_database_connection;
@@ -35,20 +35,20 @@ pub async fn create_data_source(
     }
 }
 
-#[tauri::command]
-pub async fn create_ai_integration(
-    ai_provider: &str,
-    api_key: &str,
-    display_label: Option<&str>,
-    store: State<'_, Store>,
-) -> Result<ChatItem, DwataError> {
-    let ai_provider: AiProvider = match ai_provider {
-        "OpenAI" => AiProvider::OpenAI(HttpsApi::new(api_key)),
-        "Groq" => AiProvider::Groq(HttpsApi::new(api_key)),
-        _ => return Err(DwataError::InvalidAiProvider),
-    };
-    check_ai_intro_message(ai_provider).await
-}
+// #[tauri::command]
+// pub async fn create_ai_integration(
+//     ai_provider: &str,
+//     api_key: &str,
+//     display_label: Option<&str>,
+//     store: State<'_, Store>,
+// ) -> Result<ChatItem, DwataError> {
+//     let ai_provider: AiProvider = match ai_provider {
+//         "OpenAI" => AiProvider::OpenAI(HttpsApi::new(api_key)),
+//         "Groq" => AiProvider::Groq(HttpsApi::new(api_key)),
+//         _ => return Err(DwataError::InvalidAiProvider),
+//     };
+//     // check_ai_intro_message(ai_provider).await
+// }
 
 #[tauri::command]
 pub async fn read_config(store: State<'_, Store>) -> Result<APIConfig, DwataError> {
