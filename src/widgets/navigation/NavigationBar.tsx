@@ -87,7 +87,7 @@ const NavigationBar: Component = () => {
                 tabindex="-1"
               >
                 {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                <DropdownItem label="Your Profile" />
+                <DropdownItem label="Your Account" path="/user" />
                 <DropdownItem label="Switch Organization" />
                 {/* <DropdownItem label="Settings" /> */}
               </div>

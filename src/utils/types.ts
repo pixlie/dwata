@@ -27,6 +27,12 @@ interface IAiFormData {
   displayLabel?: string;
 }
 
+interface IUserAccountFormData {
+  firstName: string;
+  lastName?: string;
+  email?: string;
+}
+
 interface IProviderPropTypes {
   children: JSX.Element;
 }
@@ -38,11 +44,27 @@ interface APIGridData {
   rows: Array<Array<any>>;
 }
 
+interface IFormField {
+  name: string;
+  fieldType:
+    | "singleLineText"
+    | "multiLineText"
+    | "markdown"
+    | "password"
+    | "date"
+    | "dateTime";
+  label: string;
+  isRequired?: boolean;
+  placeholder?: string;
+}
+
 export type {
   ILabel as IChatRoom,
   TRowValue,
   IDatabaseFormData,
   IAiFormData,
+  IUserAccountFormData,
   IProviderPropTypes,
   APIGridData,
+  IFormField,
 };

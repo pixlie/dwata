@@ -1,8 +1,9 @@
+use crate::user_account::UserAccount;
+use serde::{Deserialize, Serialize};
+use sqlx::{types::Json, FromRow};
+
 pub mod helpers;
 pub mod providers;
-
-use serde::{Deserialize, Serialize};
-use crate::user_account::UserAccount;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct HttpsApi {
@@ -18,22 +19,38 @@ impl HttpsApi {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum AiProvider {
+pub(crate) enum AiProvider {
     OpenAI(HttpsApi),
     Groq(HttpsApi),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct AiIntegration {
+pub(crate) struct AiIntegration {
+    id: u32,
     ai_provider: AiProvider,
     display_label: Option<String>,
 }
 
+#[derive(FromRow)]
+pub(crate) struct AiIntegrationRow {
+    id: u32,
+    json_data: Json<AiIntegration>,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct AiModel {
+    id: u32,
     ai_provider: AiProvider,
     user_account: UserAccount,
     name: String,
     label: String,
     description: String,
+}
+
+#[derive(FromRow)]
+pub(crate) struct AiModelRow {
+    id: u32,
+    ai_provider_id: u32,
+    user_account_id: u32,
+    json_data: Json<AiModel>,
 }

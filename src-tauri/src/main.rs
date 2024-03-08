@@ -21,6 +21,7 @@ mod chat;
 mod ai;
 mod schema;
 mod store;
+mod user_account;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -36,7 +37,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     });
     app.manage(store::Store {
         config: Arc::new(Mutex::new(workspace::helpers::load_config(&config_dir))),
-        connection: Mutex::new(db_connection),
+        db_connection: Mutex::new(db_connection),
     });
     Ok(())
 }
@@ -52,6 +53,7 @@ fn main() {
             query_result::commands::load_data,
             workspace::commands::create_data_source,
             // workspace::commands::create_ai_integration
+            user_account::commands::add_user,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

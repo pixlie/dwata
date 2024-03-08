@@ -15,4 +15,6 @@ pub enum DwataError {
 
     // Internal SQLite DB related
     CouldNotCreateAppDatabase,
+    CouldNotConnectToAppDatabase,
+    CouldNotInsertToAppDatabase,
 }

@@ -7,6 +7,7 @@ import App from "./App";
 import Home from "./routes/Home";
 import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
+import UserAccount from "./routes/UserAccount";
 
 render(
   () => (
@@ -15,6 +16,7 @@ render(
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>
+      <Route path={"/user"} component={UserAccount} />
       <Route path={"/"} component={Home} />
     </Router>
   ),

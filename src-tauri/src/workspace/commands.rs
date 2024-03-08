@@ -1,6 +1,6 @@
 // use crate::ai::helpers::check_ai_intro_message;
 use crate::ai::{AiProvider, HttpsApi};
-use crate::chat::ChatItem;
+use crate::chat::ChatReply;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{DataSource, Database};
 use crate::error::DwataError;

@@ -1,6 +1,6 @@
 use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
 use super::AiProvider;
-use crate::chat::ChatItem;
+use crate::chat::ChatReply;
 use crate::error::DwataError;
 use reqwest;
 

@@ -2,7 +2,9 @@ use crate::ai::{AiModel, AiProvider};
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::{query, types::Json, FromRow, SqliteConnection};
 
+mod crud;
 pub mod helpers;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -15,16 +17,21 @@ pub(crate) struct ChatThread {
     ai_model: AiModel,
 }
 
-// struct ChatThreadRecord {
-//     id:
-// }
+#[derive(FromRow)]
+pub(crate) struct ChatThreadRow {
+    id: u32,
+    data_json: Json<ChatThread>,
+}
 
 // impl ChatThread {
-//     pub fn new(message: String) -> Self {
-//         Self {}
+//     pub fn new(message: String, ai_provider: AiProvider, ai_model: AiModel, connection: &SqliteConnection) -> Self {
+//         let title: String = message
+//             .get(..60)
+//             .unwrap_or_else(|_| message.get(..message.len() - 1).unwrap())
+//             .to_string();
+//         query("INSERT INTO chat_thread (data_json) VALUES ( ?1 )")
+//         // Self { title }
 //     }
-//
-//     fn save_to_disk(&self) {}
 // }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -41,7 +48,13 @@ pub(crate) struct ChatReply {
     created_by: u32,
 }
 
-// impl ChatItem {
+#[derive(FromRow)]
+pub(crate) struct ChatReplyModel {
+    id: u32,
+    data_json: Json<ChatReply>,
+}
+
+// impl ChatReply {
 //     pub fn new(created_by: u32, message: String) -> Self {
 //         Self {
 //             id: 1223,

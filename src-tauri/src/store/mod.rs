@@ -7,5 +7,5 @@ pub mod database;
 
 pub struct Store {
     pub config: Arc<Mutex<Config>>,
-    pub connection: Mutex<Option<SqliteConnection>>,
+    pub db_connection: Mutex<Option<SqliteConnection>>,
 }
