@@ -1,13 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use crate::error::DwataError;
 use sqlx::SqliteConnection;
 use std::future::Future;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::task::Poll;
-use tauri::async_runtime::JoinHandle;
 use tauri::{App, Manager};
 use tokio::sync::Mutex;
 
@@ -31,12 +28,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         window.open_devtools();
         window.close_devtools();
     }
-    let config_dir: PathBuf = app.path().app_config_dir().unwrap();
+    let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
     let db_connection: Option<SqliteConnection> = tauri::async_runtime::block_on(async {
-        store::database::get_database_connection(&config_dir).await
+        store::database::get_database_connection(&app_config_dir).await
     });
     app.manage(store::Store {
-        config: Arc::new(Mutex::new(workspace::helpers::load_config(&config_dir))),
+        config: Arc::new(Mutex::new(workspace::helpers::load_config(&app_config_dir))),
         db_connection: Mutex::new(db_connection),
     });
     Ok(())
@@ -53,7 +50,7 @@ fn main() {
             query_result::commands::load_data,
             workspace::commands::create_data_source,
             // workspace::commands::create_ai_integration
-            user_account::commands::add_user,
+            user_account::commands::save_user,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

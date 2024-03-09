@@ -20,11 +20,16 @@ const UserAccount: Component = () => {
       label: "Last Name",
       fieldType: "singleLineText",
     },
+    {
+      name: "email",
+      label: "Email",
+      fieldType: "singleLineText",
+    },
   ];
 
   const handleSubmit = async () => {
     console.log(form());
-    await invoke("add_user", {
+    await invoke("save_user", {
       firstName: form().firstName,
       lastName: form().lastName,
       email: form().email,

@@ -5,8 +5,8 @@ use sqlx::Connection;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 
-pub(crate) async fn get_database_connection(path: &PathBuf) -> Option<SqliteConnection> {
-    let mut path = path.clone();
+pub(crate) async fn get_database_connection(app_config_dir: &PathBuf) -> Option<SqliteConnection> {
+    let mut path = app_config_dir.clone();
     // We return a temporary in-memory DB in case we cannot create on disk DB
     let mut db_path = "sqlite::memory:";
     if let Ok(false) = Path::try_exists(path.as_path()) {
