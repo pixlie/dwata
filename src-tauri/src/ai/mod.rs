@@ -1,6 +1,5 @@
-use crate::user_account::UserAccount;
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow};
+use ulid::Ulid;
 
 pub mod helpers;
 pub mod providers;
@@ -24,33 +23,52 @@ pub(crate) enum AiProvider {
     Groq(HttpsApi),
 }
 
+impl AiProvider {
+    pub fn new(ai_provider: &str, api_key: &str) -> Self {
+        match ai_provider {
+            "OpenAI" => Self::OpenAI(HttpsApi::new(api_key)),
+            "Groq" => Self::Groq(HttpsApi::new(api_key)),
+            _ => Self::OpenAI(HttpsApi::new(api_key)),
+        }
+    }
+
+    pub fn get_name(&self) -> String {
+        match self {
+            Self::OpenAI(_) => "OpenAI".to_string(),
+            Self::Groq(_) => "Groq".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct AiIntegration {
-    id: u32,
+    id: String,
     ai_provider: AiProvider,
     display_label: Option<String>,
 }
 
-#[derive(FromRow)]
-pub(crate) struct AiIntegrationRow {
-    id: u32,
-    json_data: Json<AiIntegration>,
+impl AiIntegration {
+    pub fn new(ai_provider: &str, api_key: &str, display_label: Option<&str>) -> Self {
+        Self {
+            id: Ulid::new().to_string(),
+            ai_provider: AiProvider::new(ai_provider, api_key),
+            display_label: display_label.map(|x| x.to_string()),
+        }
+    }
+
+    pub fn get_id(&self) -> String {
+        self.id.clone()
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct AiModel {
-    id: u32,
-    ai_provider: AiProvider,
-    user_account: UserAccount,
     name: String,
-    label: String,
-    description: String,
+    user_account_id: i64,
 }
 
-#[derive(FromRow)]
-pub(crate) struct AiModelRow {
-    id: u32,
-    ai_provider_id: u32,
-    user_account_id: u32,
-    json_data: Json<AiModel>,
+impl AiModel {
+    pub(crate) fn get_name(&self) -> String {
+        self.name.clone()
+    }
 }

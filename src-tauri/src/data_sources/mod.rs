@@ -6,9 +6,9 @@ use crate::schema::api_types::APIGridSchema;
 use crate::schema::postgresql;
 use crate::schema::postgresql::PostgreSQLObject;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
+use ulid::Ulid;
 
 pub mod api_types;
 pub mod helpers;
@@ -75,6 +75,32 @@ pub struct Database {
 }
 
 impl Database {
+    pub fn new(
+        username: &str,
+        password: Option<&str>,
+        host: &str,
+        port: Option<&str>,
+        database: &str,
+    ) -> Database {
+        Database {
+            name: database.to_string(),
+            connection: DatabaseConnection::TCPSocket(DatabaseTCPSocket {
+                host: host.to_string(),
+                port: match port {
+                    Some(x) => Some(x.parse::<u32>().unwrap()),
+                    None => None,
+                },
+            }),
+            authentication: DatabaseAuthentication {
+                username: username.to_string(),
+                password: match password {
+                    Some(x) => Some(x.to_string()),
+                    None => None,
+                },
+            },
+        }
+    }
+
     pub fn get_connection_url(&self) -> Option<String> {
         let (host, port) = match &self.connection {
             DatabaseConnection::TCPSocket(socket) => socket.get_host_port(),
@@ -149,18 +175,10 @@ impl DataSource {
     pub fn new_database(database: Database, label: Option<String>) -> Self {
         // Assume only PostgreSQL
         DataSource {
-            id: Self::hash("PostgreSQL", &database),
+            id: Ulid::new().to_string(),
             label,
             source: DataSourceType::PostgreSQL(database),
         }
-    }
-
-    fn hash(data_source_type: &str, database: &Database) -> String {
-        let mut hasher = Sha512::new();
-        hasher.update(data_source_type);
-        hasher.update(&database.name);
-        // hasher.update()
-        format!("{:x}", hasher.finalize())
     }
 
     pub fn get_id(&self) -> String {
@@ -220,34 +238,6 @@ impl DataSource {
             _ => {
                 vec![]
             }
-        }
-    }
-}
-
-impl Database {
-    pub fn new(
-        username: &str,
-        password: Option<&str>,
-        host: &str,
-        port: Option<&str>,
-        database: &str,
-    ) -> Database {
-        Database {
-            name: database.to_string(),
-            connection: DatabaseConnection::TCPSocket(DatabaseTCPSocket {
-                host: host.to_string(),
-                port: match port {
-                    Some(x) => Some(x.parse::<u32>().unwrap()),
-                    None => None,
-                },
-            }),
-            authentication: DatabaseAuthentication {
-                username: username.to_string(),
-                password: match password {
-                    Some(x) => Some(x.to_string()),
-                    None => None,
-                },
-            },
         }
     }
 }

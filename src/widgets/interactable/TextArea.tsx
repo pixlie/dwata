@@ -1,16 +1,14 @@
 import { Component } from "solid-js";
 
 interface IPropTypes {
-  type: "text" | "email" | "password";
   label?: string;
   placeholder?: string;
-  value?: string | number;
+  value?: string;
   isRequired?: boolean;
-  onInput?: (newValue: string | number) => void;
-  onFocus?: () => void;
+  onInput?: (newValue: string) => void;
 }
 
-const TextInput: Component<IPropTypes> = (props) => {
+const TextArea: Component<IPropTypes> = (props) => {
   return (
     <>
       {!!props.label && (
@@ -19,18 +17,16 @@ const TextInput: Component<IPropTypes> = (props) => {
         </label>
       )}
       <div class="mt-2">
-        <input
-          type={props.type || "text"}
+        <textarea
           required={props.isRequired}
           class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 outline-none placeholder:text-gray-400 hover:bg-yellow-100 focus:bg-yellow-100"
           placeholder={props.placeholder}
           value={props.value || ""}
           onInput={(e) => props.onInput?.(e.currentTarget.value)}
-          onFocus={props.onFocus}
         />
       </div>
     </>
   );
 };
 
-export default TextInput;
+export default TextArea;

@@ -11,9 +11,8 @@ use tokio::sync::Mutex;
 mod data_sources;
 mod error;
 // mod labels;
-mod query_result;
-
 mod chat;
+mod query_result;
 // mod saved_query;
 mod ai;
 mod schema;
@@ -49,8 +48,9 @@ fn main() {
             schema::commands::read_schema,
             query_result::commands::load_data,
             workspace::commands::create_data_source,
-            // workspace::commands::create_ai_integration
+            workspace::commands::create_ai_integration,
             user_account::commands::save_user,
+            chat::commands::start_chat_thread,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

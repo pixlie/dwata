@@ -42,7 +42,7 @@ const AiForm: Component = () => {
   };
 
   const handleConnect = async () => {
-    const response = await invoke("create_ai_integration", {
+    await invoke("create_ai_integration", {
       aiProvider: form().aiProvider,
       apiKey: form().apiKey,
       accountLabel: form().displayLabel,
@@ -83,7 +83,7 @@ const AiForm: Component = () => {
         />
 
         <div class="mt-4" />
-        <Button label="Test connection and save" onClick={handleConnect} />
+        <Button label="Save and start a chat!" onClick={handleConnect} />
       </div>
     </div>
   );

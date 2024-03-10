@@ -2,6 +2,7 @@ import { Component, For } from "solid-js";
 
 import Heading from "../widgets/typography/Heading";
 import Thread from "../widgets/chat/Thread";
+import NewThread from "../widgets/chat/NewThread";
 
 // const threads = [];
 const threads = [
@@ -36,7 +37,7 @@ const threads = [
 const Home: Component = () => {
   return (
     <>
-      <Heading size="3xl">Home</Heading>
+      <NewThread />
       <Heading size="xl">Recent conversations with AI</Heading>
 
       <div class="flex flex-row">

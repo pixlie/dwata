@@ -4,7 +4,7 @@ import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
 
 const UserAccount: Component = () => {
-  const [form, setForm] = createSignal<IUserAccountFormData>({
+  const [formData, setFormData] = createSignal<IUserAccountFormData>({
     firstName: "",
   });
 
@@ -28,11 +28,11 @@ const UserAccount: Component = () => {
   ];
 
   const handleSubmit = async () => {
-    console.log(form());
+    console.log(formData());
     await invoke("save_user", {
-      firstName: form().firstName,
-      lastName: form().lastName,
-      email: form().email,
+      firstName: formData().firstName,
+      lastName: formData().lastName,
+      email: formData().email,
     });
   };
 
@@ -42,7 +42,7 @@ const UserAccount: Component = () => {
       formFields={formFields}
       submitButtomLabel="Save"
       handleSubmit={handleSubmit}
-      setFieldInput={setForm}
+      setFieldInput={setFormData}
     ></Form>
   );
 };

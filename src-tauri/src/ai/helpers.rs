@@ -1,13 +1,13 @@
-use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
-use super::AiProvider;
-use crate::chat::ChatReply;
-use crate::error::DwataError;
-use reqwest;
+// use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
+// use super::AiProvider;
+// use crate::chat::ChatThread;
+// use crate::error::DwataError;
+// use reqwest;
 
-// pub async fn check_ai_intro_message(ai_provider: AiProvider) -> Result<ChatItem, DwataError> {
+// pub async fn check_ai_intro_message(ai_provider: AiProvider) -> Result<ChatThread, DwataError> {
 //     let chat_text = r#"
-//     You are a data analyst who is helping me in finding insights in my business. Please feel free
-//     to ask me questions to help you understand my business.
+//     You are a friendly AI assistant. I am trying to get better insights into my finances.
+//     Please feel free to ask me questions to help you understand my situation.
 //     "#;
 //     let (chat_url, api_key) = match ai_provider {
 //         AiProvider::OpenAI(x) => ("https://api.openai.com/v1/chat/completions", x.api_key),

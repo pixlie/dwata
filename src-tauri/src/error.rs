@@ -18,3 +18,10 @@ pub enum DwataError {
     CouldNotConnectToAppDatabase,
     CouldNotInsertToAppDatabase,
 }
+
+impl From<sqlx::Error> for DwataError {
+    fn from(err: sqlx::Error) -> Self {
+        println!("{:?}", err);
+        DwataError::CouldNotQueryDatabase
+    }
+}
