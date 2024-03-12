@@ -1,10 +1,9 @@
 use crate::chat::api_types::APIChatThread;
 use crate::chat::crud::create_chat_thread;
-use crate::chat::{ChatThread, ChatThreadRow};
+use crate::chat::ChatThreadRow;
 use crate::error::DwataError;
 use crate::store::Store;
-use log::Level::Error;
-use sqlx::{query, query_as};
+use sqlx::query_as;
 use tauri::State;
 
 #[tauri::command]

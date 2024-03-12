@@ -1,4 +1,5 @@
 use crate::error::DwataError;
+use chrono::Utc;
 use serde_json::json;
 use sqlx::types::JsonValue;
 use sqlx::{query, SqliteConnection};
@@ -12,7 +13,9 @@ pub(crate) async fn upsert_user_account(
     let user_account: JsonValue = json!({
         "first_name": first_name,
         "last_name": last_name,
-        "email": email
+        "email": email,
+        "is_system_user": false,
+        "is_ai_user": false
     });
     // See if user exists with ID 1
     let result = query("SELECT * FROM user_account WHERE id = 1")
@@ -34,8 +37,10 @@ pub(crate) async fn upsert_user_account(
                 }
             }
             None => {
-                match query("INSERT INTO user_account (json_data) VALUES ( ?1 )")
+                let created_at = Utc::now();
+                match query("INSERT INTO user_account (json_data, created_at) VALUES ( ?1, ?2 )")
                     .bind(user_account)
+                    .bind(created_at)
                     .execute(&mut *connection)
                     .await
                 {

@@ -50,6 +50,7 @@ fn main() {
             workspace::commands::create_data_source,
             workspace::commands::create_ai_integration,
             user_account::commands::save_user,
+            user_account::commands::fetch_current_user,
             chat::commands::start_chat_thread,
             chat::commands::fetch_chat_threads
         ])

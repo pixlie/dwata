@@ -42,7 +42,7 @@ pub(crate) async fn create_chat_thread(
                 )
                 .bind(chat_thread)
                 .bind(created_by_id)
-                .bind(created_at.clone())
+                .bind(created_at)
                 .execute(&mut **txn)
                 .await;
                 let chat_thread_id = match chat_thread_result {

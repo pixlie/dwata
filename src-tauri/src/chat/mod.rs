@@ -32,7 +32,7 @@ pub(crate) struct ChatThreadJson {
 
 #[derive(FromRow)]
 pub(crate) struct ChatThreadRow {
-    id: u32,
+    id: i64,
     json_data: Json<ChatThreadJson>,
     created_by_id: i64,
     created_at: DateTime<Utc>,
@@ -40,7 +40,7 @@ pub(crate) struct ChatThreadRow {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct ChatReply {
-    id: u32,
+    id: i64,
 
     // Stored in Markdown
     message: String,
@@ -51,28 +51,3 @@ pub(crate) struct ChatReply {
     #[serde(with = "ts_milliseconds")]
     created_at: DateTime<Utc>,
 }
-
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct ChatReplyJson {
-    message: String,
-}
-
-#[derive(FromRow)]
-pub(crate) struct ChatReplyRow {
-    id: u32,
-    data_json: Json<ChatReply>,
-    chat_thread_id: i64,
-    created_by_id: i64,
-    created_at: DateTime<Utc>,
-}
-
-// impl ChatReply {
-//     pub fn new(created_by: u32, message: String) -> Self {
-//         Self {
-//             id: 1223,
-//             created_by,
-//             message,
-//             created_at: Utc::now(),
-//         }
-//     }
-// }
