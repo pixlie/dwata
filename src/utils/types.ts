@@ -46,7 +46,8 @@ interface IFormField {
     | "markdown"
     | "password"
     | "date"
-    | "dateTime";
+    | "dateTime"
+    | "singleChoice";
   label?: string;
   isRequired?: boolean;
   placeholder?: string;

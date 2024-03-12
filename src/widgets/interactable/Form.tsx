@@ -1,4 +1,4 @@
-import { Component, For, Setter } from "solid-js";
+import { Component, For, JSX, Setter } from "solid-js";
 import Heading from "../typography/Heading";
 import Button from "./Button";
 import { IFormField } from "../../utils/types";
@@ -8,6 +8,7 @@ interface IPropTypes {
   title: string;
   formFields: Array<IFormField>;
   submitButtomLabel?: string;
+  submitButton?: JSX.Element;
   formData?: { [key: string]: any };
   setFieldInput?: Setter<{ [key: string]: any }>;
   handleSubmit?: () => {};
@@ -34,13 +35,18 @@ const Form: Component<IPropTypes> = (props) => {
         <For each={props.formFields}>
           {(field) => (
             <>
-              <FormField {...field} onInput={handleChange(field.name)} />
+              <FormField
+                {...field}
+                onInput={handleChange(field.name)}
+                value={props.formData?.[field.name]}
+              />
               <div class="mt-4" />
             </>
           )}
         </For>
 
-        {props.submitButtomLabel && (
+        {!!props.submitButton && props.submitButton}
+        {!!props.submitButtomLabel && !props.submitButton && (
           <Button
             label={props.submitButtomLabel}
             onClick={props.handleSubmit}

@@ -2,6 +2,7 @@ import { Component, createSignal } from "solid-js";
 import Form from "../interactable/Form";
 import { IFormField } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
+import Button from "../interactable/Button";
 
 interface IFormState {
   isFormOpen: boolean;
@@ -40,9 +41,12 @@ const NewThread: Component = () => {
     <Form
       title="Start a new chat"
       formFields={formFields}
-      submitButtomLabel="Start"
-      handleSubmit={handleNewThread}
+      // submitButtomLabel="Start"
+      // handleSubmit={handleNewThread}
       setFieldInput={setFormData}
+      submitButton={
+        <Button size="sm" label="Start a chat" onClick={handleNewThread} />
+      }
     ></Form>
   );
 };

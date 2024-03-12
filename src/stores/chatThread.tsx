@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 interface IStore {
   threads: Array<APIChatThread>;
+  repliesForThreads: { [threadId: string]: Array<APIChatThread> };
 
   isFetching: boolean;
   isReady: boolean;
@@ -13,6 +14,7 @@ interface IStore {
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     threads: [],
+    repliesForThreads: {},
     isFetching: false,
     isReady: false,
   });
@@ -22,7 +24,7 @@ const makeStore = () => {
     {
       fetchChatThreads: async () => {
         let result = await invoke("fetch_chat_threads");
-        console.log(result);
+        setStore({ ...store, threads: result as Array<APIChatThread> });
       },
     },
   ] as const; // `as const` forces tuple type inference

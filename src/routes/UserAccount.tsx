@@ -1,7 +1,8 @@
-import { Component, createSignal } from "solid-js";
+import { Component, createComputed, createSignal, onMount } from "solid-js";
 import { IFormField } from "../utils/types";
 import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
+import { useUser } from "../stores/user";
 
 interface IUserAccountFormData {
   firstName: string;
@@ -10,8 +11,21 @@ interface IUserAccountFormData {
 }
 
 const UserAccount: Component = () => {
+  const [user, { fetchCurrentUser }] = useUser();
   const [formData, setFormData] = createSignal<IUserAccountFormData>({
     firstName: "",
+  });
+
+  onMount(async () => {
+    await fetchCurrentUser();
+  });
+
+  createComputed(() => {
+    setFormData({
+      firstName: user.account?.firstName || "",
+      lastName: user.account?.lastName || "",
+      email: user.account?.email || "",
+    });
   });
 
   const formFields: Array<IFormField> = [
@@ -47,6 +61,7 @@ const UserAccount: Component = () => {
       formFields={formFields}
       submitButtomLabel="Save"
       handleSubmit={handleSubmit}
+      formData={formData()}
       setFieldInput={setFormData}
     ></Form>
   );

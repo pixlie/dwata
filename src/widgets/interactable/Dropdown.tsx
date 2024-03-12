@@ -4,11 +4,10 @@ interface IPropTypes {
   label: string;
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
-  onClick?: () => void;
-  href?: string;
+  onSelect?: () => void;
 }
 
-const Button: Component<IPropTypes> = (props) => {
+const Dropdown: Component<IPropTypes> = (props) => {
   const getSizeClass = (size: string) => {
     switch (size) {
       case "sm":
@@ -20,25 +19,20 @@ const Button: Component<IPropTypes> = (props) => {
         return "px-4 py-2 text-base font-normal";
     }
   };
+
   const buttonClasses = `${getSizeClass(
     props.size || "base"
   )} text-white bg-green-600 hover:bg-green-700 rounded-md select-none cursor-pointer ${
     props.isBlock ? "w-full" : ""
   }`;
 
-  if (!!props.onClick) {
-    return (
-      <button class={buttonClasses} onClick={props.onClick}>
-        {props.label}
-      </button>
-    );
-  } else if (!!props.href) {
-    return (
-      <a class={buttonClasses} href={props.href}>
-        {props.label}
-      </a>
-    );
-  }
+  const handlClick = () => {};
+
+  return (
+    <button class={buttonClasses} onClick={handlClick}>
+      {props.label} <i class="fa-solid fa-chevron-down" />
+    </button>
+  );
 };
 
-export default Button;
+export default Dropdown;

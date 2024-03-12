@@ -1,17 +1,24 @@
+import { invoke } from "@tauri-apps/api/core";
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
+import { APIUserAccount } from "../api_types/APIUserAccount";
 
 interface IStore {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  salutation?: "Mr." | "Mrs." | "Ms.";
+  account?: APIUserAccount;
 }
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({});
 
-  return [store, {}] as const; // `as const` forces tuple type inference
+  return [
+    store,
+    {
+      fetchCurrentUser: async () => {
+        let result = await invoke("fetch_current_user");
+        setStore({ ...store, account: result as APIUserAccount });
+      },
+    },
+  ] as const; // `as const` forces tuple type inference
 };
 
 type TStoreAndFunctions = ReturnType<typeof makeStore>;
