@@ -28,17 +28,17 @@ pub(crate) async fn create_chat_thread(
         "summary": JsonValue::Null,
         "labels": [],
         "ai_provider": ai_provider,
-        "ai_model": ai_model,
+        "ai_model": ai_model
     });
     let created_by_id: i64 = 1;
-    let created_at = Utc::now().to_rfc3339();
+    let created_at = Utc::now();
     connection
         .transaction(|txn| {
             Box::pin(async move {
                 let chat_thread_result = query(
                     r#"INSERT INTO chat_thread
-        (json_data, created_by_id, created_at)
-        VALUES ( ?1, ?2, ?3 )"#,
+                    (json_data, created_by_id, created_at)
+                    VALUES ( ?1, ?2, ?3 )"#,
                 )
                 .bind(chat_thread)
                 .bind(created_by_id)
@@ -55,17 +55,18 @@ pub(crate) async fn create_chat_thread(
                 // Create the first chat reply with the full message from user
                 let chat_reply: JsonValue = json!({
                     "chat_thread_id": chat_thread_id,
-                    "message": message
+                    "message": message,
+                    "is_sent_to_ai": false
                 });
                 match query(
                     r#"INSERT INTO chat_reply
-            (json_data, chat_thread_id, created_by_id, created_at)
-            VALUES ( ?1, ?2, ?3, ?4 )"#,
+                    (json_data, chat_thread_id, created_by_id, created_at)
+                    VALUES ( ?1, ?2, ?3, ?4 )"#,
                 )
                 .bind(chat_reply)
                 .bind(chat_thread_id)
                 .bind(created_by_id)
-                .bind(created_at.clone())
+                .bind(created_at.to_rfc3339().clone())
                 .execute(&mut **txn)
                 .await
                 {
@@ -76,6 +77,8 @@ pub(crate) async fn create_chat_thread(
                         labels: vec![],
                         ai_provider: ai_provider.to_string(),
                         ai_model: ai_model.to_string(),
+                        created_by_id,
+                        created_at,
                     }),
                     Err(err) => {
                         println!("Error: {:?}", err);

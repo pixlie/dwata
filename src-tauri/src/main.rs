@@ -51,6 +51,7 @@ fn main() {
             workspace::commands::create_ai_integration,
             user_account::commands::save_user,
             chat::commands::start_chat_thread,
+            chat::commands::fetch_chat_threads
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

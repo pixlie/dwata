@@ -27,12 +27,6 @@ interface IAiFormData {
   displayLabel?: string;
 }
 
-interface IUserAccountFormData {
-  firstName: string;
-  lastName?: string;
-  email?: string;
-}
-
 interface IProviderPropTypes {
   children: JSX.Element;
 }
@@ -53,7 +47,7 @@ interface IFormField {
     | "password"
     | "date"
     | "dateTime";
-  label: string;
+  label?: string;
   isRequired?: boolean;
   placeholder?: string;
 }
@@ -63,7 +57,6 @@ export type {
   TRowValue,
   IDatabaseFormData,
   IAiFormData,
-  IUserAccountFormData,
   IProviderPropTypes,
   APIGridData,
   IFormField,

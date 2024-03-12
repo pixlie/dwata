@@ -1,7 +1,13 @@
 import { Component, createSignal } from "solid-js";
-import { IFormField, IUserAccountFormData } from "../utils/types";
+import { IFormField } from "../utils/types";
 import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
+
+interface IUserAccountFormData {
+  firstName: string;
+  lastName?: string;
+  email?: string;
+}
 
 const UserAccount: Component = () => {
   const [formData, setFormData] = createSignal<IUserAccountFormData>({
@@ -28,7 +34,6 @@ const UserAccount: Component = () => {
   ];
 
   const handleSubmit = async () => {
-    console.log(formData());
     await invoke("save_user", {
       firstName: formData().firstName,
       lastName: formData().lastName,

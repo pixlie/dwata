@@ -48,7 +48,7 @@ pub async fn create_ai_integration(
     let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
     let id = ai_integration.get_id().clone();
     let mut config_guard = store.config.lock().await;
-    let mut ai_integrations = config_guard.ai_integrations.get_or_insert(vec![]);
+    let ai_integrations = config_guard.ai_integrations.get_or_insert(vec![]);
     ai_integrations.push(ai_integration);
     match fs::write(
         &config_guard.path_to_config,

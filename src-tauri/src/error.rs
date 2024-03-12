@@ -17,6 +17,7 @@ pub enum DwataError {
     CouldNotCreateAppDatabase,
     CouldNotConnectToAppDatabase,
     CouldNotInsertToAppDatabase,
+    CouldNotFetchRowsFromAppDatabase,
 }
 
 impl From<sqlx::Error> for DwataError {

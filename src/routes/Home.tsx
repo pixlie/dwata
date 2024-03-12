@@ -3,6 +3,8 @@ import { Component, For } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import Thread from "../widgets/chat/Thread";
 import NewThread from "../widgets/chat/NewThread";
+import { ChatThreadProvider } from "../stores/chatThread";
+import ChatThreadLoader from "../widgets/chat/ChatThreadLoader";
 
 // const threads = [];
 const threads = [
@@ -36,7 +38,8 @@ const threads = [
 
 const Home: Component = () => {
   return (
-    <>
+    <ChatThreadProvider>
+      <ChatThreadLoader />
       <NewThread />
       <Heading size="xl">Recent conversations with AI</Heading>
 
@@ -45,7 +48,7 @@ const Home: Component = () => {
           <For each={threads}>{(thread) => <Thread {...thread} />}</For>
         </div>
       </div>
-    </>
+    </ChatThreadProvider>
   );
 };
 
