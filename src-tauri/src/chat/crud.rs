@@ -1,4 +1,3 @@
-use crate::ai::{AiModel, AiProvider};
 use crate::chat::ChatThread;
 use crate::error::DwataError;
 use chrono::Utc;

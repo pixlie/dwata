@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use ulid::Ulid;
 
 pub mod helpers;
@@ -61,14 +62,83 @@ impl AiIntegration {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct AiModel {
-    name: String,
-    user_account_id: i64,
+pub(crate) struct AiModelTuple {
+    api_name: String,
+    label: String,
+    context_window: Option<usize>,
 }
 
-impl AiModel {
-    pub(crate) fn get_name(&self) -> String {
-        self.name.clone()
-    }
+pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModelTuple>> {
+    let mut models = HashMap::new();
+    models.insert(
+        "OpenAI".to_string(),
+        vec![
+            AiModelTuple {
+                api_name: "gpt-4-turbo-preview".to_string(),
+                label: "GPT-4 Turbo".to_string(),
+                context_window: Some(128_000),
+            },
+            AiModelTuple {
+                api_name: "gpt-3.5-turbo".to_string(),
+                label: "GPT-3.5 Turbo".to_string(),
+                context_window: Some(16_385),
+            },
+            AiModelTuple {
+                api_name: "gpt-4".to_string(),
+                label: "GPT-4".to_string(),
+                context_window: Some(8_192),
+            },
+            AiModelTuple {
+                api_name: "gpt-4-32k".to_string(),
+                label: "GPT-4 32k".to_string(),
+                context_window: Some(32_768),
+            },
+        ],
+    );
+    models.insert(
+        "Groq".to_string(),
+        vec![
+            AiModelTuple {
+                api_name: "llama2-70b-4096".to_string(),
+                label: "LLaMA2 70b".to_string(),
+                context_window: Some(4_096),
+            },
+            AiModelTuple {
+                api_name: "mixtral-8x7b-32768".to_string(),
+                label: "Mixtral 8x7b".to_string(),
+                context_window: Some(32_768),
+            },
+            AiModelTuple {
+                api_name: "gemma-7b-it".to_string(),
+                label: "Gemma 7b it".to_string(),
+                context_window: Some(8_192),
+            },
+        ],
+    );
+    models.insert(
+        "Anthropic".to_string(),
+        vec![
+            AiModelTuple {
+                api_name: "claude-3-opus-20240229".to_string(),
+                label: "Claude 3 Opus".to_string(),
+                context_window: Some(200_000),
+            },
+            AiModelTuple {
+                api_name: "claude-3-sonnet-20240229".to_string(),
+                label: "Claude 3 Sonnet".to_string(),
+                context_window: Some(200_000),
+            },
+            AiModelTuple {
+                api_name: "claude-2.1".to_string(),
+                label: "Claude 2.1".to_string(),
+                context_window: Some(200_000),
+            },
+            AiModelTuple {
+                api_name: "claude-2.0".to_string(),
+                label: "Claude 2.0".to_string(),
+                context_window: Some(100_000),
+            },
+        ],
+    );
+    models
 }

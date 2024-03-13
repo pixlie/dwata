@@ -3,6 +3,7 @@ import Form from "../interactable/Form";
 import { IFormField } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
+import Dropdown from "../interactable/Dropdown";
 
 interface IFormState {
   isFormOpen: boolean;
@@ -45,7 +46,12 @@ const NewThread: Component = () => {
       // handleSubmit={handleNewThread}
       setFieldInput={setFormData}
       submitButton={
-        <Button size="sm" label="Start a chat" onClick={handleNewThread} />
+        <div class="flex flex-row">
+          <div class="grow">
+            <Button size="sm" label="Start a chat" onClick={handleNewThread} />
+          </div>
+          <Dropdown label="AI model" choices={{ OpenAI: "OpenAI" }} size="sm" />
+        </div>
       }
     ></Form>
   );
