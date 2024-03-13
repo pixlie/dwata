@@ -4,6 +4,7 @@ import TextInput from "../interactable/TextInput";
 import { IAiFormData } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
+import Dropdown from "../interactable/Dropdown";
 
 interface IState {
   isEditing: boolean;
@@ -22,7 +23,12 @@ const AiForm: Component = () => {
     apiKey: "",
     displayLabel: "personal",
   });
-  // const params = useParams();
+
+  const AIProviderChoices = {
+    OpenAI: "OpenAI",
+    Groq: "Groq",
+    Anthropic: "Anthropic",
+  };
 
   const visibleName = createMemo(() => {
     return !!form().displayLabel
@@ -56,12 +62,13 @@ const AiForm: Component = () => {
       </div>
 
       <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
-        <TextInput
-          type="text"
+        <Dropdown
+          label="Select an AI Provider"
+          choices={AIProviderChoices}
           isRequired
-          label="AI Provider"
           value={form().aiProvider}
-          onInput={handleChange("aiProvider")}
+          onSelect={handleChange("aiProvider")}
+          size="sm"
         />
 
         <div class="mt-4" />

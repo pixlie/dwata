@@ -1,13 +1,29 @@
-import { Component } from "solid-js";
+import { Component, For, createMemo, createSignal } from "solid-js";
+import { darkTheme } from "../../utils/themes";
+import DropdownItem from "./DropdownItem";
 
 interface IPropTypes {
   label: string;
+  choices: { [key: string]: string };
+  value?: string | number;
+  isRequired?: boolean;
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
-  onSelect?: () => void;
+  onSelect?: (newValue: string) => void;
+}
+
+interface IWidgetState {
+  isOpen: boolean;
+  selected?: {
+    key: string;
+    value: string;
+  };
 }
 
 const Dropdown: Component<IPropTypes> = (props) => {
+  const [widgetState, setWidgetState] = createSignal<IWidgetState>({
+    isOpen: false,
+  });
   const getSizeClass = (size: string) => {
     switch (size) {
       case "sm":
@@ -22,16 +38,52 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const buttonClasses = `${getSizeClass(
     props.size || "base"
-  )} text-white bg-green-600 hover:bg-green-700 rounded-md select-none cursor-pointer ${
+  )} rounded-md select-none cursor-pointer ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder} ${
     props.isBlock ? "w-full" : ""
   }`;
 
-  const handlClick = () => {};
+  const getLabel = createMemo(() => {
+    if (!!widgetState().selected) {
+      return widgetState().selected!.value;
+    } else {
+      return props.label;
+    }
+  });
+
+  const handlClick = () => {
+    setWidgetState({ ...widgetState(), isOpen: !widgetState().isOpen });
+  };
+
+  const handleChoiceSelect = (selected: string) => {
+    setWidgetState({
+      ...widgetState(),
+      isOpen: false,
+      selected: {
+        key: selected,
+        value: props.choices[selected],
+      },
+    });
+  };
 
   return (
-    <button class={buttonClasses} onClick={handlClick}>
-      {props.label} <i class="fa-solid fa-chevron-down" />
-    </button>
+    <div class="relative">
+      <button class={buttonClasses} onClick={handlClick}>
+        {getLabel()} <i class="ml-1 fa-solid fa-chevron-down" />
+      </button>
+      {!!widgetState().isOpen && (
+        <div class="absolute top-10 z-10">
+          <For each={Object.entries(props.choices)}>
+            {([key, value]) => (
+              <DropdownItem
+                key={key}
+                label={value}
+                onSelect={handleChoiceSelect}
+              />
+            )}
+          </For>
+        </div>
+      )}
+    </div>
   );
 };
 
