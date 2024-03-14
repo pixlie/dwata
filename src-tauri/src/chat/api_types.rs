@@ -1,4 +1,4 @@
-use crate::chat::{ChatReply, ChatThreadRow};
+use crate::chat::{ChatReplyRow, ChatThreadRow};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -36,24 +36,24 @@ impl APIChatThread {
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub(crate) struct APIChatReply {
     id: i64,
-
     // Stored in Markdown
     message: String,
-
     chat_thread_id: i64,
     // User who posted this chat, including LLM
     created_by_id: i64,
     created_at: String,
+    is_sent_to_ai: bool,
 }
 
 impl APIChatReply {
-    pub fn from_sqlx_row(row: &ChatReply) -> Self {
+    pub fn from_sqlx_row(row: &ChatReplyRow) -> Self {
         Self {
             id: row.id,
-            message: row.message.to_string(),
+            message: row.json_data.0.message.to_string(),
             chat_thread_id: row.chat_thread_id,
             created_by_id: row.created_by_id,
             created_at: row.created_at.to_rfc3339(),
+            is_sent_to_ai: row.json_data.0.is_sent_to_ai,
         }
     }
 }

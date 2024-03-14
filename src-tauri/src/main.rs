@@ -52,7 +52,10 @@ fn main() {
             user_account::commands::save_user,
             user_account::commands::fetch_current_user,
             chat::commands::start_chat_thread,
-            chat::commands::fetch_chat_threads
+            chat::commands::fetch_chat_thread_list,
+            chat::commands::fetch_chat_thread_detail,
+            chat::commands::fetch_chat_reply_list,
+            ai::commands::fetch_list_of_ai_providers_and_models
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

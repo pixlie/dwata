@@ -1,11 +1,9 @@
-// use crate::ai::helpers::check_ai_intro_message;
 use crate::ai::AiIntegration;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{DataSource, Database};
 use crate::error::DwataError;
 use crate::store::Store;
 use crate::workspace::api_types::APIConfig;
-use log::error;
 use std::fs;
 use tauri::State;
 
@@ -48,8 +46,7 @@ pub async fn create_ai_integration(
     let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
     let id = ai_integration.get_id().clone();
     let mut config_guard = store.config.lock().await;
-    let ai_integrations = config_guard.ai_integrations.get_or_insert(vec![]);
-    ai_integrations.push(ai_integration);
+    config_guard.ai_integration_list.push(ai_integration);
     match fs::write(
         &config_guard.path_to_config,
         config_guard.get_pretty_string(),

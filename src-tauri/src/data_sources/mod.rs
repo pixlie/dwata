@@ -160,15 +160,15 @@ impl DataSourceType {
     }
 }
 
+pub enum DataSourceConnection {
+    PostgreSQL(sqlx::PgPool),
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DataSource {
     id: String,
     label: Option<String>,
     source: DataSourceType,
-}
-
-pub enum DataSourceConnection {
-    PostgreSQL(sqlx::PgPool),
 }
 
 impl DataSource {

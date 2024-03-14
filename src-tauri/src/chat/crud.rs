@@ -1,4 +1,3 @@
-use crate::chat::ChatThread;
 use crate::error::DwataError;
 use chrono::Utc;
 use serde_json::json;
@@ -11,7 +10,7 @@ pub(crate) async fn create_chat_thread(
     ai_provider: String,
     ai_model: String,
     connection: &mut SqliteConnection,
-) -> Result<ChatThread, DwataError> {
+) -> Result<i64, DwataError> {
     let title = message
         .get(
             ..(if message.len() >= 60 {
@@ -53,7 +52,6 @@ pub(crate) async fn create_chat_thread(
                 };
                 // Create the first chat reply with the full message from user
                 let chat_reply: JsonValue = json!({
-                    "chat_thread_id": chat_thread_id,
                     "message": message,
                     "is_sent_to_ai": false
                 });
@@ -69,16 +67,7 @@ pub(crate) async fn create_chat_thread(
                 .execute(&mut **txn)
                 .await
                 {
-                    Ok(_) => Ok(ChatThread {
-                        id: chat_thread_id,
-                        title: title.to_string(),
-                        summary: None,
-                        labels: vec![],
-                        ai_provider: ai_provider.to_string(),
-                        ai_model: ai_model.to_string(),
-                        created_by_id,
-                        created_at,
-                    }),
+                    Ok(_) => Ok(chat_thread_id),
                     Err(err) => {
                         println!("Error: {:?}", err);
                         return Err(DwataError::CouldNotInsertToAppDatabase);

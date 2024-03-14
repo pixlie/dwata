@@ -15,7 +15,7 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
             path_to_config: app_config_dir.clone(),
             data_source_list: vec![],
             folder_list: vec![],
-            ai_integrations: None,
+            ai_integration_list: vec![],
         },
     };
     config

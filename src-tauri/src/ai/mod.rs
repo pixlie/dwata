@@ -1,7 +1,10 @@
+use crate::ai::api_types::APIAPIntegration;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ulid::Ulid;
 
+pub(crate) mod api_types;
+pub mod commands;
 pub mod helpers;
 pub mod providers;
 
@@ -60,35 +63,43 @@ impl AiIntegration {
     pub fn get_id(&self) -> String {
         self.id.clone()
     }
+
+    pub fn get_api_ai_integration(&self) -> APIAPIntegration {
+        APIAPIntegration::new(
+            self.get_id(),
+            self.ai_provider.get_name(),
+            self.display_label.clone(),
+        )
+    }
 }
 
-pub(crate) struct AiModelTuple {
+pub(crate) struct AiModel {
     api_name: String,
     label: String,
     context_window: Option<usize>,
 }
 
-pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModelTuple>> {
+pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModel>> {
     let mut models = HashMap::new();
     models.insert(
         "OpenAI".to_string(),
         vec![
-            AiModelTuple {
+            AiModel {
                 api_name: "gpt-4-turbo-preview".to_string(),
                 label: "GPT-4 Turbo".to_string(),
                 context_window: Some(128_000),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "gpt-3.5-turbo".to_string(),
                 label: "GPT-3.5 Turbo".to_string(),
                 context_window: Some(16_385),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "gpt-4".to_string(),
                 label: "GPT-4".to_string(),
                 context_window: Some(8_192),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "gpt-4-32k".to_string(),
                 label: "GPT-4 32k".to_string(),
                 context_window: Some(32_768),
@@ -98,17 +109,17 @@ pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModelTuple>> {
     models.insert(
         "Groq".to_string(),
         vec![
-            AiModelTuple {
+            AiModel {
                 api_name: "llama2-70b-4096".to_string(),
                 label: "LLaMA2 70b".to_string(),
                 context_window: Some(4_096),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "mixtral-8x7b-32768".to_string(),
                 label: "Mixtral 8x7b".to_string(),
                 context_window: Some(32_768),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "gemma-7b-it".to_string(),
                 label: "Gemma 7b it".to_string(),
                 context_window: Some(8_192),
@@ -118,22 +129,22 @@ pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModelTuple>> {
     models.insert(
         "Anthropic".to_string(),
         vec![
-            AiModelTuple {
+            AiModel {
                 api_name: "claude-3-opus-20240229".to_string(),
                 label: "Claude 3 Opus".to_string(),
                 context_window: Some(200_000),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "claude-3-sonnet-20240229".to_string(),
                 label: "Claude 3 Sonnet".to_string(),
                 context_window: Some(200_000),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "claude-2.1".to_string(),
                 label: "Claude 2.1".to_string(),
                 context_window: Some(200_000),
             },
-            AiModelTuple {
+            AiModel {
                 api_name: "claude-2.0".to_string(),
                 label: "Claude 2.0".to_string(),
                 context_window: Some(100_000),
