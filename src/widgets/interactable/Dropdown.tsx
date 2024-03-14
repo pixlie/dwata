@@ -1,10 +1,22 @@
 import { Component, For, createMemo, createSignal } from "solid-js";
 import { darkTheme } from "../../utils/themes";
 import DropdownItem from "./DropdownItem";
+import DropdownHeading from "./DropdownHeading";
+
+export interface IKeyedChoice {
+  key: number | string;
+  label: string;
+}
+
+export interface IChoicesWithHeading {
+  name: string;
+  choices: Array<IKeyedChoice>;
+}
 
 interface IPropTypes {
   label: string;
-  choices: { [key: string]: string };
+  choices?: Array<IKeyedChoice>;
+  choicesWithHeadings?: Array<IChoicesWithHeading>;
   value?: string | number;
   isRequired?: boolean;
   size?: "sm" | "base" | "lg";
@@ -15,8 +27,8 @@ interface IPropTypes {
 interface IWidgetState {
   isOpen: boolean;
   selected?: {
-    key: string;
-    value: string;
+    key: number | string;
+    label: string;
   };
 }
 
@@ -39,12 +51,12 @@ const Dropdown: Component<IPropTypes> = (props) => {
   const buttonClasses = `${getSizeClass(
     props.size || "base"
   )} rounded-md select-none cursor-pointer ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder} ${
-    props.isBlock ? "w-full" : ""
+    props.isBlock && "w-full"
   }`;
 
   const getLabel = createMemo(() => {
     if (!!widgetState().selected) {
-      return widgetState().selected!.value;
+      return widgetState().selected!.label;
     } else {
       return props.label;
     }
@@ -54,13 +66,22 @@ const Dropdown: Component<IPropTypes> = (props) => {
     setWidgetState({ ...widgetState(), isOpen: !widgetState().isOpen });
   };
 
-  const handleChoiceSelect = (selected: string) => {
+  const handleChoiceSelect = (selected: number | string) => {
+    const allChoices = !!props.choicesWithHeadings
+      ? props.choicesWithHeadings.reduce(
+          (arr: Array<IKeyedChoice>, curr: IChoicesWithHeading) => [
+            ...arr,
+            ...curr.choices,
+          ],
+          []
+        )
+      : props.choices;
     setWidgetState({
       ...widgetState(),
       isOpen: false,
       selected: {
         key: selected,
-        value: props.choices[selected],
+        label: allChoices?.find((x) => x.key === selected)?.label || "",
       },
     });
   };
@@ -72,15 +93,34 @@ const Dropdown: Component<IPropTypes> = (props) => {
       </button>
       {!!widgetState().isOpen && (
         <div class="absolute top-10 z-10">
-          <For each={Object.entries(props.choices)}>
-            {([key, value]) => (
-              <DropdownItem
-                key={key}
-                label={value}
-                onSelect={handleChoiceSelect}
-              />
-            )}
-          </For>
+          {!!props.choicesWithHeadings ? (
+            <For each={props.choicesWithHeadings}>
+              {(heading) => (
+                <>
+                  <DropdownHeading label={heading.name} />
+                  <For each={heading.choices}>
+                    {(choice) => (
+                      <DropdownItem
+                        key={choice.key}
+                        label={choice.label}
+                        onSelect={handleChoiceSelect}
+                      />
+                    )}
+                  </For>
+                </>
+              )}
+            </For>
+          ) : (
+            <For each={props.choices}>
+              {(choice) => (
+                <DropdownItem
+                  key={choice.key}
+                  label={choice.label}
+                  onSelect={handleChoiceSelect}
+                />
+              )}
+            </For>
+          )}
         </div>
       )}
     </div>

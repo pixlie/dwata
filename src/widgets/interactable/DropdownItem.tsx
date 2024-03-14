@@ -6,15 +6,15 @@ interface IDropdownItemProps {
   href?: string;
 
   // key and onSelect can be used to set selected value
-  key?: string;
-  onSelect?: (selected: string) => void;
+  key?: number | string;
+  onSelect?: (selected: number | string) => void;
 
   // This is for traditional click handler
   onClick?: (event: MouseEvent) => void;
 }
 
 const DropdownItem: Component<IDropdownItemProps> = (props) => {
-  const classes = `block w-full text-left px-4 py-2 text-sm ${darkTheme.interactibleWidgetBackgroundAndText}`;
+  const classes = `block w-full text-left px-4 py-0.5 text-sm ${darkTheme.interactibleWidgetBackgroundAndText}`;
 
   const handleClick = (event: MouseEvent) => {
     if (!!props.onSelect) {
