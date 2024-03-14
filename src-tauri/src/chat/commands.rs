@@ -60,7 +60,7 @@ pub(crate) async fn fetch_chat_thread_list(
 
 #[tauri::command]
 pub(crate) async fn fetch_chat_thread_detail(
-    id: i64,
+    thread_id: i64,
     store: State<'_, Store>,
 ) -> Result<APIChatThread, DwataError> {
     let mut db_guard = store.db_connection.lock().await;
@@ -68,7 +68,7 @@ pub(crate) async fn fetch_chat_thread_detail(
         Some(ref mut conn) => {
             let result: Result<ChatThreadRow, sqlx::Error> =
                 query_as("SELECT * FROM chat_thread WHERE id = ?1")
-                    .bind(id)
+                    .bind(thread_id)
                     .fetch_one(conn)
                     .await;
             match result {
@@ -85,7 +85,7 @@ pub(crate) async fn fetch_chat_thread_detail(
 
 #[tauri::command]
 pub(crate) async fn fetch_chat_reply_list(
-    chat_thread_id: i64,
+    thread_id: i64,
     store: State<'_, Store>,
 ) -> Result<Vec<APIChatReply>, DwataError> {
     let mut db_guard = store.db_connection.lock().await;
@@ -93,7 +93,7 @@ pub(crate) async fn fetch_chat_reply_list(
         Some(ref mut conn) => {
             let result: Result<Vec<ChatReplyRow>, sqlx::Error> =
                 query_as("SELECT * FROM chat_reply WHERE chat_thread_id = ?1")
-                    .bind(chat_thread_id)
+                    .bind(thread_id)
                     .fetch_all(conn)
                     .await;
             match result {

@@ -1,10 +1,20 @@
 import { Component, For } from "solid-js";
 import Heading from "../typography/Heading";
 import { APIChatThread } from "../../api_types/APIChatThread";
+import { useNavigate } from "@solidjs/router";
 
 const Thread: Component<APIChatThread> = (props) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/chat/thread/${props.id}`);
+  };
+
   return (
-    <div class="my-3 bg-zinc-800 p-3 rounded-md cursor-pointer">
+    <div
+      class="my-3 bg-zinc-800 p-3 rounded-md cursor-pointer"
+      onClick={handleClick}
+    >
       <Heading size="xl">{props.title}</Heading>
       <div class="flex flex-row">
         <div class="grow" />

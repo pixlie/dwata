@@ -2,11 +2,12 @@ import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIChatThread } from "../api_types/APIChatThread";
 import { invoke } from "@tauri-apps/api/core";
+import { APIChatReply } from "../api_types/APIChatReply";
 
 interface IStore {
   threadList: Array<APIChatThread>;
-  threadDetail: { [threadId: number]: APIChatThread };
-  replyListForThread: { [threadId: number]: Array<APIChatThread> };
+  threadDetail?: APIChatThread;
+  replyListForThread?: Array<APIChatReply>;
 
   isFetching: boolean;
   isReady: boolean;
@@ -15,8 +16,6 @@ interface IStore {
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     threadList: [],
-    threadDetail: {},
-    replyListForThread: {},
     isFetching: false,
     isReady: false,
   });
@@ -31,26 +30,20 @@ const makeStore = () => {
       },
 
       fetchThreadDetail: async (threadId: number) => {
-        const result = await invoke("fetch_chat_thread_detail");
+        const result = await invoke("fetch_chat_thread_detail", { threadId });
         console.log(result);
         setStore({
           ...store,
-          threadDetail: {
-            ...store.threadDetail,
-            [threadId]: result as APIChatThread,
-          },
+          threadDetail: result as APIChatThread,
         });
       },
 
       fetchChatReplies: async (threadId: number) => {
-        const result = await invoke("fetch_chat_reply_list");
+        const result = await invoke("fetch_chat_reply_list", { threadId });
         console.log(result);
         setStore({
           ...store,
-          replyListForThread: {
-            ...store.replyListForThread,
-            [threadId]: result as Array<APIChatThread>,
-          },
+          replyListForThread: result as Array<APIChatReply>,
         });
       },
     },
