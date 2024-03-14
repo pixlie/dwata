@@ -5,6 +5,7 @@ const ChatThreadLoader: Component = () => {
   const [_, { fetchChatThreads }] = useChatThread();
 
   onMount(async () => {
+    console.log("fetching");
     await fetchChatThreads();
   });
 

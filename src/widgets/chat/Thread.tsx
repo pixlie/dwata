@@ -1,15 +1,8 @@
 import { Component, For } from "solid-js";
 import Heading from "../typography/Heading";
+import { APIChatThread } from "../../api_types/APIChatThread";
 
-interface IPropTypes {
-  title: string;
-  summary: string;
-  labels: Array<string> | null;
-  aiProvider: string;
-  aiModel: string;
-}
-
-const Thread: Component<IPropTypes> = (props) => {
+const Thread: Component<APIChatThread> = (props) => {
   return (
     <div class="my-3 bg-zinc-800 p-3 rounded-md cursor-pointer">
       <Heading size="xl">{props.title}</Heading>

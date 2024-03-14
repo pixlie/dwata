@@ -6,4 +6,5 @@ export interface APIChatReply {
   chatThreadId: bigint;
   createdById: bigint;
   createdAt: string;
+  isSentToAi: boolean;
 }

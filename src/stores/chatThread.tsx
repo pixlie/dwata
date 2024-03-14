@@ -4,8 +4,9 @@ import { APIChatThread } from "../api_types/APIChatThread";
 import { invoke } from "@tauri-apps/api/core";
 
 interface IStore {
-  threads: Array<APIChatThread>;
-  repliesForThreads: { [threadId: string]: Array<APIChatThread> };
+  threadList: Array<APIChatThread>;
+  threadDetail: { [threadId: number]: APIChatThread };
+  replyListForThread: { [threadId: number]: Array<APIChatThread> };
 
   isFetching: boolean;
   isReady: boolean;
@@ -13,8 +14,9 @@ interface IStore {
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
-    threads: [],
-    repliesForThreads: {},
+    threadList: [],
+    threadDetail: {},
+    replyListForThread: {},
     isFetching: false,
     isReady: false,
   });
@@ -23,8 +25,33 @@ const makeStore = () => {
     store,
     {
       fetchChatThreads: async () => {
-        let result = await invoke("fetch_chat_threads");
-        setStore({ ...store, threads: result as Array<APIChatThread> });
+        const result = await invoke("fetch_chat_thread_list");
+        console.log(result);
+        setStore({ ...store, threadList: result as Array<APIChatThread> });
+      },
+
+      fetchThreadDetail: async (threadId: number) => {
+        const result = await invoke("fetch_chat_thread_detail");
+        console.log(result);
+        setStore({
+          ...store,
+          threadDetail: {
+            ...store.threadDetail,
+            [threadId]: result as APIChatThread,
+          },
+        });
+      },
+
+      fetchChatReplies: async (threadId: number) => {
+        const result = await invoke("fetch_chat_reply_list");
+        console.log(result);
+        setStore({
+          ...store,
+          replyListForThread: {
+            ...store.replyListForThread,
+            [threadId]: result as Array<APIChatThread>,
+          },
+        });
       },
     },
   ] as const; // `as const` forces tuple type inference

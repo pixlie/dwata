@@ -12,16 +12,12 @@ const Sidebar: Component = () => {
         icon="fa-solid fa-sticky-note"
         href="/notes"
       /> */}
-      <SidebarHeading
-        label="Reports"
-        icon="fa-solid fa-chart-bar"
-        href="/reports"
-      />
-      <SidebarHeading
+      <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" />
+      {/* <SidebarHeading
         label="Saved Queries"
         icon="fa-solid fa-bookmark"
         href="/saved"
-      />
+      /> */}
       <div class="mt-4 border-b border-gray-800" />
       <SourceList />
       <SidebarHeading

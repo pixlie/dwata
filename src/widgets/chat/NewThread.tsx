@@ -6,10 +6,7 @@ import Button from "../interactable/Button";
 import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
 import { APIAIProvider } from "../../api_types/APIAIProvider";
 import { APIAIModel } from "../../api_types/APIAIModel";
-
-interface IFormState {
-  isFormOpen: boolean;
-}
+import { useWorkspace } from "../../stores/workspace";
 
 interface INewThreadFormData {
   message: string;
@@ -25,6 +22,7 @@ const NewThread: Component = () => {
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
+  const [workspace] = useWorkspace();
 
   const formFields: Array<IFormField> = [
     {
@@ -52,16 +50,21 @@ const NewThread: Component = () => {
   const getAiModelChoices = createMemo(() => {
     if (!!aiProvidersAndModels()) {
       return aiProvidersAndModels()?.reduce(
-        (collector: Array<IChoicesWithHeading>, item: APIAIProvider) => [
-          ...collector,
-          {
-            name: item.name,
-            choices: item.aiModelList.map((model: APIAIModel) => ({
-              key: model.apiName,
-              label: model.label,
-            })),
-          },
-        ],
+        (collector: Array<IChoicesWithHeading>, item: APIAIProvider) =>
+          workspace.aiIntegrationList.findIndex(
+            (x) => x.aiProvider === item.name
+          ) !== -1
+            ? [
+                ...collector,
+                {
+                  name: item.name,
+                  choices: item.aiModelList.map((model: APIAIModel) => ({
+                    key: model.apiName,
+                    label: model.label,
+                  })),
+                },
+              ]
+            : collector,
         []
       );
     }

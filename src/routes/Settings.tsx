@@ -1,14 +1,13 @@
-import { Component, onMount } from "solid-js";
+import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import DatabaseForm from "../widgets/settings/DatabaseForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AiForm from "../widgets/settings/AiForm";
+import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
 
 const SettingsIndex: Component = () => {
-  onMount(() => {});
-
   return (
     <>
       <Heading size="xl">Data Sources</Heading>
@@ -22,6 +21,7 @@ const SettingsIndex: Component = () => {
       <div class="mb-6" />
 
       <Heading size="xl">AI Providers</Heading>
+      <SettingsAIIntegrationList />
       <div class="mb-2" />
       <Button
         label="Add an AI provider"
