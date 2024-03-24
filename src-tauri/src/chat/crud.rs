@@ -114,5 +114,8 @@ pub(crate) async fn create_chat_reply(
 }
 
 pub(crate) async fn update_reply_sent_to_ai(chat_reply_id: i64, connection: &mut SqliteConnection) {
-    query("UPDATE chat_reply SET json_data = json_set(json_data, '$.is_sent_to_ai', true) WHERE id = ?1").bind(chat_reply_id).execute(connection).await.unwrap();
+    query("UPDATE chat_reply SET json_data = json_set(json_data, '$.is_sent_to_ai', json('true')) WHERE id = ?1")
+    .bind(chat_reply_id)
+    .execute(connection)
+    .await.unwrap();
 }

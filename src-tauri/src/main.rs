@@ -21,12 +21,12 @@ mod user_account;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
-    #[cfg(debug_assertions)] // only include this code on debug builds
-    {
-        let window = app.get_webview_window("main").unwrap();
-        window.open_devtools();
-        window.close_devtools();
-    }
+    // #[cfg(debug_assertions)] // only include this code on debug builds
+    // {
+    //     let window = app.get_webview_window("main").unwrap();
+    //     window.open_devtools();
+    //     window.close_devtools();
+    // }
     let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
     let db_connection: Option<SqliteConnection> = tauri::async_runtime::block_on(async {
         store::database::get_database_connection(&app_config_dir).await
