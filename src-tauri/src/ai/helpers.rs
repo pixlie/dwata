@@ -1,53 +1,48 @@
-// use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
-// use super::AiProvider;
-// use crate::chat::ChatThread;
-// use crate::error::DwataError;
-// use reqwest;
+use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
+use super::{AiIntegration, AiProvider};
+use crate::error::DwataError;
+use reqwest;
 
-// pub async fn check_ai_intro_message(ai_provider: AiProvider) -> Result<ChatThread, DwataError> {
-//     let chat_text = r#"
-//     You are a friendly AI assistant. I am trying to get better insights into my finances.
-//     Please feel free to ask me questions to help you understand my situation.
-//     "#;
-//     let (chat_url, api_key) = match ai_provider {
-//         AiProvider::OpenAI(x) => ("https://api.openai.com/v1/chat/completions", x.api_key),
-//         AiProvider::Groq(x) => ("https://api.groq.com/openai/v1/chat/completions", x.api_key),
-//     };
-//     let payload: OpenAIChatRequest = OpenAIChatRequest {
-//         model: "gpt-3.5-turbo".to_string(),
-//         messages: vec![
-//             ChatRequestMessage {
-//                 role: "system".to_string(),
-//                 content: chat_text.to_string(),
-//             },
-//             ChatRequestMessage {
-//                 role: "user".to_string(),
-//                 content: "Hello!".to_string(),
-//             },
-//         ],
-//     };
-//     let https_client = reqwest::Client::new();
-//     let request = https_client
-//         .post(chat_url)
-//         .header("Authorization", format!("Bearer {}", api_key))
-//         .json::<OpenAIChatRequest>(&payload)
-//         .send()
-//         .await;
-//     match request {
-//         Ok(response) => {
-//             if response.status().is_success() {
-//                 let payload = response.json::<OpenAIChatResponse>().await;
-//                 println!("{:?}", payload);
-//                 Ok(ChatItem::new(1, "text".to_string()))
-//             } else {
-//                 println!(
-//                     "Error: {}\n{}",
-//                     response.status(),
-//                     response.text().await.unwrap()
-//                 );
-//                 Err(DwataError::CouldNotConnectToAiProvider)
-//             }
-//         }
-//         Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
-//     }
-// }
+pub async fn send_message_to_ai(
+    ai_integration: AiIntegration,
+    ai_model: String,
+    message_to_send: String,
+) -> Result<String, DwataError> {
+    let (chat_url, api_key) = match ai_integration.ai_provider {
+        AiProvider::OpenAI(x) => ("https://api.openai.com/v1/chat/completions", x.api_key),
+        AiProvider::Groq(x) => ("https://api.groq.com/openai/v1/chat/completions", x.api_key),
+    };
+    let payload: OpenAIChatRequest = OpenAIChatRequest {
+        model: ai_model,
+        messages: vec![ChatRequestMessage {
+            role: "user".to_string(),
+            content: message_to_send,
+        }],
+    };
+    let https_client = reqwest::Client::new();
+    let request = https_client
+        .post(chat_url)
+        .header("Authorization", format!("Bearer {}", api_key))
+        .json::<OpenAIChatRequest>(&payload)
+        .send()
+        .await;
+    match request {
+        Ok(response) => {
+            if response.status().is_success() {
+                let payload = response.json::<OpenAIChatResponse>().await;
+                match payload {
+                    Ok(response) => Ok(response.choices[0].message.content.clone()),
+                    Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+                }
+            } else {
+                println!(
+                    "Error: {}\n{}",
+                    response.status(),
+                    response.text().await.unwrap()
+                );
+                Err(DwataError::CouldNotConnectToAiProvider)
+            }
+        }
+        Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+    }
+}

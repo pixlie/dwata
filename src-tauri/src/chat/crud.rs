@@ -1,3 +1,4 @@
+use crate::chat::ChatReplyJson;
 use crate::error::DwataError;
 use chrono::Utc;
 use serde_json::json;
@@ -9,8 +10,9 @@ pub(crate) async fn create_chat_thread(
     message: String,
     ai_provider: String,
     ai_model: String,
+    created_by_id: i64,
     connection: &mut SqliteConnection,
-) -> Result<i64, DwataError> {
+) -> Result<(i64, i64), DwataError> {
     let title = message
         .get(
             ..(if message.len() >= 60 {
@@ -28,7 +30,6 @@ pub(crate) async fn create_chat_thread(
         "ai_provider": ai_provider,
         "ai_model": ai_model
     });
-    let created_by_id: i64 = 1;
     let created_at = Utc::now();
     connection
         .transaction(|txn| {
@@ -51,29 +52,67 @@ pub(crate) async fn create_chat_thread(
                     }
                 };
                 // Create the first chat reply with the full message from user
-                let chat_reply: JsonValue = json!({
-                    "message": message,
-                    "is_sent_to_ai": false
-                });
-                match query(
+                let chat_reply: ChatReplyJson = ChatReplyJson::new(message, false, true, false);
+                let chat_reply_result = query(
                     r#"INSERT INTO chat_reply
                     (json_data, chat_thread_id, created_by_id, created_at)
                     VALUES ( ?1, ?2, ?3, ?4 )"#,
                 )
-                .bind(chat_reply)
+                .bind(serde_json::to_string(&chat_reply).unwrap())
                 .bind(chat_thread_id)
                 .bind(created_by_id)
                 .bind(created_at.to_rfc3339().clone())
                 .execute(&mut **txn)
-                .await
-                {
-                    Ok(_) => Ok(chat_thread_id),
+                .await;
+                let chat_reply_id = match chat_reply_result {
+                    Ok(result) => result.last_insert_rowid(),
                     Err(err) => {
-                        println!("Error: {:?}", err);
+                        println!("Error in create_chat_thread: {:?}", err);
                         return Err(DwataError::CouldNotInsertToAppDatabase);
                     }
-                }
+                };
+                Ok((chat_thread_id, chat_reply_id))
             })
         })
         .await
+}
+
+pub(crate) async fn create_chat_reply(
+    message: String,
+    is_system_message: bool,
+    is_to_be_sent_to_ai: bool,
+    is_sent_to_ai: bool,
+    chat_thread_id: i64,
+    created_by_id: i64,
+    connection: &mut SqliteConnection,
+) -> Result<i64, DwataError> {
+    let chat_reply: ChatReplyJson = ChatReplyJson::new(
+        message,
+        is_system_message,
+        is_to_be_sent_to_ai,
+        is_sent_to_ai,
+    );
+    let created_at = Utc::now();
+    let chat_reply_result = query(
+        r#"INSERT INTO chat_reply
+        (json_data, chat_thread_id, created_by_id, created_at)
+        VALUES ( ?1, ?2, ?3, ?4 )"#,
+    )
+    .bind(serde_json::to_string(&chat_reply).unwrap())
+    .bind(chat_thread_id)
+    .bind(created_by_id)
+    .bind(created_at.to_rfc3339().clone())
+    .execute(connection)
+    .await;
+    match chat_reply_result {
+        Ok(result) => Ok(result.last_insert_rowid()),
+        Err(err) => {
+            println!("Error in create_chat_reply: {:?}", err);
+            Err(DwataError::CouldNotInsertToAppDatabase)
+        }
+    }
+}
+
+pub(crate) async fn update_reply_sent_to_ai(chat_reply_id: i64, connection: &mut SqliteConnection) {
+    query("UPDATE chat_reply SET json_data = json_set(json_data, '$.is_sent_to_ai', true) WHERE id = ?1").bind(chat_reply_id).execute(connection).await.unwrap();
 }

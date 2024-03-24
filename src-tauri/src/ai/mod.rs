@@ -8,7 +8,7 @@ pub mod commands;
 pub mod helpers;
 pub mod providers;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct HttpsApi {
     api_key: String,
 }
@@ -21,7 +21,7 @@ impl HttpsApi {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub(crate) enum AiProvider {
     OpenAI(HttpsApi),
     Groq(HttpsApi),
@@ -44,7 +44,7 @@ impl AiProvider {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub(crate) struct AiIntegration {
     id: String,
     ai_provider: AiProvider,
@@ -70,6 +70,10 @@ impl AiIntegration {
             self.ai_provider.get_name(),
             self.display_label.clone(),
         )
+    }
+
+    pub fn match_by_ai_provider_name(&self, ai_provider_name: &str) -> bool {
+        self.ai_provider.get_name() == ai_provider_name
     }
 }
 

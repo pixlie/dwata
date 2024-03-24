@@ -1,8 +1,10 @@
+use crate::ai::helpers::send_message_to_ai;
 use crate::chat::api_types::{APIChatReply, APIChatThread};
-use crate::chat::crud::create_chat_thread;
+use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
 use crate::chat::{ChatReplyRow, ChatThreadRow};
 use crate::error::DwataError;
 use crate::store::Store;
+use crate::workspace::helpers::load_ai_integration;
 use sqlx::query_as;
 use tauri::State;
 
@@ -12,19 +14,57 @@ pub(crate) async fn start_chat_thread(
     ai_provider: &str,
     ai_model: &str,
     store: State<'_, Store>,
-) -> Result<i64, DwataError> {
+) -> Result<(i64, i64), DwataError> {
     let mut db_guard = store.db_connection.lock().await;
     match *db_guard {
         Some(ref mut conn) => {
+            // The default user has ID 1
+            let created_by_id: i64 = 1;
             match create_chat_thread(
                 message.to_string(),
                 ai_provider.to_string(),
                 ai_model.to_string(),
+                created_by_id,
                 conn,
             )
             .await
             {
-                Ok(chat_thread_id) => Ok(chat_thread_id),
+                Ok(inserted_ids) => {
+                    let config_guard = store.config.lock().await;
+                    match load_ai_integration(&config_guard, ai_provider) {
+                        Some(ai_integration) => {
+                            // It does not matter if we fail this request, we will try again later
+                            match send_message_to_ai(
+                                ai_integration,
+                                ai_model.to_string(),
+                                message.to_string(),
+                            )
+                            .await
+                            {
+                                Ok(reply_from_ai) => {
+                                    let _ = create_chat_reply(
+                                        reply_from_ai,
+                                        false,
+                                        false,
+                                        true,
+                                        inserted_ids.0,
+                                        created_by_id,
+                                        conn,
+                                    )
+                                    .await;
+                                    update_reply_sent_to_ai(inserted_ids.1, conn).await;
+                                }
+                                Err(x) => {
+                                    println!("{:?}", x);
+                                }
+                            }
+                        }
+                        None => {
+                            println!("Could not load ai integration");
+                        }
+                    }
+                    Ok(inserted_ids)
+                }
                 Err(x) => Err(x),
             }
         }
@@ -74,7 +114,7 @@ pub(crate) async fn fetch_chat_thread_detail(
             match result {
                 Ok(row) => Ok(APIChatThread::from_sqlx_row(&row)),
                 Err(error) => {
-                    println!("{:?}", error);
+                    println!("Error in fetch_chat_thread_detail: {:?}", error);
                     Err(DwataError::CouldNotFetchRowsFromAppDatabase)
                 }
             }
@@ -102,7 +142,7 @@ pub(crate) async fn fetch_chat_reply_list(
                     .map(|row| APIChatReply::from_sqlx_row(row))
                     .collect()),
                 Err(error) => {
-                    println!("{:?}", error);
+                    println!("Error in fetch_chat_reply_list: {:?}", error);
                     Err(DwataError::CouldNotFetchRowsFromAppDatabase)
                 }
             }

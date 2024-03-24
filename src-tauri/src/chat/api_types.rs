@@ -18,6 +18,7 @@ pub(crate) struct APIChatThread {
 
 impl APIChatThread {
     pub fn from_sqlx_row(row: &ChatThreadRow) -> Self {
+        println!("{:?}", row);
         Self {
             id: row.id,
             title: row.json_data.0.title.to_string(),
@@ -47,6 +48,7 @@ pub(crate) struct APIChatReply {
 
 impl APIChatReply {
     pub fn from_sqlx_row(row: &ChatReplyRow) -> Self {
+        println!("{:?}", row);
         Self {
             id: row.id,
             message: row.json_data.0.message.to_string(),

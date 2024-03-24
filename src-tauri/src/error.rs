@@ -8,6 +8,7 @@ pub enum DwataError {
     // Config related
     CouldNotLockConfig,
     CouldNotWriteConfig,
+    CouldNotLoadAiIntegration,
 
     // AI API related
     InvalidAiProvider,
