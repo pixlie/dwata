@@ -1,5 +1,5 @@
 import { Component, JSX } from "solid-js";
-import { darkTheme } from "../../utils/themes";
+import { gitHubDark } from "../../utils/colors";
 
 interface IDropdownItemProps {
   label: string;
@@ -14,7 +14,7 @@ interface IDropdownItemProps {
 }
 
 const DropdownItem: Component<IDropdownItemProps> = (props) => {
-  const classes = `block w-full text-left px-4 py-0.5 text-sm ${darkTheme.interactibleWidgetBackgroundAndText}`;
+  const classes = `block w-full text-left px-4 py-0.5 text-sm ${gitHubDark.interactibleWidgetBackgroundAndText}`;
 
   const handleClick = (event: MouseEvent) => {
     if (!!props.onSelect) {

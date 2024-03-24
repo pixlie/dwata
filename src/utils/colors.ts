@@ -1,4 +1,4 @@
-export const darkTheme = {
+export const gitHubDark = {
   inactiveWidgetBackgroundAndText:
     "bg-zinc-600 text-gray-200 placeholder:text-gray-400",
   interactibleWidgetBackgroundAndText:

@@ -5,24 +5,43 @@ import { UserProvider } from "./stores/user";
 import Sidebar from "./widgets/navigation/Sidebar";
 import { WorkspaceProvider } from "./stores/workspace";
 import { SchemaProvider } from "./stores/schema";
+import {
+  UserInterfaceProvider,
+  useUserInterface,
+} from "./stores/userInterface";
+
+const MainContent: Component<RouteSectionProps> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
+  return (
+    <div
+      class="grow p-4 pt-16"
+      style={{
+        "background-color": getColors().colors["editor.background"],
+      }}
+    >
+      {props.children}
+    </div>
+  );
+};
 
 const App: Component<RouteSectionProps> = (props) => {
   return (
     <div class="w-dvw h-dvh">
       <UserProvider>
-        <WorkspaceProvider>
-          <SchemaProvider>
-            <NavigationBar />
+        <UserInterfaceProvider>
+          <WorkspaceProvider>
+            <SchemaProvider>
+              <NavigationBar />
 
-            <div class="flex flex-row bg-gray-300 w-dvw h-dvh">
-              <div class="w-64 flex-none border-r-2 border-gray-800 bg-gray-900 pt-16">
+              <div class="flex flex-row bg-gray-300 w-dvw h-dvh">
                 <Sidebar />
-              </div>
 
-              <div class="grow bg-zinc-900 p-4 pt-16">{props.children}</div>
-            </div>
-          </SchemaProvider>
-        </WorkspaceProvider>
+                <MainContent {...props} />
+              </div>
+            </SchemaProvider>
+          </WorkspaceProvider>
+        </UserInterfaceProvider>
       </UserProvider>
     </div>
   );

@@ -38,7 +38,6 @@ const SourceList: Component = () => {
           );
         }}
       </For>
-      <div class="mt-4 border-b border-gray-800" />
     </>
   );
 };

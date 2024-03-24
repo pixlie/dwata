@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { darkTheme } from "../../utils/themes";
+import { gitHubDark } from "../../utils/colors";
 
 interface IPropTypes {
   type: "text" | "email" | "password";
@@ -23,7 +23,7 @@ const TextInput: Component<IPropTypes> = (props) => {
         <input
           type={props.type || "text"}
           required={props.isRequired}
-          class={`block w-full rounded-md px-2 py-1.5 ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder}`}
+          class={`block w-full rounded-md px-2 py-1.5 ${gitHubDark.interactibleWidgetBackgroundAndText} ${gitHubDark.interactableWidgetBorder}`}
           placeholder={props.placeholder}
           value={props.value || ""}
           onInput={(e) => props.onInput?.(e.currentTarget.value)}

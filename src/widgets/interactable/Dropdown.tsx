@@ -1,5 +1,5 @@
 import { Component, For, createMemo, createSignal } from "solid-js";
-import { darkTheme } from "../../utils/themes";
+import { gitHubDark } from "../../utils/colors";
 import DropdownItem from "./DropdownItem";
 import DropdownHeading from "./DropdownHeading";
 
@@ -50,7 +50,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const buttonClasses = `${getSizeClass(
     props.size || "base"
-  )} rounded-md select-none cursor-pointer ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder} ${
+  )} rounded-md select-none cursor-pointer ${gitHubDark.interactibleWidgetBackgroundAndText} ${gitHubDark.interactableWidgetBorder} ${
     props.isBlock && "w-full"
   }`;
 

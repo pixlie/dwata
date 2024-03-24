@@ -53,6 +53,8 @@ interface IFormField {
   placeholder?: string;
 }
 
+type uiThemes = "gitHubDark" | "gitHubLight";
+
 export type {
   ILabel as IChatRoom,
   TRowValue,
@@ -61,4 +63,5 @@ export type {
   IProviderPropTypes,
   APIGridData,
   IFormField,
+  uiThemes,
 };
