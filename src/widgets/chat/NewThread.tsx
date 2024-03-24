@@ -18,7 +18,7 @@ const NewThread: Component = () => {
   const [formData, setFormData] = createSignal<INewThreadFormData>({
     message: "",
     aiProvider: "OpenAI",
-    aiModel: "gpt-4-turbo-preview",
+    aiModel: "gpt-3.5-turbo",
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();

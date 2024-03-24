@@ -3,6 +3,7 @@ import { IFormField } from "../utils/types";
 import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
 import { useUser } from "../stores/user";
+import Heading from "../widgets/typography/Heading";
 
 interface IUserAccountFormData {
   firstName: string;
@@ -56,14 +57,19 @@ const UserAccount: Component = () => {
   };
 
   return (
-    <Form
-      title="My account"
-      formFields={formFields}
-      submitButtomLabel="Save"
-      handleSubmit={handleSubmit}
-      formData={formData()}
-      setFieldInput={setFormData}
-    ></Form>
+    <div class="max-w-screen-sm">
+      <Heading size="3xl">Account</Heading>
+      <div class="mb-4" />
+
+      <Form
+        title="My account"
+        formFields={formFields}
+        submitButtomLabel="Save"
+        handleSubmit={handleSubmit}
+        formData={formData()}
+        setFieldInput={setFormData}
+      ></Form>
+    </div>
   );
 };
 

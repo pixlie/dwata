@@ -26,7 +26,7 @@ const Form: Component<IPropTypes> = (props) => {
   };
 
   return (
-    <div class="max-w-screen-sm">
+    <div class="w-full">
       <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
         <Heading size="sm">{props.title}</Heading>
       </div>
