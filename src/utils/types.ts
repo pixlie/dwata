@@ -8,14 +8,6 @@ interface ILabel {
 
 type TRowValue = any;
 
-interface IQueryResult {
-  isReady: boolean;
-  isFetching: boolean;
-
-  areRowsSelectable?: boolean;
-  visibleColumnIndices?: Array<number>; // index of columns in select array
-}
-
 // Only required in Database form
 interface IDatabaseFormData {
   id?: string;
@@ -28,13 +20,45 @@ interface IDatabaseFormData {
   // needsSsh: boolean;
 }
 
+interface IAiFormData {
+  id?: string;
+  aiProvider: string;
+  apiKey: string;
+  displayLabel?: string;
+}
+
 interface IProviderPropTypes {
   children: JSX.Element;
+}
+
+interface APIGridData {
+  source: string;
+  schema: string | null;
+  table: string | null;
+  rows: Array<Array<any>>;
+}
+
+interface IFormField {
+  name: string;
+  fieldType:
+    | "singleLineText"
+    | "multiLineText"
+    | "markdown"
+    | "password"
+    | "date"
+    | "dateTime"
+    | "singleChoice";
+  label?: string;
+  isRequired?: boolean;
+  placeholder?: string;
 }
 
 export type {
   ILabel as IChatRoom,
   TRowValue,
   IDatabaseFormData,
+  IAiFormData,
   IProviderPropTypes,
+  APIGridData,
+  IFormField,
 };

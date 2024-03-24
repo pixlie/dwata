@@ -1,11 +1,16 @@
+use crate::data_sources::api_types::APIDataSource;
+use crate::query_result::api_types::APIGridQuery;
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-use crate::query_result::{DwataQuery, QueryBuilder};
+use crate::query_result::QueryBuilder;
+use crate::schema::api_types::APIGridSchema;
+use crate::schema::postgresql;
+use crate::schema::postgresql::PostgreSQLObject;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha512};
 use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
-use ts_rs::TS;
+use ulid::Ulid;
 
+pub mod api_types;
 pub mod helpers;
 
 // #[derive(Debug, Deserialize, Serialize)]
@@ -62,19 +67,40 @@ impl DatabaseAuthentication {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Database {
     name: String,
-    #[serde(skip_serializing)]
-    #[ts(skip)]
     connection: DatabaseConnection,
-    #[serde(skip_serializing)]
-    #[ts(skip)]
     authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
 }
 
 impl Database {
+    pub fn new(
+        username: &str,
+        password: Option<&str>,
+        host: &str,
+        port: Option<&str>,
+        database: &str,
+    ) -> Database {
+        Database {
+            name: database.to_string(),
+            connection: DatabaseConnection::TCPSocket(DatabaseTCPSocket {
+                host: host.to_string(),
+                port: match port {
+                    Some(x) => Some(x.parse::<u32>().unwrap()),
+                    None => None,
+                },
+            }),
+            authentication: DatabaseAuthentication {
+                username: username.to_string(),
+                password: match password {
+                    Some(x) => Some(x.to_string()),
+                    None => None,
+                },
+            },
+        }
+    }
+
     pub fn get_connection_url(&self) -> Option<String> {
         let (host, port) = match &self.connection {
             DatabaseConnection::TCPSocket(socket) => socket.get_host_port(),
@@ -96,8 +122,7 @@ impl Database {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum DataSourceType {
     PostgreSQL(Database),
     MySQL(Database),
@@ -107,55 +132,53 @@ pub enum DataSourceType {
 }
 
 impl DataSourceType {
-    pub fn get_database(&self) -> Option<&Database> {
+    pub fn get_query_builder(&self, grid: &APIGridQuery) -> Option<QueryBuilder> {
         match self {
-            DataSourceType::PostgreSQL(db) => Some(db),
+            DataSourceType::PostgreSQL(_) => {
+                Some(QueryBuilder::PostgreSQL(PostgreSQLQueryBuilder::new(grid)))
+            }
             _ => None,
         }
     }
 
-    pub fn get_query_builder(
-        &self,
-        query: &DwataQuery,
-        data_source_id: String,
-    ) -> Option<QueryBuilder> {
+    pub fn get_api_type(&self) -> &str {
         match self {
-            DataSourceType::PostgreSQL(_) => Some(QueryBuilder::PostgreSQL(
-                PostgreSQLQueryBuilder::new(query, data_source_id),
-            )),
-            _ => None,
+            DataSourceType::PostgreSQL(_) => "PostgreSQL",
+            DataSourceType::MySQL(_) => "MySQL",
+            DataSourceType::SQLite(_) => "SQLite",
+            _ => "",
         }
     }
-}
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct DataSource {
-    id: String,
-    label: Option<String>,
-    source: DataSourceType,
+    pub fn get_api_name(&self) -> String {
+        match self {
+            DataSourceType::PostgreSQL(x) => x.name.clone(),
+            DataSourceType::MySQL(x) => x.name.clone(),
+            DataSourceType::SQLite(x) => x.name.clone(),
+            _ => "".to_string(),
+        }
+    }
 }
 
 pub enum DataSourceConnection {
     PostgreSQL(sqlx::PgPool),
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DataSource {
+    id: String,
+    label: Option<String>,
+    source: DataSourceType,
+}
+
 impl DataSource {
     pub fn new_database(database: Database, label: Option<String>) -> Self {
         // Assume only PostgreSQL
         DataSource {
-            id: Self::hash("PostgreSQL", &database),
+            id: Ulid::new().to_string(),
             label,
             source: DataSourceType::PostgreSQL(database),
         }
-    }
-
-    fn hash(data_source_type: &str, database: &Database) -> String {
-        let mut hasher = Sha512::new();
-        hasher.update(data_source_type);
-        hasher.update(&database.name);
-        // hasher.update()
-        format!("{:x}", hasher.finalize())
     }
 
     pub fn get_id(&self) -> String {
@@ -185,35 +208,36 @@ impl DataSource {
         }
     }
 
-    pub fn get_query_builder(&self, query: &DwataQuery) -> Option<QueryBuilder> {
-        self.source.get_query_builder(query, self.id.clone())
+    pub fn get_query_builder(&self, grid: &APIGridQuery) -> Option<QueryBuilder> {
+        self.source.get_query_builder(grid)
     }
-}
 
-impl Database {
-    pub fn new(
-        username: &str,
-        password: Option<&str>,
-        host: &str,
-        port: Option<&str>,
-        database: &str,
-    ) -> Database {
-        Database {
-            name: database.to_string(),
-            connection: DatabaseConnection::TCPSocket(DatabaseTCPSocket {
-                host: host.to_string(),
-                port: match port {
-                    Some(x) => Some(x.parse::<u32>().unwrap()),
-                    None => None,
-                },
-            }),
-            authentication: DatabaseAuthentication {
-                username: username.to_string(),
-                password: match password {
-                    Some(x) => Some(x.to_string()),
-                    None => None,
-                },
-            },
+    pub fn get_api_data_source(&self) -> APIDataSource {
+        APIDataSource::new(
+            self.id.clone(),
+            self.label.clone(),
+            self.source.get_api_type().to_string(),
+            self.source.get_api_name(),
+        )
+    }
+
+    pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<APIGridSchema> {
+        match self.get_connection().await {
+            Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
+                let db_objects = postgresql::metadata::get_postgres_objects(&pg_pool).await;
+                let tables = db_objects
+                    .iter()
+                    .filter(|item| item.filter_is_table())
+                    .collect::<Vec<&PostgreSQLObject>>();
+                let mut dwata_tables: Vec<APIGridSchema> = vec![];
+                for table in tables {
+                    dwata_tables.push(table.get_table(self, with_columns).await);
+                }
+                dwata_tables
+            }
+            _ => {
+                vec![]
+            }
         }
     }
 }

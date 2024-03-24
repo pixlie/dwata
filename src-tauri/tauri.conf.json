@@ -1,14 +1,15 @@
 {
-  "productName": "ui-demo",
-  "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "productName": "dwata",
+  "version": "0.0.1",
+  "identifier": "com.dwata.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
-  "app": {"windows": [
+  "app": {
+    "windows": [
       {
         "fullscreen": false,
         "resizable": true,

@@ -1,38 +1,30 @@
-use ts_rs::TS;
-
-pub mod commands;
-pub mod helpers;
-
+use crate::ai::AiIntegration;
 use crate::data_sources::DataSource;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-// #[derive(Debug, Deserialize, Serialize)]
-// pub struct Organisation {
-//     name: String,
-//     server_uri: Url,
-// }
+pub mod api_types;
+pub mod commands;
+pub mod helpers;
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
+    path_to_config: PathBuf,
     // organisations: Vec<Organisation>,
     data_source_list: Vec<DataSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
-    #[ts(skip)]
     folder_list: Vec<PathBuf>, // CSV or Markdown files
+    ai_integration_list: Vec<AiIntegration>,
 }
 
 impl Config {
     pub fn get_data_source(&self, data_source_id: &str) -> Option<&DataSource> {
-        match self
-            .data_source_list
+        self.data_source_list
             .iter()
             .find(|x| x.get_id() == data_source_id)
-        {
-            Some(x) => Some(x),
-            None => None,
-        }
+    }
+
+    pub fn get_pretty_string(&self) -> String {
+        ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
     }
 }

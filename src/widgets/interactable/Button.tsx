@@ -5,33 +5,40 @@ interface IPropTypes {
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
   onClick?: () => void;
+  href?: string;
 }
 
 const Button: Component<IPropTypes> = (props) => {
   const getSizeClass = (size: string) => {
     switch (size) {
       case "sm":
-        return "px-2 py-1.5 text-sm";
+        return "px-2.5 py-1.5 text-sm font-normal";
       case "lg":
-        return "px-6 py-3 text-xl";
+        return "px-6 py-3 text-xl font-bold";
       case "base":
       default:
-        return "px-4 py-2 text-base";
+        return "px-4 py-2 text-base font-normal";
     }
   };
   const buttonClasses = `${getSizeClass(
     props.size || "base"
-  )} font-bold text-white bg-green-500 hover:bg-green-700 rounded-md select-none cursor-pointer ${
+  )} text-white bg-green-600 hover:bg-green-700 rounded-md select-none cursor-pointer ${
     props.isBlock ? "w-full" : ""
   }`;
 
-  //bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto
-
-  return (
-    <button class={buttonClasses} onClick={props.onClick}>
-      {props.label}
-    </button>
-  );
+  if (!!props.onClick) {
+    return (
+      <button class={buttonClasses} onClick={props.onClick}>
+        {props.label}
+      </button>
+    );
+  } else if (!!props.href) {
+    return (
+      <a class={buttonClasses} href={props.href}>
+        {props.label}
+      </a>
+    );
+  }
 };
 
 export default Button;

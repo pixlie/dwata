@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Label {
-    id: i64,
+    id: u32,
     label: String,
-    path: String,
 }

@@ -1,24 +1,15 @@
-use super::{ColumnPath, DwataData, DwataQuery, QueryOrder};
+use super::DwataQuery;
 use crate::error::DwataError;
-use crate::workspace::helpers::load_config;
-use std::collections::HashMap;
-use std::path::PathBuf;
-use tauri::{AppHandle, Manager};
+use crate::query_result::api_types::{APIGridData, APIGridQuery};
+use crate::store::Store;
+use tauri::State;
 
 #[tauri::command]
 pub async fn load_data(
-    app_handle: AppHandle,
-    select: Vec<ColumnPath>,
-    ordering: Option<HashMap<u8, QueryOrder>>,
-    filtering: Option<HashMap<u8, String>>,
-) -> Result<DwataData, DwataError> {
-    let config_dir: PathBuf = app_handle.path().config_dir().unwrap();
-    let config = load_config(&config_dir);
-
-    let query: DwataQuery = DwataQuery {
-        select,
-        ordering,
-        filtering,
-    };
-    Ok(query.get_data(config).await)
+    select: Vec<APIGridQuery>,
+    store: State<'_, Store>,
+) -> Result<Vec<APIGridData>, DwataError> {
+    let query: DwataQuery = DwataQuery { select };
+    let guard = store.config.lock().await;
+    Ok(query.get_data(&guard).await)
 }

@@ -1,89 +1,92 @@
+use crate::data_sources::DataSourceConnection;
+use crate::query_result::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
+use crate::query_result::postgresql::PostgreSQLQueryBuilder;
+use crate::workspace::Config;
 use serde::{Deserialize, Serialize};
-use ts_rs::TS;
 
+pub mod api_types;
 pub mod commands;
 pub mod postgresql;
 
-use crate::data_sources::DataSourceConnection;
-use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-use crate::workspace::Config;
-use std::collections::HashMap;
+// #[derive(Debug, Clone, Deserialize, Serialize)]
+// pub struct SelectColumnsPath {
+//     source: String,
+//     schema: Option<String>,
+//     table: Option<String>,
+//     // Columns only from one logical table, not merging should be needed
+//     columns: Vec<String>,
+//     ordering: Option<HashMap<u8, QueryOrder>>,
+//     filtering: Option<HashMap<u8, String>>,
+// }
+//
+// impl SelectColumnsPath {
+//     pub fn get_schema_and_table_names(
+//         &self,
+//         default_schema_name: Option<String>,
+//     ) -> (String, String) {
+//         (
+//             self.schema
+//                 .clone()
+//                 .unwrap_or_else(|| default_schema_name.unwrap_or_else(|| "public".to_string())),
+//             self.table.clone().unwrap(),
+//         )
+//     }
+//
+//     pub fn get_columns(&self) -> Vec<String> {
+//         self.columns.clone()
+//     }
+// }
+//
+// impl PartialEq for SelectColumnsPath {
+//     fn eq(&self, other: &Self) -> bool {
+//         self.table == other.table && self.columns == other.columns
+//     }
+// }
 
-#[derive(Debug, Clone, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct ColumnPath {
-    cn: String,
-    tn: String,
-    dsi: String,
-}
-
-impl PartialEq for ColumnPath {
-    fn eq(&self, other: &Self) -> bool {
-        self.tn == other.tn && self.cn == other.cn
-    }
-}
-
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum QueryOrder {
     Asc,
     Desc,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub enum QueryBuilder {
+    PostgreSQL(PostgreSQLQueryBuilder),
+}
+
+#[derive(Debug, Deserialize)]
 pub struct DwataQuery {
-    select: Vec<ColumnPath>,
-    ordering: Option<HashMap<u8, QueryOrder>>,
-    filtering: Option<HashMap<u8, String>>,
+    // Each SelectColumnsPath represents the columns that are fetched within any tabular source
+    // without needing any merging
+    select: Vec<APIGridQuery>,
 }
 
 impl DwataQuery {
-    pub async fn get_data(&self, config: Config) -> DwataData {
-        // let mut data_by_sources: Vec<DataBySource> = vec![];
-        let mut data_by_row: Vec<Vec<String>> = vec![];
-        for column_path in &self.select {
-            let data_source = config.get_data_source(column_path.dsi.as_str());
-            match data_source {
-                Some(ds) => match ds.get_query_builder(self).unwrap() {
-                    QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
-                        Some(conn_type) => match conn_type {
-                            DataSourceConnection::PostgreSQL(conn) => {
-                                builder
-                                    .get_data(&conn, &mut data_by_row, &self.select)
-                                    .await;
-                            }
+    pub async fn get_data(&self, config: &Config) -> Vec<APIGridData> {
+        let mut data: Vec<APIGridData> = vec![];
+        for grid in &self.select {
+            let data_source = config.get_data_source(grid.get_source_name().as_str());
+            let (schema_name, table_name) = grid.get_schema_and_table_names(None);
+            let grid_data = APIGridDataBuilder::default()
+                .source(grid.get_source_name())
+                .schema(Some(schema_name))
+                .table(Some(table_name))
+                .rows(match data_source {
+                    Some(ds) => match ds.get_query_builder(grid).unwrap() {
+                        QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
+                            Some(conn_type) => match conn_type {
+                                DataSourceConnection::PostgreSQL(conn) => {
+                                    builder.get_data(&conn).await
+                                }
+                            },
+                            None => vec![],
                         },
-                        None => {}
                     },
-                },
-                _ => {}
-            }
+                    _ => vec![],
+                })
+                .build()
+                .unwrap();
+            data.push(grid_data);
         }
-        DwataData {
-            columns: self.select.clone(),
-            rows_of_columns: data_by_row,
-        }
+        data
     }
-}
-
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct DwataData {
-    columns: Vec<ColumnPath>,
-    rows_of_columns: Vec<Vec<String>>,
-}
-
-pub struct DataBySource {
-    data_source_id: String,
-    columns: Vec<ColumnPath>,
-    data: Vec<Vec<String>>,
-}
-
-pub enum QueryBuilder {
-    PostgreSQL(PostgreSQLQueryBuilder),
 }

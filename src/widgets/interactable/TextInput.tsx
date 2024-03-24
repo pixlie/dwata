@@ -1,4 +1,5 @@
 import { Component } from "solid-js";
+import { darkTheme } from "../../utils/themes";
 
 interface IPropTypes {
   type: "text" | "email" | "password";
@@ -6,7 +7,8 @@ interface IPropTypes {
   placeholder?: string;
   value?: string | number;
   isRequired?: boolean;
-  onChange?: (newValue: string | number) => void;
+  onInput?: (newValue: string | number) => void;
+  onFocus?: () => void;
 }
 
 const TextInput: Component<IPropTypes> = (props) => {
@@ -21,10 +23,11 @@ const TextInput: Component<IPropTypes> = (props) => {
         <input
           type={props.type || "text"}
           required={props.isRequired}
-          class="block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 outline-none placeholder:text-gray-400 hover:bg-yellow-100 focus:bg-yellow-100"
+          class={`block w-full rounded-md px-2 py-1.5 ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder}`}
           placeholder={props.placeholder}
           value={props.value || ""}
-          onChange={(e) => props.onChange?.(e.currentTarget.value)}
+          onInput={(e) => props.onInput?.(e.currentTarget.value)}
+          onFocus={props.onFocus}
         />
       </div>
     </>
