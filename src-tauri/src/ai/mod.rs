@@ -1,4 +1,4 @@
-use crate::ai::api_types::APIAPIntegration;
+use crate::ai::api_types::APIAIIntegration;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ulid::Ulid;
@@ -42,6 +42,13 @@ impl AiProvider {
             Self::Groq(_) => "Groq".to_string(),
         }
     }
+
+    pub fn get_api_key(&self) -> String {
+        match self {
+            Self::OpenAI(api) => api.api_key.clone(),
+            Self::Groq(api) => api.api_key.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -64,10 +71,11 @@ impl AiIntegration {
         self.id.clone()
     }
 
-    pub fn get_api_ai_integration(&self) -> APIAPIntegration {
-        APIAPIntegration::new(
+    pub fn get_api_ai_integration(&self) -> APIAIIntegration {
+        APIAIIntegration::new(
             self.get_id(),
             self.ai_provider.get_name(),
+            Some(self.ai_provider.get_api_key()),
             self.display_label.clone(),
         )
     }
