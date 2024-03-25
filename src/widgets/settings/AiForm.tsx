@@ -83,18 +83,24 @@ const AiForm: Component = () => {
         ...formData(),
         [field]: data,
       });
-
-      console.log(field, data, formData());
     };
   };
 
   const handleSubmit = async () => {
-    console.log("handleSubmit", formData());
-    // await invoke("create_ai_integration", {
-    //   aiProvider: formData().aiProvider,
-    //   apiKey: formData().apiKey,
-    //   accountLabel: formData().displayLabel,
-    // });
+    if (!!formData().id) {
+      await invoke("update_ai_integration", {
+        id: formData().id,
+        aiProvider: formData().aiProvider,
+        apiKey: formData().apiKey,
+        accountLabel: formData().displayLabel,
+      });
+    } else {
+      await invoke("create_ai_integration", {
+        aiProvider: formData().aiProvider,
+        apiKey: formData().apiKey,
+        accountLabel: formData().displayLabel,
+      });
+    }
   };
 
   return (

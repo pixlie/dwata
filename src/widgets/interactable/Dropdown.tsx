@@ -1,7 +1,7 @@
 import { Component, For, createMemo, createSignal } from "solid-js";
-import { gitHubDark } from "../../utils/colors";
 import DropdownItem from "./DropdownItem";
 import DropdownHeading from "./DropdownHeading";
+import { useUserInterface } from "../../stores/userInterface";
 
 export interface IKeyedChoice {
   key: number | string;
@@ -36,6 +36,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
   const [widgetState, setWidgetState] = createSignal<IWidgetState>({
     isOpen: false,
   });
+  const [_, { getColors }] = useUserInterface();
   const getSizeClass = (size: string) => {
     switch (size) {
       case "sm":
@@ -50,14 +51,11 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const buttonClasses = `${getSizeClass(
     props.size || "base"
-  )} rounded-md select-none cursor-pointer ${gitHubDark.interactibleWidgetBackgroundAndText} ${gitHubDark.interactableWidgetBorder} ${
-    props.isBlock && "w-full"
-  }`;
+  )} rounded-md select-none cursor-pointer border ${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {
-    console.log(widgetState());
-    if (!!widgetState().selected) {
-      return widgetState().selected!.label;
+    if (!!props.value) {
+      return props.label + ": " + props.value;
     } else {
       return props.label;
     }
@@ -93,11 +91,25 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   return (
     <div class="relative">
-      <button class={buttonClasses} onClick={handlClick}>
+      <button
+        class={buttonClasses}
+        onClick={handlClick}
+        style={{
+          "background-color": getColors().colors["input.background"],
+          "border-color": getColors().colors["input.border"],
+          color: getColors().colors["input.foreground"],
+        }}
+      >
         {getLabel()} <i class="ml-1 fa-solid fa-chevron-down" />
       </button>
       {!!widgetState().isOpen && (
-        <div class="absolute top-10 z-10">
+        <div
+          class="absolute top-10 z-10 border"
+          style={{
+            "background-color": getColors().colors["input.background"],
+            "border-color": getColors().colors["input.border"],
+          }}
+        >
           {!!props.choicesWithHeadings ? (
             <For each={props.choicesWithHeadings}>
               {(heading) => (

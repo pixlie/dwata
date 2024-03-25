@@ -1,5 +1,5 @@
-import { Component, JSX } from "solid-js";
-import { gitHubDark } from "../../utils/colors";
+import { Component } from "solid-js";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IDropdownItemProps {
   label: string;
@@ -8,40 +8,30 @@ interface IDropdownItemProps {
   // key and onSelect can be used to set selected value
   key?: number | string;
   onSelect?: (selected: number | string) => void;
-
-  // This is for traditional click handler
-  onClick?: (event: MouseEvent) => void;
 }
 
 const DropdownItem: Component<IDropdownItemProps> = (props) => {
-  const classes = `block w-full text-left px-4 py-0.5 text-sm ${gitHubDark.interactibleWidgetBackgroundAndText}`;
+  const [_, { getColors }] = useUserInterface();
 
-  const handleClick = (event: MouseEvent) => {
+  const handleClick = () => {
     if (!!props.onSelect) {
       props.onSelect(props.key || props.label);
-    } else if (!!props.onClick) {
-      props.onClick(event);
     }
   };
 
-  if (!!props.onClick || !!props.onSelect) {
-    return (
-      <button
-        class={classes}
-        role="menuitem"
-        tabindex="-1"
-        onClick={handleClick}
-      >
-        {props.label}
-      </button>
-    );
-  } else {
-    return (
-      <a href={props.href || "#"} class={classes} role="menuitem" tabindex="-1">
-        {props.label}
-      </a>
-    );
-  }
+  return (
+    <span
+      class="block text-left px-4 py-1 text-sm cursor-pointer"
+      style={{
+        color: getColors().colors["input.foreground"],
+      }}
+      role="menuitem"
+      tabindex="-1"
+      onClick={handleClick}
+    >
+      {props.label}
+    </span>
+  );
 };
 
 export default DropdownItem;

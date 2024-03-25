@@ -25,13 +25,11 @@ const makeStore = () => {
     {
       fetchChatThreads: async () => {
         const result = await invoke("fetch_chat_thread_list");
-        console.log(result);
         setStore({ ...store, threadList: result as Array<APIChatThread> });
       },
 
       fetchThreadDetail: async (threadId: number) => {
         const result = await invoke("fetch_chat_thread_detail", { threadId });
-        console.log(result);
         setStore({
           ...store,
           threadDetail: result as APIChatThread,
@@ -40,7 +38,6 @@ const makeStore = () => {
 
       fetchChatReplies: async (threadId: number) => {
         const result = await invoke("fetch_chat_reply_list", { threadId });
-        console.log(result);
         setStore({
           ...store,
           replyListForThread: result as Array<APIChatReply>,

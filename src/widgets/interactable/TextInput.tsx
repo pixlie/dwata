@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { gitHubDark } from "../../utils/colors";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
   type: "text" | "email" | "password";
@@ -12,6 +12,8 @@ interface IPropTypes {
 }
 
 const TextInput: Component<IPropTypes> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
   return (
     <>
       {!!props.label && (
@@ -23,7 +25,12 @@ const TextInput: Component<IPropTypes> = (props) => {
         <input
           type={props.type || "text"}
           required={props.isRequired}
-          class={`block w-full rounded-md px-2 py-1.5 ${gitHubDark.interactibleWidgetBackgroundAndText} ${gitHubDark.interactableWidgetBorder}`}
+          class="block w-full rounded-md px-2 py-1.5 border"
+          style={{
+            "background-color": getColors().colors["input.background"],
+            "border-color": getColors().colors["input.border"],
+            color: getColors().colors["input.foreground"],
+          }}
           placeholder={props.placeholder}
           value={props.value || ""}
           onInput={(e) => props.onInput?.(e.currentTarget.value)}
