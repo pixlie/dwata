@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import SidebarHeading from "./SidebarHeading";
-import SourceList from "../source/SourceList";
+// import SourceList from "../source/SourceList";
 import { useUserInterface } from "../../stores/userInterface";
 
 const Sidebar: Component = () => {
@@ -30,11 +30,11 @@ const Sidebar: Component = () => {
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}
       />
-      <SourceList />
-      <div
+      {/* <SourceList /> */}
+      {/* <div
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}
-      />
+      /> */}
       <SidebarHeading
         label="Settings"
         icon="fa-solid fa-cog"

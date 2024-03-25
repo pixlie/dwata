@@ -21,7 +21,7 @@ interface IPropTypes {
   isRequired?: boolean;
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
-  onSelect?: (newValue: string) => void;
+  onSelect?: (newValue: number | string) => void;
 }
 
 interface IWidgetState {
@@ -55,6 +55,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
   }`;
 
   const getLabel = createMemo(() => {
+    console.log(widgetState());
     if (!!widgetState().selected) {
       return widgetState().selected!.label;
     } else {
@@ -84,6 +85,10 @@ const Dropdown: Component<IPropTypes> = (props) => {
         label: allChoices?.find((x) => x.key === selected)?.label || "",
       },
     });
+
+    if (!!props.onSelect) {
+      props.onSelect(selected);
+    }
   };
 
   return (
