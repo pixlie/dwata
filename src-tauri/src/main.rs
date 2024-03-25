@@ -49,6 +49,7 @@ fn main() {
             query_result::commands::load_data,
             workspace::commands::create_data_source,
             workspace::commands::create_ai_integration,
+            workspace::commands::update_ai_integration,
             user_account::commands::save_user,
             user_account::commands::fetch_current_user,
             chat::commands::start_chat_thread,
