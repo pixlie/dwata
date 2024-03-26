@@ -4,6 +4,7 @@ import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
 import { useUser } from "../stores/user";
 import Heading from "../widgets/typography/Heading";
+import { useNavigate } from "@solidjs/router";
 
 interface IUserAccountFormData {
   firstName: string;
@@ -16,6 +17,7 @@ const UserAccount: Component = () => {
   const [formData, setFormData] = createSignal<IUserAccountFormData>({
     firstName: "",
   });
+  const navigate = useNavigate();
 
   onMount(async () => {
     await fetchCurrentUser();
@@ -32,7 +34,7 @@ const UserAccount: Component = () => {
   const formFields: Array<IFormField> = [
     {
       name: "firstName",
-      label: "First Name",
+      label: "First Name (required)",
       fieldType: "singleLineText",
       isRequired: true,
     },
@@ -54,6 +56,7 @@ const UserAccount: Component = () => {
       lastName: formData().lastName,
       email: formData().email,
     });
+    navigate("/");
   };
 
   return (

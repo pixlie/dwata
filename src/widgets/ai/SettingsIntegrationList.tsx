@@ -1,9 +1,9 @@
 import { Component, For, createMemo, onMount } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
-import { APIAPIntegration } from "../../api_types/APIAPIntegration";
 import { useUserInterface } from "../../stores/userInterface";
+import { APIAIIntegration } from "../../api_types/APIAIIntegration";
 
-const SettingsAIIntegrationItem: Component<APIAPIntegration> = (props) => {
+const SettingsAIIntegrationItem: Component<APIAIIntegration> = (props) => {
   const [_, { getColors }] = useUserInterface();
 
   return (
@@ -38,7 +38,7 @@ const SettingsAIIntegrationList: Component = () => {
     if (!workspace.isFetching && !!workspace.isReady) {
       return workspace.aiIntegrationList;
     }
-    return undefined;
+    return [];
   });
 
   return (

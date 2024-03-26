@@ -4,11 +4,7 @@ import { APIChatThread } from "../../api_types/APIChatThread";
 import { useNavigate } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 
-interface IPropTypes extends APIChatThread {
-  aiProviderLabel: string;
-}
-
-const Thread: Component<IPropTypes> = (props) => {
+const Thread: Component<APIChatThread> = (props) => {
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
@@ -31,7 +27,7 @@ const Thread: Component<IPropTypes> = (props) => {
         <div class="grow" />
         <div>
           <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-1 cursor-default">
-            {props.aiProviderLabel} / {props.aiModel}
+            {props.aiProvider} / {props.aiModel}
           </span>
         </div>
       </div>

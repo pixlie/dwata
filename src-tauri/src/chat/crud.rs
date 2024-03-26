@@ -15,8 +15,8 @@ pub(crate) async fn create_chat_thread(
 ) -> Result<(i64, i64), DwataError> {
     let title = message
         .get(
-            ..(if message.len() >= 60 {
-                60
+            ..(if message.len() >= 300 {
+                300
             } else {
                 message.len() - 1
             }),

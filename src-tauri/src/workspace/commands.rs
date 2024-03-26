@@ -67,14 +67,17 @@ pub async fn update_ai_integration(
     display_label: Option<&str>,
     store: State<'_, Store>,
 ) -> Result<String, DwataError> {
-    let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
     let mut config_guard = store.config.lock().await;
-    let index = config_guard
+    match config_guard
         .ai_integration_list
-        .iter()
-        .position(|x| x.get_id() == id)
-        .unwrap();
-    config_guard.ai_integration_list[index] = ai_integration;
+        .iter_mut()
+        .find(|x| x.get_id() == id)
+    {
+        Some(ai_integration) => {
+            ai_integration.update(ai_provider, api_key, display_label);
+        }
+        None => {}
+    }
     match fs::write(
         &config_guard.path_to_config,
         config_guard.get_pretty_string(),

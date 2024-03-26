@@ -13,7 +13,7 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
     let config: Config = match fs::read_to_string(&config_file_path) {
         Ok(content) => ron::from_str(content.as_str()).unwrap(),
         Err(_) => Config {
-            path_to_config: app_config_dir.clone(),
+            path_to_config: config_file_path,
             data_source_list: vec![],
             folder_list: vec![],
             ai_integration_list: vec![],
@@ -22,11 +22,11 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
     config
 }
 
-pub fn load_ai_integration(config: &Config, ai_integration_id: &str) -> Option<AiIntegration> {
+pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AiIntegration> {
     match config
         .ai_integration_list
         .iter()
-        .find(|x| x.match_by_id(ai_integration_id))
+        .find(|x| x.match_by_provider_name(ai_provider_name))
     {
         Some(x) => Some((*x).clone()),
         None => None,

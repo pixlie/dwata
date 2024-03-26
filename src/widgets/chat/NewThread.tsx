@@ -7,6 +7,7 @@ import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
 import { APIAIProvider } from "../../api_types/APIAIProvider";
 import { APIAIModel } from "../../api_types/APIAIModel";
 import { useWorkspace } from "../../stores/workspace";
+import { useNavigate } from "@solidjs/router";
 
 interface INewThreadFormData {
   message: string;
@@ -23,6 +24,7 @@ const NewThread: Component = () => {
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
   const [workspace, { readConfigFromAPI }] = useWorkspace();
+  const navigate = useNavigate();
 
   const formFields: Array<IFormField> = [
     {
@@ -33,11 +35,12 @@ const NewThread: Component = () => {
   ];
 
   const handleNewThread = async () => {
-    await invoke("start_chat_thread", {
+    const response: [number, number] = await invoke("start_chat_thread", {
       message: formData().message,
       aiProvider: formData().aiProvider,
       aiModel: formData().aiModel,
     });
+    navigate(`/chat/thread/${response[0]}`);
   };
 
   onMount(async () => {
@@ -53,7 +56,7 @@ const NewThread: Component = () => {
 
     setFormData({
       ...formData(),
-      aiProvider: firstProvider.id,
+      aiProvider: firstProvider.aiProvider,
       aiModel: firstModel?.apiName || null,
     });
   });
@@ -75,7 +78,7 @@ const NewThread: Component = () => {
           {
             name: item.name,
             choices: item.aiModelList.map((model: APIAIModel) => ({
-              key: aiIntegration.id + "/" + model.apiName,
+              key: aiIntegration.aiProvider + "/" + model.apiName,
               label: model.label,
             })),
           },
