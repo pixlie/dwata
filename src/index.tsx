@@ -8,7 +8,7 @@ import Home from "./routes/Home";
 import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 import UserAccount from "./routes/UserAccount";
-import { ChatThreadRoutes, ChatThreadWrapper } from "./routes/ChatThread";
+import { ChatRoutes, ChatWrapper } from "./routes/Chat";
 
 render(
   () => (
@@ -19,8 +19,8 @@ render(
       </Route>
       <Route path={"/user"} component={UserAccount} />
       <Route path={"/"} component={Home} />
-      <Route path={"/chat"} component={ChatThreadWrapper}>
-        <ChatThreadRoutes />
+      <Route path={"/chat"} component={ChatWrapper}>
+        <ChatRoutes />
       </Route>
     </Router>
   ),

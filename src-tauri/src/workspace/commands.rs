@@ -60,6 +60,34 @@ pub async fn create_ai_integration(
 }
 
 #[tauri::command]
+pub async fn update_ai_integration(
+    id: &str,
+    ai_provider: &str,
+    api_key: &str,
+    display_label: Option<&str>,
+    store: State<'_, Store>,
+) -> Result<String, DwataError> {
+    let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
+    let mut config_guard = store.config.lock().await;
+    let index = config_guard
+        .ai_integration_list
+        .iter()
+        .position(|x| x.get_id() == id)
+        .unwrap();
+    config_guard.ai_integration_list[index] = ai_integration;
+    match fs::write(
+        &config_guard.path_to_config,
+        config_guard.get_pretty_string(),
+    ) {
+        Ok(_) => Ok(id.to_string()),
+        Err(error) => {
+            println!("{:?}", error);
+            Err(DwataError::CouldNotWriteConfig)
+        }
+    }
+}
+
+#[tauri::command]
 pub async fn read_config(store: State<'_, Store>) -> Result<APIConfig, DwataError> {
     let guard = store.config.lock().await;
     Ok(APIConfig::from_config(&guard))

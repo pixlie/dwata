@@ -1,7 +1,7 @@
 import { Component, For, createMemo, createSignal } from "solid-js";
-import { darkTheme } from "../../utils/themes";
 import DropdownItem from "./DropdownItem";
 import DropdownHeading from "./DropdownHeading";
+import { useUserInterface } from "../../stores/userInterface";
 
 export interface IKeyedChoice {
   key: number | string;
@@ -21,21 +21,18 @@ interface IPropTypes {
   isRequired?: boolean;
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
-  onSelect?: (newValue: string) => void;
+  onSelect?: (newValue: number | string) => void;
 }
 
 interface IWidgetState {
   isOpen: boolean;
-  selected?: {
-    key: number | string;
-    label: string;
-  };
 }
 
 const Dropdown: Component<IPropTypes> = (props) => {
   const [widgetState, setWidgetState] = createSignal<IWidgetState>({
     isOpen: false,
   });
+  const [_, { getColors }] = useUserInterface();
   const getSizeClass = (size: string) => {
     switch (size) {
       case "sm":
@@ -50,49 +47,63 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const buttonClasses = `${getSizeClass(
     props.size || "base"
-  )} rounded-md select-none cursor-pointer ${darkTheme.interactibleWidgetBackgroundAndText} ${darkTheme.interactableWidgetBorder} ${
-    props.isBlock && "w-full"
-  }`;
+  )} rounded-md select-none cursor-pointer border ${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {
-    if (!!widgetState().selected) {
-      return widgetState().selected!.label;
+    if (!!props.value && !!props.choices) {
+      return (
+        props.label +
+        ": " +
+        props.choices?.find((x) => x.key === props.value)?.label
+      );
+    } else if (!!props.value && !!props.choicesWithHeadings) {
+      const choiceHead = props.choicesWithHeadings.find((x) =>
+        x.choices.find((y) => y.key === props.value)
+      );
+      const choice = choiceHead?.choices.find(
+        (y) => y.key === props.value
+      )?.label;
+      return props.label + ": " + choiceHead?.name + " / " + choice;
     } else {
       return props.label;
     }
   });
 
   const handlClick = () => {
-    setWidgetState({ ...widgetState(), isOpen: !widgetState().isOpen });
+    setWidgetState({ isOpen: !widgetState().isOpen });
   };
 
   const handleChoiceSelect = (selected: number | string) => {
-    const allChoices = !!props.choicesWithHeadings
-      ? props.choicesWithHeadings.reduce(
-          (arr: Array<IKeyedChoice>, curr: IChoicesWithHeading) => [
-            ...arr,
-            ...curr.choices,
-          ],
-          []
-        )
-      : props.choices;
     setWidgetState({
-      ...widgetState(),
       isOpen: false,
-      selected: {
-        key: selected,
-        label: allChoices?.find((x) => x.key === selected)?.label || "",
-      },
     });
+
+    if (!!props.onSelect) {
+      props.onSelect(selected);
+    }
   };
 
   return (
     <div class="relative">
-      <button class={buttonClasses} onClick={handlClick}>
+      <button
+        class={buttonClasses}
+        onClick={handlClick}
+        style={{
+          "background-color": getColors().colors["input.background"],
+          "border-color": getColors().colors["input.border"],
+          color: getColors().colors["input.foreground"],
+        }}
+      >
         {getLabel()} <i class="ml-1 fa-solid fa-chevron-down" />
       </button>
       {!!widgetState().isOpen && (
-        <div class="absolute top-10 z-10">
+        <div
+          class="absolute top-10 z-10 border"
+          style={{
+            "background-color": getColors().colors["input.background"],
+            "border-color": getColors().colors["input.border"],
+          }}
+        >
           {!!props.choicesWithHeadings ? (
             <For each={props.choicesWithHeadings}>
               {(heading) => (

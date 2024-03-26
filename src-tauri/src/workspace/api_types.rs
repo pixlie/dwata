@@ -1,4 +1,4 @@
-use crate::ai::api_types::APIAPIntegration;
+use crate::ai::api_types::APIAIIntegration;
 use crate::data_sources::api_types::APIDataSource;
 use crate::workspace::Config;
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ use ts_rs::TS;
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APIConfig {
     data_source_list: Vec<APIDataSource>,
-    ai_integration_list: Vec<APIAPIntegration>,
+    ai_integration_list: Vec<APIAIIntegration>,
 }
 
 impl APIConfig {

@@ -1,10 +1,19 @@
-import { Component, createMemo, createSignal } from "solid-js";
+import { Component, createMemo, createSignal, onMount } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
-import { IAiFormData } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
 import Dropdown from "../interactable/Dropdown";
+import { APIAIProvider } from "../../api_types/APIAIProvider";
+import { useParams } from "@solidjs/router";
+import { useWorkspace } from "../../stores/workspace";
+
+interface IAiFormData {
+  id?: string;
+  aiProvider: string;
+  apiKey: string;
+  displayLabel: string;
+}
 
 interface IState {
   isEditing: boolean;
@@ -18,41 +27,80 @@ const AiForm: Component = () => {
     isFetching: false,
     isSaving: false,
   });
-  const [form, setForm] = createSignal<IAiFormData>({
-    aiProvider: "OpenAI",
+  const [formData, setFormData] = createSignal<IAiFormData>({
+    aiProvider: "",
     apiKey: "",
     displayLabel: "personal",
   });
+  const [aiProvidersAndModels, setAiProvidersAndModels] =
+    createSignal<Array<APIAIProvider>>();
+  const [workspace] = useWorkspace();
+  const params = useParams();
 
-  const AIProviderChoices = {
-    OpenAI: "OpenAI",
-    Groq: "Groq",
-    Anthropic: "Anthropic",
-  };
+  onMount(async () => {
+    const response = await invoke<Array<APIAIProvider>>(
+      "fetch_list_of_ai_providers_and_models"
+    );
+    setAiProvidersAndModels(response);
+
+    if (!!params.id) {
+      const config = workspace.aiIntegrationList.find(
+        (x) => x.id === params.id
+      );
+      if (!!config) {
+        setFormData({
+          id: config.id,
+          aiProvider: config.aiProvider,
+          apiKey: config.apiKey || "",
+          displayLabel: config.displayLabel || "",
+        });
+      }
+    }
+  });
+
+  const getAIProviderChoices = createMemo(() => {
+    if (!aiProvidersAndModels()) {
+      return [];
+    } else {
+      return aiProvidersAndModels()!.map((item) => ({
+        key: item.name,
+        label: item.name,
+      }));
+    }
+  });
 
   const visibleName = createMemo(() => {
-    return !!form().displayLabel
-      ? `- ${form().displayLabel}`
-      : !!form().aiProvider
-        ? `- ${form().aiProvider}`
+    return !!formData().displayLabel
+      ? `- ${formData().displayLabel}`
+      : !!formData().aiProvider
+        ? `- ${formData().aiProvider}`
         : "";
   });
 
   const handleChange = (field: string) => {
     return (data: string | number) => {
-      setForm({
-        ...form(),
+      setFormData({
+        ...formData(),
         [field]: data,
       });
     };
   };
 
-  const handleConnect = async () => {
-    await invoke("create_ai_integration", {
-      aiProvider: form().aiProvider,
-      apiKey: form().apiKey,
-      accountLabel: form().displayLabel,
-    });
+  const handleSubmit = async () => {
+    if (!!formData().id) {
+      await invoke("update_ai_integration", {
+        id: formData().id,
+        aiProvider: formData().aiProvider,
+        apiKey: formData().apiKey,
+        accountLabel: formData().displayLabel,
+      });
+    } else {
+      await invoke("create_ai_integration", {
+        aiProvider: formData().aiProvider,
+        apiKey: formData().apiKey,
+        accountLabel: formData().displayLabel,
+      });
+    }
   };
 
   return (
@@ -64,9 +112,9 @@ const AiForm: Component = () => {
       <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
         <Dropdown
           label="Select an AI Provider"
-          choices={AIProviderChoices}
+          choices={getAIProviderChoices()}
           isRequired
-          value={form().aiProvider}
+          value={formData().aiProvider}
           onSelect={handleChange("aiProvider")}
           size="sm"
         />
@@ -76,7 +124,7 @@ const AiForm: Component = () => {
           type="text"
           isRequired
           label="API Key"
-          value={form().apiKey}
+          value={formData().apiKey}
           onInput={handleChange("apiKey")}
         />
 
@@ -85,12 +133,12 @@ const AiForm: Component = () => {
           type="text"
           isRequired
           label="Account Label"
-          value={form().displayLabel}
+          value={formData().displayLabel}
           onInput={handleChange("displayLabel")}
         />
 
         <div class="mt-4" />
-        <Button label="Save and start a chat!" onClick={handleConnect} />
+        <Button label="Save and start a chat!" onClick={handleSubmit} />
       </div>
     </div>
   );

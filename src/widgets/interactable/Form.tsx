@@ -3,6 +3,7 @@ import Heading from "../typography/Heading";
 import Button from "./Button";
 import { IFormField } from "../../utils/types";
 import FormField from "./FormField";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
   title: string;
@@ -15,6 +16,8 @@ interface IPropTypes {
 }
 
 const Form: Component<IPropTypes> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
   const handleChange = (field: string) => {
     return (data: string | number) => {
       !!props.setFieldInput &&
@@ -26,12 +29,18 @@ const Form: Component<IPropTypes> = (props) => {
   };
 
   return (
-    <div class="w-full">
-      <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
-        <Heading size="sm">{props.title}</Heading>
+    <div
+      class="w-full rounded-md border"
+      style={{
+        "background-color": getColors().colors["inlineChat.background"],
+        "border-color": getColors().colors["inlineChat.border"],
+      }}
+    >
+      <div class="px-2 py-2 rounded-md rounded-b-none">
+        <Heading size="base">{props.title}</Heading>
       </div>
 
-      <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
+      <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
         <For each={props.formFields}>
           {(field) => (
             <>

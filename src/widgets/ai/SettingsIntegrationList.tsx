@@ -1,12 +1,23 @@
 import { Component, For, createMemo, onMount } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
 import { APIAPIntegration } from "../../api_types/APIAPIntegration";
+import { useUserInterface } from "../../stores/userInterface";
 
 const SettingsAIIntegrationItem: Component<APIAPIntegration> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
   return (
-    <div class="p-4 bg-zinc-800 text-white rounded-md">
-      <i class="fa-solid fa-database w-6 text-gray-500" />
-      {props.displayLabel || props.aiProvider}
+    <div
+      class="p-4 text-white rounded-md border"
+      style={{
+        "background-color": getColors().colors["panel.background"],
+        "border-color": getColors().colors["panel.border"],
+      }}
+    >
+      <a href={`/settings/ai-provider/edit/${props.id}`}>
+        <i class="fa-solid fa-database w-6 text-gray-500" />
+        {props.displayLabel || props.aiProvider}
+      </a>
       <div>
         <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
           {props.aiProvider}

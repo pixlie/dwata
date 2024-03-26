@@ -1,20 +1,36 @@
-import { Component, For, createComputed, onMount } from "solid-js";
+import {
+  Component,
+  For,
+  createComputed,
+  createSignal,
+  onMount,
+} from "solid-js";
 import Thread from "../widgets/chat/Thread";
 import { Route, RouteSectionProps, useParams } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
 import { ChatThreadProvider, useChatThread } from "../stores/chatThread";
 import NewThread from "../widgets/chat/NewThread";
 import ReplyItem from "../widgets/chat/ReplyItem";
+import { invoke } from "@tauri-apps/api/core";
+import { APIAIProvider } from "../api_types/APIAIProvider";
+import { useWorkspace } from "../stores/workspace";
 
 const ChatThreadIndex: Component = () => {
   const [
     chatThread,
     { fetchChatThreads, fetchThreadDetail, fetchChatReplies },
   ] = useChatThread();
+  const [aiProvidersAndModels, setAiProvidersAndModels] =
+    createSignal<Array<APIAIProvider>>();
+  const [workspace] = useWorkspace();
   const params = useParams();
 
   onMount(async () => {
     await fetchChatThreads();
+    const response = await invoke<Array<APIAIProvider>>(
+      "fetch_list_of_ai_providers_and_models"
+    );
+    setAiProvidersAndModels(response);
   });
 
   createComputed(async () => {
@@ -34,7 +50,16 @@ const ChatThreadIndex: Component = () => {
           <div class="mb-4" />
           <Heading size="3xl">Recent chats with AI</Heading>
           <For each={chatThread.threadList}>
-            {(thread) => <Thread {...thread} />}
+            {(thread) => (
+              <Thread
+                {...thread}
+                aiProviderLabel={
+                  workspace.aiIntegrationList.find(
+                    (x) => x.id === thread.aiProvider
+                  )!.aiProvider
+                }
+              />
+            )}
           </For>
         </div>
 
@@ -50,11 +75,11 @@ const ChatThreadIndex: Component = () => {
   );
 };
 
-const ChatThreadWrapper: Component<RouteSectionProps> = (props) => {
+const ChatWrapper: Component<RouteSectionProps> = (props) => {
   return <>{props.children}</>;
 };
 
-const ChatThreadRoutes: Component = () => {
+const ChatRoutes: Component = () => {
   return (
     <ChatThreadProvider>
       {/* <Route path="/start" component={DatabaseForm} /> */}
@@ -65,4 +90,4 @@ const ChatThreadRoutes: Component = () => {
   );
 };
 
-export { ChatThreadWrapper, ChatThreadRoutes };
+export { ChatWrapper, ChatRoutes };

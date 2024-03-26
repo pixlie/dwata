@@ -1,18 +1,26 @@
 import { Component, createSignal } from "solid-js";
 
 import NavigationButtom from "./NavigationButton";
+import { useUserInterface } from "../../stores/userInterface";
 // import DropdownItem from "../interactable/DropdownItem";
 
 const NavigationBar: Component = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] =
     createSignal<boolean>(false);
+  const [_, { getColors }] = useUserInterface();
 
   // const handleUserDropdownClick = () => {
   //   setIsUserDropdownOpen(!isUserDropdownOpen());
   // };
 
   return (
-    <nav class="fixed w-full bg-gray-800 px-8">
+    <nav
+      class="fixed w-full px-8 border-b"
+      style={{
+        "background-color": getColors().colors["sideBar.background"],
+        "border-color": getColors().colors["sideBar.border"],
+      }}
+    >
       <div class="relative flex h-12 items-center justify-between">
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
           <div class="flex flex-shrink-0 items-center">

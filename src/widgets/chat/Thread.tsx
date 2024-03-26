@@ -2,9 +2,15 @@ import { Component, For } from "solid-js";
 import Heading from "../typography/Heading";
 import { APIChatThread } from "../../api_types/APIChatThread";
 import { useNavigate } from "@solidjs/router";
+import { useUserInterface } from "../../stores/userInterface";
 
-const Thread: Component<APIChatThread> = (props) => {
+interface IPropTypes extends APIChatThread {
+  aiProviderLabel: string;
+}
+
+const Thread: Component<IPropTypes> = (props) => {
   const navigate = useNavigate();
+  const [_, { getColors }] = useUserInterface();
 
   const handleClick = () => {
     navigate(`/chat/thread/${props.id}`);
@@ -12,15 +18,20 @@ const Thread: Component<APIChatThread> = (props) => {
 
   return (
     <div
-      class="my-3 bg-zinc-800 p-3 rounded-md cursor-pointer"
+      class="my-3 p-3 rounded-md cursor-pointer border shadow"
+      style={{
+        "background-color": getColors().colors["inlineChat.background"],
+        "border-color": getColors().colors["inlineChat.border"],
+        // "box-shadow": `0 1px 3px 0 ${getColors().colors["inlineChat.shadow"]}, 0 1px 2px -1px ${getColors().colors["inlineChat.shadow"]};`,
+      }}
       onClick={handleClick}
     >
-      <Heading size="xl">{props.title}</Heading>
+      <Heading size="base">{props.title}</Heading>
       <div class="flex flex-row">
         <div class="grow" />
         <div>
           <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-1 cursor-default">
-            {props.aiProvider} / {props.aiModel}
+            {props.aiProviderLabel} / {props.aiModel}
           </span>
         </div>
       </div>
