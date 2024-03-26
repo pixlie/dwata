@@ -67,6 +67,11 @@ impl AiIntegration {
         }
     }
 
+    pub fn update(&mut self, ai_provider: &str, api_key: &str, display_label: Option<&str>) {
+        self.ai_provider = AiProvider::new(ai_provider, api_key);
+        self.display_label = display_label.map(|x| x.to_string());
+    }
+
     pub fn get_id(&self) -> String {
         self.id.clone()
     }
@@ -82,6 +87,10 @@ impl AiIntegration {
 
     pub fn match_by_id(&self, id: &str) -> bool {
         self.id == id
+    }
+
+    pub fn match_by_provider_name(&self, provider_name: &str) -> bool {
+        self.ai_provider.get_name() == provider_name
     }
 }
 

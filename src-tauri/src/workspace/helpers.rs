@@ -22,11 +22,11 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
     config
 }
 
-pub fn load_ai_integration(config: &Config, ai_integration_id: &str) -> Option<AiIntegration> {
+pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AiIntegration> {
     match config
         .ai_integration_list
         .iter()
-        .find(|x| x.match_by_id(ai_integration_id))
+        .find(|x| x.match_by_provider_name(ai_provider_name))
     {
         Some(x) => Some((*x).clone()),
         None => None,
