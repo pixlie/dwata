@@ -7,6 +7,7 @@ import Dropdown from "../interactable/Dropdown";
 import { APIAIProvider } from "../../api_types/APIAIProvider";
 import { useParams } from "@solidjs/router";
 import { useWorkspace } from "../../stores/workspace";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IAiFormData {
   id?: string;
@@ -34,6 +35,7 @@ const AiForm: Component = () => {
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
+  const [_, { getColors }] = useUserInterface();
   const [workspace] = useWorkspace();
   const params = useParams();
 
@@ -104,43 +106,94 @@ const AiForm: Component = () => {
   };
 
   return (
-    <div class="max-w-screen-sm">
-      <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
-        <Heading size="sm">AI Provider {visibleName()}</Heading>
+    <>
+      <div class="max-w-screen-sm">
+        <p style={{ color: getColors().colors["editor.foreground"] }}>
+          Pricing and API key links for AI providers (register/login if you have
+          not):
+        </p>
+
+        <ul
+          class="mb-4 list-disc"
+          style={{ color: getColors().colors["editor.foreground"] }}
+        >
+          <li class="ml-8">
+            <span class="font-bold">OpenAI</span>:{" "}
+            <a
+              href="https://platform.openai.com/api-keys"
+              target="_blank"
+              class="underline text-blue-600"
+            >
+              API keys
+            </a>
+            ,{" "}
+            <a
+              href="https://openai.com/pricing"
+              target="_blank"
+              class="underline text-blue-600"
+            >
+              pricing
+            </a>
+          </li>
+          <li class="ml-8">
+            <span class="font-bold">Groq</span>{" "}
+            <a
+              href="https://console.groq.com/keys"
+              target="_blank"
+              class="underline text-blue-600"
+            >
+              API keys
+            </a>
+            ,{" "}
+            <a
+              href="https://wow.groq.com"
+              target="_blank"
+              class="underline text-blue-600"
+            >
+              pricing
+            </a>
+          </li>
+        </ul>
       </div>
 
-      <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
-        <Dropdown
-          label="Select an AI Provider"
-          choices={getAIProviderChoices()}
-          isRequired
-          value={formData().aiProvider}
-          onSelect={handleChange("aiProvider")}
-          size="sm"
-        />
+      <div class="max-w-screen-sm">
+        <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
+          <Heading size="sm">AI Provider {visibleName()}</Heading>
+        </div>
 
-        <div class="mt-4" />
-        <TextInput
-          type="text"
-          isRequired
-          label="API Key"
-          value={formData().apiKey}
-          onInput={handleChange("apiKey")}
-        />
+        <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
+          <Dropdown
+            label="Select an AI Provider"
+            choices={getAIProviderChoices()}
+            isRequired
+            value={formData().aiProvider}
+            onSelect={handleChange("aiProvider")}
+            size="sm"
+          />
 
-        <div class="mt-4" />
-        <TextInput
-          type="text"
-          isRequired
-          label="Account Label"
-          value={formData().displayLabel}
-          onInput={handleChange("displayLabel")}
-        />
+          <div class="mt-4" />
+          <TextInput
+            type="text"
+            isRequired
+            label="API Key"
+            value={formData().apiKey}
+            onInput={handleChange("apiKey")}
+          />
 
-        <div class="mt-4" />
-        <Button label="Save and start a chat!" onClick={handleSubmit} />
+          <div class="mt-4" />
+          <TextInput
+            type="text"
+            isRequired
+            label="Account Label"
+            value={formData().displayLabel}
+            onInput={handleChange("displayLabel")}
+          />
+
+          <div class="mt-4" />
+          <Button label="Save and start a chat!" onClick={handleSubmit} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
