@@ -26,10 +26,6 @@ interface IPropTypes {
 
 interface IWidgetState {
   isOpen: boolean;
-  selected?: {
-    key: number | string;
-    label: string;
-  };
 }
 
 const Dropdown: Component<IPropTypes> = (props) => {
@@ -54,34 +50,32 @@ const Dropdown: Component<IPropTypes> = (props) => {
   )} rounded-md select-none cursor-pointer border ${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {
-    if (!!props.value) {
-      return props.label + ": " + props.value;
+    if (!!props.value && !!props.choices) {
+      return (
+        props.label +
+        ": " +
+        props.choices?.find((x) => x.key === props.value)?.label
+      );
+    } else if (!!props.value && !!props.choicesWithHeadings) {
+      const choiceHead = props.choicesWithHeadings.find((x) =>
+        x.choices.find((y) => y.key === props.value)
+      );
+      const choice = choiceHead?.choices.find(
+        (y) => y.key === props.value
+      )?.label;
+      return props.label + ": " + choiceHead?.name + " / " + choice;
     } else {
       return props.label;
     }
   });
 
   const handlClick = () => {
-    setWidgetState({ ...widgetState(), isOpen: !widgetState().isOpen });
+    setWidgetState({ isOpen: !widgetState().isOpen });
   };
 
   const handleChoiceSelect = (selected: number | string) => {
-    const allChoices = !!props.choicesWithHeadings
-      ? props.choicesWithHeadings.reduce(
-          (arr: Array<IKeyedChoice>, curr: IChoicesWithHeading) => [
-            ...arr,
-            ...curr.choices,
-          ],
-          []
-        )
-      : props.choices;
     setWidgetState({
-      ...widgetState(),
       isOpen: false,
-      selected: {
-        key: selected,
-        label: allChoices?.find((x) => x.key === selected)?.label || "",
-      },
     });
 
     if (!!props.onSelect) {

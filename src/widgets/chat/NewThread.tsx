@@ -10,19 +10,19 @@ import { useWorkspace } from "../../stores/workspace";
 
 interface INewThreadFormData {
   message: string;
-  aiProvider: string;
-  aiModel: string;
+  aiProvider: string | null;
+  aiModel: string | null;
 }
 
 const NewThread: Component = () => {
   const [formData, setFormData] = createSignal<INewThreadFormData>({
     message: "",
-    aiProvider: "OpenAI",
-    aiModel: "gpt-3.5-turbo",
+    aiProvider: null,
+    aiModel: null,
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
-  const [workspace] = useWorkspace();
+  const [workspace, { readConfigFromAPI }] = useWorkspace();
 
   const formFields: Array<IFormField> = [
     {
@@ -41,35 +41,58 @@ const NewThread: Component = () => {
   };
 
   onMount(async () => {
+    await readConfigFromAPI();
+    const firstProvider = workspace.aiIntegrationList[0];
     const response = await invoke<Array<APIAIProvider>>(
       "fetch_list_of_ai_providers_and_models"
     );
     setAiProvidersAndModels(response);
+    const firstModel = response.find(
+      (provider) => provider.name === firstProvider.aiProvider
+    )?.aiModelList[0];
+
+    setFormData({
+      ...formData(),
+      aiProvider: firstProvider.id,
+      aiModel: firstModel?.apiName || null,
+    });
   });
 
   const getAiModelChoices = createMemo(() => {
-    if (!!aiProvidersAndModels()) {
-      return aiProvidersAndModels()?.reduce(
-        (collector: Array<IChoicesWithHeading>, item: APIAIProvider) =>
-          workspace.aiIntegrationList.findIndex(
-            (x) => x.aiProvider === item.name
-          ) !== -1
-            ? [
-                ...collector,
-                {
-                  name: item.name,
-                  choices: item.aiModelList.map((model: APIAIModel) => ({
-                    key: model.apiName,
-                    label: model.label,
-                  })),
-                },
-              ]
-            : collector,
-        []
-      );
+    if (!aiProvidersAndModels()) {
+      return [];
     }
-    return [];
+    return aiProvidersAndModels()!.reduce(
+      (collector: Array<IChoicesWithHeading>, item: APIAIProvider) => {
+        const aiIntegration = workspace.aiIntegrationList.find(
+          (x) => x.aiProvider === item.name
+        );
+        if (!aiIntegration) {
+          return collector;
+        }
+        return [
+          ...collector,
+          {
+            name: item.name,
+            choices: item.aiModelList.map((model: APIAIModel) => ({
+              key: aiIntegration.id + "/" + model.apiName,
+              label: model.label,
+            })),
+          },
+        ];
+      },
+      []
+    );
   });
+
+  const handleModelSelect = (selected: string) => {
+    const [aiProvider, aiModel] = selected.split("/");
+    setFormData({
+      ...formData(),
+      aiProvider,
+      aiModel,
+    });
+  };
 
   return (
     <Form
@@ -87,6 +110,12 @@ const NewThread: Component = () => {
             label="Select an AI model"
             choicesWithHeadings={getAiModelChoices()}
             size="sm"
+            value={
+              !!formData().aiProvider && !!formData().aiModel
+                ? `${formData().aiProvider}/${formData().aiModel}`
+                : undefined
+            }
+            onSelect={handleModelSelect}
           />
         </div>
       }
