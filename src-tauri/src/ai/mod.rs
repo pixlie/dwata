@@ -80,8 +80,8 @@ impl AiIntegration {
         )
     }
 
-    pub fn match_by_ai_provider_name(&self, ai_provider_name: &str) -> bool {
-        self.ai_provider.get_name() == ai_provider_name
+    pub fn match_by_id(&self, id: &str) -> bool {
+        self.id == id
     }
 }
 

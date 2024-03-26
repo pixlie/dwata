@@ -1,5 +1,4 @@
 use crate::ai::AiIntegration;
-use crate::error::DwataError;
 use crate::workspace::Config;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -23,11 +22,11 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
     config
 }
 
-pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AiIntegration> {
+pub fn load_ai_integration(config: &Config, ai_integration_id: &str) -> Option<AiIntegration> {
     match config
         .ai_integration_list
         .iter()
-        .find(|x| x.match_by_ai_provider_name(ai_provider_name))
+        .find(|x| x.match_by_id(ai_integration_id))
     {
         Some(x) => Some((*x).clone()),
         None => None,
