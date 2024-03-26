@@ -138,30 +138,30 @@ pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModel>> {
             },
         ],
     );
-    models.insert(
-        "Anthropic".to_string(),
-        vec![
-            AiModel {
-                api_name: "claude-3-opus-20240229".to_string(),
-                label: "Claude 3 Opus".to_string(),
-                context_window: Some(200_000),
-            },
-            AiModel {
-                api_name: "claude-3-sonnet-20240229".to_string(),
-                label: "Claude 3 Sonnet".to_string(),
-                context_window: Some(200_000),
-            },
-            AiModel {
-                api_name: "claude-2.1".to_string(),
-                label: "Claude 2.1".to_string(),
-                context_window: Some(200_000),
-            },
-            AiModel {
-                api_name: "claude-2.0".to_string(),
-                label: "Claude 2.0".to_string(),
-                context_window: Some(100_000),
-            },
-        ],
-    );
+    // models.insert(
+    //     "Anthropic".to_string(),
+    //     vec![
+    //         AiModel {
+    //             api_name: "claude-3-opus-20240229".to_string(),
+    //             label: "Claude 3 Opus".to_string(),
+    //             context_window: Some(200_000),
+    //         },
+    //         AiModel {
+    //             api_name: "claude-3-sonnet-20240229".to_string(),
+    //             label: "Claude 3 Sonnet".to_string(),
+    //             context_window: Some(200_000),
+    //         },
+    //         AiModel {
+    //             api_name: "claude-2.1".to_string(),
+    //             label: "Claude 2.1".to_string(),
+    //             context_window: Some(200_000),
+    //         },
+    //         AiModel {
+    //             api_name: "claude-2.0".to_string(),
+    //             label: "Claude 2.0".to_string(),
+    //             context_window: Some(100_000),
+    //         },
+    //     ],
+    // );
     models
 }
