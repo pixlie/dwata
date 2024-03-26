@@ -5,14 +5,12 @@ import Heading from "../widgets/typography/Heading";
 import { ChatThreadProvider, useChatThread } from "../stores/chatThread";
 import NewThread from "../widgets/chat/NewThread";
 import ReplyItem from "../widgets/chat/ReplyItem";
-import { useWorkspace } from "../stores/workspace";
 
 const ChatThreadIndex: Component = () => {
   const [
     chatThread,
     { fetchChatThreads, fetchThreadDetail, fetchChatReplies },
   ] = useChatThread();
-  const [workspace] = useWorkspace();
   const params = useParams();
 
   onMount(async () => {
@@ -36,16 +34,7 @@ const ChatThreadIndex: Component = () => {
           <div class="mb-4" />
           <Heading size="3xl">Recent chats with AI</Heading>
           <For each={chatThread.threadList}>
-            {(thread) => (
-              <Thread
-                {...thread}
-                aiProviderLabel={
-                  workspace.aiIntegrationList.find(
-                    (x) => x.id === thread.aiProvider
-                  )!.aiProvider
-                }
-              />
-            )}
+            {(thread) => <Thread {...thread} />}
           </For>
         </div>
 

@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
 import Dropdown from "../interactable/Dropdown";
 import { APIAIProvider } from "../../api_types/APIAIProvider";
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 
@@ -38,6 +38,7 @@ const AiForm: Component = () => {
   const [_, { getColors }] = useUserInterface();
   const [workspace] = useWorkspace();
   const params = useParams();
+  const navigate = useNavigate();
 
   onMount(async () => {
     const response = await invoke<Array<APIAIProvider>>(
@@ -103,6 +104,7 @@ const AiForm: Component = () => {
         accountLabel: formData().displayLabel,
       });
     }
+    navigate("/");
   };
 
   return (
@@ -179,7 +181,7 @@ const AiForm: Component = () => {
             value={formData().apiKey}
             onInput={handleChange("apiKey")}
           />
-
+          {/* 
           <div class="mt-4" />
           <TextInput
             type="text"
@@ -187,10 +189,10 @@ const AiForm: Component = () => {
             label="Account Label"
             value={formData().displayLabel}
             onInput={handleChange("displayLabel")}
-          />
+          /> */}
 
           <div class="mt-4" />
-          <Button label="Save and start a chat!" onClick={handleSubmit} />
+          <Button label="Save AI integration" onClick={handleSubmit} />
         </div>
       </div>
     </>
