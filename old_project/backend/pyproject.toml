@@ -17,7 +17,7 @@ aiohttp = "^3.7.4"
 aioredis = "^2.0.0"
 python-benedict = "^0.24.3"
 sqlalchemy-migrate = "^0.13.0"
-black = {extras = ["d"], version = "^22.10.0"}
+black = {extras = ["d"], version = "^24.3.0"}
 python-dotenv = "^0.19.1"
 PyJWT = "^2.3.0"
 psycopg2 = "^2.9.3"
