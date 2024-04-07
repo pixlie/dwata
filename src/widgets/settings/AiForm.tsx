@@ -158,12 +158,21 @@ const AiForm: Component = () => {
         </ul>
       </div>
 
-      <div class="max-w-screen-sm">
-        <div class="bg-zinc-700 px-4 py-3 rounded-md rounded-b-none">
+      <div
+        class="max-w-screen-sm border rounded-md"
+        style={{
+          "background-color": getColors().colors["editorWidget.background"],
+          "border-color": getColors().colors["editorWidget.border"],
+        }}
+      >
+        <div
+          class="px-4 py-3 rounded-md rounded-b-none border-b"
+          style={{ "border-color": getColors().colors["editorWidget.border"] }}
+        >
           <Heading size="sm">AI Provider {visibleName()}</Heading>
         </div>
 
-        <div class="bg-zinc-800 px-4 pt-3 pb-4 rounded-md rounded-t-none">
+        <div class="px-4 pt-3 pb-4 rounded-md rounded-t-none">
           <Dropdown
             label="Select an AI Provider"
             choices={getAIProviderChoices()}
