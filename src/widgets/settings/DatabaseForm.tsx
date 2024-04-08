@@ -5,6 +5,7 @@ import { IDatabaseFormData } from "../../utils/types";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 import { useUserInterface } from "../../stores/userInterface";
+import { useNavigate } from "@solidjs/router";
 
 interface IState {
   isEditing: boolean;
@@ -24,6 +25,7 @@ const DatabaseForm: Component = () => {
     port: 5432,
     name: "test",
   });
+  const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
   const visibleName = createMemo(() => {
@@ -51,6 +53,9 @@ const DatabaseForm: Component = () => {
       port: `${form().port}`,
       database: form().name,
     });
+    if (response) {
+      navigate("/settings");
+    }
   };
 
   return (

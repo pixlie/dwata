@@ -2,22 +2,27 @@ import { Component, For, createMemo, onMount } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { APIAIIntegration } from "../../api_types/APIAIIntegration";
+import { useNavigate } from "@solidjs/router";
 
 const SettingsAIIntegrationItem: Component<APIAIIntegration> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/settings/ai-provider/edit/${props.id}`);
+  };
 
   return (
     <div
-      class="p-4 text-white rounded-md border"
+      class="p-4 text-white rounded-md border cursor-pointer"
       style={{
         "background-color": getColors().colors["panel.background"],
         "border-color": getColors().colors["panel.border"],
       }}
+      onClick={handleClick}
     >
-      <a href={`/settings/ai-provider/edit/${props.id}`}>
-        <i class="fa-solid fa-database w-6 text-gray-500" />
-        {props.displayLabel || props.aiProvider}
-      </a>
+      <i class="fa-solid fa-database w-6 text-gray-500" />
+      {props.displayLabel || props.aiProvider}
       <div>
         <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
           {props.aiProvider}

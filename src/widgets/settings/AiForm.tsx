@@ -104,7 +104,7 @@ const AiForm: Component = () => {
         accountLabel: formData().displayLabel,
       });
     }
-    navigate("/");
+    navigate("/settings");
   };
 
   return (
