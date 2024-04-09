@@ -105,10 +105,11 @@ const NewThread: Component = () => {
       // handleSubmit={handleNewThread}
       setFieldInput={setFormData}
       submitButton={
-        <div class="flex flex-row">
+        <div class="flex">
           <div class="grow">
             <Button size="sm" label="Start a chat" onClick={handleNewThread} />
           </div>
+
           <Dropdown
             label="Select an AI model"
             choicesWithHeadings={getAiModelChoices()}

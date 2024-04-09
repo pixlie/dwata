@@ -8,7 +8,7 @@ const Sidebar: Component = () => {
 
   return (
     <div
-      class="w-64 flex-none pt-16 border-r-2"
+      class="w-64 flex-none border-r-2"
       style={{
         "background-color": getColors().colors["sideBar.background"],
         "border-color": getColors().colors["sideBar.border"],

@@ -27,7 +27,7 @@ const ChatThreadIndex: Component = () => {
 
   return (
     <>
-      <div class="flex flex-row">
+      <div class="flex h-full">
         <div class="w-2/5 mr-4">
           <NewThread />
 
@@ -38,7 +38,7 @@ const ChatThreadIndex: Component = () => {
           </For>
         </div>
 
-        <div class="w-3/5">
+        <div class="w-3/5 overflow-y-auto h-full">
           {!!params.threadId && (
             <For each={chatThread.replyListForThread}>
               {(reply) => <ReplyItem {...reply} />}

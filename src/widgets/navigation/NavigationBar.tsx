@@ -15,7 +15,7 @@ const NavigationBar: Component = () => {
 
   return (
     <nav
-      class="fixed w-full px-8 border-b"
+      class="px-8 border-b"
       style={{
         "background-color": getColors().colors["sideBar.background"],
         "border-color": getColors().colors["sideBar.border"],

@@ -22,7 +22,7 @@ const SourceItem: Component<IPropTypes> = (props) => {
 
   return (
     <div
-      class="ml-4 mr-2 block rounded-md px-2 py-0.5 text-gray-200 hover:bg-zinc-700 cursor-pointer"
+      class="rounded px-2 py-0.5 text-gray-200 hover:bg-zinc-700 cursor-pointer shrink-0"
       onClick={handleClick}
     >
       <i class={`${icon} mr-1.5 text-sm text-gray-500`} />

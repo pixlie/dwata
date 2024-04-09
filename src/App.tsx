@@ -15,7 +15,7 @@ const MainContent: Component<RouteSectionProps> = (props) => {
 
   return (
     <div
-      class="grow p-4 pt-16"
+      class="grow p-4"
       style={{
         "background-color": getColors().colors["editor.background"],
       }}
@@ -27,23 +27,23 @@ const MainContent: Component<RouteSectionProps> = (props) => {
 
 const App: Component<RouteSectionProps> = (props) => {
   return (
-    <div class="w-dvw h-dvh">
-      <UserProvider>
-        <UserInterfaceProvider>
-          <WorkspaceProvider>
-            <SchemaProvider>
+    <UserProvider>
+      <UserInterfaceProvider>
+        <WorkspaceProvider>
+          <SchemaProvider>
+            <div class="flex flex-col w-full h-full">
               <NavigationBar />
 
-              <div class="flex flex-row bg-gray-300 w-dvw h-dvh">
+              <div class="flex bg-gray-300 grow h-full">
                 <Sidebar />
 
                 <MainContent {...props} />
               </div>
-            </SchemaProvider>
-          </WorkspaceProvider>
-        </UserInterfaceProvider>
-      </UserProvider>
-    </div>
+            </div>
+          </SchemaProvider>
+        </WorkspaceProvider>
+      </UserInterfaceProvider>
+    </UserProvider>
   );
 };
 
