@@ -33,8 +33,8 @@ const Dropdown: Component<IPropTypes> = (props) => {
     isOpen: false,
   });
   const [_, { getColors }] = useUserInterface();
-  const getSizeClass = (size: string) => {
-    switch (size) {
+  const getSizeClass = createMemo(() => {
+    switch (props.size) {
       case "sm":
         return "px-2.5 py-1.5 text-sm font-normal";
       case "lg":
@@ -43,11 +43,12 @@ const Dropdown: Component<IPropTypes> = (props) => {
       default:
         return "px-4 py-2 text-base font-normal";
     }
-  };
+  });
 
-  const buttonClasses = `${getSizeClass(
-    props.size || "base"
-  )} rounded-md select-none cursor-pointer border ${props.isBlock && "w-full"}`;
+  const buttonClasses =
+    getSizeClass() +
+    " rounded-md select-none cursor-pointer border " +
+    `${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {
     if (!!props.value && !!props.choices) {
@@ -98,7 +99,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
       </button>
       {!!widgetState().isOpen && (
         <div
-          class="absolute top-10 z-10 border"
+          class="absolute top-10 z-10 border p-1 px-3 rounded-md"
           style={{
             "background-color": getColors().colors["input.background"],
             "border-color": getColors().colors["input.border"],

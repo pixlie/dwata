@@ -9,7 +9,7 @@ const Thread: Component<APIChatThread> = (props) => {
   const [_, { getColors }] = useUserInterface();
 
   const handleClick = () => {
-    navigate(`/chat/thread/${props.id}`);
+    navigate(`/chat/${props.id}`);
   };
 
   return (

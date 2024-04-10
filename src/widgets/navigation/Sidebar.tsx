@@ -2,6 +2,7 @@ import { Component } from "solid-js";
 import SidebarHeading from "./SidebarHeading";
 import SourceList from "../source/SourceList";
 import { useUserInterface } from "../../stores/userInterface";
+import Button from "../interactable/Button";
 
 const Sidebar: Component = () => {
   const [_, { getColors }] = useUserInterface();
@@ -21,6 +22,9 @@ const Sidebar: Component = () => {
         href="/notes"
       /> */}
       <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" />
+      <div class="my-4 px-4">
+        <Button label="Start a new chat" href="/chat/start" />
+      </div>
       {/* <SidebarHeading
         label="Saved Queries"
         icon="fa-solid fa-bookmark"

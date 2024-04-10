@@ -1,6 +1,4 @@
 import { Component, createMemo, createSignal, onMount } from "solid-js";
-import Form from "../interactable/Form";
-import { IFormField } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
 import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
@@ -8,6 +6,9 @@ import { APIAIProvider } from "../../api_types/APIAIProvider";
 import { APIAIModel } from "../../api_types/APIAIModel";
 import { useWorkspace } from "../../stores/workspace";
 import { useNavigate } from "@solidjs/router";
+import { useUserInterface } from "../../stores/userInterface";
+import TextArea from "../interactable/TextArea";
+import Heading from "../typography/Heading";
 
 interface INewThreadFormData {
   message: string;
@@ -25,14 +26,7 @@ const NewThread: Component = () => {
     createSignal<Array<APIAIProvider>>();
   const [workspace, { readConfigFromAPI }] = useWorkspace();
   const navigate = useNavigate();
-
-  const formFields: Array<IFormField> = [
-    {
-      name: "message",
-      fieldType: "multiLineText",
-      isRequired: true,
-    },
-  ];
+  const [_, { getColors }] = useUserInterface();
 
   const handleNewThread = async () => {
     const response: [number, number] = await invoke("start_chat_thread", {
@@ -98,32 +92,43 @@ const NewThread: Component = () => {
   };
 
   return (
-    <Form
-      title="Start a new chat"
-      formFields={formFields}
-      // submitButtomLabel="Start"
-      // handleSubmit={handleNewThread}
-      setFieldInput={setFormData}
-      submitButton={
-        <div class="flex">
-          <div class="grow">
-            <Button size="sm" label="Start a chat" onClick={handleNewThread} />
-          </div>
+    <div class="max-w-screen-lg rounded-md m-auto">
+      <div class="mt-1">
+        <Heading size="xl">Start a new chat with AI</Heading>
+      </div>
 
-          <Dropdown
-            label="Select an AI model"
-            choicesWithHeadings={getAiModelChoices()}
-            size="sm"
-            value={
-              !!formData().aiProvider && !!formData().aiModel
-                ? `${formData().aiProvider}/${formData().aiModel}`
-                : undefined
-            }
-            onSelect={handleModelSelect}
+      <TextArea label="Your message" />
+
+      <div class="flex my-2 items-center">
+        <div class="grow">
+          <Button
+            size="lg"
+            label="Start a new chat"
+            onClick={handleNewThread}
           />
         </div>
-      }
-    ></Form>
+
+        <Button
+          size="sm"
+          label="Add context from sources"
+          onClick={handleNewThread}
+        />
+
+        <div class="mr-4" />
+
+        <Dropdown
+          label="Select an AI model"
+          choicesWithHeadings={getAiModelChoices()}
+          size="sm"
+          value={
+            !!formData().aiProvider && !!formData().aiModel
+              ? `${formData().aiProvider}/${formData().aiModel}`
+              : undefined
+          }
+          onSelect={handleModelSelect}
+        />
+      </div>
+    </div>
   );
 };
 
