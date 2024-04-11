@@ -1,5 +1,5 @@
 use crate::ai::helpers::send_message_to_ai;
-use crate::chat::api_types::{APIChatReply, APIChatThread};
+use crate::chat::api_types::{APIChatContextNode, APIChatContextType, APIChatReply, APIChatThread};
 use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
 use crate::chat::{ChatReplyRow, ChatThreadRow};
 use crate::error::DwataError;
@@ -148,5 +148,31 @@ pub(crate) async fn fetch_chat_reply_list(
             }
         }
         None => Err(DwataError::CouldNotConnectToDatabase),
+    }
+}
+
+#[tauri::command]
+pub(crate) async fn fetch_available_chat_context_list(
+    current_context: Vec<String>,
+    store: State<'_, Store>,
+) -> Result<Vec<APIChatContextNode>, DwataError> {
+    // if current_context is empty, we send the list of data sources
+    if current_context.is_empty() {
+        let config_guard = store.config.lock().await;
+        let result: Vec<APIChatContextNode> = config_guard
+            .data_source_list
+            .iter()
+            .map(|x| {
+                APIChatContextNode::new(
+                    x.get_id(),
+                    APIChatContextType::DataSource,
+                    x.get_name(),
+                    false,
+                )
+            })
+            .collect();
+        Ok(result)
+    } else {
+        Ok(vec![])
     }
 }

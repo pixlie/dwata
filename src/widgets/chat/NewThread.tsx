@@ -114,7 +114,7 @@ const NewThread: Component = () => {
 
       <TextArea label="Your message" />
       <For each={formState().chatContexts}>
-        {(chatContext) => <ChatContext chatContext={chatContext} />}
+        {(chatContext) => <ChatContext chatContextId={chatContext} />}
       </For>
 
       <div class="flex my-2 items-center">

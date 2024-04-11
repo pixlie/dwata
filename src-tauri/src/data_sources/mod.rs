@@ -221,6 +221,10 @@ impl DataSource {
         )
     }
 
+    pub fn get_name(&self) -> String {
+        self.source.get_api_name()
+    }
+
     pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<APIGridSchema> {
         match self.get_connection().await {
             Some(DataSourceConnection::PostgreSQL(pg_pool)) => {

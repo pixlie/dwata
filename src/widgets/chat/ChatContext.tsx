@@ -1,15 +1,36 @@
-import { Component, For } from "solid-js";
+import { Component, For, createSignal, onMount } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
-import { useWorkspace } from "../../stores/workspace";
+import { APIChatContextNode } from "../../api_types/APIChatContextNode";
+import { invoke } from "@tauri-apps/api/core";
 
 interface IPropTypes {
-  chatContext: string;
+  chatContextId: string;
+}
+
+interface ChatContext {
+  currentContext: Array<string>;
+  nodes: Array<Array<APIChatContextNode>>;
 }
 
 const ChatContext: Component<IPropTypes> = (props) => {
+  const [chatContext, setChatContext] = createSignal<ChatContext>({
+    currentContext: [],
+    nodes: [],
+  });
   const [_, { getColors }] = useUserInterface();
-  const [workspace] = useWorkspace();
 
+  onMount(async () => {
+    const response = await invoke<Array<APIChatContextNode>>(
+      "fetch_available_chat_context_list",
+      {
+        currentContext: chatContext().currentContext,
+      }
+    );
+    setChatContext({
+      ...chatContext(),
+      nodes: [response],
+    });
+  });
   // A modal window placed in the center on the parent
   return (
     <div
@@ -77,21 +98,24 @@ const ChatContext: Component<IPropTypes> = (props) => {
         contact_type, value, is_verified, created_at)
       </div>
 
-      <For each={workspace.dataSourceList}>
-        {(ds) => (
-          <div
-            class="p-2 px-4 cursor-pointer rounded-md rounded-t-none border-t"
-            style={{
-              color: getColors().colors["editor.foreground"],
-              "background-color": getColors().colors["editorWidget.background"],
-              "border-color": getColors().colors["editorWidget.border"],
-            }}
-          >
-            <i class="w-6 fa-solid fa-database" />
-            {ds.sourceName}
-
-            <p class="text-sm">Structure of all tables</p>
-          </div>
+      <For each={chatContext().nodes}>
+        {(level) => (
+          <For each={level}>
+            {(node) => (
+              <div
+                class="p-2 px-4 cursor-pointer rounded-md rounded-t-none border-t"
+                style={{
+                  color: getColors().colors["editor.foreground"],
+                  "background-color":
+                    getColors().colors["editorWidget.background"],
+                  "border-color": getColors().colors["editorWidget.border"],
+                }}
+              >
+                <i class="w-6 fa-solid fa-database" />
+                {node.contextLabel}
+              </div>
+            )}
+          </For>
         )}
       </For>
     </div>

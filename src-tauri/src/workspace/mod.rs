@@ -11,7 +11,7 @@ pub mod helpers;
 pub struct Config {
     path_to_config: PathBuf,
     // organisations: Vec<Organisation>,
-    data_source_list: Vec<DataSource>,
+    pub(crate) data_source_list: Vec<DataSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
     folder_list: Vec<PathBuf>, // CSV or Markdown files
     ai_integration_list: Vec<AiIntegration>,
