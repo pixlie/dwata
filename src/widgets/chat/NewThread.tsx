@@ -1,4 +1,4 @@
-import { Component, createMemo, createSignal, onMount } from "solid-js";
+import { Component, For, createMemo, createSignal, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
 import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
@@ -9,6 +9,7 @@ import { useNavigate } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 import TextArea from "../interactable/TextArea";
 import Heading from "../typography/Heading";
+import ChatContext from "./ChatContext";
 
 interface INewThreadFormData {
   message: string;
@@ -16,11 +17,18 @@ interface INewThreadFormData {
   aiModel: string | null;
 }
 
+interface IFormState {
+  chatContexts: Array<string>;
+}
+
 const NewThread: Component = () => {
   const [formData, setFormData] = createSignal<INewThreadFormData>({
     message: "",
     aiProvider: null,
     aiModel: null,
+  });
+  const [formState, setFormState] = createSignal<IFormState>({
+    chatContexts: [],
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
@@ -91,13 +99,23 @@ const NewThread: Component = () => {
     });
   };
 
+  const handleContextButtonClick = () => {
+    setFormState({
+      ...formState(),
+      chatContexts: [...formState().chatContexts, ""],
+    });
+  };
+
   return (
-    <div class="max-w-screen-lg rounded-md m-auto">
+    <div class="max-w-screen-lg rounded-md m-auto relative">
       <div class="mt-1">
         <Heading size="xl">Start a new chat with AI</Heading>
       </div>
 
       <TextArea label="Your message" />
+      <For each={formState().chatContexts}>
+        {(chatContext) => <ChatContext chatContext={chatContext} />}
+      </For>
 
       <div class="flex my-2 items-center">
         <div class="grow">
@@ -110,14 +128,14 @@ const NewThread: Component = () => {
 
         <Button
           size="sm"
-          label="Add context from sources"
-          onClick={handleNewThread}
+          label="+ Context from sources"
+          onClick={handleContextButtonClick}
         />
 
         <div class="mr-4" />
 
         <Dropdown
-          label="Select an AI model"
+          label="AI model"
           choicesWithHeadings={getAiModelChoices()}
           size="sm"
           value={

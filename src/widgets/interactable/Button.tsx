@@ -25,7 +25,7 @@ const Button: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
   const buttonClasses =
     getSizeClass() +
-    " rounded-md select-none cursor-pointer " +
+    " rounded-md select-none cursor-pointer hover:shadow-lg " +
     `${props.isBlock ? "w-full" : ""}`;
   const styles = {
     color: getColors().colors["button.foreground"],

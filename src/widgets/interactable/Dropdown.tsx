@@ -47,7 +47,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const buttonClasses =
     getSizeClass() +
-    " rounded-md select-none cursor-pointer border " +
+    " rounded-md select-none cursor-pointer border hover:shadow-lg " +
     `${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {

@@ -21,7 +21,7 @@ const TextArea: Component<IPropTypes> = (props) => {
       )}
       <textarea
         required={props.isRequired}
-        class="block w-full rounded-md px-2 py-1.5 border"
+        class="block w-full rounded-md px-2 py-1.5 border text-lg"
         style={{
           "background-color": getColors().colors["input.background"],
           "border-color": getColors().colors["input.border"],
