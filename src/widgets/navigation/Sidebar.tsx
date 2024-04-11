@@ -9,7 +9,7 @@ const Sidebar: Component = () => {
 
   return (
     <div
-      class="w-64 flex-none border-r-2"
+      class="w-64 shrink-0 border-r-2 flex flex-col"
       style={{
         "background-color": getColors().colors["sideBar.background"],
         "border-color": getColors().colors["sideBar.border"],
@@ -35,6 +35,7 @@ const Sidebar: Component = () => {
         style={{ "border-color": getColors().colors["sideBar.border"] }}
       />
       <SourceList />
+      <div class="flex-grow" />
       {/* <div
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}

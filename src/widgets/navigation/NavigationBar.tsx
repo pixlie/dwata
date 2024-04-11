@@ -23,8 +23,8 @@ const NavigationBar: Component = () => {
     >
       <div class="relative flex h-12 items-center justify-between">
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex flex-shrink-0 items-center">
-            <NavigationButtom label="Dwata" href="/" />
+          <div class="flex flex-shrink-0 items-center text-xl text-white font-bold cursor-default select-none">
+            Dwata
           </div>
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-2">
