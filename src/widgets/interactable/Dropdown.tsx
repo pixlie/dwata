@@ -14,7 +14,7 @@ export interface IChoicesWithHeading {
 }
 
 interface IPropTypes {
-  label: string;
+  label?: string;
   choices?: Array<IKeyedChoice>;
   choicesWithHeadings?: Array<IChoicesWithHeading>;
   value?: string | number;
@@ -52,11 +52,9 @@ const Dropdown: Component<IPropTypes> = (props) => {
 
   const getLabel = createMemo(() => {
     if (!!props.value && !!props.choices) {
-      return (
-        props.label +
-        ": " +
-        props.choices?.find((x) => x.key === props.value)?.label
-      );
+      return props.label
+        ? props.label + ": "
+        : "" + props.choices?.find((x) => x.key === props.value)?.label;
     } else if (!!props.value && !!props.choicesWithHeadings) {
       const choiceHead = props.choicesWithHeadings.find((x) =>
         x.choices.find((y) => y.key === props.value)
@@ -64,9 +62,11 @@ const Dropdown: Component<IPropTypes> = (props) => {
       const choice = choiceHead?.choices.find(
         (y) => y.key === props.value
       )?.label;
-      return props.label + ": " + choiceHead?.name + " / " + choice;
+      return props.label
+        ? props.label + ": "
+        : "" + choiceHead?.name + " / " + choice;
     } else {
-      return props.label;
+      return props.label || "";
     }
   });
 
