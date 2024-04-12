@@ -1,4 +1,4 @@
-import { Component, For, createMemo, onMount } from "solid-js";
+import { Component, For, createMemo } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { APIAIIntegration } from "../../api_types/APIAIIntegration";
@@ -33,11 +33,7 @@ const SettingsAIIntegrationItem: Component<APIAIIntegration> = (props) => {
 };
 
 const SettingsAIIntegrationList: Component = () => {
-  const [workspace, { readConfigFromAPI }] = useWorkspace();
-
-  onMount(async () => {
-    await readConfigFromAPI();
-  });
+  const [workspace] = useWorkspace();
 
   const dataSources = createMemo(() => {
     if (!workspace.isFetching && !!workspace.isReady) {

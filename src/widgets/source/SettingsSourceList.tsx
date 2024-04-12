@@ -1,4 +1,4 @@
-import { Component, For, createMemo, onMount } from "solid-js";
+import { Component, For, createMemo } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
 import { APIDataSource } from "../../api_types/APIDataSource";
 import { useUserInterface } from "../../stores/userInterface";
@@ -35,11 +35,7 @@ const SettingsSourceItem: Component<ISettingsSourceItemPropTypes> = (props) => {
 };
 
 const SettingsSourceList: Component = () => {
-  const [workspace, { readConfigFromAPI }] = useWorkspace();
-
-  onMount(async () => {
-    await readConfigFromAPI();
-  });
+  const [workspace] = useWorkspace();
 
   const dataSources = createMemo(() => {
     if (!workspace.isFetching && !!workspace.isReady) {

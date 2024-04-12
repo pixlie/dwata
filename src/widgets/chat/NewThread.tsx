@@ -32,7 +32,7 @@ const NewThread: Component = () => {
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
     createSignal<Array<APIAIProvider>>();
-  const [workspace, { readConfigFromAPI }] = useWorkspace();
+  const [workspace] = useWorkspace();
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
@@ -46,7 +46,6 @@ const NewThread: Component = () => {
   };
 
   onMount(async () => {
-    await readConfigFromAPI();
     const firstProvider = workspace.aiIntegrationList[0];
     const response = await invoke<Array<APIAIProvider>>(
       "fetch_list_of_ai_providers_and_models"

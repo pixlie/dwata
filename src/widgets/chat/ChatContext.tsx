@@ -14,7 +14,7 @@ interface ChatContext {
   nodes: Array<Array<APIChatContextNode>>;
 }
 
-const ChatContext: Component<IPropTypes> = (props) => {
+const ChatContext: Component<IPropTypes> = () => {
   const [chatContext, setChatContext] = createSignal<ChatContext>({
     currentContext: [],
     nodes: [],
@@ -116,7 +116,7 @@ const ChatContext: Component<IPropTypes> = (props) => {
       >
         <For each={getDropdownList()}>
           {(dropdown) => (
-            <Dropdown label="Select" choicesWithHeadings={dropdown} />
+            <Dropdown label="Select" choicesWithHeadings={dropdown} size="sm" />
           )}
         </For>
       </div>

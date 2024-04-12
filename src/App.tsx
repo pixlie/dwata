@@ -9,6 +9,7 @@ import {
   UserInterfaceProvider,
   useUserInterface,
 } from "./stores/userInterface";
+import WorkspaceLoader from "./widgets/workspace/Loader";
 
 const MainContent: Component<RouteSectionProps> = (props) => {
   const [_, { getColors }] = useUserInterface();
@@ -32,6 +33,7 @@ const App: Component<RouteSectionProps> = (props) => {
         <WorkspaceProvider>
           <SchemaProvider>
             <div class="flex flex-col w-full h-full">
+              <WorkspaceLoader />
               <NavigationBar />
 
               <div class="flex bg-gray-300 grow h-full">

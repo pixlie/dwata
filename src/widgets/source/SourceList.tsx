@@ -1,17 +1,13 @@
-import { Component, For, createMemo, onMount } from "solid-js";
+import { Component, For, createMemo } from "solid-js";
 import SidebarHeading from "../navigation/SidebarHeading";
 import { useWorkspace } from "../../stores/workspace";
 import { useSearchParams } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 
 const SourceList: Component = () => {
-  const [workspace, { readConfigFromAPI }] = useWorkspace();
+  const [workspace] = useWorkspace();
   const [searchParams] = useSearchParams();
   const [_, { getColors }] = useUserInterface();
-
-  onMount(async () => {
-    await readConfigFromAPI();
-  });
 
   const dataSources = createMemo(() => {
     if (!workspace.isFetching && !!workspace.isReady) {
