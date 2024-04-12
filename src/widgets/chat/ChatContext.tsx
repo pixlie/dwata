@@ -4,28 +4,35 @@ import { APIChatContextNode } from "../../api_types/APIChatContextNode";
 import { invoke } from "@tauri-apps/api/core";
 import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
 import { APIChatContextType } from "../../api_types/APIChatContextType";
+import TextArea from "../interactable/TextArea";
 
 interface IPropTypes {
   chatContextId: string;
 }
 
-interface ChatContext {
-  currentContext: Array<string>;
+interface IChatContext {
+  context?: string;
   nodes: Array<Array<APIChatContextNode>>;
 }
 
+interface IFormState {
+  nodePath: Array<string>;
+}
+
 const ChatContext: Component<IPropTypes> = () => {
-  const [chatContext, setChatContext] = createSignal<ChatContext>({
-    currentContext: [],
+  const [chatContext, setChatContext] = createSignal<IChatContext>({
     nodes: [],
+  });
+  const [formState, setFormState] = createSignal<IFormState>({
+    nodePath: [],
   });
   const [_, { getColors }] = useUserInterface();
 
   onMount(async () => {
     const response = await invoke<Array<APIChatContextNode>>(
-      "fetch_available_chat_context_list",
+      "fetch_chat_context_node_list",
       {
-        currentContext: chatContext().currentContext,
+        nodePath: formState().nodePath,
       }
     );
     setChatContext({
@@ -88,6 +95,41 @@ const ChatContext: Component<IPropTypes> = () => {
     return list;
   });
 
+  const handleDropdownSelect = (index: number) => async (newValue: string) => {
+    setFormState({
+      ...formState(),
+      nodePath: [
+        ...formState().nodePath.slice(0, index),
+        newValue,
+        ...formState().nodePath.slice(index + 1),
+      ],
+    });
+    const response = await invoke<Array<APIChatContextNode>>(
+      "fetch_chat_context_node_list",
+      {
+        nodePath: formState().nodePath,
+      }
+    );
+    const nodeObject = chatContext().nodes[index].find(
+      (x) => x.id === newValue
+    );
+    if (response.length) {
+      setChatContext({
+        ...chatContext(),
+        nodes: [...chatContext().nodes, response],
+      });
+    }
+    if (nodeObject?.canCreateContext) {
+      const response = await invoke("fetch_chat_context", {
+        nodePath: formState().nodePath,
+      });
+      setChatContext({
+        ...chatContext(),
+        context: response as string,
+      });
+    }
+  };
+
   return (
     <div
       class="w-full rounded-md my-2 border"
@@ -96,18 +138,24 @@ const ChatContext: Component<IPropTypes> = () => {
         "border-color": getColors().colors["editorWidget.border"],
       }}
     >
-      <label class="block text-sm font-medium leading-6 py-2 pl-4">
-        Chat context
-      </label>
-      <div
-        class="px-4 max-h-24 overflow-hidden mb-4"
-        style={{
-          color: getColors().colors["editor.foreground"],
-        }}
-      ></div>
+      <div class="px-4 py-2 min-h-8">
+        {chatContext().context ? (
+          <>
+            <TextArea value={chatContext().context} />
+            <p class="pt-2">
+              This will be sent along with your own message to the AI
+            </p>
+          </>
+        ) : (
+          <p>
+            Chat contexts are like messages but are automatically created from
+            the source you select
+          </p>
+        )}
+      </div>
 
       <div
-        class="p-2 px-4 rounded-md rounded-t-none border-t"
+        class="p-2 px-4 rounded-md rounded-t-none border-t flex"
         style={{
           color: getColors().colors["editor.foreground"],
           "background-color": getColors().colors["editorWidget.background"],
@@ -115,8 +163,15 @@ const ChatContext: Component<IPropTypes> = () => {
         }}
       >
         <For each={getDropdownList()}>
-          {(dropdown) => (
-            <Dropdown label="Select" choicesWithHeadings={dropdown} size="sm" />
+          {(dropdown, index) => (
+            <Dropdown
+              label="Select"
+              choicesWithHeadings={dropdown}
+              size="sm"
+              isRequired
+              value={formState().nodePath[index()]}
+              onSelect={handleDropdownSelect(index())}
+            />
           )}
         </For>
       </div>
