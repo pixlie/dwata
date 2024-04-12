@@ -1,7 +1,8 @@
 use crate::ai::AiIntegration;
-use crate::chat::api_types::APIChatContextNode;
+use crate::chat::api_types::{APIChatContextNode, APIChatContextType};
 use crate::chat::ChatContextNode;
 use crate::data_sources::DataSource;
+use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -36,21 +37,36 @@ impl ChatContextNode for Config {
         todo!()
     }
 
-    fn get_next_chat_context_node_list(
-        &self,
-        current_context: &[String],
-    ) -> Vec<APIChatContextNode> {
-        if current_context.is_empty() {
-            self.data_source_list
+    fn get_next_chat_context_node_list(&self, node_path: &[String]) -> Vec<APIChatContextNode> {
+        if node_path.is_empty() {
+            let mut list: Vec<APIChatContextNode> = self
+                .data_source_list
                 .iter()
                 .map(|x| x.get_self_chat_context_node())
-                .collect()
+                .collect();
+            // list.push(APIChatContextNode::new(
+            //     "__upload_file__".to_string(),
+            //     APIChatContextType::ContentsFromFile,
+            //     "Contents of a file".to_string(),
+            //     false,
+            // ));
+            list
         } else {
             let data_source = self
                 .data_source_list
                 .iter()
-                .find(|x| x.get_id() == current_context[0]);
-            data_source.unwrap().get_next_chat_context_node_list(&current_context[1..])
+                .find(|x| x.get_id() == node_path[0]);
+            data_source
+                .unwrap()
+                .get_next_chat_context_node_list(&node_path[1..])
         }
+    }
+
+    async fn get_chat_context(&self, node_path: &[String]) -> Result<String, DwataError> {
+        let data_source = self
+            .data_source_list
+            .iter()
+            .find(|x| x.get_id() == node_path[0]);
+        data_source.unwrap().get_chat_context(&node_path[1..]).await
     }
 }

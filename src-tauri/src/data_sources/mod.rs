@@ -1,10 +1,12 @@
 use crate::chat::api_types::{APIChatContextNode, APIChatContextType};
 use crate::chat::ChatContextNode;
 use crate::data_sources::api_types::APIDataSource;
+use crate::error::DwataError;
 use crate::query_result::api_types::APIGridQuery;
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::query_result::QueryBuilder;
 use crate::schema::api_types::APIGridSchema;
+use crate::schema::helpers::get_schema_summary;
 use crate::schema::postgresql;
 use crate::schema::postgresql::PostgreSQLObject;
 use serde::{Deserialize, Serialize};
@@ -258,11 +260,8 @@ impl ChatContextNode for DataSource {
         )
     }
 
-    fn get_next_chat_context_node_list(
-        &self,
-        current_context: &[String],
-    ) -> Vec<APIChatContextNode> {
-        if current_context.is_empty() {
+    fn get_next_chat_context_node_list(&self, node_path: &[String]) -> Vec<APIChatContextNode> {
+        if node_path.is_empty() {
             vec![APIChatContextNode::new(
                 "__schema__".to_string(),
                 APIChatContextType::StructureOfDataSource,
@@ -271,6 +270,14 @@ impl ChatContextNode for DataSource {
             )]
         } else {
             vec![]
+        }
+    }
+
+    async fn get_chat_context(&self, node_path: &[String]) -> Result<String, DwataError> {
+        if node_path.first() == Some(&"__schema__".to_string()) {
+            Ok(get_schema_summary(self).await)
+        } else {
+            Err(DwataError::CouldNotFindNode)
         }
     }
 }

@@ -1,4 +1,5 @@
 use crate::chat::api_types::APIChatContextNode;
+use crate::error::DwataError;
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -72,8 +73,7 @@ pub(crate) struct ChatReplyRow {
 pub(crate) trait ChatContextNode {
     fn get_self_chat_context_node(&self) -> APIChatContextNode;
 
-    fn get_next_chat_context_node_list(
-        &self,
-        current_context: &[String],
-    ) -> Vec<APIChatContextNode>;
+    fn get_next_chat_context_node_list(&self, node_path: &[String]) -> Vec<APIChatContextNode>;
+
+    async fn get_chat_context(&self, node_path: &[String]) -> Result<String, DwataError>;
 }

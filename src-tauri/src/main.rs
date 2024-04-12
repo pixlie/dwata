@@ -56,7 +56,8 @@ fn main() {
             chat::commands::fetch_chat_thread_list,
             chat::commands::fetch_chat_thread_detail,
             chat::commands::fetch_chat_reply_list,
-            chat::commands::fetch_available_chat_context_list,
+            chat::commands::fetch_chat_context_node_list,
+            chat::commands::fetch_chat_context,
             ai::commands::fetch_list_of_ai_providers_and_models,
         ])
         .run(tauri::generate_context!())

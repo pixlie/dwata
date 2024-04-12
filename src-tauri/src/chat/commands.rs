@@ -152,10 +152,16 @@ pub(crate) async fn fetch_chat_reply_list(
 }
 
 #[tauri::command]
-pub(crate) async fn fetch_available_chat_context_list(
-    current_context: Vec<String>,
+pub(crate) async fn fetch_chat_context_node_list(
+    node_path: Vec<String>,
     store: State<'_, Store>,
 ) -> Result<Vec<APIChatContextNode>, DwataError> {
     let config_guard = store.config.lock().await;
-    Ok(config_guard.get_next_chat_context_node_list(&current_context[..]))
+    Ok(config_guard.get_next_chat_context_node_list(&node_path[..]))
+}
+
+#[tauri::command]
+pub(crate) async fn fetch_chat_context(node_path: Vec<String>, store: State<'_, Store>) -> Result<String, DwataError> {
+    let config_guard = store.config.lock().await;
+    config_guard.get_chat_context(&node_path[..]).await
 }
