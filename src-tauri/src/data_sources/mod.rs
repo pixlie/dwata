@@ -1,3 +1,5 @@
+use crate::chat::api_types::{APIChatContextNode, APIChatContextType};
+use crate::chat::ChatContextNode;
 use crate::data_sources::api_types::APIDataSource;
 use crate::query_result::api_types::APIGridQuery;
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
@@ -242,6 +244,33 @@ impl DataSource {
             _ => {
                 vec![]
             }
+        }
+    }
+}
+
+impl ChatContextNode for DataSource {
+    fn get_self_chat_context_node(&self) -> APIChatContextNode {
+        APIChatContextNode::new(
+            self.get_id(),
+            APIChatContextType::DataSource,
+            self.get_name(),
+            false,
+        )
+    }
+
+    fn get_next_chat_context_node_list(
+        &self,
+        current_context: &[String],
+    ) -> Vec<APIChatContextNode> {
+        if current_context.is_empty() {
+            vec![APIChatContextNode::new(
+                "__schema__".to_string(),
+                APIChatContextType::StructureOfDataSource,
+                format!("Structure of tables in {}", self.get_name()),
+                true,
+            )]
+        } else {
+            vec![]
         }
     }
 }

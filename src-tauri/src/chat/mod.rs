@@ -1,9 +1,10 @@
+use crate::chat::api_types::APIChatContextNode;
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow};
 
-mod api_types;
+pub(crate) mod api_types;
 pub(crate) mod commands;
 mod crud;
 mod helpers;
@@ -66,4 +67,13 @@ pub(crate) struct ChatReplyRow {
     created_by_id: i64,
     #[serde(with = "ts_milliseconds")]
     created_at: DateTime<Utc>,
+}
+
+pub(crate) trait ChatContextNode {
+    fn get_self_chat_context_node(&self) -> APIChatContextNode;
+
+    fn get_next_chat_context_node_list(
+        &self,
+        current_context: &[String],
+    ) -> Vec<APIChatContextNode>;
 }

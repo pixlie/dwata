@@ -1,7 +1,7 @@
 use crate::ai::helpers::send_message_to_ai;
-use crate::chat::api_types::{APIChatContextNode, APIChatContextType, APIChatReply, APIChatThread};
+use crate::chat::api_types::{APIChatContextNode, APIChatReply, APIChatThread};
 use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
-use crate::chat::{ChatReplyRow, ChatThreadRow};
+use crate::chat::{ChatContextNode, ChatReplyRow, ChatThreadRow};
 use crate::error::DwataError;
 use crate::store::Store;
 use crate::workspace::helpers::load_ai_integration;
@@ -156,23 +156,6 @@ pub(crate) async fn fetch_available_chat_context_list(
     current_context: Vec<String>,
     store: State<'_, Store>,
 ) -> Result<Vec<APIChatContextNode>, DwataError> {
-    // if current_context is empty, we send the list of data sources
-    if current_context.is_empty() {
-        let config_guard = store.config.lock().await;
-        let result: Vec<APIChatContextNode> = config_guard
-            .data_source_list
-            .iter()
-            .map(|x| {
-                APIChatContextNode::new(
-                    x.get_id(),
-                    APIChatContextType::DataSource,
-                    x.get_name(),
-                    false,
-                )
-            })
-            .collect();
-        Ok(result)
-    } else {
-        Ok(vec![])
-    }
+    let config_guard = store.config.lock().await;
+    Ok(config_guard.get_next_chat_context_node_list(&current_context[..]))
 }
