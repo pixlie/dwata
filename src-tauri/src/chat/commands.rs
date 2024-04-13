@@ -161,7 +161,10 @@ pub(crate) async fn fetch_chat_context_node_list(
 }
 
 #[tauri::command]
-pub(crate) async fn fetch_chat_context(node_path: Vec<String>, store: State<'_, Store>) -> Result<String, DwataError> {
+pub(crate) async fn fetch_chat_context(
+    node_path: Vec<String>,
+    store: State<'_, Store>,
+) -> Result<String, DwataError> {
     let config_guard = store.config.lock().await;
     config_guard.get_chat_context(&node_path[..]).await
 }
