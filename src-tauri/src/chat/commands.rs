@@ -1,7 +1,7 @@
 use crate::ai::helpers::send_message_to_ai;
-use crate::chat::api_types::{APIChatReply, APIChatThread};
+use crate::chat::api_types::{APIChatContextNode, APIChatReply, APIChatThread};
 use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
-use crate::chat::{ChatReplyRow, ChatThreadRow};
+use crate::chat::{ChatContextNode, ChatReplyRow, ChatThreadRow};
 use crate::error::DwataError;
 use crate::store::Store;
 use crate::workspace::helpers::load_ai_integration;
@@ -149,4 +149,22 @@ pub(crate) async fn fetch_chat_reply_list(
         }
         None => Err(DwataError::CouldNotConnectToDatabase),
     }
+}
+
+#[tauri::command]
+pub(crate) async fn fetch_chat_context_node_list(
+    node_path: Vec<String>,
+    store: State<'_, Store>,
+) -> Result<Vec<APIChatContextNode>, DwataError> {
+    let config_guard = store.config.lock().await;
+    Ok(config_guard.get_next_chat_context_node_list(&node_path[..]))
+}
+
+#[tauri::command]
+pub(crate) async fn fetch_chat_context(
+    node_path: Vec<String>,
+    store: State<'_, Store>,
+) -> Result<String, DwataError> {
+    let config_guard = store.config.lock().await;
+    config_guard.get_chat_context(&node_path[..]).await
 }

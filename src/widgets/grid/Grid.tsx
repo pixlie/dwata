@@ -4,8 +4,8 @@ import GridBody from "./GridBody";
 
 const Grid: Component = () => {
   return (
-    <div class="overflow-auto w-full">
-      <table class="text-sm text-left rtl:text-right text-gray-400 table-fixed border-collapse dwata-grid">
+    <div class="grow w-full">
+      <table class="text-sm text-left rtl:text-right text-gray-400 table-fixed border-collapse dwata-grid w-full">
         <GridHead />
         <GridBody />
       </table>

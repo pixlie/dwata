@@ -10,7 +10,7 @@ const DropdownHeading: Component<IDropdownHeadingProps> = (props) => {
 
   return (
     <span
-      class="block w-full text-left px-2 py-1 text-sm font-bold cursor-default"
+      class="block text-left px-2 py-1 text-sm font-bold cursor-default"
       style={{ color: getColors().colors["input.foreground"] }}
       role="menuitem"
       tabindex="-1"

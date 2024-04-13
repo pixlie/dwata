@@ -19,6 +19,9 @@ pub enum DwataError {
     CouldNotConnectToAppDatabase,
     CouldNotInsertToAppDatabase,
     CouldNotFetchRowsFromAppDatabase,
+
+    // Chat context related
+    CouldNotFindNode,
 }
 
 impl From<sqlx::Error> for DwataError {

@@ -3,6 +3,7 @@ import { useSchema } from "../../stores/schema";
 import SourceItem from "./SourceItem";
 import SchemaLoader from "../SchemaLoader";
 import { useSearchParams } from "@solidjs/router";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface ITableListPropTypes {
   dataSourceId: string;
@@ -20,22 +21,22 @@ const TableList: Component<ITableListPropTypes> = (props) => {
     return [];
   });
 
-  return (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-      <For each={tables()}>{(table) => <SourceItem {...table} />}</For>
-    </div>
-  );
+  return <For each={tables()}>{(table) => <SourceItem {...table} />}</For>;
 };
 
 const TableBrowser: Component = () => {
   const [searchParams] = useSearchParams();
+  const [_, { getColors }] = useUserInterface();
 
   if (!!searchParams.dataSourceId) {
     return (
       <>
         <SchemaLoader dataSourceId={searchParams.dataSourceId!} />
 
-        <div class="w-full max-h-36 overflow-y-auto mb-4 border-gray-600 border py-2 bg-slate-900">
+        <div
+          class="w-full mb-4 p-2 border rounded-md flex flex-wrap"
+          style={{ "border-color": getColors().colors["editorWidget.border"] }}
+        >
           <TableList dataSourceId={searchParams.dataSourceId!} />
         </div>
       </>

@@ -1,4 +1,5 @@
-import { Component } from "solid-js";
+import { Component, createMemo } from "solid-js";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
   label: string;
@@ -9,8 +10,8 @@ interface IPropTypes {
 }
 
 const Button: Component<IPropTypes> = (props) => {
-  const getSizeClass = (size: string) => {
-    switch (size) {
+  const getSizeClass = createMemo(() => {
+    switch (props.size) {
       case "sm":
         return "px-2.5 py-1.5 text-sm font-normal";
       case "lg":
@@ -19,22 +20,27 @@ const Button: Component<IPropTypes> = (props) => {
       default:
         return "px-4 py-2 text-base font-normal";
     }
+  });
+
+  const [_, { getColors }] = useUserInterface();
+  const buttonClasses =
+    getSizeClass() +
+    " rounded-md select-none cursor-pointer hover:shadow-lg " +
+    `${props.isBlock ? "w-full" : ""}`;
+  const styles = {
+    color: getColors().colors["button.foreground"],
+    "background-color": getColors().colors["button.background"],
   };
-  const buttonClasses = `${getSizeClass(
-    props.size || "base"
-  )} text-white bg-green-600 hover:bg-green-700 rounded-md select-none cursor-pointer ${
-    props.isBlock ? "w-full" : ""
-  }`;
 
   if (!!props.onClick) {
     return (
-      <button class={buttonClasses} onClick={props.onClick}>
+      <button class={buttonClasses} onClick={props.onClick} style={styles}>
         {props.label}
       </button>
     );
   } else if (!!props.href) {
     return (
-      <a class={buttonClasses} href={props.href}>
+      <a class={buttonClasses} href={props.href} style={styles}>
         {props.label}
       </a>
     );

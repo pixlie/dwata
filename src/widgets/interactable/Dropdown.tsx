@@ -14,7 +14,7 @@ export interface IChoicesWithHeading {
 }
 
 interface IPropTypes {
-  label: string;
+  label?: string;
   choices?: Array<IKeyedChoice>;
   choicesWithHeadings?: Array<IChoicesWithHeading>;
   value?: string | number;
@@ -33,8 +33,8 @@ const Dropdown: Component<IPropTypes> = (props) => {
     isOpen: false,
   });
   const [_, { getColors }] = useUserInterface();
-  const getSizeClass = (size: string) => {
-    switch (size) {
+  const getSizeClass = createMemo(() => {
+    switch (props.size) {
       case "sm":
         return "px-2.5 py-1.5 text-sm font-normal";
       case "lg":
@@ -43,17 +43,17 @@ const Dropdown: Component<IPropTypes> = (props) => {
       default:
         return "px-4 py-2 text-base font-normal";
     }
-  };
+  });
 
-  const buttonClasses = `${getSizeClass(
-    props.size || "base"
-  )} rounded-md select-none cursor-pointer border ${props.isBlock && "w-full"}`;
+  const buttonClasses =
+    getSizeClass() +
+    " rounded-md select-none cursor-pointer border hover:shadow-lg " +
+    `${props.isBlock && "w-full"}`;
 
   const getLabel = createMemo(() => {
     if (!!props.value && !!props.choices) {
       return (
-        props.label +
-        ": " +
+        (!!props.label ? props.label + ": " : "") +
         props.choices?.find((x) => x.key === props.value)?.label
       );
     } else if (!!props.value && !!props.choicesWithHeadings) {
@@ -63,9 +63,14 @@ const Dropdown: Component<IPropTypes> = (props) => {
       const choice = choiceHead?.choices.find(
         (y) => y.key === props.value
       )?.label;
-      return props.label + ": " + choiceHead?.name + " / " + choice;
+      return (
+        (!!props.label ? props.label + ": " : "") +
+        choiceHead?.name +
+        " / " +
+        choice
+      );
     } else {
-      return props.label;
+      return props.label || "";
     }
   });
 
@@ -98,7 +103,7 @@ const Dropdown: Component<IPropTypes> = (props) => {
       </button>
       {!!widgetState().isOpen && (
         <div
-          class="absolute top-10 z-10 border"
+          class="absolute top-10 z-10 border p-1 px-3 rounded-md"
           style={{
             "background-color": getColors().colors["input.background"],
             "border-color": getColors().colors["input.border"],

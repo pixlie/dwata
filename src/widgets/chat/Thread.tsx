@@ -9,16 +9,15 @@ const Thread: Component<APIChatThread> = (props) => {
   const [_, { getColors }] = useUserInterface();
 
   const handleClick = () => {
-    navigate(`/chat/thread/${props.id}`);
+    navigate(`/chat/${props.id}`);
   };
 
   return (
     <div
-      class="my-3 p-3 rounded-md cursor-pointer border shadow"
+      class="my-3 p-3 rounded-md cursor-pointer border"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
-        // "box-shadow": `0 1px 3px 0 ${getColors().colors["inlineChat.shadow"]}, 0 1px 2px -1px ${getColors().colors["inlineChat.shadow"]};`,
       }}
       onClick={handleClick}
     >

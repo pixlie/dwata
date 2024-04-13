@@ -8,7 +8,7 @@ const ReplyItem: Component<APIChatReply> = (props) => {
 
   return (
     <div
-      class="p-3 rounded-md mb-4 border"
+      class="p-3 rounded-md mb-4 border overflow-x-scroll"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],

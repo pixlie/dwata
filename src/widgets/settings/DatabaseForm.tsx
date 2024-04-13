@@ -2,9 +2,10 @@ import { Component, createMemo, createSignal } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
 import { IDatabaseFormData } from "../../utils/types";
-// import { useParams } from "@solidjs/router";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
+import { useUserInterface } from "../../stores/userInterface";
+import { useNavigate } from "@solidjs/router";
 
 interface IState {
   isEditing: boolean;
@@ -24,7 +25,8 @@ const DatabaseForm: Component = () => {
     port: 5432,
     name: "test",
   });
-  // const params = useParams();
+  const navigate = useNavigate();
+  const [_, { getColors }] = useUserInterface();
 
   const visibleName = createMemo(() => {
     return !!form().label
@@ -51,58 +53,76 @@ const DatabaseForm: Component = () => {
       port: `${form().port}`,
       database: form().name,
     });
+    if (response) {
+      navigate("/settings");
+    }
   };
 
   return (
-    <div class="rounded-md  bg-zinc-700 p-6 max-w-screen-sm">
-      <Heading size="sm">Database {visibleName()}</Heading>
+    <div
+      class="max-w-screen-sm border rounded-md"
+      style={{
+        "background-color": getColors().colors["editorWidget.background"],
+        "border-color": getColors().colors["editorWidget.border"],
+      }}
+    >
+      <div
+        class="px-4 py-3 rounded-md rounded-b-none border-b"
+        style={{
+          "border-color": getColors().colors["editorWidget.border"],
+        }}
+      >
+        <Heading size="sm">Database {visibleName()}</Heading>
+      </div>
 
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Host"
-        value={form().host}
-        onInput={handleChange("host")}
-      />
+      <div class="px-4 pt-3 pb-4 rounded-md rounded-t-none">
+        <TextInput
+          type="text"
+          isRequired
+          label="DB Host"
+          value={form().host}
+          onInput={handleChange("host")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Port"
-        value={form().port}
-        onInput={handleChange("port")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="DB Port"
+          value={form().port}
+          onInput={handleChange("port")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Username"
-        value={form().username}
-        onInput={handleChange("username")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="DB Username"
+          value={form().username}
+          onInput={handleChange("username")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Password"
-        value={form().password}
-        onInput={handleChange("password")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="DB Password"
+          value={form().password}
+          onInput={handleChange("password")}
+        />
 
-      <div class="mt-4" />
-      <TextInput
-        type="text"
-        isRequired
-        label="DB Name"
-        value={form().name}
-        onInput={handleChange("name")}
-      />
+        <div class="mt-4" />
+        <TextInput
+          type="text"
+          isRequired
+          label="DB Name"
+          value={form().name}
+          onInput={handleChange("name")}
+        />
 
-      <div class="mt-4" />
-      <Button label="Test connection and save" onClick={handleConnect} />
+        <div class="mt-4" />
+        <Button label="Test connection and save" onClick={handleConnect} />
+      </div>
     </div>
   );
 };

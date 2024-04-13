@@ -27,10 +27,8 @@ const ChatThreadIndex: Component = () => {
 
   return (
     <>
-      <div class="flex flex-row">
+      <div class="flex h-full">
         <div class="w-2/5 mr-4">
-          <NewThread />
-
           <div class="mb-4" />
           <Heading size="3xl">Recent chats with AI</Heading>
           <For each={chatThread.threadList}>
@@ -38,7 +36,7 @@ const ChatThreadIndex: Component = () => {
           </For>
         </div>
 
-        <div class="w-3/5">
+        <div class="w-3/5 overflow-y-auto h-full">
           {!!params.threadId && (
             <For each={chatThread.replyListForThread}>
               {(reply) => <ReplyItem {...reply} />}
@@ -57,8 +55,8 @@ const ChatWrapper: Component<RouteSectionProps> = (props) => {
 const ChatRoutes: Component = () => {
   return (
     <ChatThreadProvider>
-      {/* <Route path="/start" component={DatabaseForm} /> */}
-      <Route path="/thread/:threadId" component={ChatThreadIndex} />
+      <Route path="/start" component={NewThread} />
+      <Route path="/:threadId" component={ChatThreadIndex} />
 
       <Route path="/" component={ChatThreadIndex} />
     </ChatThreadProvider>

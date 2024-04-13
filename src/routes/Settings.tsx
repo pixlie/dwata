@@ -3,14 +3,14 @@ import Heading from "../widgets/typography/Heading";
 import DatabaseForm from "../widgets/settings/DatabaseForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
-// import SettingsSourceList from "../widgets/source/SettingsSourceList";
+import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AiForm from "../widgets/settings/AiForm";
 import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
 
 const SettingsIndex: Component = () => {
   return (
     <>
-      {/* <Heading size="xl">Data Sources</Heading>
+      <Heading size="xl">Data Sources</Heading>
       <SettingsSourceList />
       <div class="mb-2" />
       <Button
@@ -18,7 +18,7 @@ const SettingsIndex: Component = () => {
         href="/settings/data-source/add"
         size="sm"
       ></Button>
-      <div class="mb-6" /> */}
+      <div class="mb-6" />
 
       <Heading size="xl">AI Providers</Heading>
       <SettingsAIIntegrationList />

@@ -57,3 +57,39 @@ impl APIChatReply {
         }
     }
 }
+
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, export_to = "../src/api_types/")]
+pub(crate) enum APIChatContextType {
+    DataSource,
+    StructureOfDataSource,
+    ContentsFromFile,
+    ResultFromPreviousChat,
+    // CustomType(String),
+}
+
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub(crate) struct APIChatContextNode {
+    id: String,
+    context_type: APIChatContextType,
+    context_label: String,
+    can_create_context: bool,
+}
+
+impl APIChatContextNode {
+    pub fn new(
+        id: String,
+        context_type: APIChatContextType,
+        context_label: String,
+        can_create_context: bool,
+    ) -> Self {
+        Self {
+            id,
+            context_type,
+            context_label,
+            can_create_context,
+        }
+    }
+}
