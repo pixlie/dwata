@@ -61,3 +61,22 @@ impl APIAIIntegration {
         }
     }
 }
+
+pub(crate) enum APIToolParameterType {
+    String,
+    Number,
+    Boolean,
+}
+
+pub(crate) struct APIToolParameter {
+    name: String,
+    parameter_type: APIToolParameterType,
+    description: String,
+}
+
+pub(crate) struct APITool {
+    name: String,
+    description: String,
+    parameters: Vec<APIToolParameter>,
+    required: Vec<String>,
+}

@@ -1,4 +1,4 @@
-use crate::ai::api_types::APIAIIntegration;
+use crate::ai::api_types::{APIAIIntegration, APITool};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use ulid::Ulid;
@@ -173,4 +173,8 @@ pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModel>> {
     //     ],
     // );
     models
+}
+
+pub(crate) trait Tool {
+    fn get_self_tool_list(&self) -> Vec<APITool>;
 }
