@@ -1,6 +1,7 @@
-use crate::ai::api_types::{APIAIIntegration, APITool};
+use crate::ai::api_types::APIAIIntegration;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use reqwest::RequestBuilder;
 use ulid::Ulid;
 
 pub(crate) mod api_types;
@@ -25,6 +26,7 @@ impl HttpsApi {
 pub(crate) enum AiProvider {
     OpenAI(HttpsApi),
     Groq(HttpsApi),
+    Anthropic(HttpsApi),
 }
 
 impl AiProvider {
@@ -40,6 +42,7 @@ impl AiProvider {
         match self {
             Self::OpenAI(_) => "OpenAI".to_string(),
             Self::Groq(_) => "Groq".to_string(),
+            Self::Anthropic(_) => "Anthropic".to_string(),
         }
     }
 
@@ -47,6 +50,40 @@ impl AiProvider {
         match self {
             Self::OpenAI(api) => api.api_key.clone(),
             Self::Groq(api) => api.api_key.clone(),
+            Self::Anthropic(api) => api.api_key.clone(),
+        }
+    }
+
+    pub fn get_api_url_and_key(&self) -> (String, String) {
+        match self {
+            Self::OpenAI(api) => (
+                "https://api.openai.com/v1/chat/completions".to_string(),
+                api.api_key.clone(),
+            ),
+            Self::Groq(api) => (
+                "https://api.groq.com/openai/v1/chat/completions".to_string(),
+                api.api_key.clone(),
+            ),
+            Self::Anthropic(api) => (
+                "https://api.anthropic.com/v1/messages".to_string(),
+                api.api_key.clone(),
+            ),
+        }
+    }
+}
+
+impl AiProvider {
+    pub(crate) fn add_tools(&self, request_builder: RequestBuilder) -> RequestBuilder {
+        match self {
+            Self::OpenAI(_) => {
+                request_builder
+            },
+            Self::Groq(_) => {
+                request_builder
+            },
+            Self::Anthropic(_) => {
+                request_builder
+            },
         }
     }
 }
@@ -175,6 +212,55 @@ pub(crate) fn get_ai_models() -> HashMap<String, Vec<AiModel>> {
     models
 }
 
-pub(crate) trait Tool {
-    fn get_self_tool_list(&self) -> Vec<APITool>;
+#[derive(Deserialize, Serialize)]
+pub(crate) enum ToolParameterType {
+    String,
+    Number,
+    Boolean,
+    Enum(Vec<String>),
+}
+
+#[derive(Deserialize, Serialize)]
+pub(crate) struct ToolParameter {
+    name: String,
+    parameter_type: ToolParameterType,
+    description: String,
+}
+
+impl ToolParameter {
+    pub fn new(name: String, parameter_type: ToolParameterType, description: String) -> Self {
+        Self {
+            name,
+            parameter_type,
+            description,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize)]
+pub(crate) struct Tool {
+    name: String,
+    description: String,
+    parameters: Vec<ToolParameter>,
+    required: Vec<String>,
+}
+
+impl Tool {
+    pub fn new(
+        name: String,
+        description: String,
+        parameters: Vec<ToolParameter>,
+        required: Vec<String>,
+    ) -> Self {
+        Self {
+            name,
+            description,
+            parameters,
+            required,
+        }
+    }
+}
+
+pub(crate) trait AITools {
+    fn get_self_tool_list(&self) -> Vec<Tool>;
 }

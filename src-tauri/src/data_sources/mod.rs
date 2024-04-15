@@ -189,6 +189,19 @@ impl DataSource {
         self.id.clone()
     }
 
+    pub fn get_name(&self) -> String {
+        self.source.get_api_name()
+    }
+
+    pub fn get_tool_name(&self) -> String {
+        format!(
+            "{}-{}-{}",
+            self.source.get_api_type(),
+            self.source.get_api_name(),
+            self.id
+        )
+    }
+
     pub fn get_database(&self) -> Option<&Database> {
         match &self.source {
             DataSourceType::PostgreSQL(db) => Some(&db),
@@ -223,10 +236,6 @@ impl DataSource {
             self.source.get_api_type().to_string(),
             self.source.get_api_name(),
         )
-    }
-
-    pub fn get_name(&self) -> String {
-        self.source.get_api_name()
     }
 
     pub async fn get_tables(&self, with_columns: Option<bool>) -> Vec<APIGridSchema> {

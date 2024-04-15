@@ -80,3 +80,35 @@ pub(crate) struct APITool {
     parameters: Vec<APIToolParameter>,
     required: Vec<String>,
 }
+
+pub(crate) struct APIToolBuilder {
+    name: Option<String>,
+    description: Option<String>,
+    parameters: Vec<APIToolParameter>,
+    required: Vec<String>,
+}
+
+impl APIToolBuilder {
+    fn new(name: Option<String>, description: Option<String>) -> Self {
+        Self {
+            name,
+            description,
+            parameters: vec![],
+            required: vec![],
+        }
+    }
+
+    fn parameter(
+        &mut self,
+        name: String,
+        parameter_type: APIToolParameterType,
+        description: String,
+    ) -> &mut Self {
+        self.parameters.push(APIToolParameter {
+            name,
+            parameter_type,
+            description,
+        });
+        self
+    }
+}
