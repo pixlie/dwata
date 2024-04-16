@@ -1,7 +1,9 @@
 use crate::ai::api_types::APIAIIntegration;
+use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
+use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use reqwest::RequestBuilder;
+use std::fmt::Display;
 use ulid::Ulid;
 
 pub(crate) mod api_types;
@@ -70,21 +72,28 @@ impl AiProvider {
             ),
         }
     }
-}
 
-impl AiProvider {
-    pub(crate) fn add_tools(&self, request_builder: RequestBuilder) -> RequestBuilder {
-        match self {
-            Self::OpenAI(_) => {
-                request_builder
-            },
-            Self::Groq(_) => {
-                request_builder
-            },
-            Self::Anthropic(_) => {
-                request_builder
-            },
-        }
+    pub fn build_https_request(
+        &self,
+        ai_model: String,
+        message_to_send: String,
+        tool_list: Vec<Tool>,
+    ) -> RequestBuilder {
+        let (chat_url, api_key) = self.get_api_url_and_key();
+        let https_client = reqwest::Client::new();
+        let payload: OpenAIChatRequest = OpenAIChatRequest {
+            model: ai_model,
+            messages: vec![ChatRequestMessage {
+                role: "user".to_string(),
+                content: message_to_send,
+            }],
+            tools: vec![],
+        };
+        let request_builder = https_client
+            .post(chat_url)
+            .header("Authorization", format!("Bearer {}", api_key))
+            .json::<OpenAIChatRequest>(&payload.add_tools(tool_list));
+        request_builder
     }
 }
 
@@ -218,6 +227,17 @@ pub(crate) enum ToolParameterType {
     Number,
     Boolean,
     Enum(Vec<String>),
+}
+
+impl Display for ToolParameterType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ToolParameterType::String => write!(f, "string"),
+            ToolParameterType::Number => write!(f, "number"),
+            ToolParameterType::Boolean => write!(f, "boolean"),
+            ToolParameterType::Enum(e) => write!(f, "enum: {}", e.join(", ")),
+        }
+    }
 }
 
 #[derive(Deserialize, Serialize)]

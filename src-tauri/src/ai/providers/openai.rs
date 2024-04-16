@@ -64,6 +64,7 @@ pub(crate) struct ChatRequestMessage {
 pub(crate) struct OpenAIChatRequest {
     pub(crate) model: String,
     pub(crate) messages: Vec<ChatRequestMessage>,
+    pub(crate) tools: Vec<OpenAITool>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -94,13 +95,8 @@ pub(crate) struct OpenAITool {
     pub(crate) function: OpenAIToolFunction,
 }
 
-#[derive(Deserialize, Serialize)]
-pub(crate) struct OpenAITools {
-    pub(crate) tools: Vec<OpenAITool>,
-}
-
-impl OpenAITools {
-    pub(crate) fn from_tool_list(tool_list: Vec<Tool>) -> Self {
+impl OpenAIChatRequest {
+    pub(crate) fn add_tools(mut self, tool_list: Vec<Tool>) -> OpenAIChatRequest {
         let mut tools: Vec<OpenAITool> = Vec::new();
         for tool in tool_list {
             tools.push(OpenAITool {
@@ -113,15 +109,21 @@ impl OpenAITools {
                         properties: tool
                             .parameters
                             .iter()
-                            .map(|x| OpenAIToolParameter {
-                                _type: x.parameter_type.to_string(),
-                                description: x.description.clone(),
+                            .map(|x| {
+                                (
+                                    x.name.to_string(),
+                                    OpenAIToolParameter {
+                                        _type: x.parameter_type.to_string(),
+                                        description: x.description.clone(),
+                                    },
+                                )
                             })
-                            .collect(),
-                    }
+                            .collect::<HashMap<String, OpenAIToolParameter>>(),
+                    },
                 },
             });
         }
-        OpenAITools { tools }
+        self.tools = tools;
+        self
     }
 }

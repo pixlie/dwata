@@ -1,47 +1,21 @@
-use super::providers::openai::{ChatRequestMessage, OpenAIChatRequest, OpenAIChatResponse};
-use super::{AiIntegration};
+use super::providers::openai::OpenAIChatResponse;
+use super::{AiIntegration, Tool};
 use crate::error::DwataError;
 use reqwest;
-use reqwest::RequestBuilder;
-
-pub(crate) fn add_user_message(
-    ai_model: String,
-    message_to_send: String,
-    request_builder: RequestBuilder,
-) -> RequestBuilder {
-    let payload: OpenAIChatRequest = OpenAIChatRequest {
-        model: ai_model,
-        messages: vec![ChatRequestMessage {
-            role: "user".to_string(),
-            content: message_to_send,
-        }],
-    };
-    request_builder.json::<OpenAIChatRequest>(&payload)
-}
-
-pub(crate) fn build_https_request(
-    ai_integration: AiIntegration,
-    ai_model: String,
-    message_to_send: String,
-) -> RequestBuilder {
-    let (chat_url, api_key) = ai_integration.ai_provider.get_api_url_and_key();
-    let https_client = reqwest::Client::new();
-    let request_builder = https_client
-        .post(chat_url)
-        .header("Authorization", format!("Bearer {}", api_key));
-    let request_builder = add_user_message(ai_model, message_to_send, request_builder);
-    ai_integration.ai_provider.add_tools(request_builder)
-}
 
 pub async fn send_message_to_ai(
     ai_integration: AiIntegration,
     ai_model: String,
     message_to_send: String,
+    tool_list: Vec<Tool>,
 ) -> Result<String, DwataError> {
-    let request = build_https_request(ai_integration, ai_model, message_to_send)
-        .send()
-        .await;
-    match request {
+    let request =
+        ai_integration
+            .ai_provider
+            .build_https_request(ai_model, message_to_send, tool_list);
+    println!("{:?}", request);
+    let response = request.send().await;
+    match response {
         Ok(response) => {
             if response.status().is_success() {
                 let payload = response.json::<OpenAIChatResponse>().await;
