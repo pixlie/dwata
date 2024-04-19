@@ -1,4 +1,4 @@
-use crate::ai::Tool;
+use crate::ai::{Tool, ToolParameterType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -54,41 +54,44 @@ pub(crate) struct LogProb {
     pub(crate) content: Option<Vec<LogProbContent>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct ChatRequestMessage {
     pub(crate) role: String,
     pub(crate) content: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct OpenAIChatRequest {
     pub(crate) model: String,
     pub(crate) messages: Vec<ChatRequestMessage>,
     pub(crate) tools: Vec<OpenAITool>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub(crate) struct OpenAIToolParameter {
     #[serde(rename(serialize = "type"))]
     pub(crate) _type: String,
     pub(crate) description: String,
+    #[serde(rename(serialize = "enum"))]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) _enum: Option<Vec<String>>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub(crate) struct OpenAIToolParameters {
     #[serde(rename(serialize = "type"))]
     pub(crate) _type: String,
     pub(crate) properties: HashMap<String, OpenAIToolParameter>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub(crate) struct OpenAIToolFunction {
     pub(crate) name: String,
     pub(crate) description: String,
     pub(crate) parameters: OpenAIToolParameters,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub(crate) struct OpenAITool {
     #[serde(rename(serialize = "type"))]
     pub(crate) _type: String,
@@ -115,6 +118,12 @@ impl OpenAIChatRequest {
                                     OpenAIToolParameter {
                                         _type: x.parameter_type.to_string(),
                                         description: x.description.clone(),
+                                        _enum: match &x.parameter_type {
+                                            ToolParameterType::Enum(values) => {
+                                                Some(values.to_vec())
+                                            }
+                                            _ => None,
+                                        },
                                     },
                                 )
                             })

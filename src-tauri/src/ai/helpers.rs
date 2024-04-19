@@ -1,6 +1,6 @@
-use super::providers::openai::OpenAIChatResponse;
 use super::{AiIntegration, Tool};
 use crate::error::DwataError;
+use openai::types::CreateChatCompletionResponse;
 use reqwest;
 
 pub async fn send_message_to_ai(
@@ -18,10 +18,12 @@ pub async fn send_message_to_ai(
     match response {
         Ok(response) => {
             if response.status().is_success() {
-                let payload = response.json::<OpenAIChatResponse>().await;
-                match payload {
+                match response.json::<CreateChatCompletionResponse>().await {
                     Ok(response) => Ok(response.choices[0].message.content.clone()),
-                    Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+                    Err(err) => {
+                        println!("{:?}", err);
+                        Err(DwataError::CouldNotConnectToAiProvider)
+                    }
                 }
             } else {
                 println!(

@@ -89,10 +89,12 @@ impl AiProvider {
             }],
             tools: vec![],
         };
+        let payload = payload.add_tools(tool_list);
         let request_builder = https_client
             .post(chat_url)
             .header("Authorization", format!("Bearer {}", api_key))
-            .json::<OpenAIChatRequest>(&payload.add_tools(tool_list));
+            .json::<OpenAIChatRequest>(&payload);
+        println!("{}", serde_json::to_string_pretty(&payload).unwrap());
         request_builder
     }
 }
@@ -235,7 +237,7 @@ impl Display for ToolParameterType {
             ToolParameterType::String => write!(f, "string"),
             ToolParameterType::Number => write!(f, "number"),
             ToolParameterType::Boolean => write!(f, "boolean"),
-            ToolParameterType::Enum(e) => write!(f, "enum: {}", e.join(", ")),
+            ToolParameterType::Enum(e) => write!(f, "string"),
         }
     }
 }

@@ -76,12 +76,14 @@ impl AITools for Config {
         let data_source_list: Vec<String> = self
             .data_source_list
             .iter()
-            .map(|x| x.get_id().clone())
+            .map(|x| x.get_tool_name().clone())
             .collect();
         let first_source = data_source_list.clone().first().unwrap().clone();
         vec![Tool::new(
             "get_schema_of_selected_data_source".to_string(),
-            "Retrieves the schema of the selected data source.".to_string(),
+            "I have multiple business databases.\
+             This function retrieves the schema of all tables of the selected data source.\
+              You can use the schema to generate SQL.".to_string(),
             vec![ToolParameter::new(
                 "data_source_id".to_string(),
                 ToolParameterType::Enum(data_source_list),
