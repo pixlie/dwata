@@ -13,7 +13,7 @@ python-decouple = "^3.5"
 databases = {extras = ["postgresql"], version = "^0.5.3"}
 aiosqlite = "^0.17.0"
 loguru = "^0.5.3"
-aiohttp = "^3.7.4"
+aiohttp = "^3.9.4"
 aioredis = "^2.0.0"
 python-benedict = "^0.24.3"
 sqlalchemy-migrate = "^0.13.0"
