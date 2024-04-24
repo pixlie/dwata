@@ -1,4 +1,5 @@
 use crate::ai::helpers::send_message_to_ai;
+use crate::ai::AITools;
 use crate::chat::api_types::{APIChatContextNode, APIChatReply, APIChatThread};
 use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
 use crate::chat::{ChatContextNode, ChatReplyRow, ChatThreadRow};
@@ -10,9 +11,9 @@ use tauri::State;
 
 #[tauri::command]
 pub(crate) async fn start_chat_thread(
-    message: &str,
-    ai_provider: &str,
-    ai_model: &str,
+    message: String,
+    ai_provider: String,
+    ai_model: String,
     store: State<'_, Store>,
 ) -> Result<(i64, i64), DwataError> {
     let mut db_guard = store.db_connection.lock().await;
@@ -31,13 +32,14 @@ pub(crate) async fn start_chat_thread(
             {
                 Ok(inserted_ids) => {
                     let config_guard = store.config.lock().await;
-                    match load_ai_integration(&config_guard, ai_provider) {
+                    match load_ai_integration(&config_guard, &ai_provider) {
                         Some(ai_integration) => {
                             // It does not matter if we fail this request, we will try again later
                             match send_message_to_ai(
                                 ai_integration,
                                 ai_model.to_string(),
                                 message.to_string(),
+                                config_guard.get_self_tool_list(),
                             )
                             .await
                             {
