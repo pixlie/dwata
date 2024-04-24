@@ -44,7 +44,6 @@ pub(crate) async fn start_chat_thread(
                             .await
                             {
                                 Ok(reply_from_ai) => {
-                                    println!("{}", &reply_from_ai);
                                     let _ = create_chat_reply(
                                         reply_from_ai,
                                         false,

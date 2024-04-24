@@ -29,8 +29,28 @@ pub(crate) struct ChatThreadRow {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub(crate) struct ChatToolResponse {
+    tool_name: String,
+    tool_type: String,
+    arguments: String,
+}
+
+impl ChatToolResponse {
+    pub fn new(tool_name: String, tool_type: String, arguments: String) -> Self {
+        Self {
+            tool_name,
+            tool_type,
+            arguments,
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct ChatReplyJson {
+    // In case there is a tool response, the message is a blank string
     message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tool_response: Option<Vec<ChatToolResponse>>,
     // These are messages created by Dwata to get meta information about a chat,
     // shown to user only when they want
     is_system_message: Option<bool>,
@@ -42,12 +62,14 @@ pub(crate) struct ChatReplyJson {
 impl ChatReplyJson {
     pub fn new(
         message: String,
+        tool_response: Option<Vec<ChatToolResponse>>,
         is_system_message: bool,
         is_to_be_sent_to_ai: bool,
         is_sent_to_ai: bool,
     ) -> Self {
         Self {
             message,
+            tool_response,
             is_system_message: if is_system_message { Some(true) } else { None },
             is_to_be_sent_to_ai: if is_to_be_sent_to_ai {
                 Some(true)

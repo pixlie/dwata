@@ -37,12 +37,17 @@ const NewThread: Component = () => {
   const [_, { getColors }] = useUserInterface();
 
   const handleNewThread = async () => {
+    console.log(formData());
+    if (!formData().message || !formData().aiProvider || !formData().aiModel) {
+      return;
+    }
+
     const response: [number, number] = await invoke("start_chat_thread", {
       message: formData().message,
       aiProvider: formData().aiProvider,
       aiModel: formData().aiModel,
     });
-    navigate(`/chat/thread/${response[0]}`);
+    navigate(`/chat/${response[0]}`);
   };
 
   onMount(async () => {
@@ -89,6 +94,12 @@ const NewThread: Component = () => {
     );
   });
 
+  const handleMessageInput = (value: string) =>
+    setFormData({
+      ...formData(),
+      message: value,
+    });
+
   const handleModelSelect = (selected: string) => {
     const [aiProvider, aiModel] = selected.split("/");
     setFormData({
@@ -111,7 +122,11 @@ const NewThread: Component = () => {
         <Heading size="xl">Start a new chat with AI</Heading>
       </div>
 
-      <TextArea label="Your message" />
+      <TextArea
+        label="Your message"
+        value={formData().message}
+        onInput={handleMessageInput}
+      />
       <For each={formState().chatContexts}>
         {(chatContext) => <ChatContext chatContextId={chatContext} />}
       </For>

@@ -1,5 +1,6 @@
-use crate::chat::ChatReplyJson;
+use crate::chat::{ChatReplyJson, ChatToolResponse};
 use crate::error::DwataError;
+use crate::schema::api_types::IsForeignKey::No;
 use chrono::Utc;
 use serde_json::json;
 use sqlx::types::JsonValue;
@@ -52,7 +53,8 @@ pub(crate) async fn create_chat_thread(
                     }
                 };
                 // Create the first chat reply with the full message from user
-                let chat_reply: ChatReplyJson = ChatReplyJson::new(message, false, true, false);
+                let chat_reply: ChatReplyJson =
+                    ChatReplyJson::new(message, None, false, true, false);
                 let chat_reply_result = query(
                     r#"INSERT INTO chat_reply
                     (json_data, chat_thread_id, created_by_id, created_at)
@@ -78,7 +80,7 @@ pub(crate) async fn create_chat_thread(
 }
 
 pub(crate) async fn create_chat_reply(
-    message: String,
+    reply_from_ai: (String, Option<Vec<ChatToolResponse>>),
     is_system_message: bool,
     is_to_be_sent_to_ai: bool,
     is_sent_to_ai: bool,
@@ -87,7 +89,8 @@ pub(crate) async fn create_chat_reply(
     connection: &mut SqliteConnection,
 ) -> Result<i64, DwataError> {
     let chat_reply: ChatReplyJson = ChatReplyJson::new(
-        message,
+        reply_from_ai.0,
+        reply_from_ai.1,
         is_system_message,
         is_to_be_sent_to_ai,
         is_sent_to_ai,
