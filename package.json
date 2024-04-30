@@ -16,7 +16,7 @@
     "@solidjs/router": "^0.12.5",
     "@tauri-apps/api": "2.0.0-beta.3",
     "@tauri-apps/plugin-shell": "2.0.0-beta.1",
-    "solid-js": "^1.8.16",
+    "solid-js": "^1.8.17",
     "solid-markdown": "^2.0.1"
   },
   "devDependencies": {
