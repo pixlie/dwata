@@ -1,14 +1,14 @@
 # Dwata
 
-Dwata is a desktop app to chat with any AI model and get insights from your data. Chats are threaded, like in Discord and each thread can connect to a different AI model. Dwata can connect databases, APIs (like Stripe) or CSV files and send structure/data as prompt **when you** need.
-
-![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads_0.0.2.png?raw=true "Recent chats with AI models")
+Dwata is an AI studio where you can chat with any model about your data. You can mix and match different AI models (from OpenAI, Anthropic, Groq, etc.) in the same chat. You can create embeddings, search for similarity, chain the responses and actions to create workflows. No coding required. Dwata can connect to databases, APIs (like Stripe) or Markdown/text/CSV/Excel files and send structure/data as prompt **when you** need.
 
 **Dwata is in early development stage, please do not expect it to work without errors**
 
+![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads_0.0.2.png?raw=true "Recent chats with AI models")
+
 ## Introduction
 
-Hello! I am Sumit and Dwata is a product that I have tried building a few times. I was focused on a GUI based product earlier but I feel AI models can be a better interface. I am working on this full-time since late 2023 and am close to the minimum viable product (MVP).
+Hello! we are Sumit and Sudeshna, from India. Dwata is a product that Sumit has tried building a few times before. It was originally supposed to be a data exploration app with no coding knowledge needed. We are re-imagining Dwata as a completely no-code app to explore all your data and get meaningful insights or build interesting solutions on top (see https://suprt.com as an example we are building with Dwata).
 
 ## What does it solve?
 
@@ -20,7 +20,7 @@ Similarly Python code (usually with Pandas) will also be executable from within 
 
 ## What AI models can I connect to?
 
-I am adding support for these:
+Dwata has or will support the following:
 
 - [OpenAI](https://platform.openai.com/docs/models) - GPT-4, GPT-4 Turbo, GPT-3.5 Turbo
 - [Groq](https://console.groq.com/docs/models) - LLaMA2-70b, Mixtral-8x7b
@@ -36,7 +36,7 @@ There are many available AI models at the moment and the catalog is growing. Whi
 
 Yes! In Dwata, you start a chat thread with an AI model. Then you can go into the thread and select to `compare` to any number of other models.
 
-I am creating a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
+Dwata will have a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
 
 ## What data sources can Dwata connect to?
 
@@ -50,8 +50,8 @@ Dwata will be able to read data from:
 
 ## Does Dwata read any of my private/business data?
 
-No, the desktop app does not send me (or my company) any of your private data. I intend to add product analytics and error tracking but you will have explicit control over the analytics or error data I collect. You will see the the tracking data being sent to my server and can agree or disagree to participate.
+No, the desktop app does not send me (or my company) any of your private data. Dwata will collect product analytics and error reports but you will have full control over the data we receive and can choose to not send these.
 
 ## How will Dwata make money?
 
-Private collaboration: the desktop app is and will remain free (both in source code and price). If you want to share your reports, insights or action items with your team, then you will have to take a subscription (not available yet).
+Private collaboration: the desktop app is and will remain free (both in source code and price). If you want collaborate and work with Dwata in your team, then you will have to take a subscription (pricing should start at USD 60 per user per year). Please remember that you pay for your AI model usage costs directly (OpenAI, Anthropic, Groq, etc).
