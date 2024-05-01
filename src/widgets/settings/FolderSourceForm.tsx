@@ -1,7 +1,7 @@
 import { Component, createMemo, createSignal } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
-import { IDatabaseFormData } from "../../utils/types";
+import { IFolderSourceFormData } from "../../utils/types";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 import { useUserInterface } from "../../stores/userInterface";
@@ -13,17 +13,16 @@ interface IState {
   isFetching: boolean;
 }
 
-const DatabaseForm: Component = () => {
+const FolderSourceForm: Component = () => {
   const [state, setState] = createSignal<IState>({
     isEditing: false,
     isFetching: false,
     isSaving: false,
   });
-  const [form, setForm] = createSignal<IDatabaseFormData>({
-    username: "postgres",
-    host: "localhost",
-    port: 5432,
-    name: "test",
+  const [form, setForm] = createSignal<IFolderSourceFormData>({
+    path: "",
+    include_patterns: [],
+    exclude_patterns: [],
   });
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
@@ -31,8 +30,8 @@ const DatabaseForm: Component = () => {
   const visibleName = createMemo(() => {
     return !!form().label
       ? `- ${form().label}`
-      : !!form().name
-        ? `- ${form().name}`
+      : !!form().path
+        ? `- ${form().path}`
         : "";
   });
 
@@ -46,12 +45,11 @@ const DatabaseForm: Component = () => {
   };
 
   const handleConnect = async () => {
-    const response = await invoke("create_data_source", {
-      username: form().username,
-      password: form().password,
-      host: form().host,
-      port: `${form().port}`,
-      database: form().name,
+    const response = await invoke("create_folder_source", {
+      path: form().path,
+      label: form().label,
+      include_patterns: form().include_patterns,
+      exclude_patterns: form().exclude_patterns,
     });
     if (response) {
       navigate("/settings");
@@ -79,52 +77,43 @@ const DatabaseForm: Component = () => {
         <TextInput
           type="text"
           isRequired
-          label="DB Host"
-          value={form().host}
-          onInput={handleChange("host")}
+          label="Folder path"
+          value={form().path}
+          onInput={handleChange("path")}
         />
 
         <div class="mt-4" />
         <TextInput
           type="text"
           isRequired
-          label="DB Port"
-          value={form().port}
-          onInput={handleChange("port")}
+          label="Label"
+          value={form().label}
+          onInput={handleChange("label")}
         />
 
         <div class="mt-4" />
         <TextInput
           type="text"
           isRequired
-          label="DB Username"
-          value={form().username}
-          onInput={handleChange("username")}
+          label="Include patterns (like in .gitignore)"
+          value={form().include_patterns.join(", ")}
+          onInput={handleChange("include_patterns")}
         />
 
         <div class="mt-4" />
         <TextInput
           type="text"
           isRequired
-          label="DB Password"
-          value={form().password}
-          onInput={handleChange("password")}
+          label="Exclude patterns"
+          value={form().exclude_patterns.join(", ")}
+          onInput={handleChange("exclude_patterns")}
         />
 
         <div class="mt-4" />
-        <TextInput
-          type="text"
-          isRequired
-          label="DB Name"
-          value={form().name}
-          onInput={handleChange("name")}
-        />
-
-        <div class="mt-4" />
-        <Button label="Test connection and save" onClick={handleConnect} />
+        <Button label="Save folder as data source" onClick={handleConnect} />
       </div>
     </div>
   );
 };
 
-export default DatabaseForm;
+export default FolderSourceForm;
