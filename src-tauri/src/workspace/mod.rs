@@ -1,7 +1,7 @@
 use crate::ai::{AITools, AiIntegration, Tool, ToolParameter, ToolParameterType};
 use crate::chat::api_types::APIChatContextNode;
 use crate::chat::ChatContextNode;
-use crate::data_sources::DataSource;
+use crate::data_sources::DatabaseSource;
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -14,14 +14,14 @@ pub mod helpers;
 pub struct Config {
     path_to_config: PathBuf,
     // organisations: Vec<Organisation>,
-    pub(crate) data_source_list: Vec<DataSource>,
+    pub(crate) data_source_list: Vec<DatabaseSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
     folder_list: Vec<PathBuf>, // CSV or Markdown files
     ai_integration_list: Vec<AiIntegration>,
 }
 
 impl Config {
-    pub fn get_data_source(&self, data_source_id: &str) -> Option<&DataSource> {
+    pub fn get_data_source(&self, data_source_id: &str) -> Option<&DatabaseSource> {
         self.data_source_list
             .iter()
             .find(|x| x.get_id() == data_source_id)
@@ -83,7 +83,8 @@ impl AITools for Config {
             "get_schema_of_selected_data_source".to_string(),
             "I have multiple business databases.\
              This function retrieves the schema of all tables of the selected data source.\
-              You can use the schema to generate SQL.".to_string(),
+              You can use the schema to generate SQL."
+                .to_string(),
             vec![ToolParameter::new(
                 "data_source_id".to_string(),
                 ToolParameterType::Enum(data_source_list),

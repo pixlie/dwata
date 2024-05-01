@@ -1,4 +1,4 @@
-use crate::data_sources::{DataSource, DataSourceConnection};
+use crate::data_sources::{DatabasePool, DatabaseSource};
 use crate::schema::postgresql;
 use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
@@ -108,12 +108,12 @@ impl APIGridSchema {
         self.name.clone().unwrap().clone()
     }
 
-    pub async fn get_columns(&mut self, data_source: &DataSource) -> Vec<APIGridColumn> {
+    pub async fn get_columns(&mut self, data_source: &DatabaseSource) -> Vec<APIGridColumn> {
         if self.has_fetched_columns {
             self.columns.to_vec()
         } else {
             match data_source.get_connection().await {
-                Some(DataSourceConnection::PostgreSQL(pg_pool)) => {
+                Some(DatabasePool::PostgreSQL(pg_pool)) => {
                     let columns = postgresql::metadata::get_postgres_columns(
                         &pg_pool,
                         self.schema.clone().unwrap(),

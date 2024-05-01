@@ -1,6 +1,6 @@
 use crate::ai::AiIntegration;
 use crate::data_sources::helpers::check_database_connection;
-use crate::data_sources::{DataSource, Database};
+use crate::data_sources::{Database, DatabaseSource};
 use crate::error::DwataError;
 use crate::store::Store;
 use crate::workspace::api_types::APIConfig;
@@ -8,7 +8,7 @@ use std::fs;
 use tauri::State;
 
 #[tauri::command]
-pub async fn create_data_source(
+pub async fn create_database_source(
     _database_type: Option<&str>,
     username: &str,
     password: Option<&str>,
@@ -20,7 +20,7 @@ pub async fn create_data_source(
     match check_database_connection(username, password, host, port, database).await {
         Ok(_) => {
             let database: Database = Database::new(username, password, host, port, database);
-            let data_source: DataSource = DataSource::new_database(database, None);
+            let data_source: DatabaseSource = DatabaseSource::new(database, None);
             let id = data_source.get_id().clone();
             let mut config_guard = store.config.lock().await;
             config_guard.data_source_list.push(data_source);

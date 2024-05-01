@@ -1,4 +1,4 @@
-use crate::data_sources::DataSourceConnection;
+use crate::data_sources::DatabasePool;
 use crate::query_result::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
 use crate::query_result::postgresql::PostgreSQLQueryBuilder;
 use crate::workspace::Config;
@@ -74,9 +74,7 @@ impl DwataQuery {
                     Some(ds) => match ds.get_query_builder(grid).unwrap() {
                         QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
                             Some(conn_type) => match conn_type {
-                                DataSourceConnection::PostgreSQL(conn) => {
-                                    builder.get_data(&conn).await
-                                }
+                                DatabasePool::PostgreSQL(conn) => builder.get_data(&conn).await,
                             },
                             None => vec![],
                         },

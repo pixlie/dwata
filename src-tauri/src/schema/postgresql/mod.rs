@@ -1,4 +1,4 @@
-use crate::data_sources::DataSource;
+use crate::data_sources::DatabaseSource;
 use crate::schema::api_types::{
     APIGridColumn, APIGridColumnBuilder, APIGridSchema, APIGridSchemaBuilder, ColumnDataType,
     IsForeignKey, TypeArrayBuilder, TypeIntegerBuilder,
@@ -25,7 +25,7 @@ impl PostgreSQLObject {
 
     pub async fn get_table(
         &self,
-        data_source: &DataSource,
+        data_source: &DatabaseSource,
         with_columns: Option<bool>,
     ) -> APIGridSchema {
         let table_builder = APIGridSchemaBuilder::default()
