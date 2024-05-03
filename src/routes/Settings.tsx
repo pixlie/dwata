@@ -7,34 +7,40 @@ import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AiForm from "../widgets/settings/AiForm";
 import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
 import FolderSourceForm from "../widgets/settings/FolderSourceForm";
+import { useUserInterface } from "../stores/userInterface";
 
 const SettingsIndex: Component = () => {
+  const [_, { getColors }] = useUserInterface();
+
   return (
     <>
       <Heading size="3xl">Data Sources</Heading>
-
-      <Heading size="xl">Databases</Heading>
-      <p>
+      <p
+        class="p-4 text-white rounded-md border cursor-default select-none text-sm mb-2"
+        style={{
+          "background-color": getColors().colors["panel.background"],
+          "border-color": getColors().colors["panel.border"],
+        }}
+      >
         Connect to databases like MySQL, PostgreSQL, SQLite, MongoDB, etc and
         Dwata can extract schema or data from them.
+        <br />
+        Connect to folders with the file types you want, like Markdown.
       </p>
       <SettingsSourceList />
       <div class="mb-2" />
-      <Button
-        label="Add a database"
-        href="/settings/database-source/add"
-        size="sm"
-      ></Button>
-      <div class="mb-6" />
-
-      <Heading size="xl">Folders</Heading>
-      <SettingsSourceList />
-      <div class="mb-2" />
-      <Button
-        label="Add a folder"
-        href="/settings/folder-source/add"
-        size="sm"
-      ></Button>
+      <div class="flex flex-row gap-2">
+        <Button
+          label="Add a Database"
+          href="/settings/database-source/add"
+          size="sm"
+        ></Button>
+        <Button
+          label="Add a Folder"
+          href="/settings/folder-source/add"
+          size="sm"
+        ></Button>
+      </div>
       <div class="mb-6" />
 
       <Heading size="xl">AI Providers</Heading>

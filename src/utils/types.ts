@@ -24,8 +24,8 @@ interface IFolderSourceFormData {
   id?: string;
   label?: string;
   path: string;
-  include_patterns: Array<string>;
-  exclude_patterns: Array<string>;
+  includePatterns: Array<string>;
+  excludePatterns: Array<string>;
 }
 
 interface IProviderPropTypes {

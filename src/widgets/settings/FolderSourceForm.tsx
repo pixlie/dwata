@@ -21,8 +21,9 @@ const FolderSourceForm: Component = () => {
   });
   const [form, setForm] = createSignal<IFolderSourceFormData>({
     path: "",
-    include_patterns: [],
-    exclude_patterns: [],
+    label: "",
+    includePatterns: [],
+    excludePatterns: [],
   });
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
@@ -36,20 +37,29 @@ const FolderSourceForm: Component = () => {
   });
 
   const handleChange = (field: string) => {
-    return (data: string | number) => {
-      setForm({
-        ...form(),
-        [field]: data,
-      });
-    };
+    if (field === "includePatterns" || field === "excludePatterns") {
+      return (data: string) => {
+        setForm({
+          ...form(),
+          [field]: data.split(","),
+        });
+      };
+    } else {
+      return (data: string | number) => {
+        setForm({
+          ...form(),
+          [field]: data,
+        });
+      };
+    }
   };
 
   const handleConnect = async () => {
     const response = await invoke("create_folder_source", {
       path: form().path,
       label: form().label,
-      include_patterns: form().include_patterns,
-      exclude_patterns: form().exclude_patterns,
+      includePatterns: form().includePatterns,
+      excludePatterns: form().excludePatterns,
     });
     if (response) {
       navigate("/settings");
@@ -96,8 +106,8 @@ const FolderSourceForm: Component = () => {
           type="text"
           isRequired
           label="Include patterns (like in .gitignore)"
-          value={form().include_patterns.join(", ")}
-          onInput={handleChange("include_patterns")}
+          value={form().includePatterns.join(", ")}
+          onInput={handleChange("includePatterns")}
         />
 
         <div class="mt-4" />
@@ -105,8 +115,8 @@ const FolderSourceForm: Component = () => {
           type="text"
           isRequired
           label="Exclude patterns"
-          value={form().exclude_patterns.join(", ")}
-          onInput={handleChange("exclude_patterns")}
+          value={form().excludePatterns.join(", ")}
+          onInput={handleChange("excludePatterns")}
         />
 
         <div class="mt-4" />
