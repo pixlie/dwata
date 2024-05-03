@@ -48,6 +48,7 @@ fn main() {
             schema::commands::read_schema,
             query_result::commands::load_data,
             workspace::commands::create_database_source,
+            workspace::commands::create_folder_source,
             workspace::commands::create_ai_integration,
             workspace::commands::update_ai_integration,
             user_account::commands::save_user,

@@ -1,4 +1,5 @@
 use crate::ai::AiIntegration;
+use crate::data_sources::folder::FolderSource;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{Database, DatabaseSource};
 use crate::error::DwataError;
@@ -23,16 +24,31 @@ pub async fn create_database_source(
             let data_source: DatabaseSource = DatabaseSource::new(database, None);
             let id = data_source.get_id().clone();
             let mut config_guard = store.config.lock().await;
-            config_guard.data_source_list.push(data_source);
-            match fs::write(
-                &config_guard.path_to_config,
-                config_guard.get_pretty_string(),
-            ) {
+            config_guard.add_database_source(data_source);
+            match config_guard.sync_to_file() {
                 Ok(_) => Ok(id),
                 Err(_) => Err(DwataError::CouldNotWriteConfig),
             }
         }
         Err(e) => Err(e),
+    }
+}
+
+#[tauri::command]
+pub async fn create_folder_source(
+    path: &str,
+    label: Option<&str>,
+    include_patterns: Vec<&str>,
+    exclude_patterns: Vec<&str>,
+    store: State<'_, Store>,
+) -> Result<String, DwataError> {
+    let folder_source = FolderSource::new(path, label, include_patterns, exclude_patterns);
+    let id = folder_source.get_id();
+    let mut config_guard = store.config.lock().await;
+    config_guard.add_folder_source(folder_source);
+    match config_guard.sync_to_file() {
+        Ok(_) => Ok(id),
+        Err(_) => Err(DwataError::CouldNotWriteConfig),
     }
 }
 
