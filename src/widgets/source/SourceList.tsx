@@ -16,6 +16,13 @@ const SourceList: Component = () => {
     return [];
   });
 
+  const folderSources = createMemo(() => {
+    if (!workspace.isFetching && !!workspace.isReady) {
+      return workspace.folderList;
+    }
+    return [];
+  });
+
   return (
     <>
       <span
@@ -39,6 +46,24 @@ const SourceList: Component = () => {
                 dataSource.id == searchParams.dataSouceId
               }
               infoTag={dataSource.sourceType}
+            />
+          );
+        }}
+      </For>
+      <For each={folderSources()}>
+        {(dataSource) => {
+          const label = dataSource.label || dataSource.path;
+
+          return (
+            <SidebarHeading
+              label={label}
+              icon="fa-solid fa-folder"
+              href={`/browse?dataSourceId=${dataSource.id}`}
+              isActive={
+                !!searchParams.dataSouceId &&
+                dataSource.id == searchParams.dataSouceId
+              }
+              infoTag="Markdown files"
             />
           );
         }}

@@ -50,11 +50,11 @@ const FolderSourceItem: Component<APIFolderSource> = (props) => {
       }}
       onClick={handleClick}
     >
-      <i class="fa-solid fa-database w-6 text-gray-500" />
+      <i class="fa-solid fa-folder w-6 text-gray-500" />
       {props.label || props.path}
       <div>
         <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
-          Folder
+          Markdown files
         </span>
       </div>
     </div>
