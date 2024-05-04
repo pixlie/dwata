@@ -12,6 +12,7 @@ interface IStore extends APIConfig {
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     dataSourceList: [],
+    folderList: [],
     aiIntegrationList: [],
 
     isReady: false,

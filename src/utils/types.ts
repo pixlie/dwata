@@ -9,7 +9,7 @@ interface ILabel {
 type TRowValue = any;
 
 // Only required in Database form
-interface IDatabaseFormData {
+interface IDatabaseSourceFormData {
   id?: string;
   username: string;
   password?: string;
@@ -18,6 +18,14 @@ interface IDatabaseFormData {
   name: string;
   label?: string;
   // needsSsh: boolean;
+}
+
+interface IFolderSourceFormData {
+  id?: string;
+  label?: string;
+  path: string;
+  includePatterns: Array<string>;
+  excludePatterns: Array<string>;
 }
 
 interface IProviderPropTypes {
@@ -51,7 +59,8 @@ type uiThemes = "gitHubDark" | "gitHubLight";
 export type {
   ILabel as IChatRoom,
   TRowValue,
-  IDatabaseFormData,
+  IDatabaseSourceFormData,
+  IFolderSourceFormData,
   IProviderPropTypes,
   APIGridData,
   IFormField,

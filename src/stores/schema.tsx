@@ -2,6 +2,7 @@ import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { APIGridSchema } from "../api_types/APIGridSchema";
+import { IProviderPropTypes } from "../utils/types";
 
 interface IStore {
   schemaForAllSources: { [dataSourceId: string]: Array<APIGridSchema> };
@@ -93,10 +94,6 @@ type TStoreAndFunctions = ReturnType<typeof makeStore>;
 export const schemaStore = makeStore();
 
 const SchemaContext = createContext<TStoreAndFunctions>(schemaStore);
-
-interface IProviderPropTypes {
-  children: JSX.Element;
-}
 
 export const SchemaProvider: Component<IProviderPropTypes> = (props) => {
   return (

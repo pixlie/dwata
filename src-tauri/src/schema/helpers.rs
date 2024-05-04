@@ -1,6 +1,6 @@
-use crate::data_sources::DataSource;
+use crate::data_sources::DatabaseSource;
 
-pub async fn get_schema_summary(data_source: &DataSource) -> String {
+pub async fn get_schema_summary(data_source: &DatabaseSource) -> String {
     let mut summary: String = "Here is the structure of tables in our database:\n".to_string();
     let tables = data_source.get_tables(None).await;
     for mut table in tables {

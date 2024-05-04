@@ -1,7 +1,7 @@
 import { Component, createMemo, createSignal } from "solid-js";
 import Heading from "../typography/Heading";
 import TextInput from "../interactable/TextInput";
-import { IDatabaseFormData } from "../../utils/types";
+import { IDatabaseSourceFormData } from "../../utils/types";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 import { useUserInterface } from "../../stores/userInterface";
@@ -13,13 +13,13 @@ interface IState {
   isFetching: boolean;
 }
 
-const DatabaseForm: Component = () => {
+const DatabaseSourceForm: Component = () => {
   const [state, setState] = createSignal<IState>({
     isEditing: false,
     isFetching: false,
     isSaving: false,
   });
-  const [form, setForm] = createSignal<IDatabaseFormData>({
+  const [form, setForm] = createSignal<IDatabaseSourceFormData>({
     username: "postgres",
     host: "localhost",
     port: 5432,
@@ -46,7 +46,7 @@ const DatabaseForm: Component = () => {
   };
 
   const handleConnect = async () => {
-    const response = await invoke("create_data_source", {
+    const response = await invoke("create_database_source", {
       username: form().username,
       password: form().password,
       host: form().host,
@@ -127,4 +127,4 @@ const DatabaseForm: Component = () => {
   );
 };
 
-export default DatabaseForm;
+export default DatabaseSourceForm;

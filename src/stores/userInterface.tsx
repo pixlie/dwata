@@ -1,6 +1,6 @@
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { uiThemes } from "../utils/types";
+import { IProviderPropTypes, uiThemes } from "../utils/types";
 import getGitHubDarkColors from "../utils/colors/gitHubDark";
 
 interface IStore {
@@ -30,10 +30,6 @@ export const userInterfaceStore = makeStore();
 
 const UserInterfaceContext =
   createContext<TStoreAndFunctions>(userInterfaceStore);
-
-interface IProviderPropTypes {
-  children: JSX.Element;
-}
 
 export const UserInterfaceProvider: Component<IProviderPropTypes> = (props) => {
   return (

@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIUserAccount } from "../api_types/APIUserAccount";
+import { IProviderPropTypes } from "../utils/types";
 
 interface IStore {
   account?: APIUserAccount;
@@ -25,10 +26,6 @@ type TStoreAndFunctions = ReturnType<typeof makeStore>;
 export const userStore = makeStore();
 
 const UserContext = createContext<TStoreAndFunctions>(userStore);
-
-interface IProviderPropTypes {
-  children: JSX.Element;
-}
 
 export const UserProvider: Component<IProviderPropTypes> = (props) => {
   return (

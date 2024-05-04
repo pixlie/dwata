@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 import { APIChatThread } from "../api_types/APIChatThread";
 import { invoke } from "@tauri-apps/api/core";
 import { APIChatReply } from "../api_types/APIChatReply";
+import { IProviderPropTypes } from "../utils/types";
 
 interface IStore {
   threadList: Array<APIChatThread>;
@@ -51,10 +52,6 @@ type TStoreAndFunctions = ReturnType<typeof makeStore>;
 export const chatThreadStore = makeStore();
 
 const ChatThreadContext = createContext<TStoreAndFunctions>(chatThreadStore);
-
-interface IProviderPropTypes {
-  children: JSX.Element;
-}
 
 export const ChatThreadProvider: Component<IProviderPropTypes> = (props) => {
   return (

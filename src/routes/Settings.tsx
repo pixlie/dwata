@@ -1,23 +1,46 @@
 import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
-import DatabaseForm from "../widgets/settings/DatabaseForm";
+import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AiForm from "../widgets/settings/AiForm";
 import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
+import FolderSourceForm from "../widgets/settings/FolderSourceForm";
+import { useUserInterface } from "../stores/userInterface";
 
 const SettingsIndex: Component = () => {
+  const [_, { getColors }] = useUserInterface();
+
   return (
     <>
-      <Heading size="xl">Data Sources</Heading>
+      <Heading size="3xl">Data Sources</Heading>
+      <p
+        class="p-4 text-white rounded-md border cursor-default select-none text-sm mb-2"
+        style={{
+          "background-color": getColors().colors["panel.background"],
+          "border-color": getColors().colors["panel.border"],
+        }}
+      >
+        Connect to databases like MySQL, PostgreSQL, SQLite, MongoDB, etc and
+        Dwata can extract schema or data from them.
+        <br />
+        Connect to folders with the file types you want, like Markdown.
+      </p>
       <SettingsSourceList />
       <div class="mb-2" />
-      <Button
-        label="Add a data soruce"
-        href="/settings/data-source/add"
-        size="sm"
-      ></Button>
+      <div class="flex flex-row gap-2">
+        <Button
+          label="Add a Database"
+          href="/settings/database-source/add"
+          size="sm"
+        ></Button>
+        <Button
+          label="Add a Folder"
+          href="/settings/folder-source/add"
+          size="sm"
+        ></Button>
+      </div>
       <div class="mb-6" />
 
       <Heading size="xl">AI Providers</Heading>
@@ -47,8 +70,11 @@ const SettingsWrapper: Component<RouteSectionProps> = (props) => {
 const SettingsRoutes: Component = () => {
   return (
     <>
-      <Route path="/data-source/add" component={DatabaseForm} />
-      <Route path="/data-source/edit/:id" component={DatabaseForm} />
+      <Route path="/database-source/add" component={DatabaseSourceForm} />
+      <Route path="/database-source/edit/:id" component={DatabaseSourceForm} />
+
+      <Route path="/folder-source/add" component={FolderSourceForm} />
+      <Route path="/folder-source/edit/:id" component={FolderSourceForm} />
 
       <Route path="/ai-provider/add" component={AiForm} />
       <Route path="/ai-provider/edit/:id" component={AiForm} />

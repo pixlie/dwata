@@ -2,7 +2,7 @@ import { Component, JSX, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIGridQuery } from "../api_types/APIGridQuery";
 import { invoke } from "@tauri-apps/api/core";
-import { APIGridData } from "../utils/types";
+import { APIGridData, IProviderPropTypes } from "../utils/types";
 
 interface IStore {
   query: Array<APIGridQuery>;
@@ -87,10 +87,6 @@ type TStoreAndFunctions = ReturnType<typeof makeStore>;
 const queryResultStore = makeStore();
 
 const QueryResultContext = createContext<TStoreAndFunctions>(queryResultStore);
-
-interface IProviderPropTypes {
-  children: JSX.Element;
-}
 
 export const QueryResultProvider: Component<IProviderPropTypes> = (props) => {
   return (
