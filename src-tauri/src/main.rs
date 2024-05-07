@@ -61,7 +61,8 @@ fn main() {
             chat::commands::fetch_chat_context_node_list,
             chat::commands::fetch_chat_context,
             ai::commands::fetch_list_of_ai_providers_and_models,
-            directory::commands::fetch_file_list_in_directory
+            directory::commands::fetch_file_list_in_directory,
+            directory::commands::fetch_file_contents,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

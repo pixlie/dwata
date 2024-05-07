@@ -1,6 +1,10 @@
 pub mod commands;
+mod helpers;
 
+use comrak::nodes::{AstNode, NodeValue};
+use comrak::{parse_document, Arena, Options};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -64,14 +68,23 @@ pub(crate) enum Content {
 )]
 #[serde(rename_all(serialize = "camelCase"))]
 pub(crate) struct FileNode {
+    #[serde(skip_serializing)]
+    base_path: Option<PathBuf>,
+
     relative_path: String,
     is_folder: bool,
     contents: Vec<(usize, Content)>,
 }
 
 impl FileNode {
-    pub fn new(relative_path: String, is_folder: bool, contents: Vec<(usize, Content)>) -> Self {
+    pub fn new(
+        base_path: Option<PathBuf>,
+        relative_path: String,
+        is_folder: bool,
+        contents: Vec<(usize, Content)>,
+    ) -> Self {
         Self {
+            base_path,
             relative_path,
             is_folder,
             contents,

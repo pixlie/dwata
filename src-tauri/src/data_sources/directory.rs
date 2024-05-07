@@ -36,12 +36,16 @@ impl FolderSource {
         }
     }
 
+    pub fn match_id(&self, folder_id: &str) -> bool {
+        self.id == folder_id
+    }
+
     pub fn get_id(&self) -> String {
         self.id.clone()
     }
 
-    pub fn match_id(&self, folder_id: &str) -> bool {
-        self.id == folder_id
+    pub fn get_path(&self) -> PathBuf {
+        self.path.clone()
     }
 
     pub fn get_file_list(&self) -> Vec<FileNode> {
@@ -53,12 +57,13 @@ impl FolderSource {
                     Ok(relative_path) => {
                         if relative_path.to_str().unwrap() != "" {
                             result.push(FileNode::new(
+                                None,
                                 relative_path.to_string_lossy().to_string(),
                                 file.path().is_dir(),
                                 vec![],
                             ))
                         }
-                    },
+                    }
                     Err(_) => {}
                 },
                 Err(_) => {}

@@ -59,7 +59,7 @@ impl Config {
         ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
     }
 
-    pub fn find_folder(&self, folder_id: String) -> Option<&FolderSource> {
+    pub fn find_directory(&self, folder_id: String) -> Option<&FolderSource> {
         self.folder_list.iter().find(|x| x.match_id(&folder_id))
     }
 }
