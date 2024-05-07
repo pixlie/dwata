@@ -58,11 +58,23 @@ pub(crate) enum Content {
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
-    rename = "APIFile",
+    rename = "APIFileNode",
     rename_all = "camelCase",
     export_to = "../src/api_types/"
 )]
-pub(crate) struct File {
+#[serde(rename_all(serialize = "camelCase"))]
+pub(crate) struct FileNode {
     relative_path: String,
+    is_folder: bool,
     contents: Vec<(usize, Content)>,
+}
+
+impl FileNode {
+    pub fn new(relative_path: String, is_folder: bool, contents: Vec<(usize, Content)>) -> Self {
+        Self {
+            relative_path,
+            is_folder,
+            contents,
+        }
+    }
 }

@@ -1,6 +1,6 @@
 use crate::data_sources::api_types::APIDataSource;
 use crate::workspace::Config;
-use crate::{ai::api_types::APIAIIntegration, data_sources::folder::FolderSource};
+use crate::{ai::api_types::APIAIIntegration, data_sources::directory::FolderSource};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 

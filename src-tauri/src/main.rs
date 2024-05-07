@@ -15,7 +15,7 @@ mod chat;
 mod query_result;
 // mod saved_query;
 mod ai;
-mod folder;
+mod directory;
 mod schema;
 mod store;
 mod user_account;
@@ -61,7 +61,7 @@ fn main() {
             chat::commands::fetch_chat_context_node_list,
             chat::commands::fetch_chat_context,
             ai::commands::fetch_list_of_ai_providers_and_models,
-            folder::commands::fetch_file_list_in_folder
+            directory::commands::fetch_file_list_in_directory
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

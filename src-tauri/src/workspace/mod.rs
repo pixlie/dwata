@@ -1,7 +1,7 @@
 use crate::ai::{AITools, AiIntegration, Tool, ToolParameter, ToolParameterType};
 use crate::chat::api_types::APIChatContextNode;
 use crate::chat::ChatContextNode;
-use crate::data_sources::folder::FolderSource;
+use crate::data_sources::directory::FolderSource;
 use crate::data_sources::DatabaseSource;
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
