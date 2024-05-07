@@ -1,4 +1,4 @@
-import { Component, JSX, createContext, useContext } from "solid-js";
+import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { APIGridSchema } from "../api_types/APIGridSchema";

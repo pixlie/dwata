@@ -9,11 +9,13 @@ import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 import UserAccount from "./routes/UserAccount";
 import { ChatRoutes, ChatWrapper } from "./routes/Chat";
+import FolderBrowser from "./routes/FolderBrowser";
 
 render(
   () => (
     <Router root={App}>
       <Route path={"/browse"} component={QueryBrowser} />
+      <Route path="/folder" component={FolderBrowser} />
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>

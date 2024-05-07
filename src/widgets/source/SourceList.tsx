@@ -58,7 +58,7 @@ const SourceList: Component = () => {
             <SidebarHeading
               label={label}
               icon="fa-solid fa-folder"
-              href={`/browse?dataSourceId=${dataSource.id}`}
+              href={`/folder?directoryId=${dataSource.id}`}
               isActive={
                 !!searchParams.dataSouceId &&
                 dataSource.id == searchParams.dataSouceId
