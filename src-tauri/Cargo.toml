@@ -36,7 +36,6 @@ ulid = { version = "1.1.2", features = ["serde"] }
 log = "0.4.21"
 openai = { path = "openai" }
 ignore = "0.4.22"
-schemars = "=0.8.17"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

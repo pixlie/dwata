@@ -58,6 +58,10 @@ impl Config {
     pub fn get_pretty_string(&self) -> String {
         ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
     }
+
+    pub fn find_folder(&self, folder_id: String) -> Option<&FolderSource> {
+        self.folder_list.iter().find(|x| x.match_id(&folder_id))
+    }
 }
 
 impl ChatContextNode for Config {

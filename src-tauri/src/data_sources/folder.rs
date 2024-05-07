@@ -1,3 +1,4 @@
+use ignore::Walk;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use ts_rs::TS;
@@ -36,5 +37,21 @@ impl FolderSource {
 
     pub fn get_id(&self) -> String {
         self.id.clone()
+    }
+
+    pub fn match_id(&self, folder_id: &str) -> bool {
+        self.id == folder_id
+    }
+
+    pub fn get_file_list(&self) -> Vec<String> {
+        // Glob all the files in this folder
+        let mut result: Vec<String> = vec![];
+        for entry in Walk::new(&self.path) {
+            match entry {
+                Ok(file) => result.push(file.path().display().to_string()),
+                Err(_) => {}
+            }
+        }
+        result
     }
 }
