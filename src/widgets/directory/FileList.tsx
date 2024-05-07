@@ -6,7 +6,6 @@ const FileList: Component = () => {
   const [store] = useDirectory();
 
   const getFileList = createMemo(() => store.fileList);
-  console.log(getFileList());
 
   return (
     <div class="flex flex-col w-96">

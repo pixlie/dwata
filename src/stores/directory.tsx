@@ -3,25 +3,41 @@ import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { IProviderPropTypes } from "../utils/types";
 import { APIFileNode } from "../api_types/APIFileNode";
+import { APIFileContent } from "../api_types/APIFileContent";
 
 interface IStore {
   fileList: Array<APIFileNode>;
+  contents: Array<[number, APIFileContent]>;
 }
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     fileList: [],
+    contents: [],
   });
 
   return [
     store,
     {
-      fetchFileList: async (folderId: string) => {
+      fetchFileList: async (directoryId: string) => {
         let result = await invoke("fetch_file_list_in_directory", {
-          folderId,
+          directoryId,
         });
 
         setStore({ fileList: result as Array<APIFileNode> });
+      },
+
+      fetchContents: async (directoryId: string, relativeFilePath: string) => {
+        let result = await invoke("fetch_file_contents", {
+          directoryId,
+          relativeFilePath,
+        });
+        console.log(result);
+
+        setStore({
+          ...store,
+          contents: result as Array<[number, APIFileContent]>,
+        });
       },
     },
   ] as const; // `as const` forces tuple type inference
