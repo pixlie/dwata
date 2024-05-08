@@ -37,6 +37,7 @@ log = "0.4.21"
 openai = { path = "openai" }
 ignore = "0.4.22"
 comrak = "0.23.0"
+sqlite-vss = { version = "0.1.2", features = ["download-libs"] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

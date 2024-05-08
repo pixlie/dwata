@@ -44,12 +44,7 @@ pub(crate) struct Link {
 }
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "APIFileContent",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename = "APIFileContent", export_to = "../src/api_types/")]
 pub(crate) enum Content {
     Heading(String),
     Paragraph(String),
