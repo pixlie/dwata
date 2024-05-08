@@ -2,13 +2,4 @@
 import type { ColumnDataType } from "./ColumnDataType";
 import type { IsForeignKey } from "./IsForeignKey";
 
-export interface APIGridColumn {
-  name: string;
-  label: string | null;
-  dataType: ColumnDataType;
-  isNullable: boolean;
-  isAutoIncrement: boolean;
-  isPrimaryKey: boolean;
-  isIndexed: boolean;
-  isForeignKey: IsForeignKey;
-}
+export interface APIGridColumn { name: string, label: string | null, dataType: ColumnDataType, isNullable: boolean, isAutoIncrement: boolean, isPrimaryKey: boolean, isIndexed: boolean, isForeignKey: IsForeignKey, }

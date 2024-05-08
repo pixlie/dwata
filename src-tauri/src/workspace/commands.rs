@@ -1,5 +1,5 @@
 use crate::ai::AiIntegration;
-use crate::data_sources::folder::FolderSource;
+use crate::data_sources::directory::FolderSource;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{Database, DatabaseSource};
 use crate::error::DwataError;

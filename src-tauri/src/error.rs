@@ -22,6 +22,9 @@ pub enum DwataError {
 
     // Chat context related
     CouldNotFindNode,
+
+    // Folder related
+    CouldNotOpenFolder,
 }
 
 impl From<sqlx::Error> for DwataError {

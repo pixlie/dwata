@@ -3,8 +3,4 @@ import type { APIAIIntegration } from "./APIAIIntegration";
 import type { APIDataSource } from "./APIDataSource";
 import type { APIFolderSource } from "./APIFolderSource";
 
-export interface APIConfig {
-  dataSourceList: Array<APIDataSource>;
-  folderList: Array<APIFolderSource>;
-  aiIntegrationList: Array<APIAIIntegration>;
-}
+export interface APIConfig { dataSourceList: Array<APIDataSource>, folderList: Array<APIFolderSource>, aiIntegrationList: Array<APIAIIntegration>, }

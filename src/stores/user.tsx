@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { Component, JSX, createContext, useContext } from "solid-js";
+import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { APIUserAccount } from "../api_types/APIUserAccount";
 import { IProviderPropTypes } from "../utils/types";

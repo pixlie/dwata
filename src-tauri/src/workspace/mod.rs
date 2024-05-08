@@ -1,7 +1,7 @@
 use crate::ai::{AITools, AiIntegration, Tool, ToolParameter, ToolParameterType};
 use crate::chat::api_types::APIChatContextNode;
 use crate::chat::ChatContextNode;
-use crate::data_sources::folder::FolderSource;
+use crate::data_sources::directory::FolderSource;
 use crate::data_sources::DatabaseSource;
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
@@ -57,6 +57,10 @@ impl Config {
 
     pub fn get_pretty_string(&self) -> String {
         ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
+    }
+
+    pub fn find_directory(&self, folder_id: String) -> Option<&FolderSource> {
+        self.folder_list.iter().find(|x| x.match_id(&folder_id))
     }
 }
 

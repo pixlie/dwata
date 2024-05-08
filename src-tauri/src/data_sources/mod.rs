@@ -1,6 +1,6 @@
 pub mod api_types;
 pub mod database;
-pub mod folder;
+pub mod directory;
 pub mod helpers;
 
 pub use database::{Database, DatabasePool, DatabaseSource};

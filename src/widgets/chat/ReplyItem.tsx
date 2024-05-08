@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { APIChatReply } from "../../api_types/APIChatReply";
-import { SolidMarkdown } from "solid-markdown";
+// import { SolidMarkdown } from "solid-markdown";
 import { useUserInterface } from "../../stores/userInterface";
 
 const ReplyItem: Component<APIChatReply> = (props) => {
@@ -15,7 +15,8 @@ const ReplyItem: Component<APIChatReply> = (props) => {
       }}
     >
       <div style={{ color: getColors().colors["editor.foreground"] }}>
-        <SolidMarkdown children={props.message} />
+        {/* <SolidMarkdown children={props.message} /> */}
+        {props.message}
       </div>
     </div>
   );
