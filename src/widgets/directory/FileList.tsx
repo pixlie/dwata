@@ -7,11 +7,7 @@ const FileList: Component = () => {
 
   const getFileList = createMemo(() => store.fileList);
 
-  return (
-    <div class="flex flex-col w-96">
-      <For each={getFileList()}>{(file) => <FileItem {...file} />}</For>
-    </div>
-  );
+  return <For each={getFileList()}>{(file) => <FileItem {...file} />}</For>;
 };
 
 export default FileList;

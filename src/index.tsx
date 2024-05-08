@@ -15,7 +15,7 @@ render(
   () => (
     <Router root={App}>
       <Route path={"/browse"} component={QueryBrowser} />
-      <Route path="/directory" component={FolderBrowser} />
+      <Route path="/directory/:directoryId/" component={FolderBrowser} />
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>

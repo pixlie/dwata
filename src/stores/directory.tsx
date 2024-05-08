@@ -32,7 +32,6 @@ const makeStore = () => {
           directoryId,
           relativeFilePath,
         });
-        console.log(result);
 
         setStore({
           ...store,
