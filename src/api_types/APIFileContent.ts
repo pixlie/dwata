@@ -3,10 +3,4 @@ import type { APIContentCode } from "./APIContentCode";
 import type { APIContentImage } from "./APIContentImage";
 import type { APIContentLink } from "./APIContentLink";
 
-export type APIFileContent =
-  | { heading: string }
-  | { paragraph: string }
-  | { image: APIContentImage }
-  | { link: APIContentLink }
-  | { bulletlist: Array<string> }
-  | { code: APIContentCode };
+export type APIFileContent = { "Heading": string } | { "Paragraph": string } | { "Image": APIContentImage } | { "Link": APIContentLink } | { "BulletList": Array<string> } | { "Code": APIContentCode };

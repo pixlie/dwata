@@ -3,13 +3,4 @@ import type { TypeArray } from "./TypeArray";
 import type { TypeFloat } from "./TypeFloat";
 import type { TypeInteger } from "./TypeInteger";
 
-export type ColumnDataType =
-  | { signedinteger: TypeInteger }
-  | { float: TypeFloat }
-  | { chararray: TypeArray }
-  | "boolean"
-  | "json"
-  | "jsonb"
-  | "uuid"
-  | "text"
-  | "unknown";
+export type ColumnDataType = { "signedinteger": TypeInteger } | { "float": TypeFloat } | { "chararray": TypeArray } | "boolean" | "json" | "jsonb" | "uuid" | "text" | "unknown";
