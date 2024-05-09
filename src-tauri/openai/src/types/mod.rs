@@ -27,3 +27,21 @@ pub use chat_completion_token_logprob::ChatCompletionTokenLogprob;
 
 pub mod chat_completion_token_logprob_top_logprobs_inner;
 pub use chat_completion_token_logprob_top_logprobs_inner::ChatCompletionTokenLogprobTopLogprobsInner;
+
+pub mod create_embedding_request;
+pub use create_embedding_request::CreateEmbeddingRequest;
+
+pub mod create_embedding_request_input;
+pub use create_embedding_request_input::CreateEmbeddingRequestInput;
+
+pub mod create_embedding_request_model;
+pub use create_embedding_request_model::CreateEmbeddingRequestModel;
+
+pub mod create_embedding_response;
+pub use create_embedding_response::CreateEmbeddingResponse;
+
+pub mod create_embedding_response_usage;
+pub use create_embedding_response_usage::CreateEmbeddingResponseUsage;
+
+pub mod embedding;
+pub use embedding::Embedding;

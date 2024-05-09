@@ -3,11 +3,11 @@ members = ["openai"]
 
 [package]
 name = "dwata"
-version = "0.0.4"
-description = "AI enabled Business Intelligence (desktop) app"
+version = "0.0.5"
+description = "An AI studio whee you connect your data sources and have convesations with AI"
 authors = ["Sumit Datta <sumitd@dwata.com>"]
-license = ""
-repository = ""
+license = "Apache-2.0 license"
+repository = "https://github.com/brainless/dwata"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
