@@ -35,9 +35,9 @@ derive_builder = "0.20.0"
 ulid = { version = "1.1.2", features = ["serde"] }
 log = "0.4.21"
 openai = { path = "openai" }
-ignore = "0.4.22"
 comrak = "0.23.0"
 sqlite-vss = { version = "0.1.2", features = ["download-libs"] }
+glob = "0.3.1"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
