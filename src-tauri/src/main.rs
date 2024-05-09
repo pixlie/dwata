@@ -16,6 +16,7 @@ mod query_result;
 // mod saved_query;
 mod ai;
 mod directory;
+mod embedding;
 mod schema;
 mod store;
 mod user_account;
@@ -63,6 +64,7 @@ fn main() {
             ai::commands::fetch_list_of_ai_providers_and_models,
             directory::commands::fetch_file_list_in_directory,
             directory::commands::fetch_file_contents,
+            embedding::commands::generate_text_embedding,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

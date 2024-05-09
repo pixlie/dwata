@@ -1,4 +1,4 @@
-use crate::ai::helpers::send_message_to_ai;
+use crate::ai::helpers::get_chat_response_from_ai_provider;
 use crate::ai::AITools;
 use crate::chat::api_types::{APIChatContextNode, APIChatReply, APIChatThread};
 use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
@@ -35,7 +35,7 @@ pub(crate) async fn start_chat_thread(
                     match load_ai_integration(&config_guard, &ai_provider) {
                         Some(ai_integration) => {
                             // It does not matter if we fail this request, we will try again later
-                            match send_message_to_ai(
+                            match get_chat_response_from_ai_provider(
                                 ai_integration,
                                 ai_model.to_string(),
                                 message.to_string(),

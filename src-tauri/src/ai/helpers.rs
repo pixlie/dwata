@@ -1,11 +1,11 @@
-use super::{AiIntegration, Tool};
+use super::{AiIntegration, AiModel, Tool};
 use crate::chat::ChatToolResponse;
 use crate::error::DwataError;
 use openai::types::chat_completion_message_tool_call::Type;
-use openai::types::CreateChatCompletionResponse;
+use openai::types::{CreateChatCompletionResponse, CreateEmbeddingResponse};
 use reqwest;
 
-pub async fn send_message_to_ai(
+pub async fn get_chat_response_from_ai_provider(
     ai_integration: AiIntegration,
     ai_model: String,
     message_to_send: String,
@@ -14,7 +14,7 @@ pub async fn send_message_to_ai(
     let request =
         ai_integration
             .ai_provider
-            .build_https_request(ai_model, message_to_send, tool_list);
+            .build_chat_https_request(ai_model, message_to_send, tool_list);
 
     let response = request.send().await;
     match response {
@@ -56,6 +56,39 @@ pub async fn send_message_to_ai(
                             ))
                         }
                     }
+                    Err(err) => {
+                        println!("{:?}", err);
+                        Err(DwataError::CouldNotConnectToAiProvider)
+                    }
+                }
+            } else {
+                println!(
+                    "Error: {}\n{}",
+                    response.status(),
+                    response.text().await.unwrap()
+                );
+                Err(DwataError::CouldNotConnectToAiProvider)
+            }
+        }
+        Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+    }
+}
+
+pub async fn get_embedding_from_ai_provider(
+    ai_integration: &AiIntegration,
+    ai_model: String,
+    text_to_embed: String,
+) -> Result<Vec<f64>, DwataError> {
+    let request = ai_integration
+        .ai_provider
+        .build_embedding_https_request(ai_model, text_to_embed);
+
+    let response = request.send().await;
+    match response {
+        Ok(response) => {
+            if response.status().is_success() {
+                match response.json::<CreateEmbeddingResponse>().await {
+                    Ok(response) => Ok(response.data[0].embedding.clone()),
                     Err(err) => {
                         println!("{:?}", err);
                         Err(DwataError::CouldNotConnectToAiProvider)

@@ -1,5 +1,9 @@
 use crate::ai::api_types::APIAIIntegration;
 use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
+use openai::types::create_embedding_request::EncodingFormat;
+use openai::types::{
+    CreateEmbeddingRequest, CreateEmbeddingRequestInput, CreateEmbeddingRequestModel,
+};
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -55,8 +59,11 @@ impl AiProvider {
             Self::Anthropic(api) => api.api_key.clone(),
         }
     }
+}
 
-    pub fn get_api_url_and_key(&self) -> (String, String) {
+impl AiProvider {
+    // Chat related
+    pub fn get_chat_url_and_key(&self) -> (String, String) {
         match self {
             Self::OpenAI(api) => (
                 "https://api.openai.com/v1/chat/completions".to_string(),
@@ -73,13 +80,13 @@ impl AiProvider {
         }
     }
 
-    pub fn build_https_request(
+    pub fn build_chat_https_request(
         &self,
         ai_model: String,
         message_to_send: String,
         tool_list: Vec<Tool>,
     ) -> RequestBuilder {
-        let (chat_url, api_key) = self.get_api_url_and_key();
+        let (chat_url, api_key) = self.get_chat_url_and_key();
         let https_client = reqwest::Client::new();
         let payload: OpenAIChatRequest = OpenAIChatRequest {
             model: ai_model,
@@ -94,6 +101,45 @@ impl AiProvider {
             .post(chat_url)
             .header("Authorization", format!("Bearer {}", api_key))
             .json::<OpenAIChatRequest>(&payload);
+        println!("{}", serde_json::to_string_pretty(&payload).unwrap());
+        request_builder
+    }
+}
+
+impl AiProvider {
+    // Embedding related
+    pub fn get_embedding_url_and_key(&self) -> (String, String) {
+        match self {
+            Self::OpenAI(api) => (
+                "https://api.openai.com/v1/embeddings".to_string(),
+                api.api_key.clone(),
+            ),
+            Self::Groq(api) => (
+                "https://api.groq.com/openai/v1/embeddings".to_string(),
+                api.api_key.clone(),
+            ),
+            Self::Anthropic(api) => (
+                "https://api.voyageai.com/v1/embeddings".to_string(),
+                api.api_key.clone(),
+            ),
+        }
+    }
+
+    pub fn build_embedding_https_request(
+        &self,
+        ai_model: String,
+        text_to_embed: String,
+    ) -> RequestBuilder {
+        let (chat_url, api_key) = self.get_embedding_url_and_key();
+        let https_client = reqwest::Client::new();
+        let payload: CreateEmbeddingRequest = CreateEmbeddingRequest::new(
+            CreateEmbeddingRequestInput::String(text_to_embed),
+            ai_model,
+        );
+        let request_builder = https_client
+            .post(chat_url)
+            .header("Authorization", format!("Bearer {}", api_key))
+            .json::<CreateEmbeddingRequest>(&payload);
         println!("{}", serde_json::to_string_pretty(&payload).unwrap());
         request_builder
     }

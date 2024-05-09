@@ -13,6 +13,7 @@ pub enum DwataError {
     // AI API related
     InvalidAiProvider,
     CouldNotConnectToAiProvider,
+    CouldNotGenerateEmbedding,
 
     // Internal SQLite DB related
     CouldNotCreateAppDatabase,
