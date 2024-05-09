@@ -7,7 +7,11 @@ const FileList: Component = () => {
 
   const getFileList = createMemo(() => store.fileList);
 
-  return <For each={getFileList()}>{(file) => <FileItem {...file} />}</For>;
+  return (
+    <div class="overflow-y-auto">
+      <For each={getFileList()}>{(file) => <FileItem {...file} />}</For>
+    </div>
+  );
 };
 
 export default FileList;

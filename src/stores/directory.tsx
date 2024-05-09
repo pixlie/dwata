@@ -38,6 +38,16 @@ const makeStore = () => {
           contents: result as Array<[number, APIFileContent]>,
         });
       },
+
+      generateEmbeddings: async (
+        directoryId: string,
+        relativeFilePath: string
+      ) => {
+        let result = await invoke("generate_text_embedding", {
+          directoryId,
+          relativeFilePath,
+        });
+      },
     },
   ] as const; // `as const` forces tuple type inference
 };

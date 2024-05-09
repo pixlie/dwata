@@ -9,13 +9,13 @@ import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 import UserAccount from "./routes/UserAccount";
 import { ChatRoutes, ChatWrapper } from "./routes/Chat";
-import FolderBrowser from "./routes/FolderBrowser";
+import DirectoryBrowser from "./routes/DirectoryBrowser";
 
 render(
   () => (
     <Router root={App}>
       <Route path={"/browse"} component={QueryBrowser} />
-      <Route path="/directory/:directoryId/" component={FolderBrowser} />
+      <Route path="/directory/:directoryId/" component={DirectoryBrowser} />
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>
@@ -26,5 +26,5 @@ render(
       </Route>
     </Router>
   ),
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );

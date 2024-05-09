@@ -7,7 +7,7 @@ const FileItem: Component<APIFileNode> = (props) => {
 
   return (
     <a
-      class="ml-4 mr-2 block rounded-md px-2 py-0.5 text-gray-200 hover:bg-zinc-700 cursor-pointer"
+      class="px-2 block rounded-md py-0.5 text-sm whitespace-nowrap overflow-hidden text-gray-200 hover:bg-zinc-700 cursor-pointer"
       href={`/directory/${params.directoryId}/?relativeFilePath=${props.relativePath}`}
     >
       <i

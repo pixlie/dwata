@@ -27,16 +27,15 @@ const ChatThreadIndex: Component = () => {
 
   return (
     <>
-      <div class="flex h-full">
-        <div class="w-2/5 mr-4">
-          <div class="mb-4" />
+      <div class="flex gap-4 h-full">
+        <div class="w-2/5 overflow-y-auto pr-4">
           <Heading size="3xl">Recent chats with AI</Heading>
           <For each={chatThread.threadList}>
             {(thread) => <Thread {...thread} />}
           </For>
         </div>
 
-        <div class="w-3/5 overflow-y-auto h-full">
+        <div class="w-3/5 overflow-y-auto">
           {!!params.threadId && (
             <For each={chatThread.replyListForThread}>
               {(reply) => <ReplyItem {...reply} />}
