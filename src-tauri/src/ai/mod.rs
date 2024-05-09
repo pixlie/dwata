@@ -1,5 +1,6 @@
 use crate::ai::api_types::APIAIIntegration;
 use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
+use openai::types::create_embedding_request::EncodingFormat;
 use openai::types::{
     CreateEmbeddingRequest, CreateEmbeddingRequestInput, CreateEmbeddingRequestModel,
 };
@@ -8,7 +9,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
 use ulid::Ulid;
-use openai::types::create_embedding_request::EncodingFormat;
 
 pub(crate) mod api_types;
 pub mod commands;
@@ -130,7 +130,7 @@ impl AiProvider {
         ai_model: String,
         text_to_embed: String,
     ) -> RequestBuilder {
-        let (chat_url, api_key) = self.get_chat_url_and_key();
+        let (chat_url, api_key) = self.get_embedding_url_and_key();
         let https_client = reqwest::Client::new();
         let payload: CreateEmbeddingRequest = CreateEmbeddingRequest::new(
             CreateEmbeddingRequestInput::String(text_to_embed),
