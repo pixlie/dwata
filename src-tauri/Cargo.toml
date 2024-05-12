@@ -38,6 +38,7 @@ openai = { path = "openai" }
 comrak = "0.23.0"
 sqlite-vss = { version = "0.1.2", features = ["download-libs"] }
 glob = "0.3.1"
+qdrant-client = "1.9.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

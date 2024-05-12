@@ -58,6 +58,8 @@ pub enum DatabaseConnection {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DatabaseAuthentication {
+    // TODO: Add API_KEY support
+    // https://github.com/brainless/dwata/issues/118
     username: String,
     password: Option<String>,
 }
@@ -72,7 +74,10 @@ impl DatabaseAuthentication {
 pub struct Database {
     name: String,
     connection: DatabaseConnection,
-    authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
+    // TODO: Make authentication optional to allow for no authentication (locally hosted databases)
+    // https://github.com/brainless/dwata/issues/118
+    authentication: DatabaseAuthentication,
+    // needs_ssh: NeedsSSH,
 }
 
 impl Database {
@@ -130,6 +135,7 @@ pub enum DatabaseType {
     SQLite(Database),
     MSSQL(Database),
     MongoDB(Database),
+    Qdrant(Database),
 }
 
 impl DatabaseType {
@@ -173,12 +179,11 @@ pub struct DatabaseSource {
 }
 
 impl DatabaseSource {
-    pub fn new(database: Database, label: Option<String>) -> Self {
-        // Assume only PostgreSQL
+    pub fn new(source: DatabaseType, label: Option<String>) -> Self {
         DatabaseSource {
             id: Ulid::new().to_string(),
             label,
-            source: DatabaseType::PostgreSQL(database),
+            source,
         }
     }
 

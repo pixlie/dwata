@@ -1,9 +1,10 @@
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub enum DwataError {
-    // Database type data source related
+    // Database related
     DatabaseNotFound,
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
+    CouldNotCreateDatabase,
 
     // Config related
     CouldNotLockConfig,

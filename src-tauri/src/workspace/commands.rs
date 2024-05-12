@@ -7,6 +7,7 @@ use crate::store::Store;
 use crate::workspace::api_types::APIConfig;
 use std::fs;
 use tauri::State;
+use crate::data_sources::database::DatabaseType;
 
 #[tauri::command]
 pub async fn create_database_source(
@@ -20,8 +21,8 @@ pub async fn create_database_source(
 ) -> Result<String, DwataError> {
     match check_database_connection(username, password, host, port, database).await {
         Ok(_) => {
-            let database: Database = Database::new(username, password, host, port, database);
-            let data_source: DatabaseSource = DatabaseSource::new(database, None);
+            let source: DatabaseType = DatabaseType::PostgreSQL(Database::new(username, password, host, port, database));
+            let data_source: DatabaseSource = DatabaseSource::new(source, None);
             let id = data_source.get_id().clone();
             let mut config_guard = store.config.lock().await;
             config_guard.add_database_source(data_source);
