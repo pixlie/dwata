@@ -1,4 +1,5 @@
 use crate::ai::AiIntegration;
+use crate::data_sources::database::DatabaseType;
 use crate::data_sources::directory::FolderSource;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{Database, DatabaseSource};
@@ -20,11 +21,12 @@ pub async fn create_database_source(
 ) -> Result<String, DwataError> {
     match check_database_connection(username, password, host, port, database).await {
         Ok(_) => {
-            let database: Database = Database::new(username, password, host, port, database);
-            let data_source: DatabaseSource = DatabaseSource::new(database, None);
+            let source: DatabaseType =
+                DatabaseType::PostgreSQL(Database::new(username, password, host, port, database));
+            let data_source: DatabaseSource = DatabaseSource::new(source, None);
             let id = data_source.get_id().clone();
             let mut config_guard = store.config.lock().await;
-            config_guard.add_database_source(data_source);
+            config_guard.data_source_list.push(data_source);
             match config_guard.sync_to_file() {
                 Ok(_) => Ok(id),
                 Err(_) => Err(DwataError::CouldNotWriteConfig),
@@ -45,7 +47,7 @@ pub async fn create_folder_source(
     let folder_source = FolderSource::new(path, label, include_patterns, exclude_patterns);
     let id = folder_source.get_id();
     let mut config_guard = store.config.lock().await;
-    config_guard.add_folder_source(folder_source);
+    config_guard.folder_list.push(folder_source);
     match config_guard.sync_to_file() {
         Ok(_) => Ok(id),
         Err(_) => Err(DwataError::CouldNotWriteConfig),

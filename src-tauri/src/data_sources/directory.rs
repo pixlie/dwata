@@ -1,5 +1,5 @@
 use crate::directory::FileNode;
-use ignore::Walk;
+use glob::glob;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use ts_rs::TS;
@@ -51,23 +51,28 @@ impl FolderSource {
     pub fn get_file_list(&self) -> Vec<FileNode> {
         // Glob all the files in this directory
         let mut result: Vec<FileNode> = vec![];
-        for entry in Walk::new(&self.path) {
-            match entry {
-                Ok(file) => match file.path().strip_prefix(&self.path) {
-                    Ok(relative_path) => {
-                        if relative_path.to_str().unwrap() != "" {
-                            result.push(FileNode::new(
-                                None,
-                                relative_path.to_string_lossy().to_string(),
-                                file.path().is_dir(),
-                                vec![],
-                            ))
-                        }
+        match glob(&self.path.join("**/*.md").to_string_lossy().to_string()) {
+            Ok(paths) => {
+                for entry in paths {
+                    match entry {
+                        Ok(file) => match file.strip_prefix(&self.path) {
+                            Ok(relative_path) => {
+                                if relative_path.to_str().unwrap() != "" {
+                                    result.push(FileNode::new(
+                                        None,
+                                        relative_path.to_string_lossy().to_string(),
+                                        file.is_dir(),
+                                        vec![],
+                                    ))
+                                }
+                            }
+                            Err(_) => {}
+                        },
+                        Err(_) => {}
                     }
-                    Err(_) => {}
-                },
-                Err(_) => {}
+                }
             }
+            Err(_) => {}
         }
         result
     }

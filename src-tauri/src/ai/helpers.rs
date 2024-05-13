@@ -1,9 +1,8 @@
-use super::{AiIntegration, AiModel, Tool};
+use super::{AiIntegration, Tool};
 use crate::chat::ChatToolResponse;
 use crate::error::DwataError;
 use openai::types::chat_completion_message_tool_call::Type;
 use openai::types::{CreateChatCompletionResponse, CreateEmbeddingResponse};
-use reqwest;
 
 pub async fn get_chat_response_from_ai_provider(
     ai_integration: AiIntegration,
@@ -78,7 +77,7 @@ pub async fn get_embedding_from_ai_provider(
     ai_integration: &AiIntegration,
     ai_model: String,
     text_to_embed: String,
-) -> Result<Vec<f64>, DwataError> {
+) -> Result<Vec<f32>, DwataError> {
     let request = ai_integration
         .ai_provider
         .build_embedding_https_request(ai_model, text_to_embed);
@@ -88,7 +87,11 @@ pub async fn get_embedding_from_ai_provider(
         Ok(response) => {
             if response.status().is_success() {
                 match response.json::<CreateEmbeddingResponse>().await {
-                    Ok(response) => Ok(response.data[0].embedding.clone()),
+                    Ok(response) => Ok(response.data[0]
+                        .embedding
+                        .iter()
+                        .map(|n| n.clone() as f32)
+                        .collect()),
                     Err(err) => {
                         println!("{:?}", err);
                         Err(DwataError::CouldNotConnectToAiProvider)

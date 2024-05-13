@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use sqlx::SqliteConnection;
-use std::future::Future;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tauri::{App, Manager};

@@ -16,10 +16,10 @@ pub mod helpers;
 pub struct Config {
     path_to_config: PathBuf,
     // organisations: Vec<Organisation>,
-    data_source_list: Vec<DatabaseSource>,
+    pub data_source_list: Vec<DatabaseSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
-    folder_list: Vec<FolderSource>, // CSV or Markdown files
-    ai_integration_list: Vec<AiIntegration>,
+    pub folder_list: Vec<FolderSource>, // CSV or Markdown files
+    pub ai_integration_list: Vec<AiIntegration>,
 }
 
 impl Config {
@@ -32,14 +32,6 @@ impl Config {
         }
     }
 
-    pub fn add_database_source(&mut self, database_source: DatabaseSource) {
-        self.data_source_list.push(database_source);
-    }
-
-    pub fn add_folder_source(&mut self, folder_source: FolderSource) {
-        self.folder_list.push(folder_source);
-    }
-
     pub fn sync_to_file(&self) -> Result<(), DwataError> {
         match fs::write(self.path_to_config.clone(), self.get_pretty_string()) {
             Ok(_) => Ok(()),
@@ -49,7 +41,7 @@ impl Config {
 }
 
 impl Config {
-    pub fn get_data_source(&self, data_source_id: &str) -> Option<&DatabaseSource> {
+    pub fn get_database_by_id(&self, data_source_id: &str) -> Option<&DatabaseSource> {
         self.data_source_list
             .iter()
             .find(|x| x.get_id() == data_source_id)

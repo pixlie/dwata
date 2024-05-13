@@ -58,6 +58,8 @@ pub enum DatabaseConnection {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DatabaseAuthentication {
+    // TODO: Add API_KEY support
+    // https://github.com/brainless/dwata/issues/118
     username: String,
     password: Option<String>,
 }
@@ -70,9 +72,12 @@ impl DatabaseAuthentication {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Database {
-    name: String,
+    pub name: String,
     connection: DatabaseConnection,
-    authentication: DatabaseAuthentication, // needs_ssh: NeedsSSH,
+    // TODO: Make authentication optional to allow for no authentication (locally hosted databases)
+    // https://github.com/brainless/dwata/issues/118
+    authentication: DatabaseAuthentication,
+    // needs_ssh: NeedsSSH,
 }
 
 impl Database {
@@ -130,6 +135,7 @@ pub enum DatabaseType {
     SQLite(Database),
     MSSQL(Database),
     MongoDB(Database),
+    Qdrant(Database),
 }
 
 impl DatabaseType {
@@ -147,6 +153,7 @@ impl DatabaseType {
             DatabaseType::PostgreSQL(_) => "PostgreSQL",
             DatabaseType::MySQL(_) => "MySQL",
             DatabaseType::SQLite(_) => "SQLite",
+            DatabaseType::Qdrant(_) => "Qdrant",
             _ => "",
         }
     }
@@ -156,6 +163,7 @@ impl DatabaseType {
             DatabaseType::PostgreSQL(x) => x.name.clone(),
             DatabaseType::MySQL(x) => x.name.clone(),
             DatabaseType::SQLite(x) => x.name.clone(),
+            DatabaseType::Qdrant(x) => x.name.clone(),
             _ => "".to_string(),
         }
     }
@@ -168,17 +176,16 @@ pub enum DatabasePool {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DatabaseSource {
     id: String,
-    label: Option<String>,
-    source: DatabaseType,
+    pub label: Option<String>,
+    pub source: DatabaseType,
 }
 
 impl DatabaseSource {
-    pub fn new(database: Database, label: Option<String>) -> Self {
-        // Assume only PostgreSQL
+    pub fn new(source: DatabaseType, label: Option<String>) -> Self {
         DatabaseSource {
             id: Ulid::new().to_string(),
             label,
-            source: DatabaseType::PostgreSQL(database),
+            source,
         }
     }
 
@@ -202,6 +209,7 @@ impl DatabaseSource {
     pub fn get_database(&self) -> Option<&Database> {
         match &self.source {
             DatabaseType::PostgreSQL(db) => Some(&db),
+            DatabaseType::Qdrant(db) => Some(&db),
             _ => None,
         }
     }
