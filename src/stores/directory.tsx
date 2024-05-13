@@ -43,7 +43,7 @@ const makeStore = () => {
         directoryId: string,
         relativeFilePath: string
       ) => {
-        let result = await invoke("generate_text_embedding", {
+        await invoke("generate_text_embedding", {
           directoryId,
           relativeFilePath,
         });
