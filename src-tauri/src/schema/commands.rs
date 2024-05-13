@@ -10,7 +10,7 @@ pub async fn read_schema(
 ) -> Result<Vec<APIGridSchema>, DwataError> {
     let mut schema: Vec<APIGridSchema> = vec![];
     let guard = store.config.lock().await;
-    match guard.get_data_source(data_source_id) {
+    match guard.get_database_by_id(data_source_id) {
         Some(ds) => {
             let mut tables = ds.get_tables(Some(true)).await;
             schema.append(&mut tables);

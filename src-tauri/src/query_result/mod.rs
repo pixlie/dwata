@@ -64,7 +64,7 @@ impl DwataQuery {
     pub async fn get_data(&self, config: &Config) -> Vec<APIGridData> {
         let mut data: Vec<APIGridData> = vec![];
         for grid in &self.select {
-            let data_source = config.get_data_source(grid.get_source_name().as_str());
+            let data_source = config.get_database_by_id(grid.get_source_name().as_str());
             let (schema_name, table_name) = grid.get_schema_and_table_names(None);
             let grid_data = APIGridDataBuilder::default()
                 .source(grid.get_source_name())

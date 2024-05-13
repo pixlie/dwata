@@ -7,6 +7,7 @@ pub mod commands;
 pub mod storage;
 // mod rust_bert;
 
+#[derive(PartialEq, Eq, Hash, Debug, Deserialize, Serialize)]
 pub(crate) enum ParagraphExtractMethods {
     // Join short sibling sentences, which are within the given length, into a paragraph
     JoinShortSiblings(usize),

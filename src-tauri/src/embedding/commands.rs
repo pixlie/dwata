@@ -3,7 +3,7 @@ use crate::directory::helpers::get_file_contents;
 use crate::directory::Content;
 use std::collections::HashSet;
 // use crate::embedding::fastembed::get_embeddings_with_fastembed;
-use crate::embedding::storage::store_embedding_in_qdrant;
+use crate::embedding::storage::{create_collection_in_qdrant, store_embedding_in_qdrant};
 use crate::embedding::{ParagraphExtractMethods, ParagraphId};
 use crate::error::DwataError;
 use crate::store::Store;
@@ -17,7 +17,13 @@ pub(crate) async fn generate_text_embedding(
     relative_file_path: &str,
     store: State<'_, Store>,
 ) -> Result<(), DwataError> {
-    let config_guard = store.config.lock().await;
+    let mut config_guard = store.config.lock().await;
+    let embeddings_storage_exists = match create_collection_in_qdrant(&mut config_guard).await {
+        Ok(_) => true,
+        Err(_) => {
+            return Err(DwataError::CouldNotConnectToDatabase);
+        }
+    };
     // Find the FolderSource matching the given folder_id
     match config_guard.find_directory(directory_id.to_string()) {
         Some(folder) => {
@@ -50,7 +56,10 @@ pub(crate) async fn generate_text_embedding(
                                             };
                                             let text_id =
                                                 serde_json::to_string(&text_id_struct).unwrap();
-                                            store_embedding_in_qdrant(text_id, embedding).await?;
+                                            if embeddings_storage_exists {
+                                                store_embedding_in_qdrant(text_id, embedding)
+                                                    .await?;
+                                            }
                                         }
                                         Err(_) => break,
                                     }
@@ -60,7 +69,7 @@ pub(crate) async fn generate_text_embedding(
                         }
                     }
                     None => {
-                        println!("Could not load ai integration");
+                        println!("Could not load AI integration");
                     }
                 }
                 Ok(())

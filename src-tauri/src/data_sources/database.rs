@@ -72,7 +72,7 @@ impl DatabaseAuthentication {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Database {
-    name: String,
+    pub name: String,
     connection: DatabaseConnection,
     // TODO: Make authentication optional to allow for no authentication (locally hosted databases)
     // https://github.com/brainless/dwata/issues/118
@@ -153,6 +153,7 @@ impl DatabaseType {
             DatabaseType::PostgreSQL(_) => "PostgreSQL",
             DatabaseType::MySQL(_) => "MySQL",
             DatabaseType::SQLite(_) => "SQLite",
+            DatabaseType::Qdrant(_) => "Qdrant",
             _ => "",
         }
     }
@@ -162,6 +163,7 @@ impl DatabaseType {
             DatabaseType::PostgreSQL(x) => x.name.clone(),
             DatabaseType::MySQL(x) => x.name.clone(),
             DatabaseType::SQLite(x) => x.name.clone(),
+            DatabaseType::Qdrant(x) => x.name.clone(),
             _ => "".to_string(),
         }
     }
@@ -174,8 +176,8 @@ pub enum DatabasePool {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DatabaseSource {
     id: String,
-    label: Option<String>,
-    source: DatabaseType,
+    pub label: Option<String>,
+    pub source: DatabaseType,
 }
 
 impl DatabaseSource {
@@ -207,6 +209,7 @@ impl DatabaseSource {
     pub fn get_database(&self) -> Option<&Database> {
         match &self.source {
             DatabaseType::PostgreSQL(db) => Some(&db),
+            DatabaseType::Qdrant(db) => Some(&db),
             _ => None,
         }
     }
