@@ -1,13 +1,14 @@
 use crate::ai::helpers::get_embedding_from_ai_provider;
 use crate::directory::helpers::get_file_contents;
 use crate::directory::Content;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 // use crate::embedding::fastembed::get_embeddings_with_fastembed;
 use crate::embedding::storage::{create_collection_in_qdrant, store_embedding_in_qdrant};
-use crate::embedding::{ParagraphExtractMethods, ParagraphId};
 use crate::error::DwataError;
 use crate::store::Store;
 use crate::workspace::helpers::load_ai_integration;
+use qdrant_client::qdrant::value::Kind;
+use qdrant_client::qdrant::Value;
 use std::path::PathBuf;
 use tauri::State;
 
@@ -46,19 +47,32 @@ pub(crate) async fn generate_text_embedding(
                                         Ok(embedding) => {
                                             println!("{}", embedding.len());
                                             // We serialize this file path and also store the paragraph index
-                                            let text_id_struct = ParagraphId {
-                                                file_path: file_path.clone(),
-                                                index,
-                                                extract_methods: HashSet::from([
-                                                    ParagraphExtractMethods::JoinShortSiblings(255),
-                                                    ParagraphExtractMethods::IgnoreHeadings,
-                                                ]),
-                                            };
-                                            let text_id =
-                                                serde_json::to_string(&text_id_struct).unwrap();
+                                            let paragraph_context: HashMap<String, Value> =
+                                                HashMap::from([
+                                                    (
+                                                        "file_path".to_string(),
+                                                        Value {
+                                                            kind: Some(Kind::StringValue(
+                                                                serde_json::to_string(&file_path)
+                                                                    .unwrap(),
+                                                            )),
+                                                        },
+                                                    ),
+                                                    (
+                                                        "index".to_string(),
+                                                        Value {
+                                                            kind: Some(Kind::IntegerValue(
+                                                                index as i64,
+                                                            )),
+                                                        },
+                                                    ),
+                                                ]);
                                             if embeddings_storage_exists {
-                                                store_embedding_in_qdrant(text_id, embedding)
-                                                    .await?;
+                                                store_embedding_in_qdrant(
+                                                    embedding,
+                                                    paragraph_context,
+                                                )
+                                                .await?;
                                             }
                                         }
                                         Err(_) => break,
