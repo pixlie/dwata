@@ -1,8 +1,7 @@
 use crate::error::DwataError;
-use crate::store::Store;
-use crate::user_account::api_types::APIUserAccount;
 use crate::user_account::crud::upsert_user_account;
-use crate::user_account::UserAccountRow;
+use crate::user_account::{UserAccount, UserAccountRow};
+use crate::workspace::Store;
 use sqlx::query_as;
 use tauri::State;
 
@@ -21,9 +20,7 @@ pub(crate) async fn save_user(
 }
 
 #[tauri::command]
-pub(crate) async fn fetch_current_user(
-    store: State<'_, Store>,
-) -> Result<APIUserAccount, DwataError> {
+pub(crate) async fn fetch_current_user(store: State<'_, Store>) -> Result<UserAccount, DwataError> {
     let mut db_guard = store.db_connection.lock().await;
     match *db_guard {
         Some(ref mut conn) => {
@@ -33,7 +30,7 @@ pub(crate) async fn fetch_current_user(
                     .fetch_one(conn)
                     .await;
             match result {
-                Ok(row) => Ok(APIUserAccount::from_sqlx_row(&row)),
+                Ok(row) => Ok(UserAccount::from_sqlx_row(&row)),
                 Err(error) => {
                     println!("Error: {:?}", error);
                     Err(DwataError::CouldNotFetchRowsFromAppDatabase)

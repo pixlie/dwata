@@ -1,6 +1,6 @@
 use crate::error::DwataError;
 use crate::schema::api_types::APIGridSchema;
-use crate::store::Store;
+use crate::workspace::Store;
 use tauri::State;
 
 #[tauri::command]

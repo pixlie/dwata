@@ -1,7 +1,7 @@
 use crate::directory::helpers::get_file_contents;
 use crate::directory::{Content, FileNode};
 use crate::error::DwataError;
-use crate::store::Store;
+use crate::workspace::Store;
 use std::path::PathBuf;
 use tauri::State;
 

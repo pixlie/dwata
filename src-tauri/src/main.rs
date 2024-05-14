@@ -17,7 +17,6 @@ mod ai;
 mod directory;
 mod embedding;
 mod schema;
-mod store;
 mod user_account;
 mod workspace;
 
@@ -30,9 +29,9 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     }
     let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
     let db_connection: Option<SqliteConnection> = tauri::async_runtime::block_on(async {
-        store::database::get_database_connection(&app_config_dir).await
+        workspace::helpers::get_database_connection(&app_config_dir).await
     });
-    app.manage(store::Store {
+    app.manage(workspace::Store {
         config: Arc::new(Mutex::new(workspace::helpers::load_config(&app_config_dir))),
         db_connection: Mutex::new(db_connection),
     });

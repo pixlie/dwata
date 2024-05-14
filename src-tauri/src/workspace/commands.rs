@@ -4,8 +4,7 @@ use crate::data_sources::directory::FolderSource;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{Database, DatabaseSource};
 use crate::error::DwataError;
-use crate::store::Store;
-use crate::workspace::api_types::APIConfig;
+use crate::workspace::{api_types::APIConfig, Store};
 use std::fs;
 use tauri::State;
 

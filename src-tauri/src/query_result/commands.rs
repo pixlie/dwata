@@ -1,7 +1,7 @@
 use super::DwataQuery;
 use crate::error::DwataError;
 use crate::query_result::api_types::{APIGridData, APIGridQuery};
-use crate::store::Store;
+use crate::workspace::Store;
 use tauri::State;
 
 #[tauri::command]

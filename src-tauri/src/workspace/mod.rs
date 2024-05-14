@@ -5,12 +5,29 @@ use crate::data_sources::directory::FolderSource;
 use crate::data_sources::DatabaseSource;
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
+use sqlx::SqliteConnection;
 use std::fs;
 use std::path::PathBuf;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 pub mod api_types;
 pub mod commands;
 pub mod helpers;
+
+pub struct Store {
+    pub config: Arc<Mutex<Config>>,
+    pub db_connection: Mutex<Option<SqliteConnection>>,
+}
+
+impl Store {
+    pub fn new(app_config_dir: &PathBuf, db_connection: Option<SqliteConnection>) -> Self {
+        Store {
+            config: Arc::new(Mutex::new(helpers::load_config(&app_config_dir))),
+            db_connection: Mutex::new(db_connection),
+        }
+    }
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Config {
