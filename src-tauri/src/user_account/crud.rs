@@ -1,8 +1,30 @@
 use crate::error::DwataError;
+use crate::relational_database::crud::CRUD;
 use chrono::Utc;
 use serde_json::json;
 use sqlx::types::JsonValue;
-use sqlx::{query, SqliteConnection};
+use sqlx::{query, query_as, SqliteConnection};
+
+use super::models::UserAccount;
+
+impl CRUD for UserAccount {
+    type Model = UserAccount;
+    type PrimaryKey = i64;
+
+    fn table_name() -> String {
+        "user_account".to_string()
+    }
+
+    async fn select_one_by_pk(
+        pk: Self::PrimaryKey,
+        db_connection: &mut SqliteConnection,
+    ) -> Result<UserAccount, sqlx::Error> {
+        query_as("SELECT * FROM user_account WHERE id = ?1")
+            .bind(pk)
+            .fetch_one(db_connection)
+            .await
+    }
+}
 
 pub(crate) async fn upsert_user_account(
     first_name: Option<&str>,

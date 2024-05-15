@@ -1,9 +1,17 @@
--- Add migration script here
 CREATE TABLE user_account
 (
-    id         INTEGER PRIMARY KEY,
-    json_data  JSONB,
-    created_at DATETIME NOT NULL
+    id                  INTEGER PRIMARY KEY,
+    json_data           JSONB,
+    created_at          DATETIME NOT NULL
+);
+
+CREATE TABLE directory
+(
+    id                  INTEGER PRIMARY KEY,
+    json_data           JSONB,
+    created_by_id       INTEGER,
+    created_at          DATETIME NOT NULL,
+    FOREIGN KEY (created_by_id) REFERENCES user_account (id)
 );
 
 CREATE TABLE chat_thread

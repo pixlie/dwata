@@ -8,7 +8,7 @@ use std::fmt::Display;
 use ts_rs::TS;
 use ulid::Ulid;
 
-pub(crate) mod api_types;
+pub mod api_types;
 pub mod commands;
 pub mod helpers;
 pub mod providers;

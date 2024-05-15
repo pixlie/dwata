@@ -1,8 +1,8 @@
+use super::models::UserAccount;
 use crate::error::DwataError;
+use crate::relational_database::crud::CRUD;
 use crate::user_account::crud::upsert_user_account;
-use crate::user_account::{UserAccount, UserAccountRow};
 use crate::workspace::Store;
-use sqlx::query_as;
 use tauri::State;
 
 #[tauri::command]
@@ -23,19 +23,20 @@ pub(crate) async fn save_user(
 pub(crate) async fn fetch_current_user(store: State<'_, Store>) -> Result<UserAccount, DwataError> {
     let mut db_guard = store.db_connection.lock().await;
     match *db_guard {
-        Some(ref mut conn) => {
-            let result: Result<UserAccountRow, sqlx::Error> =
-                query_as("SELECT * FROM user_account WHERE id = ?1")
-                    .bind(1)
-                    .fetch_one(conn)
-                    .await;
-            match result {
-                Ok(row) => Ok(UserAccount::from_sqlx_row(&row)),
-                Err(error) => {
-                    println!("Error: {:?}", error);
-                    Err(DwataError::CouldNotFetchRowsFromAppDatabase)
-                }
-            }
+        Some(ref mut db_connection) => {
+            UserAccount::read_one_by_pk(1, db_connection).await
+            // let result: Result<UserAccountRow, sqlx::Error> =
+            //     query_as("SELECT * FROM user_account WHERE id = ?1")
+            //         .bind(1)
+            //         .fetch_one(conn)
+            //         .await;
+            // match result {
+            //     Ok(row) => Ok(UserAccount::from_sqlx_row(&row)),
+            //     Err(error) => {
+            //         println!("Error: {:?}", error);
+            //         Err(DwataError::CouldNotFetchRowsFromAppDatabase)
+            //     }
+            // }
         }
         None => Err(DwataError::CouldNotConnectToDatabase),
     }

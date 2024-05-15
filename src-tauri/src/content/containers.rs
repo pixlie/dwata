@@ -6,7 +6,7 @@ use ts_rs::TS;
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
-    rename = "APIHeterogeneousContentArray",
+    rename = "HeterogeneousContentArray",
     export_to = "../src/api_types/"
 )]
 pub struct HeterogeneousContentArray {
@@ -16,7 +16,7 @@ pub struct HeterogeneousContentArray {
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
-    rename = "APIHomogeneousContentArray",
+    rename = "HomogeneousContentArray",
     export_to = "../src/api_types/"
 )]
 pub struct HomogeneousContentArray {

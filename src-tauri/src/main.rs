@@ -3,23 +3,23 @@
 
 use sqlx::SqliteConnection;
 use std::path::PathBuf;
-use std::sync::Arc;
+// use std::sync::Arc;
 use tauri::{App, Manager};
 use tokio::sync::Mutex;
 
-mod data_sources;
+// mod data_sources;
 mod error;
 // mod labels;
-mod chat;
+// mod chat;
 mod relational_database;
 // mod saved_query;
-mod ai;
-mod directory;
-mod embedding;
-mod schema;
+// mod ai;
+mod content;
+// mod directory;
+// mod embedding;
+// mod schema;
 mod user_account;
 mod workspace;
-mod content;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(debug_assertions)] // only include this code on debug builds
@@ -33,7 +33,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         workspace::helpers::get_database_connection(&app_config_dir).await
     });
     app.manage(workspace::Store {
-        config: Arc::new(Mutex::new(workspace::helpers::load_config(&app_config_dir))),
+        // config: Arc::new(Mutex::new(workspace::helpers::load_config(&app_config_dir))),
         db_connection: Mutex::new(db_connection),
     });
     Ok(())
@@ -44,26 +44,26 @@ fn main() {
         .setup(setup)
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            workspace::commands::read_config,
+            // workspace::commands::read_config,
             // labels::commands::load_labels,
-            schema::commands::read_schema,
-            relational_database::commands::load_data,
-            workspace::commands::create_database_source,
-            workspace::commands::create_folder_source,
-            workspace::commands::create_ai_integration,
-            workspace::commands::update_ai_integration,
+            // schema::commands::read_schema,
+            // relational_database::commands::load_data,
+            // workspace::commands::create_database_source,
+            // workspace::commands::create_folder_source,
+            // workspace::commands::create_ai_integration,
+            // workspace::commands::update_ai_integration,
             user_account::commands::save_user,
             user_account::commands::fetch_current_user,
-            chat::commands::start_chat_thread,
-            chat::commands::fetch_chat_thread_list,
-            chat::commands::fetch_chat_thread_detail,
-            chat::commands::fetch_chat_reply_list,
-            chat::commands::fetch_chat_context_node_list,
-            chat::commands::fetch_chat_context,
-            ai::commands::fetch_list_of_ai_providers_and_models,
-            directory::commands::fetch_file_list_in_directory,
-            directory::commands::fetch_file_contents,
-            embedding::commands::generate_text_embedding,
+            // chat::commands::start_chat_thread,
+            // chat::commands::fetch_chat_thread_list,
+            // chat::commands::fetch_chat_thread_detail,
+            // chat::commands::fetch_chat_reply_list,
+            // chat::commands::fetch_chat_context_node_list,
+            // chat::commands::fetch_chat_context,
+            // ai::commands::fetch_list_of_ai_providers_and_models,
+            // directory::commands::fetch_files_in_directory,
+            // directory::commands::fetch_file_contents,
+            // embedding::commands::generate_text_embedding,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -31,7 +31,15 @@ pub struct ConfigurationData {
 }
 
 pub trait Configuration {
+    type Model;
+    type PrimaryKey;
+
     fn get_schema() -> ConfigurationSchema;
+
+    async fn get_single_configuration(
+        id: Self::PrimaryKey,
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Self::Model, DwataError>;
 
     async fn list_configurations(
         db_connection: &mut SqliteConnection,

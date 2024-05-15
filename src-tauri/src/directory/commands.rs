@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use tauri::State;
 
 #[tauri::command]
-pub(crate) async fn fetch_file_list_in_directory(
+pub(crate) async fn fetch_files_in_directory(
     directory_id: &str,
     store: State<'_, Store>,
 ) -> Result<Vec<FileNode>, DwataError> {

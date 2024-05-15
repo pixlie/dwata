@@ -1,12 +1,13 @@
-use crate::data_sources::DatabasePool;
-use crate::relational_database::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
-use crate::relational_database::postgresql::PostgreSQLQueryBuilder;
-use crate::workspace::Config;
-use serde::{Deserialize, Serialize};
+// use crate::data_sources::DatabasePool;
+// use crate::relational_database::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
+// use crate::relational_database::postgresql::PostgreSQLQueryBuilder;
+// use crate::workspace::Config;
+// use serde::{Deserialize, Serialize};
 
-pub mod api_types;
-pub mod commands;
-pub mod postgresql;
+// pub mod api_types;
+// pub mod commands;
+pub mod crud;
+// pub mod postgresql;
 
 // #[derive(Debug, Clone, Deserialize, Serialize)]
 // pub struct SelectColumnsPath {
@@ -43,48 +44,48 @@ pub mod postgresql;
 //     }
 // }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub enum QueryOrder {
-    Asc,
-    Desc,
-}
+// #[derive(Debug, Clone, Deserialize, Serialize)]
+// pub enum QueryOrder {
+//     Asc,
+//     Desc,
+// }
 
-pub enum QueryBuilder {
-    PostgreSQL(PostgreSQLQueryBuilder),
-}
+// pub enum QueryBuilder {
+//     PostgreSQL(PostgreSQLQueryBuilder),
+// }
 
-#[derive(Debug, Deserialize)]
-pub struct DwataQuery {
-    // Each SelectColumnsPath represents the columns that are fetched within any tabular source
-    // without needing any merging
-    select: Vec<APIGridQuery>,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct DwataQuery {
+//     // Each SelectColumnsPath represents the columns that are fetched within any tabular source
+//     // without needing any merging
+//     select: Vec<APIGridQuery>,
+// }
 
-impl DwataQuery {
-    pub async fn get_data(&self, config: &Config) -> Vec<APIGridData> {
-        let mut data: Vec<APIGridData> = vec![];
-        for grid in &self.select {
-            let data_source = config.get_database_by_id(grid.get_source_name().as_str());
-            let (schema_name, table_name) = grid.get_schema_and_table_names(None);
-            let grid_data = APIGridDataBuilder::default()
-                .source(grid.get_source_name())
-                .schema(Some(schema_name))
-                .table(Some(table_name))
-                .rows(match data_source {
-                    Some(ds) => match ds.get_query_builder(grid).unwrap() {
-                        QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
-                            Some(conn_type) => match conn_type {
-                                DatabasePool::PostgreSQL(conn) => builder.get_data(&conn).await,
-                            },
-                            None => vec![],
-                        },
-                    },
-                    _ => vec![],
-                })
-                .build()
-                .unwrap();
-            data.push(grid_data);
-        }
-        data
-    }
-}
+// impl DwataQuery {
+//     pub async fn get_data(&self, config: &Config) -> Vec<APIGridData> {
+//         let mut data: Vec<APIGridData> = vec![];
+//         for grid in &self.select {
+//             let data_source = config.get_database_by_id(grid.get_source_name().as_str());
+//             let (schema_name, table_name) = grid.get_schema_and_table_names(None);
+//             let grid_data = APIGridDataBuilder::default()
+//                 .source(grid.get_source_name())
+//                 .schema(Some(schema_name))
+//                 .table(Some(table_name))
+//                 .rows(match data_source {
+//                     Some(ds) => match ds.get_query_builder(grid).unwrap() {
+//                         QueryBuilder::PostgreSQL(builder) => match ds.get_connection().await {
+//                             Some(conn_type) => match conn_type {
+//                                 DatabasePool::PostgreSQL(conn) => builder.get_data(&conn).await,
+//                             },
+//                             None => vec![],
+//                         },
+//                     },
+//                     _ => vec![],
+//                 })
+//                 .build()
+//                 .unwrap();
+//             data.push(grid_data);
+//         }
+//         data
+//     }
+// }

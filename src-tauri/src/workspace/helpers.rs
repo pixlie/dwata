@@ -1,35 +1,35 @@
-use crate::ai::AIIntegration;
-use crate::workspace::Config;
+// use crate::ai::AIIntegration;
+// use crate::workspace::Config;
 use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::{Connection, SqliteConnection};
-use std::fs;
+// use std::fs;
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
 
-pub fn load_config(app_config_dir: &PathBuf) -> Config {
-    if Path::new(&app_config_dir).try_exists().is_err() {
-        fs::create_dir(&app_config_dir).unwrap();
-    }
+// pub fn load_config(app_config_dir: &PathBuf) -> Config {
+//     if Path::new(&app_config_dir).try_exists().is_err() {
+//         fs::create_dir(&app_config_dir).unwrap();
+//     }
 
-    let mut config_file_path = app_config_dir.clone();
-    config_file_path.push("default.ron");
-    let config: Config = match fs::read_to_string(&config_file_path) {
-        Ok(content) => ron::from_str(content.as_str()).unwrap(),
-        Err(_) => Config::new(config_file_path),
-    };
-    config
-}
+//     let mut config_file_path = app_config_dir.clone();
+//     config_file_path.push("default.ron");
+//     let config: Config = match fs::read_to_string(&config_file_path) {
+//         Ok(content) => ron::from_str(content.as_str()).unwrap(),
+//         Err(_) => Config::new(config_file_path),
+//     };
+//     config
+// }
 
-pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AIIntegration> {
-    match config
-        .ai_integration_list
-        .iter()
-        .find(|x| x.match_by_provider_name(ai_provider_name))
-    {
-        Some(x) => Some((*x).clone()),
-        None => None,
-    }
-}
+// pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AIIntegration> {
+//     match config
+//         .ai_integration_list
+//         .iter()
+//         .find(|x| x.match_by_provider_name(ai_provider_name))
+//     {
+//         Some(x) => Some((*x).clone()),
+//         None => None,
+//     }
+// }
 
 pub(crate) async fn get_database_connection(app_config_dir: &PathBuf) -> Option<SqliteConnection> {
     let mut path = app_config_dir.clone();
