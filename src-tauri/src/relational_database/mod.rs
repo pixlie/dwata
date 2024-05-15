@@ -1,6 +1,6 @@
 use crate::data_sources::DatabasePool;
-use crate::query_result::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
-use crate::query_result::postgresql::PostgreSQLQueryBuilder;
+use crate::relational_database::api_types::{APIGridData, APIGridDataBuilder, APIGridQuery};
+use crate::relational_database::postgresql::PostgreSQLQueryBuilder;
 use crate::workspace::Config;
 use serde::{Deserialize, Serialize};
 

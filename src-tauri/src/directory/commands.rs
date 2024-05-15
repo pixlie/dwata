@@ -1,5 +1,6 @@
+use crate::content::containers::{HeterogeneousContentArray, HomogeneousContentArray};
 use crate::directory::helpers::get_file_contents;
-use crate::directory::{Content, FileNode};
+use crate::directory::FileNode;
 use crate::error::DwataError;
 use crate::workspace::Store;
 use std::path::PathBuf;
@@ -23,7 +24,7 @@ pub(crate) async fn fetch_file_contents(
     directory_id: &str,
     relative_file_path: &str,
     store: State<'_, Store>,
-) -> Result<Vec<(usize, Content)>, DwataError> {
+) -> Result<HeterogeneousContentArray, DwataError> {
     // We assume we are reading Markdown files only
     // We parse Markdown file with comrak and extract headings and paragraphs only
     let config = store.config.lock().await;

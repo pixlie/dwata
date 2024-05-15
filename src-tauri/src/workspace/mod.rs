@@ -1,7 +1,6 @@
-use crate::ai::{AITools, AiIntegration, Tool, ToolParameter, ToolParameterType};
+use crate::ai::{AIIntegration, AITools, Tool, ToolParameter, ToolParameterType};
 use crate::chat::api_types::APIChatContextNode;
 use crate::chat::ChatContextNode;
-use crate::data_sources::directory::FolderSource;
 use crate::data_sources::DatabaseSource;
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
@@ -10,9 +9,11 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use ts_rs::TS;
 
 pub mod api_types;
 pub mod commands;
+pub mod configuration;
 pub mod helpers;
 
 pub struct Store {
@@ -29,14 +30,19 @@ impl Store {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[serde(rename_all(serialize = "camelCase"))]
+#[ts(
+    export,
+    rename = "Config",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
 pub struct Config {
     path_to_config: PathBuf,
-    // organisations: Vec<Organisation>,
     pub data_source_list: Vec<DatabaseSource>,
     // api_list: Vec<>, // Stripe, Shopify, etc.
-    pub folder_list: Vec<FolderSource>, // CSV or Markdown files
-    pub ai_integration_list: Vec<AiIntegration>,
+    pub ai_integration_list: Vec<AIIntegration>,
 }
 
 impl Config {
@@ -44,7 +50,6 @@ impl Config {
         Config {
             path_to_config,
             data_source_list: vec![],
-            folder_list: vec![],
             ai_integration_list: vec![],
         }
     }
@@ -68,9 +73,9 @@ impl Config {
         ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
     }
 
-    pub fn find_directory(&self, folder_id: String) -> Option<&FolderSource> {
-        self.folder_list.iter().find(|x| x.match_id(&folder_id))
-    }
+    // pub fn find_directory(&self, folder_id: String) -> Option<&Directory> {
+    //     self.folder_list.iter().find(|x| x.match_id(&folder_id))
+    // }
 }
 
 impl ChatContextNode for Config {

@@ -1,13 +1,11 @@
 use crate::ai::api_types::APIAIIntegration;
 use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
-use openai::types::create_embedding_request::EncodingFormat;
-use openai::types::{
-    CreateEmbeddingRequest, CreateEmbeddingRequestInput, CreateEmbeddingRequestModel,
-};
+use openai::types::{CreateEmbeddingRequest, CreateEmbeddingRequestInput};
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
+use ts_rs::TS;
 use ulid::Ulid;
 
 pub(crate) mod api_types;
@@ -29,13 +27,13 @@ impl HttpsApi {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub(crate) enum AiProvider {
+pub(crate) enum AIProvider {
     OpenAI(HttpsApi),
     Groq(HttpsApi),
     Anthropic(HttpsApi),
 }
 
-impl AiProvider {
+impl AIProvider {
     pub fn new(ai_provider: &str, api_key: &str) -> Self {
         match ai_provider {
             "OpenAI" => Self::OpenAI(HttpsApi::new(api_key)),
@@ -61,7 +59,7 @@ impl AiProvider {
     }
 }
 
-impl AiProvider {
+impl AIProvider {
     // Chat related
     pub fn get_chat_url_and_key(&self) -> (String, String) {
         match self {
@@ -106,7 +104,7 @@ impl AiProvider {
     }
 }
 
-impl AiProvider {
+impl AIProvider {
     // Embedding related
     pub fn get_embedding_url_and_key(&self) -> (String, String) {
         match self {
@@ -145,24 +143,25 @@ impl AiProvider {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub(crate) struct AiIntegration {
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename = "AIIntegration", export_to = "../src/api_types/")]
+pub(crate) struct AIIntegration {
     id: String,
-    ai_provider: AiProvider,
+    ai_provider: AIProvider,
     display_label: Option<String>,
 }
 
-impl AiIntegration {
+impl AIIntegration {
     pub fn new(ai_provider: &str, api_key: &str, display_label: Option<&str>) -> Self {
         Self {
             id: Ulid::new().to_string(),
-            ai_provider: AiProvider::new(ai_provider, api_key),
+            ai_provider: AIProvider::new(ai_provider, api_key),
             display_label: display_label.map(|x| x.to_string()),
         }
     }
 
     pub fn update(&mut self, ai_provider: &str, api_key: &str, display_label: Option<&str>) {
-        self.ai_provider = AiProvider::new(ai_provider, api_key);
+        self.ai_provider = AIProvider::new(ai_provider, api_key);
         self.display_label = display_label.map(|x| x.to_string());
     }
 

@@ -1,4 +1,4 @@
-use crate::ai::AiIntegration;
+use crate::ai::AIIntegration;
 use crate::workspace::Config;
 use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::{Connection, SqliteConnection};
@@ -20,7 +20,7 @@ pub fn load_config(app_config_dir: &PathBuf) -> Config {
     config
 }
 
-pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AiIntegration> {
+pub fn load_ai_integration(config: &Config, ai_provider_name: &str) -> Option<AIIntegration> {
     match config
         .ai_integration_list
         .iter()

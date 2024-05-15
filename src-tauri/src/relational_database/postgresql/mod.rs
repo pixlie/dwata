@@ -1,4 +1,4 @@
-use crate::query_result::api_types::APIGridQuery;
+use crate::relational_database::api_types::APIGridQuery;
 use crate::schema::postgresql::metadata::get_postgres_columns;
 use crate::schema::postgresql::PostgreSQLColumn;
 use serde_json::{Number, Value};

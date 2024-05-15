@@ -1,9 +1,9 @@
-use crate::directory::Content;
+use crate::content::containers::HeterogeneousContentArray;
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, Options};
 use std::path::PathBuf;
 
-pub fn get_file_contents(file_path: &PathBuf) -> Vec<(usize, Content)> {
+pub fn get_file_contents(file_path: &PathBuf) -> HeterogeneousContentArray {
     let file_contents = std::fs::read_to_string(file_path).unwrap();
     let arena = Arena::new();
     let root = parse_document(&arena, &file_contents, &Options::default());

@@ -2,9 +2,9 @@ use crate::chat::api_types::{APIChatContextNode, APIChatContextType};
 use crate::chat::ChatContextNode;
 use crate::data_sources::api_types::APIDataSource;
 use crate::error::DwataError;
-use crate::query_result::api_types::APIGridQuery;
-use crate::query_result::postgresql::PostgreSQLQueryBuilder;
-use crate::query_result::QueryBuilder;
+use crate::relational_database::api_types::APIGridQuery;
+use crate::relational_database::postgresql::PostgreSQLQueryBuilder;
+use crate::relational_database::QueryBuilder;
 use crate::schema::api_types::APIGridSchema;
 use crate::schema::helpers::get_schema_summary;
 use crate::schema::postgresql;
@@ -12,6 +12,7 @@ use crate::schema::postgresql::PostgreSQLObject;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPoolOptions;
 use std::path::PathBuf;
+use ts_rs::TS;
 use ulid::Ulid;
 
 // #[derive(Debug, Deserialize, Serialize)]
@@ -173,7 +174,8 @@ pub enum DatabasePool {
     PostgreSQL(sqlx::PgPool),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename = "DatabaseSource", export_to = "../src/api_types/")]
 pub struct DatabaseSource {
     id: String,
     pub label: Option<String>,

@@ -1,6 +1,6 @@
 use super::DwataQuery;
 use crate::error::DwataError;
-use crate::query_result::api_types::{APIGridData, APIGridQuery};
+use crate::relational_database::api_types::{APIGridData, APIGridQuery};
 use crate::workspace::Store;
 use tauri::State;
 

@@ -1,6 +1,6 @@
 use crate::data_sources::api_types::APIDataSource;
 use crate::workspace::Config;
-use crate::{ai::api_types::APIAIIntegration, data_sources::directory::FolderSource};
+use crate::{ai::api_types::APIAIIntegration, data_sources::directory::Directory};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -9,7 +9,6 @@ use ts_rs::TS;
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct APIConfig {
     data_source_list: Vec<APIDataSource>,
-    folder_list: Vec<FolderSource>,
     ai_integration_list: Vec<APIAIIntegration>,
 }
 
@@ -21,7 +20,6 @@ impl APIConfig {
                 .iter()
                 .map(|x| x.get_api_data_source())
                 .collect::<Vec<APIDataSource>>(),
-            folder_list: config.folder_list.clone(),
             ai_integration_list: config
                 .ai_integration_list
                 .iter()

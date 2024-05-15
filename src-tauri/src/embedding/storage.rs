@@ -2,9 +2,7 @@ use crate::data_sources::database::DatabaseType;
 use crate::data_sources::{Database, DatabaseSource};
 use crate::error::DwataError;
 use crate::workspace::Config;
-use qdrant_client::qdrant::{
-    vectors_config, vectors_config_diff, PointId, PointStruct, VectorParamsDiff, VectorsConfigDiff,
-};
+use qdrant_client::qdrant::{vectors_config, PointId, PointStruct};
 use qdrant_client::{
     client::QdrantClient,
     qdrant::{CreateCollection, Distance, Value, VectorParams, VectorsConfig},

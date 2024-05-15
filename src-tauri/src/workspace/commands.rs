@@ -1,12 +1,14 @@
-use crate::ai::AiIntegration;
+use crate::ai::AIIntegration;
 use crate::data_sources::database::DatabaseType;
-use crate::data_sources::directory::FolderSource;
 use crate::data_sources::helpers::check_database_connection;
 use crate::data_sources::{Database, DatabaseSource};
+use crate::directory::Directory;
 use crate::error::DwataError;
 use crate::workspace::{api_types::APIConfig, Store};
 use std::fs;
 use tauri::State;
+
+use super::configuration::{Configuration, ConfigurationData};
 
 #[tauri::command]
 pub async fn create_database_source(
@@ -37,19 +39,12 @@ pub async fn create_database_source(
 
 #[tauri::command]
 pub async fn create_folder_source(
-    path: &str,
-    label: Option<&str>,
-    include_patterns: Vec<&str>,
-    exclude_patterns: Vec<&str>,
+    data: ConfigurationData,
     store: State<'_, Store>,
 ) -> Result<String, DwataError> {
-    let folder_source = FolderSource::new(path, label, include_patterns, exclude_patterns);
-    let id = folder_source.get_id();
-    let mut config_guard = store.config.lock().await;
-    config_guard.folder_list.push(folder_source);
-    match config_guard.sync_to_file() {
-        Ok(_) => Ok(id),
-        Err(_) => Err(DwataError::CouldNotWriteConfig),
+    match *(store.db_connection.lock().await) {
+        Some(ref mut db_connection) => Directory::create_configuration(data, db_connection),
+        None => Err(DwataError::CouldNotConnectToDatabase),
     }
 }
 
@@ -60,7 +55,7 @@ pub async fn create_ai_integration(
     display_label: Option<&str>,
     store: State<'_, Store>,
 ) -> Result<String, DwataError> {
-    let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
+    let ai_integration = AIIntegration::new(ai_provider, api_key, display_label);
     let id = ai_integration.get_id().clone();
     let mut config_guard = store.config.lock().await;
     config_guard.ai_integration_list.push(ai_integration);

@@ -11,7 +11,7 @@ mod data_sources;
 mod error;
 // mod labels;
 mod chat;
-mod query_result;
+mod relational_database;
 // mod saved_query;
 mod ai;
 mod directory;
@@ -19,6 +19,7 @@ mod embedding;
 mod schema;
 mod user_account;
 mod workspace;
+mod content;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(debug_assertions)] // only include this code on debug builds
@@ -46,7 +47,7 @@ fn main() {
             workspace::commands::read_config,
             // labels::commands::load_labels,
             schema::commands::read_schema,
-            query_result::commands::load_data,
+            relational_database::commands::load_data,
             workspace::commands::create_database_source,
             workspace::commands::create_folder_source,
             workspace::commands::create_ai_integration,
