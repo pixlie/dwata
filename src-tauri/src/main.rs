@@ -1,9 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
 use sqlx::SqliteConnection;
 use std::path::PathBuf;
 // use std::sync::Arc;
+use env_logger;
+use log::info;
 use tauri::{App, Manager};
 use tokio::sync::Mutex;
 
@@ -22,6 +23,8 @@ mod user_account;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+    info!("Setting up Dwata");
     #[cfg(debug_assertions)] // only include this code on debug builds
     {
         let window = app.get_webview_window("main").unwrap();

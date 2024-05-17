@@ -20,6 +20,7 @@ pub enum DwataError {
     CouldNotCreateAppDatabase,
     CouldNotConnectToAppDatabase,
     CouldNotInsertToAppDatabase,
+    CouldNotUpdateAddDatabase,
     CouldNotFetchRowsFromAppDatabase,
 
     // Chat context related

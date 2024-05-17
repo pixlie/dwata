@@ -19,8 +19,12 @@ pub struct UserAccount {
     pub email: Option<String>,
     // Users that provide services within Dwata
     pub is_system_user: Option<bool>,
-    // Users that represent and AI model
-    pub is_ai_user: Option<bool>,
     #[ts(type = "string")]
     pub created_at: DateTime<Utc>,
+}
+
+pub struct InputUserAccount {
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: Option<String>,
 }
