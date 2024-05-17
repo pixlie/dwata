@@ -59,21 +59,7 @@ pub(crate) async fn save_user(
 pub(crate) async fn fetch_current_user(store: State<'_, Store>) -> Result<UserAccount, DwataError> {
     let mut db_guard = store.db_connection.lock().await;
     match *db_guard {
-        Some(ref mut db_connection) => {
-            UserAccount::read_one_by_pk(1, db_connection).await
-            // let result: Result<UserAccountRow, sqlx::Error> =
-            //     query_as("SELECT * FROM user_account WHERE id = ?1")
-            //         .bind(1)
-            //         .fetch_one(conn)
-            //         .await;
-            // match result {
-            //     Ok(row) => Ok(UserAccount::from_sqlx_row(&row)),
-            //     Err(error) => {
-            //         println!("Error: {:?}", error);
-            //         Err(DwataError::CouldNotFetchRowsFromAppDatabase)
-            //     }
-            // }
-        }
+        Some(ref mut db_connection) => UserAccount::read_one_by_pk(1, db_connection).await,
         None => Err(DwataError::CouldNotConnectToDatabase),
     }
 }

@@ -1,13 +1,14 @@
 use crate::error::DwataError;
 use chrono::Utc;
 use log::error;
-use sqlx::{query, Execute, QueryBuilder, Sqlite, SqliteConnection};
-use std::{collections::HashMap, fmt::format};
+use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
+use std::collections::HashMap;
 
 pub enum InputField {
     Text(String),
     Number(i64),
     Float(f64),
+    DateTime(chrono::DateTime<Utc>),
 }
 
 pub type InputModel = HashMap<String, InputField>;
@@ -16,6 +17,23 @@ pub trait CRUD {
     type Model;
 
     fn table_name() -> String;
+
+    fn input_field_push_bind(value: &InputField, builder: &mut QueryBuilder<Sqlite>) {
+        match value {
+            InputField::Text(x) => {
+                builder.push_bind(x.clone());
+            }
+            InputField::Number(x) => {
+                builder.push_bind(x.clone());
+            }
+            InputField::Float(x) => {
+                builder.push_bind(x.clone());
+            }
+            InputField::DateTime(x) => {
+                builder.push_bind(x.clone());
+            }
+        }
+    }
 
     // async fn create_item(data: Self::InputModel) -> Result<Self::PrimaryKey, DwataError>;
 
@@ -42,34 +60,29 @@ pub trait CRUD {
         data: InputModel,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
-        let created_at = Utc::now();
-        let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new("INSERT INTO ");
-        query_builder.push(Self::table_name());
-        query_builder.push(" (");
-        let mut separated = query_builder.separated(", ");
-        for (key, _) in data.iter() {
-            separated.push(key);
-        }
-        separated.push_unseparated(") VALUES (");
+        let mut data = data;
+        data.insert("created_at".to_string(), InputField::DateTime(Utc::now()));
+        let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+            "INSERT INTO {} ({}) VALUES (",
+            Self::table_name(),
+            data.keys()
+                .map(|x| x.clone())
+                .collect::<Vec<String>>()
+                .join(", ")
+        ));
+        let mut count = 0;
+        let limit = data.len();
         for (_, value) in data.iter() {
-            match value {
-                InputField::Text(x) => {
-                    separated.push_bind(x);
-                }
-                InputField::Number(x) => {
-                    separated.push_bind(x);
-                }
-                InputField::Float(x) => {
-                    separated.push_bind(x);
-                }
+            Self::input_field_push_bind(value, &mut builder);
+            count += 1;
+            if count < limit {
+                builder.push(", ");
             }
         }
-        let sql = query_builder.build().sql();
-        match query(sql)
-            .bind(created_at)
-            .execute(&mut *db_connection)
-            .await
-        {
+        builder.push(")");
+        let executable = builder.build();
+        let sql = &executable.sql();
+        match executable.execute(&mut *db_connection).await {
             Ok(result) => Ok(result.last_insert_rowid()),
             Err(err) => {
                 error!(
@@ -95,17 +108,7 @@ pub trait CRUD {
         let limit = data.len();
         for (key, value) in data.iter() {
             builder.push(format!("{} = ", key));
-            match value {
-                InputField::Text(x) => {
-                    builder.push_bind(x);
-                }
-                InputField::Number(x) => {
-                    builder.push_bind(x);
-                }
-                InputField::Float(x) => {
-                    builder.push_bind(x);
-                }
-            }
+            Self::input_field_push_bind(value, &mut builder);
             count += 1;
             if count < limit {
                 builder.push(", ");
