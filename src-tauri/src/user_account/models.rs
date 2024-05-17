@@ -22,9 +22,3 @@ pub struct UserAccount {
     #[ts(type = "string")]
     pub created_at: DateTime<Utc>,
 }
-
-pub struct InputUserAccount {
-    pub first_name: Option<String>,
-    pub last_name: Option<String>,
-    pub email: Option<String>,
-}

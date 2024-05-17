@@ -35,19 +35,19 @@ pub(crate) async fn save_user(
     }
     let pk = 1;
     match *db_guard {
-        Some(ref mut conn) => {
+        Some(ref mut db_connection) => {
             let executed = query("SELECT * FROM user_account WHERE id = ?")
                 .bind(pk)
-                .fetch_one(&mut *conn)
+                .fetch_one(&mut *db_connection)
                 .await;
             match executed {
                 Ok(_) => {
                     info!("User with id {} exists, updating", pk);
-                    UserAccount::update_by_pk(1, input, conn).await
+                    UserAccount::update_by_pk(pk, input, db_connection).await
                 }
                 Err(_) => {
                     info!("User with id {} does not exist, creating", pk);
-                    UserAccount::insert(input, conn).await
+                    UserAccount::insert(input, db_connection).await
                 }
             }
         }
