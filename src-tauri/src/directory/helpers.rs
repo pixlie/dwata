@@ -1,13 +1,15 @@
-use crate::content::containers::HeterogeneousContentArray;
+use crate::content::containers::{HeterogeneousContentArray, HeterogenousContent};
+use crate::content::content_types::{Content, ContentType};
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, Options};
+use std::collections::HashSet;
 use std::path::PathBuf;
 
 pub fn get_file_contents(file_path: &PathBuf) -> HeterogeneousContentArray {
     let file_contents = std::fs::read_to_string(file_path).unwrap();
     let arena = Arena::new();
     let root = parse_document(&arena, &file_contents, &Options::default());
-    let mut result: Vec<(usize, Content)> = vec![];
+    let mut contents: Vec<HeterogenousContent> = vec![];
 
     fn extract_text<'a>(node: &'a AstNode<'a>, accumulator: &mut Vec<String>) {
         for child in node.children() {
@@ -26,24 +28,45 @@ pub fn get_file_contents(file_path: &PathBuf) -> HeterogeneousContentArray {
                 // We found a heading, we extract all the text children nodes and store as Content::Heading
                 let mut accumulator: Vec<String> = vec![];
                 extract_text(child, &mut accumulator);
-                result.push((0, Content::Heading(accumulator.join(" "))));
+                contents.push((
+                    ContentType::Text,
+                    HashSet::new(),
+                    Content::Text(accumulator.join(" ")),
+                ));
             }
             NodeValue::Paragraph => {
                 // We found a paragraph, we extract all the text children nodes and store as Content::Paragraph
                 let mut accumulator: Vec<String> = vec![];
                 extract_text(child, &mut accumulator);
-                match result.last_mut() {
-                    Some(x) => match x {
-                        (_, Content::Paragraph(p)) => {
-                            // If the previous element is a Content::Paragraph, we append to it
-                            x.1 = Content::Paragraph(format!("{} {}", p, accumulator.join(" ")));
+                match contents.last_mut() {
+                    Some((content_type, _, data)) => match content_type {
+                        ContentType::Text => {
+                            // If the previous element is a Content::Text, we append to it
+                            match data {
+                                Content::Text(content) => {
+                                    *data = Content::Text(format!(
+                                        "{} {}",
+                                        content,
+                                        accumulator.join(" ")
+                                    ))
+                                }
+                                _ => {}
+                            }
                         }
                         _ => {
-                            result.push((0, Content::Paragraph(accumulator.join(" "))));
+                            contents.push((
+                                ContentType::Text,
+                                HashSet::new(),
+                                Content::Text(accumulator.join(" ")),
+                            ));
                         }
                     },
                     _ => {
-                        result.push((0, Content::Paragraph(accumulator.join(" "))));
+                        contents.push((
+                            ContentType::Text,
+                            HashSet::new(),
+                            Content::Text(accumulator.join(" ")),
+                        ));
                     }
                 }
             }
@@ -51,7 +74,7 @@ pub fn get_file_contents(file_path: &PathBuf) -> HeterogeneousContentArray {
         }
     }
 
-    result
+    HeterogeneousContentArray { contents }
 }
 
 #[cfg(test)]
@@ -60,11 +83,11 @@ mod tests {
 
     #[test]
     fn test_get_file_contents() {
-        let result: Vec<(usize, Content)> = get_file_contents(
+        let result: HeterogeneousContentArray = get_file_contents(
             &std::env::current_dir()
                 .unwrap()
                 .join("test_fixtures/fastapi_tutorial.md"),
         );
-        assert_eq!(result.len(), 8);
+        assert_eq!(result.contents.len(), 8);
     }
 }

@@ -13,9 +13,12 @@ impl CRUD for UserAccount {
         pk: i64,
         db_connection: &mut SqliteConnection,
     ) -> Result<UserAccount, sqlx::Error> {
-        query_as("SELECT * FROM user_account WHERE id = ?1")
-            .bind(pk)
-            .fetch_one(db_connection)
-            .await
+        query_as(&format!(
+            "SELECT * FROM {} WHERE id = ?1",
+            Self::table_name()
+        ))
+        .bind(pk)
+        .fetch_one(db_connection)
+        .await
     }
 }

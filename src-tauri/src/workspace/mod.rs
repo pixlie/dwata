@@ -13,71 +13,10 @@ use tokio::sync::Mutex;
 
 // pub mod api_types;
 // pub mod commands;
-pub mod configuration;
+// pub mod configuration;
 pub mod helpers;
 
-pub struct Store {
-    // pub config: Arc<Mutex<Config>>,
-    pub db_connection: Mutex<Option<SqliteConnection>>,
-}
-
-impl Store {
-    // pub fn new(app_config_dir: &PathBuf, db_connection: Option<SqliteConnection>) -> Self {
-    pub fn new(db_connection: Option<SqliteConnection>) -> Self {
-        Store {
-            // config: Arc::new(Mutex::new(helpers::load_config(&app_config_dir))),
-            db_connection: Mutex::new(db_connection),
-        }
-    }
-}
-
-// #[derive(Debug, Deserialize, Serialize, TS)]
-// #[serde(rename_all(serialize = "camelCase"))]
-// #[ts(
-//     export,
-//     rename = "Config",
-//     rename_all = "camelCase",
-//     export_to = "../src/api_types/"
-// )]
-// pub struct Config {
-//     path_to_config: PathBuf,
-//     pub data_source_list: Vec<DatabaseSource>,
-//     // api_list: Vec<>, // Stripe, Shopify, etc.
-//     pub ai_integration_list: Vec<AIIntegration>,
-// }
-
-// impl Config {
-//     pub fn new(path_to_config: PathBuf) -> Self {
-//         Config {
-//             path_to_config,
-//             data_source_list: vec![],
-//             ai_integration_list: vec![],
-//         }
-//     }
-
-//     pub fn sync_to_file(&self) -> Result<(), DwataError> {
-//         match fs::write(self.path_to_config.clone(), self.get_pretty_string()) {
-//             Ok(_) => Ok(()),
-//             Err(_) => Err(DwataError::CouldNotWriteConfig),
-//         }
-//     }
-// }
-
-// impl Config {
-//     pub fn get_database_by_id(&self, data_source_id: &str) -> Option<&DatabaseSource> {
-//         self.data_source_list
-//             .iter()
-//             .find(|x| x.get_id() == data_source_id)
-//     }
-
-//     pub fn get_pretty_string(&self) -> String {
-//         ron::ser::to_string_pretty(&self, ron::ser::PrettyConfig::default()).unwrap()
-//     }
-
-//     // pub fn find_directory(&self, folder_id: String) -> Option<&Directory> {
-//     //     self.folder_list.iter().find(|x| x.match_id(&folder_id))
-//     // }
-// }
+pub type DwataDb = Mutex<Option<SqliteConnection>>;
 
 // impl ChatContextNode for Config {
 //     fn get_self_chat_context_node(&self) -> APIChatContextNode {

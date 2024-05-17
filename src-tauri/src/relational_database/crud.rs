@@ -52,7 +52,7 @@ pub trait CRUD {
             Self::select_one_by_pk(pk, db_connection).await;
         match result {
             Ok(row) => Ok(row),
-            Err(_) => Err(DwataError::CouldNotFetchRowsFromAppDatabase),
+            Err(_) => Err(DwataError::CouldNotFetchRowsFromDwataDB),
         }
     }
 
@@ -91,7 +91,7 @@ pub trait CRUD {
                     sql,
                     err
                 );
-                Err(DwataError::CouldNotInsertToAppDatabase)
+                Err(DwataError::CouldNotInsertToDwataDB)
             }
         }
     }
@@ -127,7 +127,7 @@ pub trait CRUD {
                     sql,
                     err
                 );
-                Err(DwataError::CouldNotUpdateAddDatabase)
+                Err(DwataError::CouldNotUpdateDwataDB)
             }
         }
     }

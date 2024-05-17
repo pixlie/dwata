@@ -16,7 +16,7 @@ mod relational_database;
 // mod saved_query;
 // mod ai;
 mod content;
-// mod directory;
+mod directory;
 // mod embedding;
 // mod schema;
 mod user_account;
@@ -35,10 +35,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     let db_connection: Option<SqliteConnection> = tauri::async_runtime::block_on(async {
         workspace::helpers::get_database_connection(&app_config_dir).await
     });
-    app.manage(workspace::Store {
-        // config: Arc::new(Mutex::new(workspace::helpers::load_config(&app_config_dir))),
-        db_connection: Mutex::new(db_connection),
-    });
+    app.manage(workspace::DwataDb::new(db_connection));
     Ok(())
 }
 
@@ -64,8 +61,8 @@ fn main() {
             // chat::commands::fetch_chat_context_node_list,
             // chat::commands::fetch_chat_context,
             // ai::commands::fetch_list_of_ai_providers_and_models,
-            // directory::commands::fetch_files_in_directory,
-            // directory::commands::fetch_file_contents,
+            directory::commands::fetch_files_in_directory,
+            directory::commands::fetch_file_contents,
             // embedding::commands::generate_text_embedding,
         ])
         .run(tauri::generate_context!())

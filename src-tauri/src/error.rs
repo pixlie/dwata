@@ -16,12 +16,12 @@ pub enum DwataError {
     CouldNotConnectToAiProvider,
     CouldNotGenerateEmbedding,
 
-    // Internal SQLite DB related
-    CouldNotCreateAppDatabase,
-    CouldNotConnectToAppDatabase,
-    CouldNotInsertToAppDatabase,
-    CouldNotUpdateAddDatabase,
-    CouldNotFetchRowsFromAppDatabase,
+    // Internal SQLite DB for Dwata
+    CouldNotCreateDwataDB,
+    CouldNotConnectToDwataDB,
+    CouldNotInsertToDwataDB,
+    CouldNotUpdateDwataDB,
+    CouldNotFetchRowsFromDwataDB,
 
     // Chat context related
     CouldNotFindNode,

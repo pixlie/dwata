@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use ts_rs::TS;
 
+pub type HeterogenousContent = (ContentType, HashSet<ContentSpec>, Content);
+
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
@@ -10,7 +12,7 @@ use ts_rs::TS;
     export_to = "../src/api_types/"
 )]
 pub struct HeterogeneousContentArray {
-    pub contents: Vec<(ContentType, HashSet<ContentSpec>, Vec<Content>)>,
+    pub contents: Vec<HeterogenousContent>,
 }
 
 #[derive(Deserialize, Serialize, TS)]

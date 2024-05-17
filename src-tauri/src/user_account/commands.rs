@@ -1,8 +1,8 @@
 use super::models::UserAccount;
 use crate::error::DwataError;
 use crate::relational_database::crud::{InputField, InputModel, CRUD};
-use crate::workspace::Store;
-use log::info;
+use crate::workspace::DwataDb;
+use log::{error, info};
 use sqlx::query;
 use tauri::State;
 
@@ -11,9 +11,9 @@ pub(crate) async fn save_user(
     first_name: Option<&str>,
     last_name: Option<&str>,
     email: Option<&str>,
-    store: State<'_, Store>,
+    db: State<'_, DwataDb>,
 ) -> Result<i64, DwataError> {
-    let mut db_guard = store.db_connection.lock().await;
+    let mut db_guard = db.lock().await;
     let mut input: InputModel = InputModel::new();
     match first_name {
         Some(x) => {
@@ -56,10 +56,13 @@ pub(crate) async fn save_user(
 }
 
 #[tauri::command]
-pub(crate) async fn fetch_current_user(store: State<'_, Store>) -> Result<UserAccount, DwataError> {
-    let mut db_guard = store.db_connection.lock().await;
+pub(crate) async fn fetch_current_user(db: State<'_, DwataDb>) -> Result<UserAccount, DwataError> {
+    let mut db_guard = db.lock().await;
     match *db_guard {
         Some(ref mut db_connection) => UserAccount::read_one_by_pk(1, db_connection).await,
-        None => Err(DwataError::CouldNotConnectToDatabase),
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
     }
 }
