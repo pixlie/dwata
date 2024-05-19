@@ -8,55 +8,51 @@ use std::collections::HashSet;
 
 impl Configuration for Directory {
     type Model = Directory;
-    type PrimaryKey = i64;
 
     fn get_schema() -> ConfigurationSchema {
-        ConfigurationSchema {
-            name: "Directory".to_string(),
-            description: "Directory containing files which match specified types".to_string(),
-            fields: vec![
-                FormField {
-                    name: "path".to_string(),
-                    label: "Path to Directory".to_string(),
-                    description: Some(
-                        "The directory from which you want to read files matching specified types"
-                            .to_string(),
+        ConfigurationSchema::new(
+            "Directory",
+            "Directory containing files which match specified types",
+            vec![
+                FormField::new(
+                    "path",
+                    "Path to Directory",
+                    Some(
+                        "The directory from which you want to read files matching specified types",
                     ),
-                    field: (ContentType::Text, HashSet::new()),
-                    is_required: Some(true),
-                    is_editable: Some(true),
-                },
-                FormField {
-                    name: "label".to_string(),
-                    label: "Label".to_string(),
-                    description: Some("An easy to remember label for this directory".to_string()),
-                    field: (ContentType::Text, HashSet::new()),
-                    is_required: Some(false),
-                    is_editable: Some(true),
-                },
-                FormField {
-                    name: "include_patters".to_string(),
-                    label: "Include patterns".to_string(),
-                    description: Some(
-                        "File glob patterns to include (like in .gitignore file)".to_string(),
-                    ),
-                    field: (ContentType::Text, HashSet::new()),
-                    is_required: Some(true),
-                    is_editable: Some(true),
-                },
+                    (ContentType::Text, HashSet::new()),
+                    Some(true),
+                    Some(true),
+                ),
+                FormField::new(
+                    "label",
+                    "Label",
+                    Some("An easy to remember label for this directory"),
+                    (ContentType::Text, HashSet::new()),
+                    Some(false),
+                    Some(true),
+                ),
+                FormField::new(
+                    "include_patters",
+                    "Include patterns",
+                    Some("File glob patterns to include (like in .gitignore file)"),
+                    (ContentType::Text, HashSet::new()),
+                    Some(true),
+                    Some(true),
+                ),
             ],
-        }
+        )
     }
 
     async fn list_configurations(
         db_connection: &mut SqliteConnection,
-    ) -> Result<Self::Model, DwataError> {
+    ) -> Result<Directory, DwataError> {
     }
 
     async fn create_configuration(
         data: ConfigurationData,
         db_connection: &mut SqliteConnection,
-    ) -> Result<String, DwataError> {
+    ) -> Result<i64, DwataError> {
     }
 
     async fn update_configuration(

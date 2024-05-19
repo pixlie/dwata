@@ -13,7 +13,7 @@ use tokio::sync::Mutex;
 
 // pub mod api_types;
 // pub mod commands;
-// pub mod configuration;
+pub mod configuration;
 pub mod helpers;
 
 pub type DwataDb = Mutex<Option<SqliteConnection>>;

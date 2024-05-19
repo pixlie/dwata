@@ -1,5 +1,6 @@
-use super::form::FormField;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -46,7 +47,7 @@ pub enum ContentType {
     Link,
     Code,
     FilePath,
-    FormField,
+    DateTime,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
@@ -60,13 +61,12 @@ pub(crate) enum ContentSpec {
     // BulletPoints,
 }
 
-#[derive(Deserialize, Serialize, TS)]
-#[ts(export, rename = "Content", export_to = "../src/api_types/")]
+#[derive(Deserialize, Serialize)]
 pub enum Content {
     Text(String),
     Image(Image),
     Link(Link),
     Code(Code),
-    FilePath(String),
-    FormField(FormField),
+    FilePath(PathBuf),
+    DateTime(DateTime<Utc>),
 }

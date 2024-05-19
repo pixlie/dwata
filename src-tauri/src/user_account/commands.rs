@@ -1,6 +1,8 @@
 use super::models::UserAccount;
+use crate::content::content_types::Content;
+use crate::content::form::FormFieldData;
 use crate::error::DwataError;
-use crate::relational_database::crud::{InputField, InputModel, CRUD};
+use crate::relational_database::crud::{InputModel, CRUD};
 use crate::workspace::DwataDb;
 use log::{error, info};
 use sqlx::query;
@@ -17,19 +19,28 @@ pub(crate) async fn save_user(
     let mut input: InputModel = InputModel::new();
     match first_name {
         Some(x) => {
-            input.insert("first_name".to_string(), InputField::Text(x.to_string()));
+            input.push(FormFieldData {
+                name: "first_name".to_string(),
+                data: Content::Text(x.to_string()),
+            });
         }
         None => {}
     }
     match last_name {
         Some(x) => {
-            input.insert("last_name".to_string(), InputField::Text(x.to_string()));
+            input.push(FormFieldData {
+                name: "last_name".to_string(),
+                data: Content::Text(x.to_string()),
+            });
         }
         None => {}
     }
     match email {
         Some(x) => {
-            input.insert("email".to_string(), InputField::Text(x.to_string()));
+            input.push(FormFieldData {
+                name: "email".to_string(),
+                data: Content::Text(x.to_string()),
+            });
         }
         None => {}
     }

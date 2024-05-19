@@ -18,6 +18,16 @@ pub struct ConfigurationSchema {
     pub fields: Vec<FormField>,
 }
 
+impl ConfigurationSchema {
+    pub fn new(name: &str, desctiption: &str, fields: Vec<FormField>) -> Self {
+        ConfigurationSchema {
+            name: name.to_string(),
+            description: desctiption.to_string(),
+            fields,
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
@@ -32,12 +42,11 @@ pub struct ConfigurationData {
 
 pub trait Configuration {
     type Model;
-    type PrimaryKey;
 
     fn get_schema() -> ConfigurationSchema;
 
     async fn get_single_configuration(
-        id: Self::PrimaryKey,
+        id: i64,
         db_connection: &mut SqliteConnection,
     ) -> Result<Self::Model, DwataError>;
 
@@ -48,10 +57,10 @@ pub trait Configuration {
     async fn create_configuration(
         data: ConfigurationData,
         db_connection: &mut SqliteConnection,
-    ) -> Result<String, DwataError>;
+    ) -> Result<i64, DwataError>;
 
     async fn update_configuration(
-        id: &str,
+        id: i64,
         data: ConfigurationData,
         db_connection: &mut SqliteConnection,
     ) -> Result<bool, DwataError>;

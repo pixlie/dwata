@@ -22,6 +22,26 @@ pub struct FormField {
     pub is_editable: Option<bool>,
 }
 
+impl FormField {
+    pub fn new(
+        name: &str,
+        label: &str,
+        description: Option<&str>,
+        field: (ContentType, HashSet<ContentSpec>),
+        is_required: Option<bool>,
+        is_editable: Option<bool>,
+    ) -> Self {
+        FormField {
+            name: name.to_string(),
+            label: label.to_string(),
+            description: description.and_then(|x| Some(x.to_string())),
+            field,
+            is_required,
+            is_editable,
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize, TS)]
 #[ts(
     export,
