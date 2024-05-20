@@ -3,19 +3,19 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use ts_rs::TS;
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(
     export,
     rename = "Image",
     rename_all = "camelCase",
     export_to = "../src/api_types/"
 )]
-pub(crate) struct Image {
+pub struct Image {
     pub url: String,
     pub caption: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(
     export,
     rename = "Link",
@@ -27,16 +27,24 @@ pub struct Link {
     pub caption: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(
     export,
     rename = "Code",
     rename_all = "camelCase",
     export_to = "../src/api_types/"
 )]
-pub(crate) struct Code {
+pub struct Code {
     pub language: String,
     pub lines: Vec<(usize, String)>,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
+#[ts(export, rename = "TextType", export_to = "../src/api_types/")]
+pub enum TextType {
+    Email,
+    Password,
+    Default,
 }
 
 #[derive(Deserialize, Serialize, TS)]
@@ -50,23 +58,28 @@ pub enum ContentType {
     DateTime,
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
-#[ts(export, rename = "ContentSpec", export_to = "../src/api_types/")]
-pub(crate) enum ContentSpec {
-    // MinimumLength(usize),
-    MaximumLength(usize),
-    HeadingLevel(usize),
+#[derive(Default, Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
+#[ts(
+    export,
+    rename = "ContentSpec",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
+pub struct ContentSpec {
+    text_type: Option<TextType>,
+    length_limits: Option<(usize, usize)>,
     // Text can be a prompt to AI model
-    IsPrompt,
+    is_prompt: Option<bool>,
     // BulletPoints,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(export, rename = "Content", export_to = "../src/api_types/")]
 pub enum Content {
     Text(String),
     Image(Image),
     Link(Link),
-    Code(Code),
-    FilePath(PathBuf),
+    // Code(Code),
+    // FilePath(PathBuf),
     DateTime(DateTime<Utc>),
 }

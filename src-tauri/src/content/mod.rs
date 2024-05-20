@@ -1,3 +1,3 @@
 pub mod containers;
-pub mod content_types;
+pub mod content;
 pub mod form;

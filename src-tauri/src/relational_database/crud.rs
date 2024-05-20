@@ -1,24 +1,36 @@
 use crate::{
-    content::{content_types::Content, form::FormFieldData},
+    content::{
+        content::Content,
+        form::{FormFieldData, FormFieldDataSingleOrArray},
+    },
     error::DwataError,
 };
 use chrono::Utc;
 use log::error;
 use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
 
-pub type InputModel = Vec<FormFieldData>;
+pub type FormData = Vec<FormFieldData>;
 
 pub trait CRUD {
     type Model;
 
     fn table_name() -> String;
 
-    fn input_field_push_bind(value: &Content, builder: &mut QueryBuilder<Sqlite>) {
+    fn input_field_push_bind(
+        value: &FormFieldDataSingleOrArray,
+        builder: &mut QueryBuilder<Sqlite>,
+    ) {
         match value {
-            Content::Text(x) => {
+            FormFieldDataSingleOrArray::Single(Content::Text(x)) => {
                 builder.push_bind(x.clone());
             }
-            _ => {}
+            // FormFieldDataSingleOrArray::Array(x)
+            _ => {
+                error!(
+                    "Unhandled value type in CRUD::input_field_push_bind {:?}",
+                    value
+                )
+            }
         }
     }
 
@@ -44,13 +56,13 @@ pub trait CRUD {
     }
 
     async fn insert(
-        data: InputModel,
+        data: FormData,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
         let mut data = data;
         data.push(FormFieldData {
             name: "created_at".to_string(),
-            data: Content::DateTime(Utc::now()),
+            data: FormFieldDataSingleOrArray::Single(Content::DateTime(Utc::now())),
         });
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
@@ -88,7 +100,7 @@ pub trait CRUD {
 
     async fn update_by_pk(
         pk: i64,
-        data: InputModel,
+        data: FormData,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
         let mut builder: QueryBuilder<Sqlite> =

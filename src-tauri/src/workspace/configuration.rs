@@ -1,8 +1,6 @@
 use crate::content::form::FormField;
-use crate::content::form::FormFieldData;
-use crate::error::DwataError;
+use crate::relational_database::crud::FormData;
 use serde::{Deserialize, Serialize};
-use sqlx::SqliteConnection;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -37,31 +35,26 @@ impl ConfigurationSchema {
 )]
 pub struct ConfigurationData {
     pub id: Option<String>,
-    pub data: Vec<FormFieldData>,
+    pub data: FormData,
 }
 
-pub trait Configuration {
-    type Model;
-
+pub trait Configurable {
     fn get_schema() -> ConfigurationSchema;
-
-    async fn get_single_configuration(
-        id: i64,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<Self::Model, DwataError>;
-
-    async fn list_configurations(
-        db_connection: &mut SqliteConnection,
-    ) -> Result<ConfigurationData, DwataError>;
-
-    async fn create_configuration(
-        data: ConfigurationData,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<i64, DwataError>;
-
-    async fn update_configuration(
-        id: i64,
-        data: ConfigurationData,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<bool, DwataError>;
 }
+
+// pub trait ManageConfiguration {
+// async fn get_single_configuration(
+//     id: i64,
+//     db_connection: &mut SqliteConnection,
+// ) -> Result<Self::Model, DwataError>;
+
+// async fn list_configurations(
+//     db_connection: &mut SqliteConnection,
+// ) -> Result<ConfigurationData, DwataError>;
+
+// async fn update_configuration(
+//     id: i64,
+//     data: ConfigurationData,
+//     db_connection: &mut SqliteConnection,
+// ) -> Result<bool, DwataError>;
+// }

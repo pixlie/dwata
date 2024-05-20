@@ -1,23 +1,36 @@
 use super::models::{Directory, File};
 use crate::content::containers::HeterogeneousContentArray;
+use crate::content::form::FormFieldData;
 use crate::error::DwataError;
-use crate::relational_database::crud::CRUD;
-use crate::workspace::configuration::{Configuration, ConfigurationData};
+use crate::relational_database::crud::{FormData, CRUD};
 use crate::workspace::DwataDb;
 use log::error;
 use std::path::PathBuf;
 use tauri::State;
 
 #[tauri::command]
-pub async fn create_folder_source(
+pub async fn create_directory_source(
     path: &str,
     label: Option<&str>,
     include_patterns: Vec<&str>,
-    exclude_patterns: Vec<&str>,
+    // exclude_patterns: Vec<&str>,
     db: State<'_, DwataDb>,
-) -> Result<String, DwataError> {
+) -> Result<i64, DwataError> {
+    let mut form_data: FormData = FormData::new();
+    form_data.push(FormFieldData::from_string("path", path));
+    if label.is_some() {
+        form_data.push(FormFieldData::from_string("label", label.unwrap()));
+    }
+    form_data.push(FormFieldData::from_array_of_string(
+        "include_patterns",
+        include_patterns,
+    ));
+    // form_data.push(FormFieldData::from_array_of_string(
+    //     "exclude_patterns",
+    //     exclude_patterns,
+    // ));
     match *(db.lock().await) {
-        Some(ref mut db_connection) => Directory::create_configuration(data, db_connection).await,
+        Some(ref mut db_connection) => Directory::insert(form_data, db_connection).await,
         None => Err(DwataError::CouldNotConnectToDatabase),
     }
 }

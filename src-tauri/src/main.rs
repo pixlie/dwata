@@ -1,12 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use sqlx::SqliteConnection;
-use std::path::PathBuf;
-// use std::sync::Arc;
 use env_logger;
 use log::info;
+use sqlx::SqliteConnection;
+use std::path::PathBuf;
 use tauri::{App, Manager};
-use tokio::sync::Mutex;
 
 // mod data_sources;
 mod error;
@@ -52,6 +50,7 @@ fn main() {
             // workspace::commands::create_folder_source,
             // workspace::commands::create_ai_integration,
             // workspace::commands::update_ai_integration,
+            user_account::commands::get_configuration_schema,
             user_account::commands::save_user,
             user_account::commands::fetch_current_user,
             // chat::commands::start_chat_thread,
@@ -61,6 +60,7 @@ fn main() {
             // chat::commands::fetch_chat_context_node_list,
             // chat::commands::fetch_chat_context,
             // ai::commands::fetch_list_of_ai_providers_and_models,
+            directory::commands::create_directory_source,
             directory::commands::fetch_files_in_directory,
             directory::commands::fetch_file_contents,
             // embedding::commands::generate_text_embedding,

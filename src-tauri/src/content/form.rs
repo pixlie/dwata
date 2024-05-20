@@ -1,6 +1,5 @@
-use crate::content::content_types::{Content, ContentSpec, ContentType};
+use crate::content::content::{Content, ContentSpec, ContentType};
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -15,7 +14,8 @@ pub struct FormField {
     pub name: String,
     pub label: String,
     pub description: Option<String>,
-    pub field: (ContentType, HashSet<ContentSpec>),
+    pub placeholder: Option<String>,
+    pub field: (ContentType, ContentSpec),
     // Not required by default
     pub is_required: Option<bool>,
     // Editable by default
@@ -27,7 +27,7 @@ impl FormField {
         name: &str,
         label: &str,
         description: Option<&str>,
-        field: (ContentType, HashSet<ContentSpec>),
+        field: (ContentType, ContentSpec),
         is_required: Option<bool>,
         is_editable: Option<bool>,
     ) -> Self {
@@ -35,11 +35,24 @@ impl FormField {
             name: name.to_string(),
             label: label.to_string(),
             description: description.and_then(|x| Some(x.to_string())),
+            placeholder: None,
             field,
             is_required,
             is_editable,
         }
     }
+}
+
+#[derive(Debug, Deserialize, Serialize, TS)]
+#[ts(
+    export,
+    rename = "FormFieldDataSingleOrArray",
+    rename_all = "camelCase",
+    export_to = "../src/api_types/"
+)]
+pub enum FormFieldDataSingleOrArray {
+    Single(Content),
+    Array(Vec<Content>),
 }
 
 #[derive(Deserialize, Serialize, TS)]
@@ -51,5 +64,31 @@ impl FormField {
 )]
 pub struct FormFieldData {
     pub name: String,
-    pub data: Content,
+    pub data: FormFieldDataSingleOrArray,
+}
+
+impl FormFieldData {
+    pub fn from_string<T>(name: &str, data: T) -> Self
+    where
+        T: ToString,
+    {
+        FormFieldData {
+            name: name.to_string(),
+            data: FormFieldDataSingleOrArray::Single(Content::Text(data.to_string())),
+        }
+    }
+}
+
+impl FormFieldData {
+    pub fn from_array_of_string<T>(name: &str, data: Vec<T>) -> Self
+    where
+        T: ToString,
+    {
+        FormFieldData {
+            name: name.to_string(),
+            data: FormFieldDataSingleOrArray::Array(
+                data.iter().map(|x| Content::Text(x.to_string())).collect(),
+            ),
+        }
+    }
 }

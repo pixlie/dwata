@@ -1,4 +1,4 @@
-use super::content_types::{Content, ContentSpec, ContentType};
+use super::content::{Content, ContentSpec, ContentType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use ts_rs::TS;
@@ -26,5 +26,3 @@ pub struct HomogeneousContentArray {
     pub content_type_spec: HashSet<ContentSpec>,
     pub contents: Vec<Content>,
 }
-
-// pub struct TypedGrid {}

@@ -1,4 +1,4 @@
-use super::models::UserAccount;
+use super::UserAccount;
 use crate::relational_database::crud::CRUD;
 use sqlx::{query_as, SqliteConnection};
 

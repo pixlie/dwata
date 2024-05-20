@@ -1,51 +1,42 @@
-use super::models::UserAccount;
-use crate::content::content_types::Content;
+use super::UserAccount;
 use crate::content::form::FormFieldData;
 use crate::error::DwataError;
-use crate::relational_database::crud::{InputModel, CRUD};
+use crate::relational_database::crud::FormData;
+use crate::relational_database::crud::CRUD;
+use crate::workspace::configuration::Configurable;
+use crate::workspace::configuration::ConfigurationSchema;
 use crate::workspace::DwataDb;
 use log::{error, info};
 use sqlx::query;
 use tauri::State;
 
 #[tauri::command]
-pub(crate) async fn save_user(
+pub fn get_configuration_schema() -> ConfigurationSchema {
+    UserAccount::get_schema()
+}
+
+#[tauri::command]
+pub async fn save_user(
     first_name: Option<&str>,
     last_name: Option<&str>,
     email: Option<&str>,
     db: State<'_, DwataDb>,
 ) -> Result<i64, DwataError> {
-    let mut db_guard = db.lock().await;
-    let mut input: InputModel = InputModel::new();
-    match first_name {
-        Some(x) => {
-            input.push(FormFieldData {
-                name: "first_name".to_string(),
-                data: Content::Text(x.to_string()),
-            });
-        }
-        None => {}
+    let mut form_data: FormData = FormData::new();
+    if first_name.is_some() {
+        form_data.push(FormFieldData::from_string(
+            "first_name",
+            first_name.unwrap(),
+        ));
     }
-    match last_name {
-        Some(x) => {
-            input.push(FormFieldData {
-                name: "last_name".to_string(),
-                data: Content::Text(x.to_string()),
-            });
-        }
-        None => {}
+    if last_name.is_some() {
+        form_data.push(FormFieldData::from_string("last_name", last_name.unwrap()));
     }
-    match email {
-        Some(x) => {
-            input.push(FormFieldData {
-                name: "email".to_string(),
-                data: Content::Text(x.to_string()),
-            });
-        }
-        None => {}
+    if email.is_some() {
+        form_data.push(FormFieldData::from_string("email", email.unwrap()));
     }
     let pk = 1;
-    match *db_guard {
+    match *db.lock().await {
         Some(ref mut db_connection) => {
             let executed = query("SELECT * FROM user_account WHERE id = ?")
                 .bind(pk)
@@ -54,11 +45,11 @@ pub(crate) async fn save_user(
             match executed {
                 Ok(_) => {
                     info!("User with id {} exists, updating", pk);
-                    UserAccount::update_by_pk(pk, input, db_connection).await
+                    UserAccount::update_by_pk(pk, form_data, db_connection).await
                 }
                 Err(_) => {
                     info!("User with id {} does not exist, creating", pk);
-                    UserAccount::insert(input, db_connection).await
+                    UserAccount::insert(form_data, db_connection).await
                 }
             }
         }
@@ -67,10 +58,10 @@ pub(crate) async fn save_user(
 }
 
 #[tauri::command]
-pub(crate) async fn fetch_current_user(db: State<'_, DwataDb>) -> Result<UserAccount, DwataError> {
-    let mut db_guard = db.lock().await;
-    match *db_guard {
-        Some(ref mut db_connection) => UserAccount::read_one_by_pk(1, db_connection).await,
+pub async fn fetch_current_user(db: State<'_, DwataDb>) -> Result<UserAccount, DwataError> {
+    let pk = 1;
+    match *db.lock().await {
+        Some(ref mut db_connection) => UserAccount::read_one_by_pk(pk, db_connection).await,
         None => {
             error!("Could not connect to Dwata DB");
             Err(DwataError::CouldNotConnectToDwataDB)

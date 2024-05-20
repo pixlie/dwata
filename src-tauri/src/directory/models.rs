@@ -31,7 +31,7 @@ pub(crate) struct File {
     export_to = "../src/api_types/"
 )]
 pub struct Directory {
-    pub id: String,
+    pub id: i64,
     #[sqlx(try_from = "String")]
     pub path: PathBuf,
     pub label: Option<String>,
