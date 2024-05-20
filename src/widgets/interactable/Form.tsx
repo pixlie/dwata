@@ -1,13 +1,13 @@
 import { Component, For, JSX, Setter } from "solid-js";
 import Heading from "../typography/Heading";
 import Button from "./Button";
-import { IFormField } from "../../utils/types";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
+import { ConfigurationSchema } from "../../api_types/ConfigurationSchema";
 
 interface IPropTypes {
-  title: string;
-  formFields: Array<IFormField>;
+  formConfiguration?: ConfigurationSchema;
+  title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
   formData?: { [key: string]: any };
@@ -37,11 +37,13 @@ const Form: Component<IPropTypes> = (props) => {
       }}
     >
       <div class="px-2 py-2 rounded-md rounded-b-none">
-        <Heading size="base">{props.title}</Heading>
+        <Heading size="base">
+          {props.formConfiguration?.name || props.title}
+        </Heading>
       </div>
 
       <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
-        <For each={props.formFields}>
+        <For each={props.formConfiguration?.fields}>
           {(field) => (
             <>
               <FormField

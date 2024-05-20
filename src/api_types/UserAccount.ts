@@ -6,6 +6,5 @@ export interface UserAccount {
   lastName: string | null;
   email: string | null;
   isSystemUser: boolean | null;
-  isAiUser: boolean | null;
   createdAt: string;
 }

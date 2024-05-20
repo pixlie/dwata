@@ -6,7 +6,8 @@ export interface FormField {
   name: string;
   label: string;
   description: string | null;
-  field: [ContentType, Array<ContentSpec>];
+  placeholder: string | null;
+  field: [ContentType, ContentSpec];
   isRequired: boolean | null;
   isEditable: boolean | null;
 }

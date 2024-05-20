@@ -1,4 +1,5 @@
 import { JSX } from "solid-js";
+import { FormField } from "../api_types/FormField";
 
 interface ILabel {
   id: number;
@@ -39,19 +40,10 @@ interface APIGridData {
   rows: Array<Array<any>>;
 }
 
-interface IFormField {
-  name: string;
-  fieldType:
-    | "singleLineText"
-    | "multiLineText"
-    | "markdown"
-    | "password"
-    | "date"
-    | "dateTime"
-    | "singleChoice";
-  label?: string;
-  isRequired?: boolean;
-  placeholder?: string;
+interface IFormField extends FormField {
+  value?: string | number;
+  onInput?: (newValue: string | number) => void;
+  onFocus?: () => void;
 }
 
 type uiThemes = "gitHubDark" | "gitHubLight";
