@@ -1,9 +1,9 @@
-use crate::content::form::FormField;
-use crate::relational_database::crud::FormData;
+use crate::content::form::{FormData, FormField};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(
     export,
     rename = "ConfigurationSchema",
@@ -27,6 +27,7 @@ impl ConfigurationSchema {
 }
 
 #[derive(Deserialize, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(
     export,
     rename = "ConfigurationData",
@@ -41,20 +42,3 @@ pub struct ConfigurationData {
 pub trait Configurable {
     fn get_schema() -> ConfigurationSchema;
 }
-
-// pub trait ManageConfiguration {
-// async fn get_single_configuration(
-//     id: i64,
-//     db_connection: &mut SqliteConnection,
-// ) -> Result<Self::Model, DwataError>;
-
-// async fn list_configurations(
-//     db_connection: &mut SqliteConnection,
-// ) -> Result<ConfigurationData, DwataError>;
-
-// async fn update_configuration(
-//     id: i64,
-//     data: ConfigurationData,
-//     db_connection: &mut SqliteConnection,
-// ) -> Result<bool, DwataError>;
-// }

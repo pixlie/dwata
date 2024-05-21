@@ -1,5 +1,6 @@
-import { JSX } from "solid-js";
+import { JSX, Setter } from "solid-js";
 import { FormField } from "../api_types/FormField";
+import { FormFieldData } from "../api_types/FormFieldData";
 
 interface ILabel {
   id: number;
@@ -41,10 +42,12 @@ interface APIGridData {
 }
 
 interface IFormField extends FormField {
-  value?: string | number;
-  onInput?: (newValue: string | number) => void;
+  value?: FormFieldData;
+  onInput?: Setter<IFormData>;
   onFocus?: () => void;
 }
+
+type IFormData = {[key: string]: FormFieldData};
 
 type uiThemes = "gitHubDark" | "gitHubLight";
 
@@ -56,5 +59,6 @@ export type {
   IProviderPropTypes,
   APIGridData,
   IFormField,
+  IFormData,
   uiThemes,
 };

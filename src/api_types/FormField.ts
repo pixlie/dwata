@@ -7,7 +7,8 @@ export interface FormField {
   label: string;
   description: string | null;
   placeholder: string | null;
-  field: [ContentType, ContentSpec];
+  contentType: ContentType;
+  contentSpec: ContentSpec;
   isRequired: boolean | null;
   isEditable: boolean | null;
 }

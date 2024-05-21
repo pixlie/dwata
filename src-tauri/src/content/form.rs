@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use crate::content::content::{Content, ContentSpec, ContentType};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(
     export,
     rename = "FormField",
@@ -15,7 +18,8 @@ pub struct FormField {
     pub label: String,
     pub description: Option<String>,
     pub placeholder: Option<String>,
-    pub field: (ContentType, ContentSpec),
+    pub content_type: ContentType,
+    pub content_spec: ContentSpec,
     // Not required by default
     pub is_required: Option<bool>,
     // Editable by default
@@ -27,7 +31,8 @@ impl FormField {
         name: &str,
         label: &str,
         description: Option<&str>,
-        field: (ContentType, ContentSpec),
+        content_type: ContentType,
+        content_spec: ContentSpec,
         is_required: Option<bool>,
         is_editable: Option<bool>,
     ) -> Self {
@@ -36,7 +41,8 @@ impl FormField {
             label: label.to_string(),
             description: description.and_then(|x| Some(x.to_string())),
             placeholder: None,
-            field,
+            content_type,
+            content_spec,
             is_required,
             is_editable,
         }
@@ -46,49 +52,31 @@ impl FormField {
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(
     export,
-    rename = "FormFieldDataSingleOrArray",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
-pub enum FormFieldDataSingleOrArray {
-    Single(Content),
-    Array(Vec<Content>),
-}
-
-#[derive(Deserialize, Serialize, TS)]
-#[ts(
-    export,
     rename = "FormFieldData",
     rename_all = "camelCase",
     export_to = "../src/api_types/"
 )]
-pub struct FormFieldData {
-    pub name: String,
-    pub data: FormFieldDataSingleOrArray,
+pub enum FormFieldData {
+    Single(Content),
+    Array(Vec<Content>),
 }
 
 impl FormFieldData {
-    pub fn from_string<T>(name: &str, data: T) -> Self
+    pub fn from_string<T>(data: T) -> Self
     where
         T: ToString,
     {
-        FormFieldData {
-            name: name.to_string(),
-            data: FormFieldDataSingleOrArray::Single(Content::Text(data.to_string())),
-        }
+        FormFieldData::Single(Content::Text(data.to_string()))
     }
 }
 
 impl FormFieldData {
-    pub fn from_array_of_string<T>(name: &str, data: Vec<T>) -> Self
+    pub fn from_array_of_string<T>(data: Vec<T>) -> Self
     where
         T: ToString,
     {
-        FormFieldData {
-            name: name.to_string(),
-            data: FormFieldDataSingleOrArray::Array(
-                data.iter().map(|x| Content::Text(x.to_string())).collect(),
-            ),
-        }
+        FormFieldData::Array(data.iter().map(|x| Content::Text(x.to_string())).collect())
     }
 }
+
+pub type FormData = HashMap<String, FormFieldData>;

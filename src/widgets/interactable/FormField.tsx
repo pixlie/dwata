@@ -4,8 +4,9 @@ import TextInput from "./TextInput";
 import { IFormField } from "../../utils/types";
 
 const FormField: Component<IFormField> = (props) => {
-  let Field: Component | undefined = undefined; // Initialize Field with a default value
-  switch (props.field[0]) {
+  let Field: Component<IFormField> | null = null; // Initialize Field with a default value
+
+  switch (props.contentType) {
     case "Text": {
       Field = TextInput;
       break;

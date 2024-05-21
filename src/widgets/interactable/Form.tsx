@@ -4,29 +4,20 @@ import Button from "./Button";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
 import { ConfigurationSchema } from "../../api_types/ConfigurationSchema";
+import { IFormData } from "../../utils/types";
 
 interface IPropTypes {
-  formConfiguration?: ConfigurationSchema;
+  configuration?: ConfigurationSchema;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
-  formData?: { [key: string]: any };
-  setFieldInput?: Setter<{ [key: string]: any }>;
+  formData: IFormData;
+  onInput?: Setter<IFormData>;
   handleSubmit?: () => {};
 }
 
 const Form: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
-
-  const handleChange = (field: string) => {
-    return (data: string | number) => {
-      !!props.setFieldInput &&
-        props.setFieldInput((state) => ({
-          ...state,
-          [field]: data,
-        }));
-    };
-  };
 
   return (
     <div
@@ -37,19 +28,21 @@ const Form: Component<IPropTypes> = (props) => {
       }}
     >
       <div class="px-2 py-2 rounded-md rounded-b-none">
-        <Heading size="base">
-          {props.formConfiguration?.name || props.title}
-        </Heading>
+        <Heading size="xl">{props.configuration?.name || props.title}</Heading>
+
+        <p style={{ color: getColors().colors["editor.foreground"] }}>
+          {props.configuration?.description}
+        </p>
       </div>
 
       <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
-        <For each={props.formConfiguration?.fields}>
+        <For each={props.configuration?.fields}>
           {(field) => (
             <>
               <FormField
                 {...field}
-                onInput={handleChange(field.name)}
-                value={props.formData?.[field.name]}
+                onInput={props.onInput}
+                value={props.formData[field.name]}
               />
               <div class="mt-4" />
             </>

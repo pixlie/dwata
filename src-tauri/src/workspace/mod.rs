@@ -12,7 +12,7 @@ use tokio::sync::Mutex;
 // use ts_rs::TS;
 
 // pub mod api_types;
-// pub mod commands;
+pub mod commands;
 pub mod configuration;
 pub mod helpers;
 

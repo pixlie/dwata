@@ -1,7 +1,7 @@
 use crate::{
     content::{
         content::Content,
-        form::{FormFieldData, FormFieldDataSingleOrArray},
+        form::{FormData, FormFieldData},
     },
     error::DwataError,
 };
@@ -9,19 +9,14 @@ use chrono::Utc;
 use log::error;
 use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
 
-pub type FormData = Vec<FormFieldData>;
-
 pub trait CRUD {
     type Model;
 
     fn table_name() -> String;
 
-    fn input_field_push_bind(
-        value: &FormFieldDataSingleOrArray,
-        builder: &mut QueryBuilder<Sqlite>,
-    ) {
+    fn input_field_push_bind(value: &FormFieldData, builder: &mut QueryBuilder<Sqlite>) {
         match value {
-            FormFieldDataSingleOrArray::Single(Content::Text(x)) => {
+            FormFieldData::Single(Content::Text(x)) => {
                 builder.push_bind(x.clone());
             }
             // FormFieldDataSingleOrArray::Array(x)
@@ -60,22 +55,22 @@ pub trait CRUD {
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
         let mut data = data;
-        data.push(FormFieldData {
-            name: "created_at".to_string(),
-            data: FormFieldDataSingleOrArray::Single(Content::DateTime(Utc::now())),
-        });
+        data.insert(
+            "created_at".to_string(),
+            FormFieldData::Single(Content::DateTime(Utc::now())),
+        );
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
             Self::table_name(),
-            data.iter()
-                .map(|x| x.name.clone())
+            data.keys()
+                .map(|x| x.clone())
                 .collect::<Vec<String>>()
                 .join(", ")
         ));
         let mut count = 0;
         let limit = data.len();
-        for field in data.iter() {
-            Self::input_field_push_bind(&field.data, &mut builder);
+        for field in data.values() {
+            Self::input_field_push_bind(&field, &mut builder);
             count += 1;
             if count < limit {
                 builder.push(", ");
@@ -108,9 +103,9 @@ pub trait CRUD {
         builder.push(" SET ");
         let mut count = 0;
         let limit = data.len();
-        for field in data.iter() {
-            builder.push(format!("{} = ", field.name));
-            Self::input_field_push_bind(&field.data, &mut builder);
+        for (name, data) in data.iter() {
+            builder.push(format!("{} = ", name));
+            Self::input_field_push_bind(&data, &mut builder);
             count += 1;
             if count < limit {
                 builder.push(", ");

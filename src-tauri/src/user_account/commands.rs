@@ -1,19 +1,11 @@
 use super::UserAccount;
-use crate::content::form::FormFieldData;
+use crate::content::form::{FormData, FormFieldData};
 use crate::error::DwataError;
-use crate::relational_database::crud::FormData;
 use crate::relational_database::crud::CRUD;
-use crate::workspace::configuration::Configurable;
-use crate::workspace::configuration::ConfigurationSchema;
 use crate::workspace::DwataDb;
 use log::{error, info};
 use sqlx::query;
 use tauri::State;
-
-#[tauri::command]
-pub fn get_configuration_schema() -> ConfigurationSchema {
-    UserAccount::get_schema()
-}
 
 #[tauri::command]
 pub async fn save_user(
@@ -24,16 +16,22 @@ pub async fn save_user(
 ) -> Result<i64, DwataError> {
     let mut form_data: FormData = FormData::new();
     if first_name.is_some() {
-        form_data.push(FormFieldData::from_string(
-            "first_name",
-            first_name.unwrap(),
-        ));
+        form_data.insert(
+            "first_name".to_string(),
+            FormFieldData::from_string(first_name.unwrap()),
+        );
     }
     if last_name.is_some() {
-        form_data.push(FormFieldData::from_string("last_name", last_name.unwrap()));
+        form_data.insert(
+            "last_name".to_string(),
+            FormFieldData::from_string(last_name.unwrap()),
+        );
     }
     if email.is_some() {
-        form_data.push(FormFieldData::from_string("email", email.unwrap()));
+        form_data.insert(
+            "email".to_string(),
+            FormFieldData::from_string(email.unwrap()),
+        );
     }
     let pk = 1;
     match *db.lock().await {

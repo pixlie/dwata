@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use ts_rs::TS;
 
 #[derive(Debug, Deserialize, Serialize, TS)]
@@ -59,6 +58,7 @@ pub enum ContentType {
 }
 
 #[derive(Default, Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(
     export,
     rename = "ContentSpec",

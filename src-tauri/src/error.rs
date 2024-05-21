@@ -6,10 +6,8 @@ pub enum DwataError {
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
 
-    // Config related
-    CouldNotLockConfig,
-    CouldNotWriteConfig,
-    CouldNotLoadAiIntegration,
+    // Workspace related
+    ModuleNotFound,
 
     // AI API related
     InvalidAiProvider,

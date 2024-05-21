@@ -3,5 +3,5 @@ import type { FormFieldData } from "./FormFieldData";
 
 export interface ConfigurationData {
   id: string | null;
-  data: Array;
+  data: Record;
 }

@@ -1,8 +1,8 @@
 use super::models::{Directory, File};
 use crate::content::containers::HeterogeneousContentArray;
-use crate::content::form::FormFieldData;
+use crate::content::form::{FormData, FormFieldData};
 use crate::error::DwataError;
-use crate::relational_database::crud::{FormData, CRUD};
+use crate::relational_database::crud::CRUD;
 use crate::workspace::DwataDb;
 use log::error;
 use std::path::PathBuf;
@@ -17,18 +17,17 @@ pub async fn create_directory_source(
     db: State<'_, DwataDb>,
 ) -> Result<i64, DwataError> {
     let mut form_data: FormData = FormData::new();
-    form_data.push(FormFieldData::from_string("path", path));
+    form_data.insert("path".to_string(), FormFieldData::from_string(path));
     if label.is_some() {
-        form_data.push(FormFieldData::from_string("label", label.unwrap()));
+        form_data.insert(
+            "label".to_string(),
+            FormFieldData::from_string(label.unwrap()),
+        );
     }
-    form_data.push(FormFieldData::from_array_of_string(
-        "include_patterns",
-        include_patterns,
-    ));
-    // form_data.push(FormFieldData::from_array_of_string(
-    //     "exclude_patterns",
-    //     exclude_patterns,
-    // ));
+    form_data.insert(
+        "include_patterns".to_string(),
+        FormFieldData::from_array_of_string(include_patterns),
+    );
     match *(db.lock().await) {
         Some(ref mut db_connection) => Directory::insert(form_data, db_connection).await,
         None => Err(DwataError::CouldNotConnectToDatabase),

@@ -1,28 +1,32 @@
 import { Component, JSX } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
-import { FormField } from "../../api_types/FormField";
+import { IFormField } from "../../utils/types";
+import { getSingleText } from "../../utils/helpers";
 
-interface IPropTypes extends FormField {
-  value?: string | number;
-  onInput?: (newValue: string | number) => void;
-  onFocus?: () => void;
-}
-
-const TextInput: Component<IPropTypes> = (props) => {
+const TextInput: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
-  if (props.field[0] !== "Text") {
-    return <></>;
+  if (props.contentType !== "Text") {
+    return null;
   }
 
   let inputType: string = "text";
-  if (!!props.field[1].textType) {
-    const textType = props.field[1].textType;
+  if (!!props.contentSpec.textType) {
+    const textType = props.contentSpec.textType;
     if (textType === "Email") {
       inputType = "email";
     } else if (textType === "Password") {
       inputType = "password";
     }
   }
+
+  const handleInput: JSX.InputEventHandler<HTMLInputElement, InputEvent> = (
+    event,
+  ) => {
+    !!props.onInput &&
+      props.onInput({
+        [props.name]: { single: { Text: event.currentTarget.value } },
+      });
+  };
 
   return (
     <>
@@ -42,8 +46,8 @@ const TextInput: Component<IPropTypes> = (props) => {
             color: getColors().colors["input.foreground"],
           }}
           placeholder={props.placeholder || undefined}
-          value={props.value || ""}
-          onInput={(e) => props.onInput?.(e.currentTarget.value)}
+          value={getSingleText(props.value)}
+          onInput={handleInput}
           onFocus={props.onFocus}
         />
       </div>
