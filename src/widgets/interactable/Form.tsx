@@ -3,16 +3,16 @@ import Heading from "../typography/Heading";
 import Button from "./Button";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
-import { ConfigurationSchema } from "../../api_types/ConfigurationSchema";
-import { IFormData } from "../../utils/types";
+import { Configuration } from "../../api_types/Configuration";
+import { UserAccountCreateUpdate } from "../../api_types/UserAccountCreateUpdate";
 
 interface IPropTypes {
-  configuration?: ConfigurationSchema;
+  configuration?: Configuration;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
-  formData: IFormData;
-  onInput?: Setter<IFormData>;
+  formData: UserAccountCreateUpdate;
+  onInput?: Setter<UserAccountCreateUpdate>;
   handleSubmit?: () => {};
 }
 

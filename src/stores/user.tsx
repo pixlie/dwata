@@ -3,6 +3,8 @@ import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { UserAccount } from "../api_types/UserAccount";
 import { IProviderPropTypes } from "../utils/types";
+import { Module } from "../api_types/Module";
+import { ModuleDataRead } from "../api_types/ModuleDataRead";
 
 interface IStore {
   account?: UserAccount;
@@ -15,8 +17,18 @@ const makeStore = () => {
     store,
     {
       fetchCurrentUser: async () => {
-        let result = await invoke("fetch_current_user");
-        setStore({ ...store, account: result as UserAccount });
+        let result: ModuleDataRead = await invoke(
+          "read_single_module_item_by_pk",
+          {
+            module: "UserAccount" as Module,
+            pk: 1,
+          },
+        );
+
+        setStore({
+          ...store,
+          account: "UserAccount" in result ? result.UserAccount : undefined,
+        });
       },
     },
   ] as const; // `as const` forces tuple type inference

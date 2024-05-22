@@ -1,7 +1,6 @@
 import { Component, JSX } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { IFormField } from "../../utils/types";
-import { getSingleText } from "../../utils/helpers";
 
 const TextInput: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
@@ -23,9 +22,10 @@ const TextInput: Component<IFormField> = (props) => {
     event,
   ) => {
     !!props.onInput &&
-      props.onInput({
-        [props.name]: { single: { Text: event.currentTarget.value } },
-      });
+      props.onInput((state) => ({
+        ...state,
+        [props.name]: event.currentTarget.value,
+      }));
   };
 
   return (
@@ -46,7 +46,7 @@ const TextInput: Component<IFormField> = (props) => {
             color: getColors().colors["input.foreground"],
           }}
           placeholder={props.placeholder || undefined}
-          value={getSingleText(props.value)}
+          value={props.value}
           onInput={handleInput}
           onFocus={props.onFocus}
         />

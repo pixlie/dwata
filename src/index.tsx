@@ -7,7 +7,7 @@ import App from "./App";
 import Home from "./routes/Home";
 import QueryBrowser from "./routes/QueryBrowser";
 import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
-import UserAccount from "./routes/UserAccount";
+import UserAccountForm from "./routes/UserAccountForm";
 import { ChatRoutes, ChatWrapper } from "./routes/Chat";
 import DirectoryBrowser from "./routes/DirectoryBrowser";
 
@@ -19,7 +19,7 @@ render(
       <Route path={"/settings"} component={SettingsWrapper}>
         <SettingsRoutes />
       </Route>
-      <Route path={"/user"} component={UserAccount} />
+      <Route path={"/user"} component={UserAccountForm} />
       <Route path={"/"} component={Home} />
       <Route path={"/chat"} component={ChatWrapper}>
         <ChatRoutes />
