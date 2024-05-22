@@ -2,7 +2,6 @@ import { Component, createSignal, onMount } from "solid-js";
 import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
 import { useUser } from "../stores/user";
-import Heading from "../widgets/typography/Heading";
 import { useNavigate } from "@solidjs/router";
 import { Module } from "../api_types/Module";
 import { Configuration } from "../api_types/Configuration";
@@ -37,8 +36,6 @@ const UserAccountForm: Component = () => {
   });
 
   const handleSubmit = async () => {
-    console.log(formData());
-
     await invoke("upsert_module_item", {
       pk: 1,
       data: {
@@ -54,9 +51,6 @@ const UserAccountForm: Component = () => {
 
   return (
     <div class="max-w-screen-sm">
-      <Heading size="3xl">Account</Heading>
-      <div class="mb-4" />
-
       <Form
         configuration={formConfiguration()}
         title="My account"

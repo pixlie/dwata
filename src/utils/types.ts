@@ -2,6 +2,7 @@ import { JSX, Setter } from "solid-js";
 import { FormField } from "../api_types/FormField";
 import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
 import { Directory } from "../api_types/Directory";
+import { DirectoryCreateUpdate } from "../api_types/DirectoryCreateUpdate";
 
 interface ILabel {
   id: number;
@@ -44,7 +45,7 @@ interface APIGridData {
 
 interface IFormField extends FormField {
   value?: string | number;
-  onInput?: Setter<UserAccountCreateUpdate>;
+  onInput?: Setter<UserAccountCreateUpdate> | Setter<DirectoryCreateUpdate>;
   onFocus?: () => void;
 }
 

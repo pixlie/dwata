@@ -5,14 +5,15 @@ import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
 import { Configuration } from "../../api_types/Configuration";
 import { UserAccountCreateUpdate } from "../../api_types/UserAccountCreateUpdate";
+import { DirectoryCreateUpdate } from "../../api_types/DirectoryCreateUpdate";
 
 interface IPropTypes {
   configuration?: Configuration;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
-  formData: UserAccountCreateUpdate;
-  onInput?: Setter<UserAccountCreateUpdate>;
+  formData: UserAccountCreateUpdate | DirectoryCreateUpdate;
+  onInput?: Setter<UserAccountCreateUpdate> | Setter<DirectoryCreateUpdate>;
   handleSubmit?: () => {};
 }
 
@@ -27,7 +28,12 @@ const Form: Component<IPropTypes> = (props) => {
         "border-color": getColors().colors["inlineChat.border"],
       }}
     >
-      <div class="px-2 py-2 rounded-md rounded-b-none">
+      <div
+        class="px-2 py-2 rounded-md rounded-b-none border-b"
+        style={{
+          "border-color": getColors().colors["editorWidget.border"],
+        }}
+      >
         <Heading size="xl">{props.configuration?.name || props.title}</Heading>
 
         <p style={{ color: getColors().colors["editor.foreground"] }}>
