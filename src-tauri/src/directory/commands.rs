@@ -1,6 +1,5 @@
-use super::models::{Directory, File};
+use super::{Directory, File};
 use crate::content::containers::HeterogeneousContentArray;
-use crate::content::form::{FormData, FormFieldData};
 use crate::error::DwataError;
 use crate::workspace::crud::CRUD;
 use crate::workspace::DwataDb;
@@ -8,31 +7,31 @@ use log::error;
 use std::path::PathBuf;
 use tauri::State;
 
-#[tauri::command]
-pub async fn create_directory_source(
-    path: &str,
-    label: Option<&str>,
-    include_patterns: Vec<&str>,
-    // exclude_patterns: Vec<&str>,
-    db: State<'_, DwataDb>,
-) -> Result<i64, DwataError> {
-    let mut form_data: FormData = FormData::new();
-    form_data.insert("path".to_string(), FormFieldData::from_string(path));
-    if label.is_some() {
-        form_data.insert(
-            "label".to_string(),
-            FormFieldData::from_string(label.unwrap()),
-        );
-    }
-    form_data.insert(
-        "include_patterns".to_string(),
-        FormFieldData::from_array_of_string(include_patterns),
-    );
-    match *(db.lock().await) {
-        Some(ref mut db_connection) => Directory::insert(form_data, db_connection).await,
-        None => Err(DwataError::CouldNotConnectToDatabase),
-    }
-}
+// #[tauri::command]
+// pub async fn create_directory_source(
+//     path: &str,
+//     label: Option<&str>,
+//     include_patterns: Vec<&str>,
+//     // exclude_patterns: Vec<&str>,
+//     db: State<'_, DwataDb>,
+// ) -> Result<i64, DwataError> {
+//     let mut form_data: FormData = FormData::new();
+//     form_data.insert("path".to_string(), FormFieldData::from_string(path));
+//     if label.is_some() {
+//         form_data.insert(
+//             "label".to_string(),
+//             FormFieldData::from_string(label.unwrap()),
+//         );
+//     }
+//     form_data.insert(
+//         "include_patterns".to_string(),
+//         FormFieldData::from_array_of_string(include_patterns),
+//     );
+//     match *(db.lock().await) {
+//         Some(ref mut db_connection) => Directory::insert(form_data, db_connection).await,
+//         None => Err(DwataError::CouldNotConnectToDatabase),
+//     }
+// }
 
 #[tauri::command]
 pub(crate) async fn fetch_files_in_directory(

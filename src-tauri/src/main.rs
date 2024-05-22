@@ -51,7 +51,7 @@ fn main() {
             // workspace::commands::create_ai_integration,
             // workspace::commands::update_ai_integration,
             workspace::commands::get_module_configuration,
-            workspace::commands::read_single_module_item_by_pk,
+            workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::upsert_module_item,
             // chat::commands::start_chat_thread,

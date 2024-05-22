@@ -1,4 +1,4 @@
-use super::models::Directory;
+use super::Directory;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
 use crate::workspace::configuration::{Configurable, Configuration};

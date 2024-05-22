@@ -3,7 +3,7 @@ use super::{
     crud::{CRUDHelperCreate, ModuleDataCreateUpdate},
     DwataDb, Module,
 };
-use crate::directory::models::Directory;
+use crate::directory::Directory;
 use crate::error::DwataError;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::{ModuleDataRead, CRUD};
@@ -19,7 +19,7 @@ pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataEr
 }
 
 #[tauri::command]
-pub async fn read_single_module_item_by_pk(
+pub async fn read_module_item_by_pk(
     module: Module,
     pk: i64,
     db: State<'_, DwataDb>,
@@ -48,6 +48,7 @@ pub async fn insert_module_item(
     match *db.lock().await {
         Some(ref mut db_connection) => match data {
             ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
+            ModuleDataCreateUpdate::Directory(x) => x.insert_module_data(db_connection).await,
         },
         None => {
             error!("Could not connect to Dwata DB");
@@ -68,9 +69,10 @@ pub async fn upsert_module_item(
                 UserAccount::read_one_by_pk(pk, db_connection)
                     .await
                     .and_then(|x| Ok(ModuleDataRead::UserAccount(x)))
-            } // ModuleDataCreateUpdate::Directory(_) => Directory::read_one_by_pk(pk, db_connection)
-              //     .await
-              //     .and_then(|x| Ok(ModuleDataRead::Directory(x))),
+            }
+            ModuleDataCreateUpdate::Directory(_) => Directory::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::Directory(x))),
         },
         None => {
             error!("Could not connect to Dwata DB");
@@ -85,6 +87,9 @@ pub async fn upsert_module_item(
                     ModuleDataCreateUpdate::UserAccount(x) => {
                         x.update_module_data(pk, db_connection).await
                     }
+                    ModuleDataCreateUpdate::Directory(x) => {
+                        x.update_module_data(pk, db_connection).await
+                    }
                 },
                 None => {
                     error!("Could not connect to Dwata DB");
@@ -97,6 +102,9 @@ pub async fn upsert_module_item(
             match *db.lock().await {
                 Some(ref mut db_connection) => match data {
                     ModuleDataCreateUpdate::UserAccount(x) => {
+                        x.insert_module_data(db_connection).await
+                    }
+                    ModuleDataCreateUpdate::Directory(x) => {
                         x.insert_module_data(db_connection).await
                     }
                 },

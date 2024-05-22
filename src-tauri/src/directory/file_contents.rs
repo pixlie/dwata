@@ -1,4 +1,4 @@
-use super::models::Directory;
+use super::Directory;
 use crate::content::containers::{HeterogeneousContentArray, HeterogenousContent};
 use crate::content::content::{Content, ContentType};
 use comrak::nodes::{AstNode, NodeValue};

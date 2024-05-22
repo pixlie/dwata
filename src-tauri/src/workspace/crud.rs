@@ -1,14 +1,9 @@
-// use crate::content::{
-//     content::Content,
-//     form::{FormData, FormFieldData},
-// };
-use crate::directory::models::Directory;
+use crate::directory::{Directory, DirectoryCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
-// use chrono::Utc;
 use log::error;
 use serde::{Deserialize, Serialize};
-use sqlx::{Encode, Execute, QueryBuilder, Sqlite, SqliteConnection, Type};
+use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
 use ts_rs::TS;
 
 pub trait CRUD {
@@ -237,5 +232,5 @@ pub trait CRUDHelperCreate {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
-    // Directory(Directory),
+    Directory(DirectoryCreateUpdate),
 }
