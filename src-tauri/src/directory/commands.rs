@@ -2,7 +2,7 @@ use super::models::{Directory, File};
 use crate::content::containers::HeterogeneousContentArray;
 use crate::content::form::{FormData, FormFieldData};
 use crate::error::DwataError;
-use crate::relational_database::crud::CRUD;
+use crate::workspace::crud::CRUD;
 use crate::workspace::DwataDb;
 use log::error;
 use std::path::PathBuf;

@@ -1,11 +1,11 @@
 use super::models::Directory;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
-use crate::workspace::configuration::{Configurable, ConfigurationSchema};
+use crate::workspace::configuration::{Configurable, Configuration};
 
 impl Configurable for Directory {
-    fn get_schema() -> ConfigurationSchema {
-        ConfigurationSchema::new(
+    fn get_schema() -> Configuration {
+        Configuration::new(
             "Directory",
             "Directory containing files which match specified types",
             vec![
@@ -30,7 +30,7 @@ impl Configurable for Directory {
                     Some(true),
                 ),
                 FormField::new(
-                    "include_patters",
+                    "includePatters",
                     "Include patterns",
                     Some("File glob patterns to include (like in .gitignore file)"),
                     ContentType::Text,

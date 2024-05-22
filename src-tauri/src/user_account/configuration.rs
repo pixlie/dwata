@@ -1,16 +1,16 @@
 use super::UserAccount;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
-use crate::workspace::configuration::{Configurable, ConfigurationSchema};
+use crate::workspace::configuration::{Configurable, Configuration};
 
 impl Configurable for UserAccount {
-    fn get_schema() -> ConfigurationSchema {
-        ConfigurationSchema::new(
+    fn get_schema() -> Configuration {
+        Configuration::new(
             "User Account",
             "User account details",
             vec![
                 FormField::new(
-                    "first_name",
+                    "firstName",
                     "First Name",
                     None,
                     ContentType::Text,
@@ -19,7 +19,7 @@ impl Configurable for UserAccount {
                     Some(true),
                 ),
                 FormField::new(
-                    "last_name",
+                    "lastName",
                     "Last Name",
                     None,
                     ContentType::Text,

@@ -1,5 +1,5 @@
-use super::UserAccount;
-use crate::relational_database::crud::CRUD;
+use super::{UserAccount, UserAccountCreateUpdate};
+use crate::workspace::crud::{CRUDHelperCreate, InputValue, CRUD};
 use sqlx::{query_as, SqliteConnection};
 
 impl CRUD for UserAccount {
@@ -20,5 +20,28 @@ impl CRUD for UserAccount {
         .bind(pk)
         .fetch_one(db_connection)
         .await
+    }
+}
+
+impl CRUDHelperCreate for UserAccountCreateUpdate {
+    fn table_name() -> String {
+        "user_account".to_string()
+    }
+
+    fn get_column_names_values(&self) -> Vec<(String, InputValue)> {
+        let mut names_values: Vec<(String, InputValue)> = vec![];
+        match &self.first_name {
+            Some(x) => names_values.push(("first_name".to_string(), InputValue::Text(x.clone()))),
+            None => {}
+        }
+        match &self.last_name {
+            Some(x) => names_values.push(("last_name".to_string(), InputValue::Text(x.clone()))),
+            None => {}
+        }
+        match &self.email {
+            Some(x) => names_values.push(("email".to_string(), InputValue::Text(x.clone()))),
+            None => {}
+        }
+        names_values
     }
 }

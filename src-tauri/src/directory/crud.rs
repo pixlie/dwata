@@ -1,7 +1,7 @@
 use sqlx::{query_as, SqliteConnection};
 
 use super::models::Directory;
-use crate::relational_database::crud::CRUD;
+use crate::workspace::crud::CRUD;
 
 impl CRUD for Directory {
     type Model = Directory;

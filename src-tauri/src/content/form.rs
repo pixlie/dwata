@@ -1,7 +1,6 @@
-use std::collections::HashMap;
-
 use crate::content::content::{Content, ContentSpec, ContentType};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -50,12 +49,7 @@ impl FormField {
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "FormFieldData",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename = "FormFieldData", export_to = "../src/api_types/")]
 pub enum FormFieldData {
     Single(Content),
     Array(Vec<Content>),

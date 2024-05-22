@@ -6,7 +6,6 @@
 
 // pub mod api_types;
 // pub mod commands;
-pub mod crud;
 // pub mod postgresql;
 
 // #[derive(Debug, Clone, Deserialize, Serialize)]
