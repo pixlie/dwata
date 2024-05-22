@@ -6,7 +6,7 @@ import Button from "../widgets/interactable/Button";
 import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AiForm from "../widgets/settings/AiForm";
 import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
-import FolderSourceForm from "../widgets/settings/FolderSourceForm";
+import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useUserInterface } from "../stores/userInterface";
 
 const SettingsIndex: Component = () => {
@@ -25,7 +25,7 @@ const SettingsIndex: Component = () => {
         Connect to databases like MySQL, PostgreSQL, SQLite, MongoDB, etc and
         Dwata can extract schema or data from them.
         <br />
-        Connect to folders with the file types you want, like Markdown.
+        Import files like Markdown from directories.
       </p>
       <SettingsSourceList />
       <div class="mb-2" />
@@ -36,8 +36,8 @@ const SettingsIndex: Component = () => {
           size="sm"
         ></Button>
         <Button
-          label="Add a Folder"
-          href="/settings/folder-source/add"
+          label="Add a Directory"
+          href="/settings/directory-source/add"
           size="sm"
         ></Button>
       </div>
@@ -73,8 +73,11 @@ const SettingsRoutes: Component = () => {
       <Route path="/database-source/add" component={DatabaseSourceForm} />
       <Route path="/database-source/edit/:id" component={DatabaseSourceForm} />
 
-      <Route path="/folder-source/add" component={FolderSourceForm} />
-      <Route path="/folder-source/edit/:id" component={FolderSourceForm} />
+      <Route path="/directory-source/add" component={DirectorySourceForm} />
+      <Route
+        path="/directory-source/edit/:id"
+        component={DirectorySourceForm}
+      />
 
       <Route path="/ai-provider/add" component={AiForm} />
       <Route path="/ai-provider/edit/:id" component={AiForm} />

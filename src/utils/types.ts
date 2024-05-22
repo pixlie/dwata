@@ -1,6 +1,7 @@
 import { JSX, Setter } from "solid-js";
 import { FormField } from "../api_types/FormField";
 import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
+import { Directory } from "../api_types/Directory";
 
 interface ILabel {
   id: number;
@@ -47,6 +48,13 @@ interface IFormField extends FormField {
   onFocus?: () => void;
 }
 
+interface IWorkspace {
+  directoryList: Array<Directory>;
+
+  isReady: boolean;
+  isFetching: boolean;
+}
+
 type uiThemes = "gitHubDark" | "gitHubLight";
 
 export type {
@@ -57,5 +65,6 @@ export type {
   IProviderPropTypes,
   APIGridData,
   IFormField,
+  IWorkspace,
   uiThemes,
 };

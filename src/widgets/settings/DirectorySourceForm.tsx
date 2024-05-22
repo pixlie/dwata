@@ -13,7 +13,7 @@ interface IState {
   isFetching: boolean;
 }
 
-const FolderSourceForm: Component = () => {
+const DirectorySourceForm: Component = () => {
   const [state, setState] = createSignal<IState>({
     isEditing: false,
     isFetching: false,
@@ -126,4 +126,4 @@ const FolderSourceForm: Component = () => {
   );
 };
 
-export default FolderSourceForm;
+export default DirectorySourceForm;

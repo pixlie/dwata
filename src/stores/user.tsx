@@ -17,13 +17,10 @@ const makeStore = () => {
     store,
     {
       fetchCurrentUser: async () => {
-        let result: ModuleDataRead = await invoke(
-          "read_single_module_item_by_pk",
-          {
-            module: "UserAccount" as Module,
-            pk: 1,
-          },
-        );
+        let result: ModuleDataRead = await invoke("read_module_item_by_pk", {
+          module: "UserAccount" as Module,
+          pk: 1,
+        });
 
         setStore({
           ...store,
