@@ -77,10 +77,8 @@ impl Directory {
 #[serde(rename_all(serialize = "camelCase"))]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DirectoryCreateUpdate {
-    pub path: PathBuf,
+    pub path: Option<PathBuf>,
     pub label: Option<String>,
-    #[ts(type = "Vec<String>")]
-    pub include_patterns: Json<Vec<String>>,
-    #[ts(type = "Vec<String>")]
-    pub exclude_patterns: Json<Vec<String>>,
+    pub include_patterns: Vec<String>,
+    pub exclude_patterns: Vec<String>,
 }

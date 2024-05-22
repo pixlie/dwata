@@ -3,6 +3,7 @@ use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use log::error;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
 use ts_rs::TS;
 
@@ -136,33 +137,47 @@ pub enum ModuleDataRead {
 
 pub enum InputValue {
     Text(String),
+    Json(Value),
+}
+
+#[derive(Default)]
+pub struct VecColumnNameValue(Vec<(String, InputValue)>);
+
+impl VecColumnNameValue {
+    pub fn push_name_value(&mut self, name: &str, value: InputValue) {
+        self.0.push((name.to_string(), value));
+    }
 }
 
 pub trait CRUDHelperCreate {
     fn table_name() -> String;
 
-    fn get_column_names_values(&self) -> Vec<(String, InputValue)>;
+    fn get_column_names_values(&self) -> VecColumnNameValue;
 
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
-        let column_names_values: Vec<(String, InputValue)> = self.get_column_names_values();
+        let column_names_values: VecColumnNameValue = self.get_column_names_values();
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
             Self::table_name(),
             column_names_values
+                .0
                 .iter()
                 .map(|x| x.0.clone())
                 .collect::<Vec<String>>()
                 .join(", ")
         ));
         let mut count = 0;
-        let limit = column_names_values.len();
-        for column in column_names_values {
+        let limit = column_names_values.0.len();
+        for column in column_names_values.0 {
             match column.1 {
                 InputValue::Text(x) => {
                     builder.push_bind(x.clone());
+                }
+                InputValue::Json(x) => {
+                    builder.push_bind(x);
                 }
             }
             count += 1;
@@ -194,14 +209,17 @@ pub trait CRUDHelperCreate {
     ) -> Result<i64, DwataError> {
         let mut builder: QueryBuilder<Sqlite> =
             QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
-        let column_names_values: Vec<(String, InputValue)> = self.get_column_names_values();
+        let column_names_values: VecColumnNameValue = self.get_column_names_values();
         let mut count = 0;
-        let limit = column_names_values.len();
-        for (name, data) in column_names_values {
+        let limit = column_names_values.0.len();
+        for (name, data) in column_names_values.0 {
             builder.push(format!("{} = ", name));
             match data {
                 InputValue::Text(x) => {
                     builder.push_bind(x.clone());
+                }
+                InputValue::Json(x) => {
+                    builder.push_bind(x);
                 }
             }
             count += 1;
