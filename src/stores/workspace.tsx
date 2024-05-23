@@ -4,6 +4,7 @@ import { IProviderPropTypes, IWorkspace } from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import { Module } from "../api_types/Module";
 import { Directory } from "../api_types/Directory";
+import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 
 const makeStore = () => {
   const [store, setStore] = createStore<IWorkspace>({
@@ -25,12 +26,15 @@ const makeStore = () => {
           isFetching: true,
         });
         // We invoke the Tauri API to load workspace
-        const response = await invoke("read_module_list", {
+        const response: ModuleDataReadList = await invoke("read_module_list", {
           module: "Directory" as Module,
         });
         setStore((state) => ({
           ...state,
-          directoryList: response as Array<Directory>,
+          directoryList:
+            "Directory" in response
+              ? (response.Directory as Array<Directory>)
+              : [],
           isReady: true,
           isFetching: false,
         }));

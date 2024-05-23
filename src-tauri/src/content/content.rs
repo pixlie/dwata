@@ -60,12 +60,7 @@ pub enum ContentType {
 
 #[derive(Default, Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(
-    export,
-    rename = "ContentSpec",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ContentSpec {
     text_type: Option<TextType>,
     length_limits: Option<(usize, usize)>,

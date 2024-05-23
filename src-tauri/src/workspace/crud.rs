@@ -1,6 +1,7 @@
 use crate::directory::{Directory, DirectoryCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
+use chrono::{DateTime, Utc};
 use log::error;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -31,6 +32,22 @@ pub trait CRUD {
 
     // async fn read_list() -> Result<Vec<Self::Model>, DwataError>;
 
+    async fn select_all(
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Self::Model>, sqlx::Error>;
+
+    async fn read_all(
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Self::Model>, DwataError> {
+        match Self::select_all(db_connection).await {
+            Ok(result) => Ok(result),
+            Err(err) => {
+                println!("Could not fetch rows from Dwata DB.\nError: {}", err);
+                Err(DwataError::CouldNotFetchRowsFromDwataDB)
+            }
+        }
+    }
+
     async fn select_one_by_pk(
         pk: i64,
         db_connection: &mut SqliteConnection,
@@ -44,7 +61,10 @@ pub trait CRUD {
             Self::select_one_by_pk(pk, db_connection).await;
         match result {
             Ok(row) => Ok(row),
-            Err(_) => Err(DwataError::CouldNotFetchRowsFromDwataDB),
+            Err(err) => {
+                println!("Could not fetch rows from Dwata DB.\nError: {}", err);
+                Err(DwataError::CouldNotFetchRowsFromDwataDB)
+            }
         }
     }
 
@@ -128,16 +148,24 @@ pub trait CRUD {
     // }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
     Directory(Directory),
 }
 
+#[derive(Debug, Serialize, TS)]
+#[ts(export, export_to = "../src/api_types/")]
+pub enum ModuleDataReadList {
+    UserAccount(Vec<UserAccount>),
+    Directory(Vec<Directory>),
+}
+
 pub enum InputValue {
     Text(String),
     Json(Value),
+    DateTime(DateTime<Utc>),
 }
 
 #[derive(Default)]
@@ -177,6 +205,9 @@ pub trait CRUDHelperCreate {
                     builder.push_bind(x.clone());
                 }
                 InputValue::Json(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
             }
@@ -219,6 +250,9 @@ pub trait CRUDHelperCreate {
                     builder.push_bind(x.clone());
                 }
                 InputValue::Json(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
             }

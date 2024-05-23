@@ -1,6 +1,6 @@
 use super::{
     configuration::{Configurable, Configuration},
-    crud::{CRUDHelperCreate, ModuleDataCreateUpdate},
+    crud::{CRUDHelperCreate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
 use crate::directory::Directory;
@@ -15,6 +15,27 @@ pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataEr
     match module {
         Module::UserAccount => Ok(UserAccount::get_schema()),
         Module::Directory => Ok(Directory::get_schema()),
+    }
+}
+
+#[tauri::command]
+pub async fn read_module_list(
+    module: Module,
+    db: State<'_, DwataDb>,
+) -> Result<ModuleDataReadList, DwataError> {
+    match *db.lock().await {
+        Some(ref mut db_connection) => match module {
+            Module::UserAccount => UserAccount::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
+            Module::Directory => Directory::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::Directory(result))),
+        },
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
     }
 }
 

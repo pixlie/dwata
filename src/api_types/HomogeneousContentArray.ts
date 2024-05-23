@@ -5,6 +5,6 @@ import type { ContentType } from "./ContentType";
 
 export interface HomogeneousContentArray {
   content_type: ContentType;
-  content_type_spec: Array<ContentSpec>;
+  content_type_spec: ContentSpec;
   contents: Array<Content>;
 }

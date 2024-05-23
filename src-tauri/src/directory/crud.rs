@@ -1,3 +1,4 @@
+use chrono::Utc;
 use sqlx::{query_as, SqliteConnection};
 
 use super::{Directory, DirectoryCreateUpdate};
@@ -8,6 +9,14 @@ impl CRUD for Directory {
 
     fn table_name() -> String {
         "directory".to_string()
+    }
+
+    async fn select_all(
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Directory>, sqlx::Error> {
+        query_as(&format!("SELECT * FROM {}", Self::table_name()))
+            .fetch_all(db_connection)
+            .await
     }
 
     async fn select_one_by_pk(
@@ -43,6 +52,7 @@ impl CRUDHelperCreate for DirectoryCreateUpdate {
             "include_patterns",
             InputValue::Json(serde_json::json!(self.include_patterns)),
         );
+        name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         name_values
     }
 }

@@ -1,9 +1,8 @@
 use super::Directory;
 use crate::content::containers::{HeterogeneousContentArray, HeterogenousContent};
-use crate::content::content::{Content, ContentType};
+use crate::content::content::{Content, ContentSpec, ContentType};
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, Options};
-use std::collections::HashSet;
 use std::path::PathBuf;
 
 impl Directory {
@@ -32,7 +31,7 @@ impl Directory {
                     extract_text(child, &mut accumulator);
                     contents.push((
                         ContentType::Text,
-                        HashSet::new(),
+                        ContentSpec::default(),
                         Content::Text(accumulator.join(" ")),
                     ));
                 }
@@ -58,7 +57,7 @@ impl Directory {
                             _ => {
                                 contents.push((
                                     ContentType::Text,
-                                    HashSet::new(),
+                                    ContentSpec::default(),
                                     Content::Text(accumulator.join(" ")),
                                 ));
                             }
@@ -66,7 +65,7 @@ impl Directory {
                         _ => {
                             contents.push((
                                 ContentType::Text,
-                                HashSet::new(),
+                                ContentSpec::default(),
                                 Content::Text(accumulator.join(" ")),
                             ));
                         }

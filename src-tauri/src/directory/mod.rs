@@ -10,7 +10,7 @@ pub mod configuration;
 pub mod crud;
 pub mod file_contents;
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub(crate) struct File {
@@ -21,7 +21,7 @@ pub(crate) struct File {
     // pub contents: Vec<HeterogeneousContentArray>,
 }
 
-#[derive(Debug, Deserialize, Serialize, FromRow, TS)]
+#[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Directory {
@@ -32,7 +32,7 @@ pub struct Directory {
     #[ts(type = "Vec<String>")]
     pub include_patterns: Json<Vec<String>>,
     #[ts(type = "Vec<String>")]
-    pub exclude_patterns: Json<Vec<String>>,
+    pub exclude_patterns: Option<Json<Vec<String>>>,
     #[ts(type = "String")]
     pub created_at: DateTime<Utc>,
 }

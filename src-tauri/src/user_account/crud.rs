@@ -9,6 +9,14 @@ impl CRUD for UserAccount {
         "user_account".to_string()
     }
 
+    async fn select_all(
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<UserAccount>, sqlx::Error> {
+        query_as(&format!("SELECT * FROM {}", Self::table_name()))
+            .fetch_all(db_connection)
+            .await
+    }
+
     async fn select_one_by_pk(
         pk: i64,
         db_connection: &mut SqliteConnection,

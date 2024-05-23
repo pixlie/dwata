@@ -51,6 +51,7 @@ fn main() {
             // workspace::commands::create_ai_integration,
             // workspace::commands::update_ai_integration,
             workspace::commands::get_module_configuration,
+            workspace::commands::read_module_list,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::upsert_module_item,
@@ -61,9 +62,8 @@ fn main() {
             // chat::commands::fetch_chat_context_node_list,
             // chat::commands::fetch_chat_context,
             // ai::commands::fetch_list_of_ai_providers_and_models,
-            // directory::commands::create_directory_source,
-            // directory::commands::fetch_files_in_directory,
-            // directory::commands::fetch_file_contents,
+            directory::commands::fetch_file_list_in_directory,
+            directory::commands::fetch_file_content_list,
             // embedding::commands::generate_text_embedding,
         ])
         .run(tauri::generate_context!())

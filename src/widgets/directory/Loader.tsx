@@ -10,11 +10,11 @@ const Loader: Component = () => {
   createComputed(async () => {
     if (!!params.directoryId && !!searchParams.relativeFilePath) {
       await fetchContents(
-        params.directoryId as string,
-        searchParams.relativeFilePath as string
+        parseInt(params.directoryId),
+        searchParams.relativeFilePath as string,
       );
     } else if (!!params.directoryId) {
-      await fetchFileList(params.directoryId as string);
+      await fetchFileList(parseInt(params.directoryId));
     }
   });
 

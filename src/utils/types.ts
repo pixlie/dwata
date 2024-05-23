@@ -1,6 +1,9 @@
 import { JSX } from "solid-js";
 import { FormField } from "../api_types/FormField";
 import { Directory } from "../api_types/Directory";
+import { ContentType } from "../api_types/ContentType";
+import { ContentSpec } from "../api_types/ContentSpec";
+import { Content } from "../api_types/Content";
 
 interface ILabel {
   id: number;
@@ -37,6 +40,8 @@ interface IWorkspace {
   isFetching: boolean;
 }
 
+type IHeterogenousContent = [ContentType, ContentSpec, Content];
+
 type uiThemes = "gitHubDark" | "gitHubLight";
 
 export type {
@@ -48,5 +53,6 @@ export type {
   IFormData,
   IFormField,
   IWorkspace,
+  IHeterogenousContent,
   uiThemes,
 };

@@ -16,9 +16,13 @@ const SourceList: Component = () => {
     return [];
   });
 
-  const folderSources = createMemo(() => {
-    if (!workspace.isFetching && !!workspace.isReady) {
-      return workspace.folderList;
+  const directorySources = createMemo(() => {
+    if (
+      !workspace.isFetching &&
+      !!workspace.isReady &&
+      !!workspace.directoryList
+    ) {
+      return workspace.directoryList;
     }
     return [];
   });
@@ -50,7 +54,7 @@ const SourceList: Component = () => {
           );
         }}
       </For>
-      <For each={folderSources()}>
+      <For each={directorySources()}>
         {(dataSource) => {
           const label = dataSource.label || dataSource.path;
 
