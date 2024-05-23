@@ -7,7 +7,7 @@ pub mod configuration;
 pub mod crud;
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct UserAccount {
     // First user, with ID one is used as default user
@@ -20,8 +20,8 @@ pub struct UserAccount {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[derive(Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct UserAccountCreateUpdate {
     pub first_name: Option<String>,

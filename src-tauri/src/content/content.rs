@@ -50,6 +50,7 @@ pub enum TextType {
 #[ts(export, rename = "ContentType", export_to = "../src/api_types/")]
 pub enum ContentType {
     Text,
+    TextArray,
     Image,
     Link,
     Code,

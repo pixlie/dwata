@@ -246,7 +246,7 @@ pub trait CRUDHelperCreate {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Debug, Deserialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),

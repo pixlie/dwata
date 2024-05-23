@@ -11,13 +11,8 @@ pub mod crud;
 pub mod file_contents;
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "File",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub(crate) struct File {
     #[serde(skip_serializing)]
     pub base_path: Option<PathBuf>,
@@ -27,7 +22,7 @@ pub(crate) struct File {
 }
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Directory {
     pub id: i64,
@@ -73,8 +68,8 @@ impl Directory {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[serde(rename_all(serialize = "camelCase"))]
+#[derive(Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DirectoryCreateUpdate {
     pub path: Option<PathBuf>,

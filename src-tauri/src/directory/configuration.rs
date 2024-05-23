@@ -30,10 +30,10 @@ impl Configurable for Directory {
                     Some(true),
                 ),
                 FormField::new(
-                    "includePatters",
+                    "includePatterns",
                     "Include patterns",
                     Some("File glob patterns to include (like in .gitignore file)"),
-                    ContentType::Text,
+                    ContentType::TextArray,
                     ContentSpec::default(),
                     Some(true),
                     Some(true),

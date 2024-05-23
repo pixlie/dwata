@@ -1,6 +1,5 @@
 use crate::content::content::{Content, ContentSpec, ContentType};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -54,23 +53,3 @@ pub enum FormFieldData {
     Single(Content),
     Array(Vec<Content>),
 }
-
-impl FormFieldData {
-    pub fn from_string<T>(data: T) -> Self
-    where
-        T: ToString,
-    {
-        FormFieldData::Single(Content::Text(data.to_string()))
-    }
-}
-
-impl FormFieldData {
-    pub fn from_array_of_string<T>(data: Vec<T>) -> Self
-    where
-        T: ToString,
-    {
-        FormFieldData::Array(data.iter().map(|x| Content::Text(x.to_string())).collect())
-    }
-}
-
-pub type FormData = HashMap<String, FormFieldData>;
