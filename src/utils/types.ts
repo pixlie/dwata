@@ -1,8 +1,6 @@
-import { JSX, Setter } from "solid-js";
+import { JSX } from "solid-js";
 import { FormField } from "../api_types/FormField";
-import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
 import { Directory } from "../api_types/Directory";
-import { DirectoryCreateUpdate } from "../api_types/DirectoryCreateUpdate";
 
 interface ILabel {
   id: number;
@@ -11,26 +9,6 @@ interface ILabel {
 }
 
 type TRowValue = any;
-
-// Only required in Database form
-interface IDatabaseSourceFormData {
-  id?: string;
-  username: string;
-  password?: string;
-  host: string;
-  port?: number;
-  name: string;
-  label?: string;
-  // needsSsh: boolean;
-}
-
-interface IFolderSourceFormData {
-  id?: string;
-  label?: string;
-  path: string;
-  includePatterns: Array<string>;
-  excludePatterns: Array<string>;
-}
 
 interface IProviderPropTypes {
   children: JSX.Element;
@@ -43,9 +21,12 @@ interface APIGridData {
   rows: Array<Array<any>>;
 }
 
+type IFormFieldValue = string | number | Array<string> | undefined;
+type IFormData = {[key: string]: IFormFieldValue};
+
 interface IFormField extends FormField {
-  value?: string | number;
-  onInput?: Setter<UserAccountCreateUpdate> | Setter<DirectoryCreateUpdate>;
+  value?: IFormFieldValue;
+  onInput?: (name: string, value: IFormFieldValue) => void;
   onFocus?: () => void;
 }
 
@@ -61,10 +42,10 @@ type uiThemes = "gitHubDark" | "gitHubLight";
 export type {
   ILabel as IChatRoom,
   TRowValue,
-  IDatabaseSourceFormData,
-  IFolderSourceFormData,
   IProviderPropTypes,
   APIGridData,
+  IFormFieldValue,
+  IFormData,
   IFormField,
   IWorkspace,
   uiThemes,

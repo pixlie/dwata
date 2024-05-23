@@ -7,6 +7,7 @@ import { Module } from "../api_types/Module";
 import { Configuration } from "../api_types/Configuration";
 import { ModuleDataCreateUpdate } from "../api_types/ModuleDataCreateUpdate";
 import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
+import { IFormFieldValue } from "../utils/types";
 
 const UserAccountForm: Component = () => {
   const [user, { fetchCurrentUser }] = useUser();
@@ -35,6 +36,13 @@ const UserAccountForm: Component = () => {
     }
   });
 
+  const handleInput = (name: string, value: IFormFieldValue) => {
+    setFormData((state) => ({
+      ...state,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async () => {
     await invoke("upsert_module_item", {
       pk: 1,
@@ -56,8 +64,11 @@ const UserAccountForm: Component = () => {
         title="My account"
         submitButtomLabel="Save"
         handleSubmit={handleSubmit}
-        formData={formData()}
-        onInput={setFormData}
+        formData={Object.entries(formData()).reduce(
+          (acc, [key, value]) => ({ ...acc, [key as string]: value }),
+          {},
+        )}
+        onInput={handleInput}
       ></Form>
     </div>
   );

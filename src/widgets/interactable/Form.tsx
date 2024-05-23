@@ -1,19 +1,18 @@
-import { Component, For, JSX, Setter } from "solid-js";
+import { Component, For, JSX } from "solid-js";
 import Heading from "../typography/Heading";
 import Button from "./Button";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
 import { Configuration } from "../../api_types/Configuration";
-import { UserAccountCreateUpdate } from "../../api_types/UserAccountCreateUpdate";
-import { DirectoryCreateUpdate } from "../../api_types/DirectoryCreateUpdate";
+import { IFormData, IFormFieldValue } from "../../utils/types";
 
 interface IPropTypes {
   configuration?: Configuration;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
-  formData: UserAccountCreateUpdate | DirectoryCreateUpdate;
-  onInput?: Setter<UserAccountCreateUpdate> | Setter<DirectoryCreateUpdate>;
+  formData: IFormData;
+  onInput?: (name: string, value: IFormFieldValue) => void;
   handleSubmit?: () => {};
 }
 

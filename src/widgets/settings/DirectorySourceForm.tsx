@@ -1,17 +1,18 @@
-import { Component, createMemo, createSignal, onMount } from "solid-js";
+import { Component, createSignal, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
-import { useUserInterface } from "../../stores/userInterface";
 import { useNavigate } from "@solidjs/router";
 import { DirectoryCreateUpdate } from "../../api_types/DirectoryCreateUpdate";
 import { Configuration } from "../../api_types/Configuration";
 import Form from "../interactable/Form";
 import { Module } from "../../api_types/Module";
+import { IFormFieldValue } from "../../utils/types";
+import { ModuleDataCreateUpdate } from "../../api_types/ModuleDataCreateUpdate";
 
-interface IState {
-  isEditing: boolean;
-  isSaving: boolean;
-  isFetching: boolean;
-}
+// interface IState {
+//   isEditing: boolean;
+//   isSaving: boolean;
+//   isFetching: boolean;
+// }
 
 const DirectorySourceForm: Component = () => {
   // const [state, setState] = createSignal<IState>({
@@ -22,7 +23,7 @@ const DirectorySourceForm: Component = () => {
   const [formData, setFormData] = createSignal<DirectoryCreateUpdate>({
     path: "",
     label: "",
-    includePatterns: [],
+    includePatterns: [""],
     excludePatterns: [],
   });
   const [formConfiguration, setFormConfiguration] =
@@ -36,42 +37,27 @@ const DirectorySourceForm: Component = () => {
     setFormConfiguration(response as Configuration);
   });
 
-  const visibleName = createMemo(() => {
-    return !!formData().label
-      ? `- ${formData().label}`
-      : !!formData().path
-        ? `- ${formData().path}`
-        : "";
-  });
-
-  const handleChange = (field: string) => {
-    if (field === "includePatterns" || field === "excludePatterns") {
-      return (data: string) => {
-        setFormData({
-          ...formData(),
-          [field]: data.split(","),
-        });
-      };
-    } else {
-      return (data: string | number) => {
-        setFormData({
-          ...formData(),
-          [field]: data,
-        });
-      };
-    }
-  };
-
   const handleSubmit = async () => {
-    const response = await invoke("create_folder_source", {
-      path: formData().path,
-      label: formData().label,
-      includePatterns: formData().includePatterns,
-      excludePatterns: formData().excludePatterns,
+    const response = await invoke("insert_module_item", {
+      data: {
+        Directory: {
+          path: formData().path,
+          label: formData().label,
+          includePatterns: formData().includePatterns,
+          excludePatterns: formData().excludePatterns,
+        },
+      } as ModuleDataCreateUpdate,
     });
     if (response) {
       navigate("/settings");
     }
+  };
+
+  const handleInput = (name: string, value: IFormFieldValue) => {
+    setFormData((state) => ({
+      ...state,
+      [name]: value,
+    }));
   };
 
   return (
@@ -81,8 +67,11 @@ const DirectorySourceForm: Component = () => {
         title="Directory Source"
         submitButtomLabel="Save"
         handleSubmit={handleSubmit}
-        formData={formData()}
-        onInput={setFormData}
+        formData={Object.entries(formData()).reduce(
+          (acc, [key, value]) => ({ ...acc, [key as string]: value }),
+          {},
+        )}
+        onInput={handleInput}
       ></Form>
     </div>
   );

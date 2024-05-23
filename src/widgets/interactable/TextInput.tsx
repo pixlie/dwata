@@ -1,10 +1,11 @@
 import { Component, JSX } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { IFormField } from "../../utils/types";
+import { ContentType } from "../../api_types/ContentType";
 
 const TextInput: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
-  if (props.contentType !== "Text") {
+  if (props.contentType !== ("Text" as ContentType)) {
     return null;
   }
 
@@ -21,11 +22,9 @@ const TextInput: Component<IFormField> = (props) => {
   const handleInput: JSX.InputEventHandler<HTMLInputElement, InputEvent> = (
     event,
   ) => {
-    !!props.onInput &&
-      props.onInput((state) => ({
-        ...state,
-        [props.name]: event.currentTarget.value,
-      }));
+    if (!!props.onInput) {
+      props.onInput(props.name, event.currentTarget.value);
+    }
   };
 
   return (

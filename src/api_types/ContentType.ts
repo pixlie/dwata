@@ -2,6 +2,7 @@
 
 export type ContentType =
   | "Text"
+  | "TextArray"
   | "Image"
   | "Link"
   | "Code"
