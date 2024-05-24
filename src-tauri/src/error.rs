@@ -1,18 +1,21 @@
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
 pub enum DwataError {
-    // Database related
+    // External Database sources
     DatabaseNotFound,
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
 
-    // Workspace related
+    // Workspace and configuration
     ModuleNotFound,
 
-    // AI API related
-    InvalidAiProvider,
-    CouldNotConnectToAiProvider,
+    // AI providers/models/features
+    InvalidAIProvider,
+    CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
+    FeatureNotAvailableWithAIProvider,
 
     // Internal SQLite DB for Dwata
     CouldNotCreateDwataDB,
@@ -21,11 +24,14 @@ pub enum DwataError {
     CouldNotUpdateDwataDB,
     CouldNotFetchRowsFromDwataDB,
 
+    // Integrated vector DB
+    CouldNotConnectToVectorDB,
+
     // Chat context related
     CouldNotFindNode,
 
-    // Folder related
-    CouldNotOpenFolder,
+    // Directory related
+    CouldNotOpenDirectory,
 }
 
 impl From<sqlx::Error> for DwataError {

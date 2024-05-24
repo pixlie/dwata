@@ -6,7 +6,7 @@ use ts_rs::TS;
 pub mod configuration;
 pub mod crud;
 
-#[derive(Debug, Deserialize, Serialize, FromRow, TS)]
+#[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct UserAccount {

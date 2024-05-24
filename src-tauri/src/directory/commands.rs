@@ -47,7 +47,7 @@ pub(crate) async fn fetch_file_content_list(
                     if full_path.exists() {
                         Ok(Directory::get_file_contents(&full_path))
                     } else {
-                        Err(DwataError::CouldNotOpenFolder)
+                        Err(DwataError::CouldNotOpenDirectory)
                     }
                 }
                 Err(x) => Err(x),

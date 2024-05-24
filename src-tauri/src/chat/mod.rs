@@ -1,28 +1,25 @@
-use crate::chat::api_types::APIChatContextNode;
-use crate::error::DwataError;
+// use crate::chat::api_types::APIChatContextNode;
 use chrono::serde::ts_milliseconds;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow};
+use sqlx::FromRow;
+use ts_rs::TS;
 
-pub(crate) mod api_types;
-pub(crate) mod commands;
-mod crud;
-mod helpers;
+// pub(crate) mod api_types;
+// pub(crate) mod commands;
+// mod crud;
+// mod helpers;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct ChatThreadJson {
+#[derive(Debug, FromRow, Serialize)]
+pub(crate) struct Thread {
+    id: i64,
     title: String,
     summary: Option<String>,
     labels: Vec<String>,
-    ai_provider: String,
-    ai_model: String,
-}
 
-#[derive(Debug, FromRow, Serialize)]
-pub(crate) struct ChatThreadRow {
-    id: i64,
-    json_data: Json<ChatThreadJson>,
+    // Default AI model for chats in this thread
+    ai_model_id: Option<i64>,
+
     created_by_id: i64,
     #[serde(with = "ts_milliseconds")]
     created_at: DateTime<Utc>,
@@ -45,57 +42,38 @@ impl ChatToolResponse {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct ChatReplyJson {
+#[derive(Debug, Serialize, FromRow, TS)]
+pub(crate) struct Reply {
+    id: i64,
+    thread_id: i64,
+
     // In case there is a tool response, the message is a blank string
-    message: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    tool_response: Option<Vec<ChatToolResponse>>,
+    message: Option<String>,
+
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // tool_response: Option<Vec<ChatToolResponse>>,
+
     // These are messages created by Dwata to get meta information about a chat,
     // shown to user only when they want
     is_system_message: Option<bool>,
-    // Messages that need to be sent to AI, either system messages or general user chat
-    is_to_be_sent_to_ai: Option<bool>,
-    is_sent_to_ai: bool,
-}
 
-impl ChatReplyJson {
-    pub fn new(
-        message: String,
-        tool_response: Option<Vec<ChatToolResponse>>,
-        is_system_message: bool,
-        is_to_be_sent_to_ai: bool,
-        is_sent_to_ai: bool,
-    ) -> Self {
-        Self {
-            message,
-            tool_response,
-            is_system_message: if is_system_message { Some(true) } else { None },
-            is_to_be_sent_to_ai: if is_to_be_sent_to_ai {
-                Some(true)
-            } else {
-                None
-            },
-            is_sent_to_ai,
-        }
-    }
-}
+    // For prompts that need to be processed by an AI model and
+    // in case the model is different from the default model for this thread
+    ai_model_id: Option<i64>,
+    // For messages that need to be processed by AI, either system generated prompts or general user prompt
+    is_processed_by_ai: Option<bool>,
 
-#[derive(Debug, FromRow, Serialize)]
-pub(crate) struct ChatReplyRow {
-    id: i64,
-    json_data: Json<ChatReplyJson>,
-    chat_thread_id: i64,
-    // User who posted this chat, including LLM
-    created_by_id: i64,
+    // User who posted this reply, if this reply was created by user
+    created_by_id: Option<i64>,
+
     #[serde(with = "ts_milliseconds")]
     created_at: DateTime<Utc>,
 }
 
-pub(crate) trait ChatContextNode {
-    fn get_self_chat_context_node(&self) -> APIChatContextNode;
+// pub(crate) trait ChatContextNode {
+//     fn get_self_chat_context_node(&self) -> APIChatContextNode;
 
-    fn get_next_chat_context_node_list(&self, node_path: &[String]) -> Vec<APIChatContextNode>;
+//     fn get_next_chat_context_node_list(&self, node_path: &[String]) -> Vec<APIChatContextNode>;
 
-    async fn get_chat_context(&self, node_path: &[String]) -> Result<String, DwataError>;
-}
+//     async fn get_chat_context(&self, node_path: &[String]) -> Result<String, DwataError>;
+// }

@@ -13,7 +13,7 @@ pub mod file_contents;
 #[derive(Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub(crate) struct File {
+pub struct File {
     #[serde(skip_serializing)]
     pub base_path: Option<PathBuf>,
     pub relative_path: String,
@@ -33,7 +33,6 @@ pub struct Directory {
     pub include_patterns: Json<Vec<String>>,
     #[ts(type = "Vec<String>")]
     pub exclude_patterns: Option<Json<Vec<String>>>,
-    #[ts(type = "String")]
     pub created_at: DateTime<Utc>,
 }
 

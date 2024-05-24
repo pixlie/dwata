@@ -5420,6 +5420,7 @@ dependencies = [
  "chrono",
  "thiserror",
  "ts-rs-macros",
+ "url",
 ]
 
 [[package]]

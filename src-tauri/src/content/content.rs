@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -51,6 +53,7 @@ pub enum TextType {
 pub enum ContentType {
     Text,
     TextArray,
+    SingleChoice,
     Image,
     Link,
     Code,
@@ -62,10 +65,11 @@ pub enum ContentType {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ContentSpec {
-    text_type: Option<TextType>,
-    length_limits: Option<(usize, usize)>,
+    pub text_type: Option<TextType>,
+    pub length_limits: Option<(usize, usize)>,
+    pub choices_with_string_keys: Option<Vec<(String, String)>>,
     // Text can be a prompt to AI model
-    is_prompt: Option<bool>,
+    pub is_prompt: Option<bool>,
     // BulletPoints,
 }
 

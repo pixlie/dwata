@@ -24,7 +24,7 @@ include_dir = "0.7.3"
 sqlx = { version = "0.7.3", features = ["runtime-tokio", "tls-native-tls", "postgres", "mysql", "sqlite", "migrate", "chrono"] }
 ron = "0.8.1"
 url = { version = "2.5.0", features = ["serde"] }
-ts-rs = { version = "7.1.1", features = ["chrono", "chrono-impl"] }
+ts-rs = { version = "7.1.1", features = ["chrono", "chrono-impl", "url", "url-impl"] }
 sqlx-postgres = "0.7.3"
 chrono = { version = "0.4.34", features = ["serde"] }
 sqlparser = "0.43.1"
