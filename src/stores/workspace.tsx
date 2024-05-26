@@ -3,8 +3,8 @@ import { createStore } from "solid-js/store";
 import { IProviderPropTypes, IWorkspace } from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import { Module } from "../api_types/Module";
-import { Directory } from "../api_types/Directory";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
+import { DirectorySource } from "../api_types/DirectorySource";
 
 const makeStore = () => {
   const [store, setStore] = createStore<IWorkspace>({
@@ -27,13 +27,13 @@ const makeStore = () => {
         });
         // We invoke the Tauri API to load workspace
         const response: ModuleDataReadList = await invoke("read_module_list", {
-          module: "Directory" as Module,
+          module: "DirectorySource" as Module,
         });
         setStore((state) => ({
           ...state,
           directoryList:
-            "Directory" in response
-              ? (response.Directory as Array<Directory>)
+            "DirectorySource" in response
+              ? (response.DirectorySource as Array<DirectorySource>)
               : [],
           isReady: true,
           isFetching: false,

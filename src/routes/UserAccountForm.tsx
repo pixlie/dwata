@@ -1,56 +1,33 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component } from "solid-js";
 import Form from "../widgets/interactable/Form";
 import { invoke } from "@tauri-apps/api/core";
-import { useUser } from "../stores/user";
 import { useNavigate } from "@solidjs/router";
 import { Module } from "../api_types/Module";
-import { Configuration } from "../api_types/Configuration";
 import { ModuleDataCreateUpdate } from "../api_types/ModuleDataCreateUpdate";
 import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
-import { IFormFieldValue } from "../utils/types";
+import withConfiguredForm from "../utils/configuredForm";
 
 const UserAccountForm: Component = () => {
-  const [user, { fetchCurrentUser }] = useUser();
-  const [formData, setFormData] = createSignal<UserAccountCreateUpdate>({
-    firstName: null,
-    lastName: null,
-    email: null,
-  });
-  const [formConfiguration, setFormConfiguration] =
-    createSignal<Configuration>();
   const navigate = useNavigate();
 
-  onMount(async () => {
-    const response = await invoke("get_module_configuration", {
-      module: "UserAccount" as Module,
-    });
-    setFormConfiguration(response as Configuration);
-
-    await fetchCurrentUser();
-    if (!!user.account) {
-      setFormData({
-        firstName: user.account.firstName,
-        lastName: user.account.lastName || null,
-        email: user.account.email || null,
-      });
-    }
+  let configuredForm = withConfiguredForm<UserAccountCreateUpdate>({
+    module: "UserAccount" as Module,
+    existingItemId: 1,
+    initialData: {
+      firstName: null,
+      lastName: null,
+      email: null,
+    },
   });
-
-  const handleInput = (name: string, value: IFormFieldValue) => {
-    setFormData((state) => ({
-      ...state,
-      [name]: value,
-    }));
-  };
 
   const handleSubmit = async () => {
     await invoke("upsert_module_item", {
       pk: 1,
       data: {
         UserAccount: {
-          firstName: formData().firstName,
-          lastName: formData().lastName,
-          email: formData().email,
+          firstName: configuredForm.formData().firstName,
+          lastName: configuredForm.formData().lastName,
+          email: configuredForm.formData().email,
         },
       } as ModuleDataCreateUpdate,
     });
@@ -60,15 +37,10 @@ const UserAccountForm: Component = () => {
   return (
     <div class="max-w-screen-sm">
       <Form
-        configuration={formConfiguration()}
+        configuredForm={configuredForm}
         title="My account"
         submitButtomLabel="Save"
         handleSubmit={handleSubmit}
-        formData={Object.entries(formData()).reduce(
-          (acc, [key, value]) => ({ ...acc, [key as string]: value }),
-          {},
-        )}
-        onInput={handleInput}
       ></Form>
     </div>
   );

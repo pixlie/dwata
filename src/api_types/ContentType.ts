@@ -3,6 +3,7 @@
 export type ContentType =
   | "Text"
   | "TextArray"
+  | "SingleChoice"
   | "Image"
   | "Link"
   | "Code"

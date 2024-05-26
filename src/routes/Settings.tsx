@@ -4,7 +4,7 @@ import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 import SettingsSourceList from "../widgets/source/SettingsSourceList";
-import AiForm from "../widgets/settings/AiForm";
+import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
 import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useUserInterface } from "../stores/userInterface";
@@ -79,8 +79,8 @@ const SettingsRoutes: Component = () => {
         component={DirectorySourceForm}
       />
 
-      <Route path="/ai-provider/add" component={AiForm} />
-      <Route path="/ai-provider/edit/:id" component={AiForm} />
+      <Route path="/ai-provider/add" component={AIIntegrationForm} />
+      <Route path="/ai-provider/edit/:id" component={AIIntegrationForm} />
 
       <Route path="/" component={SettingsIndex} />
     </>

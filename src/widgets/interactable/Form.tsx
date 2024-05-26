@@ -3,21 +3,20 @@ import Heading from "../typography/Heading";
 import Button from "./Button";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
-import { Configuration } from "../../api_types/Configuration";
-import { IFormData, IFormFieldValue } from "../../utils/types";
+import { TConfiguredForm } from "../../utils/configuredForm";
 
 interface IPropTypes {
-  configuration?: Configuration;
+  configuredForm: TConfiguredForm;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
-  formData: IFormData;
-  onInput?: (name: string, value: IFormFieldValue) => void;
   handleSubmit?: () => {};
 }
 
 const Form: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  const { handleInput, formConfiguration, formDataHashMap, handleSubmit } =
+    props.configuredForm;
 
   return (
     <div
@@ -33,32 +32,33 @@ const Form: Component<IPropTypes> = (props) => {
           "border-color": getColors().colors["editorWidget.border"],
         }}
       >
-        <Heading size="xl">{props.configuration?.name || props.title}</Heading>
+        <Heading size="xl">{formConfiguration()?.title || props.title}</Heading>
 
         <p style={{ color: getColors().colors["editor.foreground"] }}>
-          {props.configuration?.description}
+          {formConfiguration()?.description}
         </p>
       </div>
 
       <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
-        <For each={props.configuration?.fields}>
+        <For each={formConfiguration()?.fields}>
           {(field) => (
             <>
               <FormField
                 {...field}
-                onInput={props.onInput}
-                value={props.formData[field.name]}
+                onInput={handleInput}
+                value={formDataHashMap()[field.name]}
               />
               <div class="mt-4" />
             </>
           )}
         </For>
 
-        {!!props.submitButton && props.submitButton}
-        {!!props.submitButtomLabel && !props.submitButton && (
+        {!!props.submitButton ? (
+          props.submitButton
+        ) : (
           <Button
-            label={props.submitButtomLabel}
-            onClick={props.handleSubmit}
+            label={props.submitButtomLabel || "Save"}
+            onClick={props.handleSubmit || handleSubmit}
           />
         )}
       </div>

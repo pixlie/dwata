@@ -1,9 +1,9 @@
 import { JSX } from "solid-js";
 import { FormField } from "../api_types/FormField";
-import { Directory } from "../api_types/Directory";
 import { ContentType } from "../api_types/ContentType";
 import { ContentSpec } from "../api_types/ContentSpec";
 import { Content } from "../api_types/Content";
+import { DirectorySource } from "../api_types/DirectorySource";
 
 interface ILabel {
   id: number;
@@ -34,7 +34,7 @@ interface IFormField extends FormField {
 }
 
 interface IWorkspace {
-  directoryList: Array<Directory>;
+  directoryList: Array<DirectorySource>;
 
   isReady: boolean;
   isFetching: boolean;

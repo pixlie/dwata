@@ -2,7 +2,7 @@
 import type { FormField } from "./FormField";
 
 export interface Configuration {
-  name: string;
+  title: string;
   description: string;
   fields: Array<FormField>;
 }

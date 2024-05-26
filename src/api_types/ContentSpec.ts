@@ -4,5 +4,6 @@ import type { TextType } from "./TextType";
 export interface ContentSpec {
   textType: TextType | null;
   lengthLimits: [number, number] | null;
+  choicesWithStringKeys: Array<[string, string]> | null;
   isPrompt: boolean | null;
 }
