@@ -1,4 +1,9 @@
 import { JSX } from "solid-js";
+import { FormField } from "../api_types/FormField";
+import { ContentType } from "../api_types/ContentType";
+import { ContentSpec } from "../api_types/ContentSpec";
+import { Content } from "../api_types/Content";
+import { DirectorySource } from "../api_types/DirectorySource";
 
 interface ILabel {
   id: number;
@@ -7,26 +12,6 @@ interface ILabel {
 }
 
 type TRowValue = any;
-
-// Only required in Database form
-interface IDatabaseSourceFormData {
-  id?: string;
-  username: string;
-  password?: string;
-  host: string;
-  port?: number;
-  name: string;
-  label?: string;
-  // needsSsh: boolean;
-}
-
-interface IFolderSourceFormData {
-  id?: string;
-  label?: string;
-  path: string;
-  includePatterns: Array<string>;
-  excludePatterns: Array<string>;
-}
 
 interface IProviderPropTypes {
   children: JSX.Element;
@@ -39,30 +24,35 @@ interface APIGridData {
   rows: Array<Array<any>>;
 }
 
-interface IFormField {
-  name: string;
-  fieldType:
-    | "singleLineText"
-    | "multiLineText"
-    | "markdown"
-    | "password"
-    | "date"
-    | "dateTime"
-    | "singleChoice";
-  label?: string;
-  isRequired?: boolean;
-  placeholder?: string;
+type IFormFieldValue = string | number | Array<string> | undefined;
+type IFormData = {[key: string]: IFormFieldValue};
+
+interface IFormField extends FormField {
+  value?: IFormFieldValue;
+  onInput?: (name: string, value: IFormFieldValue) => void;
+  onFocus?: () => void;
 }
+
+interface IWorkspace {
+  directoryList: Array<DirectorySource>;
+
+  isReady: boolean;
+  isFetching: boolean;
+}
+
+type IHeterogenousContent = [ContentType, ContentSpec, Content];
 
 type uiThemes = "gitHubDark" | "gitHubLight";
 
 export type {
   ILabel as IChatRoom,
   TRowValue,
-  IDatabaseSourceFormData,
-  IFolderSourceFormData,
   IProviderPropTypes,
   APIGridData,
+  IFormFieldValue,
+  IFormData,
   IFormField,
+  IWorkspace,
+  IHeterogenousContent,
   uiThemes,
 };

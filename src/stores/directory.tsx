@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { IProviderPropTypes } from "../utils/types";
-import { APIFileNode } from "../api_types/APIFileNode";
-import { APIFileContent } from "../api_types/APIFileContent";
+import { IHeterogenousContent, IProviderPropTypes } from "../utils/types";
+import { File } from "../api_types/File";
+import { HeterogeneousContentArray } from "../api_types/HeterogeneousContentArray";
 
 interface IStore {
-  fileList: Array<APIFileNode>;
-  contents: Array<[number, APIFileContent]>;
+  fileList: Array<File>;
+  contents: Array<IHeterogenousContent>;
 }
 
 const makeStore = () => {
@@ -19,29 +19,29 @@ const makeStore = () => {
   return [
     store,
     {
-      fetchFileList: async (directoryId: string) => {
+      fetchFileList: async (directoryId: number) => {
         let result = await invoke("fetch_file_list_in_directory", {
           directoryId,
         });
 
-        setStore({ fileList: result as Array<APIFileNode> });
+        setStore({ fileList: result as Array<File> });
       },
 
-      fetchContents: async (directoryId: string, relativeFilePath: string) => {
-        let result = await invoke("fetch_file_contents", {
+      fetchContents: async (directoryId: number, relativeFilePath: string) => {
+        let result = await invoke("fetch_file_content_list", {
           directoryId,
           relativeFilePath,
         });
 
         setStore({
           ...store,
-          contents: result as Array<[number, APIFileContent]>,
+          contents: (result as HeterogeneousContentArray).contents,
         });
       },
 
       generateEmbeddings: async (
         directoryId: string,
-        relativeFilePath: string
+        relativeFilePath: string,
       ) => {
         await invoke("generate_text_embedding", {
           directoryId,

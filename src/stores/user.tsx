@@ -1,11 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { APIUserAccount } from "../api_types/APIUserAccount";
+import { UserAccount } from "../api_types/UserAccount";
 import { IProviderPropTypes } from "../utils/types";
+import { Module } from "../api_types/Module";
+import { ModuleDataRead } from "../api_types/ModuleDataRead";
 
 interface IStore {
-  account?: APIUserAccount;
+  account?: UserAccount;
 }
 
 const makeStore = () => {
@@ -15,8 +17,15 @@ const makeStore = () => {
     store,
     {
       fetchCurrentUser: async () => {
-        let result = await invoke("fetch_current_user");
-        setStore({ ...store, account: result as APIUserAccount });
+        let result: ModuleDataRead = await invoke("read_module_item_by_pk", {
+          module: "UserAccount" as Module,
+          pk: 1,
+        });
+
+        setStore({
+          ...store,
+          account: "UserAccount" in result ? result.UserAccount : undefined,
+        });
       },
     },
   ] as const; // `as const` forces tuple type inference

@@ -1,18 +1,31 @@
-import { Component } from "solid-js";
+import { Component, JSX } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
+import { IFormField } from "../../utils/types";
+import { ContentType } from "../../api_types/ContentType";
 
-interface IPropTypes {
-  type: "text" | "email" | "password";
-  label?: string;
-  placeholder?: string;
-  value?: string | number;
-  isRequired?: boolean;
-  onInput?: (newValue: string | number) => void;
-  onFocus?: () => void;
-}
-
-const TextInput: Component<IPropTypes> = (props) => {
+const TextInput: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  if (props.contentType !== ("Text" as ContentType)) {
+    return null;
+  }
+
+  let inputType: string = "text";
+  if (!!props.contentSpec.textType) {
+    const textType = props.contentSpec.textType;
+    if (textType === "Email") {
+      inputType = "email";
+    } else if (textType === "Password") {
+      inputType = "password";
+    }
+  }
+
+  const handleInput: JSX.InputEventHandler<HTMLInputElement, InputEvent> = (
+    event,
+  ) => {
+    if (!!props.onInput) {
+      props.onInput(props.name, event.currentTarget.value);
+    }
+  };
 
   return (
     <>
@@ -23,17 +36,17 @@ const TextInput: Component<IPropTypes> = (props) => {
       )}
       <div class="mt-2">
         <input
-          type={props.type || "text"}
-          required={props.isRequired}
+          type={inputType}
+          required={props.isRequired || undefined}
           class="block w-full rounded-md px-2 py-1.5 border"
           style={{
             "background-color": getColors().colors["input.background"],
             "border-color": getColors().colors["input.border"],
             color: getColors().colors["input.foreground"],
           }}
-          placeholder={props.placeholder}
-          value={props.value || ""}
-          onInput={(e) => props.onInput?.(e.currentTarget.value)}
+          placeholder={props.placeholder || undefined}
+          value={props.value}
+          onInput={handleInput}
           onFocus={props.onFocus}
         />
       </div>

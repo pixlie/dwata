@@ -1,8 +1,8 @@
 import { Component } from "solid-js";
-import { APIFileNode } from "../../api_types/APIFileNode";
 import { useParams } from "@solidjs/router";
+import { File } from "../../api_types/File";
 
-const FileItem: Component<APIFileNode> = (props) => {
+const FileItem: Component<File> = (props) => {
   const params = useParams();
 
   return (
@@ -11,7 +11,7 @@ const FileItem: Component<APIFileNode> = (props) => {
       href={`/directory/${params.directoryId}/?relativeFilePath=${props.relativePath}`}
     >
       <i
-        class={`${props.isFolder ? "fa-solid fa-folder" : "fa-solid fa-file"} mr-1.5 text-sm text-gray-500`}
+        class={`${props.isDirectory ? "fa-solid fa-folder" : "fa-solid fa-file"} mr-1.5 text-sm text-gray-500`}
       />
       {props.relativePath}
     </a>

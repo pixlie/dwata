@@ -1,1 +1,1 @@
-pub(crate) mod openai;
+pub mod openai;

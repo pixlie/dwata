@@ -1,19 +1,14 @@
 import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { IProviderPropTypes } from "../utils/types";
+import { IProviderPropTypes, IWorkspace } from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
-import { APIConfig } from "../api_types/APIConfig";
-
-interface IStore extends APIConfig {
-  isReady: boolean;
-  isFetching: boolean;
-}
+import { Module } from "../api_types/Module";
+import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
+import { DirectorySource } from "../api_types/DirectorySource";
 
 const makeStore = () => {
-  const [store, setStore] = createStore<IStore>({
-    dataSourceList: [],
-    folderList: [],
-    aiIntegrationList: [],
+  const [store, setStore] = createStore<IWorkspace>({
+    directoryList: [],
 
     isReady: false,
     isFetching: false,
@@ -22,7 +17,7 @@ const makeStore = () => {
   return [
     store,
     {
-      readConfigFromAPI: async () => {
+      readDirectoryList: async () => {
         if (store.isFetching) {
           return;
         }
@@ -31,12 +26,18 @@ const makeStore = () => {
           isFetching: true,
         });
         // We invoke the Tauri API to load workspace
-        const response = await invoke("read_config");
-        setStore({
-          ...(response as APIConfig),
+        const response: ModuleDataReadList = await invoke("read_module_list", {
+          module: "DirectorySource" as Module,
+        });
+        setStore((state) => ({
+          ...state,
+          directoryList:
+            "DirectorySource" in response
+              ? (response.DirectorySource as Array<DirectorySource>)
+              : [],
           isReady: true,
           isFetching: false,
-        });
+        }));
       },
     },
   ] as const; // `as const` forces tuple type inference

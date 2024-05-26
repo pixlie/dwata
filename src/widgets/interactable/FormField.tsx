@@ -1,27 +1,29 @@
 import { Component } from "solid-js";
-import { IFormField } from "../../utils/types";
 import TextInput from "./TextInput";
-import TextArea from "./TextArea";
+// import TextArea from "./TextArea";
+import { IFormField } from "../../utils/types";
+import TextInputArray from "./TextInputArray";
 
-interface IPropTypes extends IFormField {
-  onInput?: (newValue: string | number | boolean) => void;
-}
+const FormField: Component<IFormField> = (props) => {
+  let Field: Component<IFormField> | null = null; // Initialize Field with a default value
 
-const FormField: Component<IPropTypes> = (props) => {
-  let Field: Component | undefined = undefined; // Initialize Field with a default value
-  switch (props.fieldType) {
-    case "singleLineText": {
+  switch (props.contentType) {
+    case "Text": {
       Field = TextInput;
       break;
     }
-    case "multiLineText": {
-      Field = TextArea;
+    case "TextArray": {
+      Field = TextInputArray;
       break;
     }
+    // case "multiLineText": {
+    //   Field = TextArea;
+    //   break;
+    // }
   }
 
   if (!Field) {
-    return <></>;
+    return null;
   }
 
   return <Field {...props} />;

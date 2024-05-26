@@ -1,115 +1,159 @@
-use crate::ai::AiIntegration;
-use crate::data_sources::database::DatabaseType;
-use crate::data_sources::directory::FolderSource;
-use crate::data_sources::helpers::check_database_connection;
-use crate::data_sources::{Database, DatabaseSource};
+use super::{
+    configuration::{Configurable, Configuration},
+    crud::{CRUDHelperCreate, ModuleDataCreateUpdate, ModuleDataReadList},
+    DwataDb, Module,
+};
+use crate::ai::AIIntegration;
+use crate::database_source::DatabaseSource;
+use crate::directory_source::DirectorySource;
 use crate::error::DwataError;
-use crate::store::Store;
-use crate::workspace::api_types::APIConfig;
-use std::fs;
+use crate::user_account::UserAccount;
+use crate::workspace::crud::{ModuleDataRead, CRUD};
+use log::error;
+use tauri::path::BaseDirectory::Data;
+use tauri::process::restart;
 use tauri::State;
 
 #[tauri::command]
-pub async fn create_database_source(
-    _database_type: Option<&str>,
-    username: &str,
-    password: Option<&str>,
-    host: &str,
-    port: Option<&str>,
-    database: &str,
-    store: State<'_, Store>,
-) -> Result<String, DwataError> {
-    match check_database_connection(username, password, host, port, database).await {
+pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
+    match module {
+        Module::UserAccount => Ok(UserAccount::get_schema()),
+        Module::DirectorySource => Ok(DirectorySource::get_schema()),
+        Module::DatabaseSource => Ok(DatabaseSource::get_schema()),
+        Module::AIIntegration => Ok(AIIntegration::get_schema()),
+    }
+}
+
+#[tauri::command]
+pub async fn read_module_list(
+    module: Module,
+    db: State<'_, DwataDb>,
+) -> Result<ModuleDataReadList, DwataError> {
+    match *db.lock().await {
+        Some(ref mut db_connection) => match module {
+            Module::UserAccount => UserAccount::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
+            Module::DirectorySource => DirectorySource::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::DirectorySource(result))),
+            Module::DatabaseSource => DatabaseSource::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::DatabaseSource(result))),
+            Module::AIIntegration => AIIntegration::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
+        },
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn read_module_item_by_pk(
+    module: Module,
+    pk: i64,
+    db: State<'_, DwataDb>,
+) -> Result<ModuleDataRead, DwataError> {
+    match *db.lock().await {
+        Some(ref mut db_connection) => match module {
+            Module::UserAccount => UserAccount::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
+            Module::DirectorySource => DirectorySource::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::Directory(x))),
+            Module::DatabaseSource => DatabaseSource::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
+            Module::AIIntegration => AIIntegration::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
+        },
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn insert_module_item(
+    data: ModuleDataCreateUpdate,
+    db: State<'_, DwataDb>,
+) -> Result<i64, DwataError> {
+    match *db.lock().await {
+        Some(ref mut db_connection) => match data {
+            ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
+            ModuleDataCreateUpdate::Directory(x) => x.insert_module_data(db_connection).await,
+        },
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn upsert_module_item(
+    pk: i64,
+    data: ModuleDataCreateUpdate,
+    db: State<'_, DwataDb>,
+) -> Result<i64, DwataError> {
+    let existing = match *db.lock().await {
+        Some(ref mut db_connection) => match data {
+            ModuleDataCreateUpdate::UserAccount(_) => {
+                UserAccount::read_one_by_pk(pk, db_connection)
+                    .await
+                    .and_then(|x| Ok(ModuleDataRead::UserAccount(x)))
+            }
+            ModuleDataCreateUpdate::Directory(_) => {
+                DirectorySource::read_one_by_pk(pk, db_connection)
+                    .await
+                    .and_then(|x| Ok(ModuleDataRead::Directory(x)))
+            }
+        },
+        None => {
+            error!("Could not connect to Dwata DB");
+            Err(DwataError::CouldNotConnectToDwataDB)
+        }
+    };
+    match existing {
         Ok(_) => {
-            let source: DatabaseType =
-                DatabaseType::PostgreSQL(Database::new(username, password, host, port, database));
-            let data_source: DatabaseSource = DatabaseSource::new(source, None);
-            let id = data_source.get_id().clone();
-            let mut config_guard = store.config.lock().await;
-            config_guard.data_source_list.push(data_source);
-            match config_guard.sync_to_file() {
-                Ok(_) => Ok(id),
-                Err(_) => Err(DwataError::CouldNotWriteConfig),
+            // We found an item in the DB, let us update it
+            match *db.lock().await {
+                Some(ref mut db_connection) => match data {
+                    ModuleDataCreateUpdate::UserAccount(x) => {
+                        x.update_module_data(pk, db_connection).await
+                    }
+                    ModuleDataCreateUpdate::Directory(x) => {
+                        x.update_module_data(pk, db_connection).await
+                    }
+                },
+                None => {
+                    error!("Could not connect to Dwata DB");
+                    Err(DwataError::CouldNotConnectToDwataDB)
+                }
             }
         }
-        Err(e) => Err(e),
-    }
-}
-
-#[tauri::command]
-pub async fn create_folder_source(
-    path: &str,
-    label: Option<&str>,
-    include_patterns: Vec<&str>,
-    exclude_patterns: Vec<&str>,
-    store: State<'_, Store>,
-) -> Result<String, DwataError> {
-    let folder_source = FolderSource::new(path, label, include_patterns, exclude_patterns);
-    let id = folder_source.get_id();
-    let mut config_guard = store.config.lock().await;
-    config_guard.folder_list.push(folder_source);
-    match config_guard.sync_to_file() {
-        Ok(_) => Ok(id),
-        Err(_) => Err(DwataError::CouldNotWriteConfig),
-    }
-}
-
-#[tauri::command]
-pub async fn create_ai_integration(
-    ai_provider: &str,
-    api_key: &str,
-    display_label: Option<&str>,
-    store: State<'_, Store>,
-) -> Result<String, DwataError> {
-    let ai_integration = AiIntegration::new(ai_provider, api_key, display_label);
-    let id = ai_integration.get_id().clone();
-    let mut config_guard = store.config.lock().await;
-    config_guard.ai_integration_list.push(ai_integration);
-    match fs::write(
-        &config_guard.path_to_config,
-        config_guard.get_pretty_string(),
-    ) {
-        Ok(_) => Ok(id),
-        Err(error) => {
-            println!("{:?}", error);
-            Err(DwataError::CouldNotWriteConfig)
+        Err(_) => {
+            // We did not find an existing item, so we insert one
+            match *db.lock().await {
+                Some(ref mut db_connection) => match data {
+                    ModuleDataCreateUpdate::UserAccount(x) => {
+                        x.insert_module_data(db_connection).await
+                    }
+                    ModuleDataCreateUpdate::Directory(x) => {
+                        x.insert_module_data(db_connection).await
+                    }
+                },
+                None => {
+                    error!("Could not connect to Dwata DB");
+                    Err(DwataError::CouldNotConnectToDwataDB)
+                }
+            }
         }
     }
-}
-
-#[tauri::command]
-pub async fn update_ai_integration(
-    id: &str,
-    ai_provider: &str,
-    api_key: &str,
-    display_label: Option<&str>,
-    store: State<'_, Store>,
-) -> Result<String, DwataError> {
-    let mut config_guard = store.config.lock().await;
-    match config_guard
-        .ai_integration_list
-        .iter_mut()
-        .find(|x| x.get_id() == id)
-    {
-        Some(ai_integration) => {
-            ai_integration.update(ai_provider, api_key, display_label);
-        }
-        None => {}
-    }
-    match fs::write(
-        &config_guard.path_to_config,
-        config_guard.get_pretty_string(),
-    ) {
-        Ok(_) => Ok(id.to_string()),
-        Err(error) => {
-            println!("{:?}", error);
-            Err(DwataError::CouldNotWriteConfig)
-        }
-    }
-}
-
-#[tauri::command]
-pub async fn read_config(store: State<'_, Store>) -> Result<APIConfig, DwataError> {
-    let guard = store.config.lock().await;
-    Ok(APIConfig::from_config(&guard))
 }

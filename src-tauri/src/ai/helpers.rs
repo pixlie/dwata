@@ -1,11 +1,11 @@
-use super::{AiIntegration, Tool};
+use super::{AIIntegration, Tool};
 use crate::chat::ChatToolResponse;
 use crate::error::DwataError;
 use openai::types::chat_completion_message_tool_call::Type;
 use openai::types::{CreateChatCompletionResponse, CreateEmbeddingResponse};
 
 pub async fn get_chat_response_from_ai_provider(
-    ai_integration: AiIntegration,
+    ai_integration: AIIntegration,
     ai_model: String,
     message_to_send: String,
     tool_list: Vec<Tool>,
@@ -74,7 +74,7 @@ pub async fn get_chat_response_from_ai_provider(
 }
 
 pub async fn get_embedding_from_ai_provider(
-    ai_integration: &AiIntegration,
+    ai_integration: &AIIntegration,
     ai_model: String,
     text_to_embed: String,
 ) -> Result<Vec<f32>, DwataError> {

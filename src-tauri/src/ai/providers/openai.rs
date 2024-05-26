@@ -1,4 +1,4 @@
-use crate::ai::{Tool, ToolParameterType};
+// use crate::ai::{Tool, ToolParameterType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -98,41 +98,41 @@ pub(crate) struct OpenAITool {
     pub(crate) function: OpenAIToolFunction,
 }
 
-impl OpenAIChatRequest {
-    pub(crate) fn add_tools(mut self, tool_list: Vec<Tool>) -> OpenAIChatRequest {
-        let mut tools: Vec<OpenAITool> = Vec::new();
-        for tool in tool_list {
-            tools.push(OpenAITool {
-                _type: "function".to_string(),
-                function: OpenAIToolFunction {
-                    name: tool.name.clone(),
-                    description: tool.description.clone(),
-                    parameters: OpenAIToolParameters {
-                        _type: "object".to_string(),
-                        properties: tool
-                            .parameters
-                            .iter()
-                            .map(|x| {
-                                (
-                                    x.name.to_string(),
-                                    OpenAIToolParameter {
-                                        _type: x.parameter_type.to_string(),
-                                        description: x.description.clone(),
-                                        _enum: match &x.parameter_type {
-                                            ToolParameterType::Enum(values) => {
-                                                Some(values.to_vec())
-                                            }
-                                            _ => None,
-                                        },
-                                    },
-                                )
-                            })
-                            .collect::<HashMap<String, OpenAIToolParameter>>(),
-                    },
-                },
-            });
-        }
-        self.tools = tools;
-        self
-    }
-}
+// impl OpenAIChatRequest {
+//     pub(crate) fn add_tools(mut self, tool_list: Vec<Tool>) -> OpenAIChatRequest {
+//         let mut tools: Vec<OpenAITool> = Vec::new();
+//         for tool in tool_list {
+//             tools.push(OpenAITool {
+//                 _type: "function".to_string(),
+//                 function: OpenAIToolFunction {
+//                     name: tool.name.clone(),
+//                     description: tool.description.clone(),
+//                     parameters: OpenAIToolParameters {
+//                         _type: "object".to_string(),
+//                         properties: tool
+//                             .parameters
+//                             .iter()
+//                             .map(|x| {
+//                                 (
+//                                     x.name.to_string(),
+//                                     OpenAIToolParameter {
+//                                         _type: x.parameter_type.to_string(),
+//                                         description: x.description.clone(),
+//                                         _enum: match &x.parameter_type {
+//                                             ToolParameterType::Enum(values) => {
+//                                                 Some(values.to_vec())
+//                                             }
+//                                             _ => None,
+//                                         },
+//                                     },
+//                                 )
+//                             })
+//                             .collect::<HashMap<String, OpenAIToolParameter>>(),
+//                     },
+//                 },
+//             });
+//         }
+//         self.tools = tools;
+//         self
+//     }
+// }
