@@ -1,8 +1,9 @@
 use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
 use crate::error::DwataError;
+use chrono::{DateTime, Utc};
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
+use sqlx::prelude::{FromRow, Type};
 use ts_rs::TS;
 use url::Url;
 
@@ -10,9 +11,10 @@ use url::Url;
 // pub mod commands;
 // pub mod helpers;
 pub mod configuration;
+pub mod crud;
 pub mod providers;
 
-#[derive(Debug, Deserialize, Serialize, Clone, TS)]
+#[derive(Debug, Deserialize, Serialize, Clone, TS, Type)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum AIProvider {
     OpenAI,
@@ -70,9 +72,10 @@ pub struct AIIntegration {
 #[derive(Debug, Deserialize, TS)]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct AIIntegrationCreateUpdate {
-    ai_provider: Option<AIProvider>,
+    ai_provider: Option<String>,
     api_key: Option<String>,
     display_label: Option<String>,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]

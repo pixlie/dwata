@@ -1,45 +1,30 @@
-use crate::directory::{Directory, DirectoryCreateUpdate};
+use crate::ai::AIIntegration;
+use crate::database_source::DatabaseSource;
+use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use log::error;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{Execute, QueryBuilder, Sqlite, SqliteConnection};
+use sqlx::sqlite::SqliteRow;
+use sqlx::{
+    query_as, Database, Encode, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection, Type,
+};
 use ts_rs::TS;
 
 pub trait CRUD {
-    type Model;
-
     fn table_name() -> String;
 
-    // fn input_field_push_bind(value: &FormFieldData, builder: &mut QueryBuilder<Sqlite>) {
-    //     match value {
-    //         FormFieldData::Single(Content::Text(x)) => {
-    //             builder.push_bind(x.clone());
-    //         }
-    //         // FormFieldDataSingleOrArray::Array(x)
-    //         _ => {
-    //             error!(
-    //                 "Unhandled value type in CRUD::input_field_push_bind {:?}",
-    //                 value
-    //             )
-    //         }
-    //     }
-    // }
-
-    // async fn create_item(data: Self::InputModel) -> Result<Self::PrimaryKey, DwataError>;
-
-    // async fn read_list() -> Result<Vec<Self::Model>, DwataError>;
-
-    async fn select_all(
-        db_connection: &mut SqliteConnection,
-    ) -> Result<Vec<Self::Model>, sqlx::Error>;
-
-    async fn read_all(
-        db_connection: &mut SqliteConnection,
-    ) -> Result<Vec<Self::Model>, DwataError> {
-        match Self::select_all(db_connection).await {
+    async fn read_all(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+    {
+        match query_as(&format!("SELECT * FROM {}", Self::table_name()))
+            .fetch_all(db_connection)
+            .await
+        {
             Ok(result) => Ok(result),
             Err(err) => {
                 println!("Could not fetch rows from Dwata DB.\nError: {}", err);
@@ -48,17 +33,21 @@ pub trait CRUD {
         }
     }
 
-    async fn select_one_by_pk(
-        pk: i64,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<Self::Model, sqlx::Error>;
-
     async fn read_one_by_pk(
         pk: i64,
         db_connection: &mut SqliteConnection,
-    ) -> Result<Self::Model, DwataError> {
-        let result: Result<Self::Model, sqlx::Error> =
-            Self::select_one_by_pk(pk, db_connection).await;
+    ) -> Result<Self, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+    {
+        let result: Result<Self, sqlx::Error> = query_as(&format!(
+            "SELECT * FROM {} WHERE id = ?1",
+            Self::table_name()
+        ))
+        .bind(pk)
+        .fetch_one(db_connection)
+        .await;
         match result {
             Ok(row) => Ok(row),
             Err(err) => {
@@ -67,99 +56,24 @@ pub trait CRUD {
             }
         }
     }
-
-    // async fn insert(
-    //     data: FormData,
-    //     db_connection: &mut SqliteConnection,
-    // ) -> Result<i64, DwataError> {
-    //     let mut data = data;
-    //     data.insert(
-    //         "created_at".to_string(),
-    //         FormFieldData::Single(Content::DateTime(Utc::now())),
-    //     );
-    //     let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-    //         "INSERT INTO {} ({}) VALUES (",
-    //         Self::table_name(),
-    //         data.keys()
-    //             .map(|x| x.clone())
-    //             .collect::<Vec<String>>()
-    //             .join(", ")
-    //     ));
-    //     let mut count = 0;
-    //     let limit = data.len();
-    //     for field in data.values() {
-    //         Self::input_field_push_bind(&field, &mut builder);
-    //         count += 1;
-    //         if count < limit {
-    //             builder.push(", ");
-    //         }
-    //     }
-    //     builder.push(")");
-    //     let executable = builder.build();
-    //     let sql = &executable.sql();
-    //     match executable.execute(&mut *db_connection).await {
-    //         Ok(result) => Ok(result.last_insert_rowid()),
-    //         Err(err) => {
-    //             error!(
-    //                 "Could not insert into Dwata DB, table {}:\nSQL: {}\nError: {:?}",
-    //                 Self::table_name(),
-    //                 sql,
-    //                 err
-    //             );
-    //             Err(DwataError::CouldNotInsertToDwataDB)
-    //         }
-    //     }
-    // }
-
-    // async fn update_by_pk(
-    //     pk: i64,
-    //     data: FormData,
-    //     db_connection: &mut SqliteConnection,
-    // ) -> Result<i64, DwataError> {
-    //     let mut builder: QueryBuilder<Sqlite> =
-    //         QueryBuilder::new(format!("UPDATE {}", Self::table_name()));
-    //     builder.push(" SET ");
-    //     let mut count = 0;
-    //     let limit = data.len();
-    //     for (name, data) in data.iter() {
-    //         builder.push(format!("{} = ", name));
-    //         Self::input_field_push_bind(&data, &mut builder);
-    //         count += 1;
-    //         if count < limit {
-    //             builder.push(", ");
-    //         }
-    //     }
-    //     builder.push(" WHERE id = ");
-    //     builder.push_bind(pk);
-    //     let executable = builder.build();
-    //     let sql = &executable.sql();
-    //     match executable.execute(&mut *db_connection).await {
-    //         Ok(_) => Ok(pk),
-    //         Err(err) => {
-    //             error!(
-    //                 "Could not update Dwata DB, table {}:\nSQL: {}\nError: {:?}",
-    //                 Self::table_name(),
-    //                 sql,
-    //                 err
-    //             );
-    //             Err(DwataError::CouldNotUpdateDwataDB)
-    //         }
-    //     }
-    // }
 }
 
 #[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
-    Directory(Directory),
+    Directory(DirectorySource),
+    DatabaseSource(DatabaseSource),
+    AIIntegration(AIIntegration),
 }
 
 #[derive(Debug, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
-    Directory(Vec<Directory>),
+    DirectorySource(Vec<DirectorySource>),
+    DatabaseSource(Vec<DatabaseSource>),
+    AIIntegration(Vec<AIIntegration>),
 }
 
 pub enum InputValue {
@@ -284,5 +198,5 @@ pub trait CRUDHelperCreate {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
-    Directory(DirectoryCreateUpdate),
+    Directory(DirectorySourceCreateUpdate),
 }

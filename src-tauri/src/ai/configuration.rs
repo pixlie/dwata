@@ -34,7 +34,7 @@ impl Configurable for AIIntegration {
                     Some(true),
                 ),
                 FormField::new(
-                    "label",
+                    "display_label",
                     "Label",
                     Some("An easy to remember label for this AI integration"),
                     ContentType::Text,

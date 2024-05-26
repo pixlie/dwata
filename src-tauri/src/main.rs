@@ -6,7 +6,8 @@ use sqlx::SqliteConnection;
 use std::path::PathBuf;
 use tauri::{App, Manager};
 
-// mod data_sources;
+mod database_source;
+mod directory_source;
 mod error;
 // mod labels;
 mod chat;
@@ -14,8 +15,7 @@ mod relational_database;
 // mod saved_query;
 mod ai;
 mod content;
-mod directory;
-mod embedding;
+// mod embedding;
 // mod schema;
 mod user_account;
 mod workspace;
@@ -47,8 +47,8 @@ fn main() {
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::upsert_module_item,
-            directory::commands::fetch_file_list_in_directory,
-            directory::commands::fetch_file_content_list,
+            directory_source::commands::fetch_file_list_in_directory,
+            directory_source::commands::fetch_file_content_list,
             // labels::commands::load_labels,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,

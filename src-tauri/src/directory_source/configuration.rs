@@ -1,9 +1,9 @@
-use super::Directory;
+use super::DirectorySource;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
 use crate::workspace::configuration::{Configurable, Configuration};
 
-impl Configurable for Directory {
+impl Configurable for DirectorySource {
     fn get_schema() -> Configuration {
         Configuration::new(
             "Directory",

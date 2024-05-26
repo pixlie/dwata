@@ -1,11 +1,11 @@
-use super::Directory;
+use super::DirectorySource;
 use crate::content::containers::{HeterogeneousContentArray, HeterogenousContent};
 use crate::content::content::{Content, ContentSpec, ContentType};
 use comrak::nodes::{AstNode, NodeValue};
 use comrak::{parse_document, Arena, Options};
 use std::path::PathBuf;
 
-impl Directory {
+impl DirectorySource {
     pub fn get_file_contents(file_path: &PathBuf) -> HeterogeneousContentArray {
         let file_contents = std::fs::read_to_string(file_path).unwrap();
         let arena = Arena::new();

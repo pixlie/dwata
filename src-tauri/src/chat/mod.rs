@@ -11,7 +11,7 @@ use ts_rs::TS;
 // mod helpers;
 
 #[derive(Debug, FromRow, Serialize)]
-pub(crate) struct Thread {
+pub struct Thread {
     id: i64,
     title: String,
     summary: Option<String>,

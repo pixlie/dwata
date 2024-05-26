@@ -3,18 +3,24 @@ use super::{
     crud::{CRUDHelperCreate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
-use crate::directory::Directory;
+use crate::ai::AIIntegration;
+use crate::database_source::DatabaseSource;
+use crate::directory_source::DirectorySource;
 use crate::error::DwataError;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::{ModuleDataRead, CRUD};
 use log::error;
+use tauri::path::BaseDirectory::Data;
+use tauri::process::restart;
 use tauri::State;
 
 #[tauri::command]
 pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
     match module {
         Module::UserAccount => Ok(UserAccount::get_schema()),
-        Module::Directory => Ok(Directory::get_schema()),
+        Module::DirectorySource => Ok(DirectorySource::get_schema()),
+        Module::DatabaseSource => Ok(DatabaseSource::get_schema()),
+        Module::AIIntegration => Ok(AIIntegration::get_schema()),
     }
 }
 
@@ -28,9 +34,15 @@ pub async fn read_module_list(
             Module::UserAccount => UserAccount::read_all(db_connection)
                 .await
                 .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
-            Module::Directory => Directory::read_all(db_connection)
+            Module::DirectorySource => DirectorySource::read_all(db_connection)
                 .await
-                .and_then(|result| Ok(ModuleDataReadList::Directory(result))),
+                .and_then(|result| Ok(ModuleDataReadList::DirectorySource(result))),
+            Module::DatabaseSource => DatabaseSource::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::DatabaseSource(result))),
+            Module::AIIntegration => AIIntegration::read_all(db_connection)
+                .await
+                .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
         },
         None => {
             error!("Could not connect to Dwata DB");
@@ -50,9 +62,15 @@ pub async fn read_module_item_by_pk(
             Module::UserAccount => UserAccount::read_one_by_pk(pk, db_connection)
                 .await
                 .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
-            Module::Directory => Directory::read_one_by_pk(pk, db_connection)
+            Module::DirectorySource => DirectorySource::read_one_by_pk(pk, db_connection)
                 .await
                 .and_then(|x| Ok(ModuleDataRead::Directory(x))),
+            Module::DatabaseSource => DatabaseSource::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
+            Module::AIIntegration => AIIntegration::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
         },
         None => {
             error!("Could not connect to Dwata DB");
@@ -91,9 +109,11 @@ pub async fn upsert_module_item(
                     .await
                     .and_then(|x| Ok(ModuleDataRead::UserAccount(x)))
             }
-            ModuleDataCreateUpdate::Directory(_) => Directory::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::Directory(x))),
+            ModuleDataCreateUpdate::Directory(_) => {
+                DirectorySource::read_one_by_pk(pk, db_connection)
+                    .await
+                    .and_then(|x| Ok(ModuleDataRead::Directory(x)))
+            }
         },
         None => {
             error!("Could not connect to Dwata DB");

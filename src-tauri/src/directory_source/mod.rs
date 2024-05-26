@@ -24,7 +24,7 @@ pub struct File {
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct Directory {
+pub struct DirectorySource {
     pub id: i64,
     #[sqlx(try_from = "String")]
     pub path: PathBuf,
@@ -36,7 +36,7 @@ pub struct Directory {
     pub created_at: DateTime<Utc>,
 }
 
-impl Directory {
+impl DirectorySource {
     pub fn get_file_list(&self) -> Vec<File> {
         // Glob all the files in this directory
         let mut result: Vec<File> = vec![];
@@ -70,8 +70,8 @@ impl Directory {
 #[derive(Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct DirectoryCreateUpdate {
-    pub path: Option<PathBuf>,
+pub struct DirectorySourceCreateUpdate {
+    pub path: Option<String>,
     pub label: Option<String>,
     pub include_patterns: Vec<String>,
     pub exclude_patterns: Vec<String>,

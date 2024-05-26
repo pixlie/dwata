@@ -1,17 +1,7 @@
 use serde::{Deserialize, Serialize};
-// use crate::ai::{AIIntegration, AITools, Tool, ToolParameter, ToolParameterType};
-// use crate::chat::api_types::APIChatContextNode;
-// use crate::chat::ChatContextNode;
-// use crate::data_sources::DatabaseSource;
-// use crate::error::DwataError;
-// use serde::{Deserialize, Serialize};
 use sqlx::SqliteConnection;
-// use std::fs;
-// use std::path::PathBuf;
-// use std::sync::Arc;
 use tokio::sync::Mutex;
 use ts_rs::TS;
-// use ts_rs::TS;
 
 // pub mod api_types;
 pub mod commands;
@@ -25,7 +15,11 @@ pub type DwataDb = Mutex<Option<SqliteConnection>>;
 #[ts(export, rename = "Module", export_to = "../src/api_types/")]
 pub enum Module {
     UserAccount,
-    Directory,
+    DirectorySource,
+    DatabaseSource,
+    AIIntegration,
+    // ChatThread,
+    // ChatReply,
 }
 
 // impl ChatContextNode for Config {

@@ -11,16 +11,16 @@ use ts_rs::TS;
     export_to = "../src/api_types/"
 )]
 pub struct Configuration {
-    pub name: String,
+    pub title: String,
     pub description: String,
     pub fields: Vec<FormField>,
 }
 
 impl Configuration {
-    pub fn new(name: &str, desctiption: &str, fields: Vec<FormField>) -> Self {
+    pub fn new(title: &str, description: &str, fields: Vec<FormField>) -> Self {
         Configuration {
-            name: name.to_string(),
-            description: desctiption.to_string(),
+            title: title.to_string(),
+            description: description.to_string(),
             fields,
         }
     }
