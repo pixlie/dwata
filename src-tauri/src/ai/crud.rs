@@ -15,18 +15,15 @@ impl CRUDHelperCreate for AIIntegrationCreateUpdate {
 
     fn get_column_names_values(&self) -> VecColumnNameValue {
         let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
-        self.ai_provider.as_ref().and_then(|x| {
+        if let Some(x) = &self.ai_provider {
             name_values.push_name_value("ai_provider", InputValue::Text(x.clone()));
-            Some(())
-        });
-        self.api_key.as_ref().and_then(|x| {
+        }
+        if let Some(x) = &self.api_key {
             name_values.push_name_value("api_key", InputValue::Text(x.clone()));
-            Some(())
-        });
-        self.display_label.as_ref().and_then(|x| {
+        }
+        if let Some(x) = &self.display_label {
             name_values.push_name_value("display_label", InputValue::Text(x.clone()));
-            Some(())
-        });
+        }
         name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         name_values
     }

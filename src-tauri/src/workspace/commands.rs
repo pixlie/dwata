@@ -29,25 +29,24 @@ pub async fn read_module_list(
     module: Module,
     db: State<'_, DwataDb>,
 ) -> Result<ModuleDataReadList, DwataError> {
-    match *db.lock().await {
-        Some(ref mut db_connection) => match module {
-            Module::UserAccount => UserAccount::read_all(db_connection)
-                .await
-                .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
-            Module::DirectorySource => DirectorySource::read_all(db_connection)
-                .await
-                .and_then(|result| Ok(ModuleDataReadList::DirectorySource(result))),
-            Module::DatabaseSource => DatabaseSource::read_all(db_connection)
-                .await
-                .and_then(|result| Ok(ModuleDataReadList::DatabaseSource(result))),
-            Module::AIIntegration => AIIntegration::read_all(db_connection)
-                .await
-                .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
-        },
-        None => {
-            error!("Could not connect to Dwata DB");
-            Err(DwataError::CouldNotConnectToDwataDB)
-        }
+    let mut db_guard = db.lock().await;
+    let db_connection = db_guard.as_mut().ok_or_else(|| {
+        error!("Could not connect to Dwata DB");
+        DwataError::CouldNotConnectToDwataDB
+    })?;
+    match module {
+        Module::UserAccount => UserAccount::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
+        Module::DirectorySource => DirectorySource::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::DirectorySource(result))),
+        Module::DatabaseSource => DatabaseSource::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::DatabaseSource(result))),
+        Module::AIIntegration => AIIntegration::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
     }
 }
 
@@ -57,25 +56,24 @@ pub async fn read_module_item_by_pk(
     pk: i64,
     db: State<'_, DwataDb>,
 ) -> Result<ModuleDataRead, DwataError> {
-    match *db.lock().await {
-        Some(ref mut db_connection) => match module {
-            Module::UserAccount => UserAccount::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
-            Module::DirectorySource => DirectorySource::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::Directory(x))),
-            Module::DatabaseSource => DatabaseSource::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
-            Module::AIIntegration => AIIntegration::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
-        },
-        None => {
-            error!("Could not connect to Dwata DB");
-            Err(DwataError::CouldNotConnectToDwataDB)
-        }
+    let mut db_guard = db.lock().await;
+    let db_connection = db_guard.as_mut().ok_or_else(|| {
+        error!("Could not connect to Dwata DB");
+        DwataError::CouldNotConnectToDwataDB
+    })?;
+    match module {
+        Module::UserAccount => UserAccount::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
+        Module::DirectorySource => DirectorySource::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::DirectorySource(x))),
+        Module::DatabaseSource => DatabaseSource::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
+        Module::AIIntegration => AIIntegration::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
     }
 }
 
@@ -84,15 +82,35 @@ pub async fn insert_module_item(
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
 ) -> Result<i64, DwataError> {
-    match *db.lock().await {
-        Some(ref mut db_connection) => match data {
-            ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
-            ModuleDataCreateUpdate::Directory(x) => x.insert_module_data(db_connection).await,
-        },
-        None => {
-            error!("Could not connect to Dwata DB");
-            Err(DwataError::CouldNotConnectToDwataDB)
-        }
+    let mut db_guard = db.lock().await;
+    let db_connection = db_guard.as_mut().ok_or_else(|| {
+        error!("Could not connect to Dwata DB");
+        DwataError::CouldNotConnectToDwataDB
+    })?;
+    match data {
+        ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::DirectorySource(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::DatabaseSource(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::AIIntegration(x) => x.insert_module_data(db_connection).await,
+    }
+}
+
+#[tauri::command]
+pub async fn update_module_item(
+    pk: i64,
+    data: ModuleDataCreateUpdate,
+    db: State<'_, DwataDb>,
+) -> Result<i64, DwataError> {
+    let mut db_guard = db.lock().await;
+    let db_connection = db_guard.as_mut().ok_or_else(|| {
+        error!("Could not connect to Dwata DB");
+        DwataError::CouldNotConnectToDwataDB
+    })?;
+    match data {
+        ModuleDataCreateUpdate::UserAccount(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::DirectorySource(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::DatabaseSource(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::AIIntegration(x) => x.update_module_data(pk, db_connection).await,
     }
 }
 
@@ -102,56 +120,61 @@ pub async fn upsert_module_item(
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
 ) -> Result<i64, DwataError> {
-    let existing = match *db.lock().await {
-        Some(ref mut db_connection) => match data {
-            ModuleDataCreateUpdate::UserAccount(_) => {
-                UserAccount::read_one_by_pk(pk, db_connection)
-                    .await
-                    .and_then(|x| Ok(ModuleDataRead::UserAccount(x)))
-            }
-            ModuleDataCreateUpdate::Directory(_) => {
-                DirectorySource::read_one_by_pk(pk, db_connection)
-                    .await
-                    .and_then(|x| Ok(ModuleDataRead::Directory(x)))
-            }
-        },
-        None => {
-            error!("Could not connect to Dwata DB");
-            Err(DwataError::CouldNotConnectToDwataDB)
+    let mut db_guard = db.lock().await;
+    let db_connection = db_guard.as_mut().ok_or_else(|| {
+        error!("Could not connect to Dwata DB");
+        DwataError::CouldNotConnectToDwataDB
+    })?;
+    let existing = match data {
+        ModuleDataCreateUpdate::UserAccount(_) => UserAccount::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
+        ModuleDataCreateUpdate::DirectorySource(_) => {
+            DirectorySource::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::DirectorySource(x)))
+        }
+        ModuleDataCreateUpdate::DatabaseSource(_) => {
+            DatabaseSource::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x)))
+        }
+        ModuleDataCreateUpdate::AIIntegration(_) => {
+            AIIntegration::read_one_by_pk(pk, db_connection)
+                .await
+                .and_then(|x| Ok(ModuleDataRead::AIIntegration(x)))
         }
     };
     match existing {
         Ok(_) => {
             // We found an item in the DB, let us update it
-            match *db.lock().await {
-                Some(ref mut db_connection) => match data {
-                    ModuleDataCreateUpdate::UserAccount(x) => {
-                        x.update_module_data(pk, db_connection).await
-                    }
-                    ModuleDataCreateUpdate::Directory(x) => {
-                        x.update_module_data(pk, db_connection).await
-                    }
-                },
-                None => {
-                    error!("Could not connect to Dwata DB");
-                    Err(DwataError::CouldNotConnectToDwataDB)
+            match data {
+                ModuleDataCreateUpdate::UserAccount(x) => {
+                    x.update_module_data(pk, db_connection).await
+                }
+                ModuleDataCreateUpdate::DirectorySource(x) => {
+                    x.update_module_data(pk, db_connection).await
+                }
+                ModuleDataCreateUpdate::DatabaseSource(x) => {
+                    x.update_module_data(pk, db_connection).await
+                }
+                ModuleDataCreateUpdate::AIIntegration(x) => {
+                    x.update_module_data(pk, db_connection).await
                 }
             }
         }
         Err(_) => {
             // We did not find an existing item, so we insert one
-            match *db.lock().await {
-                Some(ref mut db_connection) => match data {
-                    ModuleDataCreateUpdate::UserAccount(x) => {
-                        x.insert_module_data(db_connection).await
-                    }
-                    ModuleDataCreateUpdate::Directory(x) => {
-                        x.insert_module_data(db_connection).await
-                    }
-                },
-                None => {
-                    error!("Could not connect to Dwata DB");
-                    Err(DwataError::CouldNotConnectToDwataDB)
+            match data {
+                ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
+                ModuleDataCreateUpdate::DirectorySource(x) => {
+                    x.insert_module_data(db_connection).await
+                }
+                ModuleDataCreateUpdate::DatabaseSource(x) => {
+                    x.insert_module_data(db_connection).await
+                }
+                ModuleDataCreateUpdate::AIIntegration(x) => {
+                    x.insert_module_data(db_connection).await
                 }
             }
         }

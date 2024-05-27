@@ -1,10 +1,10 @@
-use crate::ai::AIIntegration;
-use crate::database_source::DatabaseSource;
+use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
-use log::error;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::sqlite::SqliteRow;
@@ -25,7 +25,14 @@ pub trait CRUD {
             .fetch_all(db_connection)
             .await
         {
-            Ok(result) => Ok(result),
+            Ok(result) => {
+                info!(
+                    "Fetched {} rows from Dwata DB::{}",
+                    result.len(),
+                    Self::table_name()
+                );
+                Ok(result)
+            }
             Err(err) => {
                 println!("Could not fetch rows from Dwata DB.\nError: {}", err);
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
@@ -49,7 +56,14 @@ pub trait CRUD {
         .fetch_one(db_connection)
         .await;
         match result {
-            Ok(row) => Ok(row),
+            Ok(row) => {
+                info!(
+                    "Fetched one row from Dwata DB::{}, ID {}",
+                    Self::table_name(),
+                    pk
+                );
+                Ok(row)
+            }
             Err(err) => {
                 println!("Could not fetch rows from Dwata DB.\nError: {}", err);
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
@@ -62,7 +76,7 @@ pub trait CRUD {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
-    Directory(DirectorySource),
+    DirectorySource(DirectorySource),
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
 }
@@ -198,5 +212,7 @@ pub trait CRUDHelperCreate {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
-    Directory(DirectorySourceCreateUpdate),
+    DirectorySource(DirectorySourceCreateUpdate),
+    DatabaseSource(DatabaseSourceCreateUpdate),
+    AIIntegration(AIIntegrationCreateUpdate),
 }

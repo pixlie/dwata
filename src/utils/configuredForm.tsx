@@ -26,6 +26,7 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
   const [formData, setFormData] = createSignal<T>(
     (options.initialData as T) || ({} as T),
   );
+  const [dirty, setDirty] = createSignal<Array<string>>([]);
   const navigate = useNavigate();
   // const [formState, setFormState] = createSignal<IFormState>({
   //   isEditing: false,
@@ -72,16 +73,32 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
       ...state,
       [name]: value,
     }));
+    setDirty((state) => [...state, name]);
   };
 
   const handleSubmit = async () => {
-    const response = await invoke("insert_module_item", {
-      data: {
-        [options.module]: formData() as T,
-      } as ModuleDataCreateUpdate,
-    });
-    if (!!response && !!options.navtigateToAfterSave) {
-      navigate(options.navtigateToAfterSave);
+    if (!!options.existingItemId) {
+      const response = await invoke("update_module_item", {
+        pk: options.existingItemId,
+        data: {
+          [options.module]: dirty().reduce(
+            (acc, name) => ({ ...acc, [name]: formData()[name] }),
+            {},
+          ),
+        },
+      });
+      if (!!response && !!options.navtigateToAfterSave) {
+        navigate(options.navtigateToAfterSave);
+      }
+    } else {
+      const response = await invoke("insert_module_item", {
+        data: {
+          [options.module]: formData(),
+        },
+      });
+      if (!!response && !!options.navtigateToAfterSave) {
+        navigate(options.navtigateToAfterSave);
+      }
     }
   };
 

@@ -46,6 +46,7 @@ fn main() {
             workspace::commands::read_module_list,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
+            workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
