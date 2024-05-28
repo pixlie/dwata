@@ -4,6 +4,7 @@ import { ContentType } from "../api_types/ContentType";
 import { ContentSpec } from "../api_types/ContentSpec";
 import { Content } from "../api_types/Content";
 import { DirectorySource } from "../api_types/DirectorySource";
+import { DatabaseSource } from "../api_types/DatabaseSource";
 
 interface ILabel {
   id: number;
@@ -25,16 +26,26 @@ interface APIGridData {
 }
 
 type IFormFieldValue = string | number | Array<string> | undefined;
-type IFormData = {[key: string]: IFormFieldValue};
+type IFormData = { [key: string]: IFormFieldValue };
+
+export interface IChoicesWithHeading {
+  name: string;
+  choices: Array<[string, string]>;
+}
 
 interface IFormField extends FormField {
+  size?: "xs" | "sm" | "base" | "lg";
+  displayBlock?: boolean;
   value?: IFormFieldValue;
-  onInput?: (name: string, value: IFormFieldValue) => void;
+  choices?: Array<[string, string]>;
+  choicesWithHeadings?: Array<IChoicesWithHeading>;
+  onChange?: (name: string, value: IFormFieldValue) => void;
   onFocus?: () => void;
 }
 
 interface IWorkspace {
   directoryList: Array<DirectorySource>;
+  databaseList: Array<DatabaseSource>;
 
   isReady: boolean;
   isFetching: boolean;

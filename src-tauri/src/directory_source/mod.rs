@@ -73,6 +73,6 @@ impl DirectorySource {
 pub struct DirectorySourceCreateUpdate {
     pub path: Option<String>,
     pub label: Option<String>,
-    pub include_patterns: Vec<String>,
-    pub exclude_patterns: Vec<String>,
+    pub include_patterns: Option<Vec<String>>,
+    pub exclude_patterns: Option<Vec<String>>,
 }

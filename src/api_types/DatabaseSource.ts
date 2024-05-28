@@ -4,18 +4,12 @@ import type { DatabaseType } from "./DatabaseType";
 export interface DatabaseSource {
   id: bigint;
   label: string | null;
-  database_type: DatabaseType;
-  name: string | null;
-  path_to_local_database: string | null;
-  database_host: string | null;
-  database_port: number | null;
-  database_username: string | null;
-  prompt_database_password: boolean | null;
-  database_password: string | null;
-  database_api_key: string | null;
-  ssh_username: string | null;
-  prompt_ssh_password: boolean | null;
-  ssh_password: string | null;
-  ssh_key_path: string | null;
-  ssh_port: number | null;
+  databaseType: DatabaseType;
+  databaseName: string | null;
+  pathToLocalDatabase: string | null;
+  databaseHost: string | null;
+  databasePort: number | null;
+  databaseUsername: string | null;
+  databasePassword: string | null;
+  databaseApiKey: string | null;
 }

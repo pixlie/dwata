@@ -6,7 +6,6 @@ use ts_rs::TS;
 #[serde(rename_all = "camelCase")]
 #[ts(
     export,
-    rename = "Configuration",
     rename_all = "camelCase",
     export_to = "../src/api_types/"
 )]

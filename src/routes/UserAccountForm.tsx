@@ -21,7 +21,7 @@ const UserAccountForm: Component = () => {
   });
 
   const handleSubmit = async () => {
-    await invoke("upsert_module_item", {
+    await invoke("update_module_item", {
       pk: 1,
       data: {
         UserAccount: {

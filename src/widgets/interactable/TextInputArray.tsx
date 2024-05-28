@@ -13,10 +13,10 @@ const TextInputArray: Component<IFormField> = (props) => {
   }
 
   const handleInput = (name: string, value: string | number) => {
-    if (Array.isArray(props.value) && !!props.onInput) {
+    if (Array.isArray(props.value) && !!props.onChange) {
       const index = parseInt(name.split("-")[1]);
 
-      props.onInput(props.name, [
+      props.onChange(props.name, [
         ...props.value?.slice(0, index),
         value as string,
         ...props.value?.slice(index + 1),
@@ -30,7 +30,7 @@ const TextInputArray: Component<IFormField> = (props) => {
         <TextInput
           {...props}
           contentType={"Text" as ContentType}
-          onInput={handleInput}
+          onChange={handleInput}
           name={`${props.name}-${i()}`}
           value={value}
         />

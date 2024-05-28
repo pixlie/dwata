@@ -11,10 +11,10 @@ impl Configurable for AIIntegration {
         let ai_provider_spec: ContentSpec = ContentSpec {
             text_type: None,
             length_limits: None,
-            choices_with_string_keys: Some(vec![
-                ("openai".to_string(), "OpenAI".to_string()),
-                ("groq".to_string(), "Groq".to_string()),
-                ("anthropic".to_string(), "Anthropic".to_string()),
+            choices: Some(vec![
+                ("OpenAI".to_string(), "OpenAI".to_string()),
+                ("Groq".to_string(), "Groq".to_string()),
+                ("Anthropic".to_string(), "Anthropic".to_string()),
             ]),
             is_prompt: None,
         };

@@ -1,7 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use crate::error::DwataError;
 use env_logger;
-use log::info;
+use log::{error, info};
 use sqlx::SqliteConnection;
 use std::path::PathBuf;
 use tauri::{App, Manager};
@@ -30,10 +31,17 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         window.close_devtools();
     }
     let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
-    let db_connection: Option<SqliteConnection> = tauri::async_runtime::block_on(async {
+    match tauri::async_runtime::block_on(async {
         workspace::helpers::get_database_connection(&app_config_dir).await
-    });
-    app.manage(workspace::DwataDb::new(db_connection));
+    }) {
+        Ok(db_connection) => {
+            app.manage(workspace::DwataDb::new(db_connection));
+        }
+        Err(err) => {
+            error!("Could not connect to Dwata DB\n Error: {:?}", err);
+            return Err(Box::new(DwataError::CouldNotConnectToDwataDB));
+        }
+    }
     Ok(())
 }
 
@@ -46,6 +54,7 @@ fn main() {
             workspace::commands::read_module_list,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
+            workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,

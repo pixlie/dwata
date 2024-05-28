@@ -1,10 +1,10 @@
-use crate::ai::AIIntegration;
-use crate::database_source::DatabaseSource;
+use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
-use log::error;
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::sqlite::SqliteRow;
@@ -25,7 +25,14 @@ pub trait CRUD {
             .fetch_all(db_connection)
             .await
         {
-            Ok(result) => Ok(result),
+            Ok(result) => {
+                info!(
+                    "Fetched {} rows from Dwata DB::{}",
+                    result.len(),
+                    Self::table_name()
+                );
+                Ok(result)
+            }
             Err(err) => {
                 println!("Could not fetch rows from Dwata DB.\nError: {}", err);
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
@@ -49,7 +56,14 @@ pub trait CRUD {
         .fetch_one(db_connection)
         .await;
         match result {
-            Ok(row) => Ok(row),
+            Ok(row) => {
+                info!(
+                    "Fetched one row from Dwata DB::{}, ID {}",
+                    Self::table_name(),
+                    pk
+                );
+                Ok(row)
+            }
             Err(err) => {
                 println!("Could not fetch rows from Dwata DB.\nError: {}", err);
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
@@ -62,7 +76,7 @@ pub trait CRUD {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
-    Directory(DirectorySource),
+    DirectorySource(DirectorySource),
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
 }
@@ -91,15 +105,21 @@ impl VecColumnNameValue {
     }
 }
 
-pub trait CRUDHelperCreate {
+pub trait CRUDHelperCreateUpdate {
     fn table_name() -> String;
 
     fn get_column_names_values(&self) -> VecColumnNameValue;
+
+    async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
+        Ok(())
+    }
 
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
+        // Just calling this so if it fails the error will propagate up
+        self.pre_insert(db_connection).await?;
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
@@ -198,5 +218,7 @@ pub trait CRUDHelperCreate {
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
-    Directory(DirectorySourceCreateUpdate),
+    DirectorySource(DirectorySourceCreateUpdate),
+    DatabaseSource(DatabaseSourceCreateUpdate),
+    AIIntegration(AIIntegrationCreateUpdate),
 }

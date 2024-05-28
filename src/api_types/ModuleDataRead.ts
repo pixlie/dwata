@@ -6,6 +6,6 @@ import type { UserAccount } from "./UserAccount";
 
 export type ModuleDataRead =
   | { UserAccount: UserAccount }
-  | { Directory: DirectorySource }
+  | { DirectorySource: DirectorySource }
   | { DatabaseSource: DatabaseSource }
   | { AIIntegration: AIIntegration };

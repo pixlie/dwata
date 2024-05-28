@@ -1,37 +1,8 @@
-import { Component, For, createMemo, createSignal } from "solid-js";
-import DropdownItem from "./DropdownItem";
-import DropdownHeading from "./DropdownHeading";
+import { Component, For, JSX, createMemo } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
+import { IFormField } from "../../utils/types";
 
-export interface IKeyedChoice {
-  key: number | string;
-  label: string;
-}
-
-export interface IChoicesWithHeading {
-  name: string;
-  choices: Array<IKeyedChoice>;
-}
-
-interface IPropTypes {
-  label?: string;
-  choices?: Array<IKeyedChoice>;
-  choicesWithHeadings?: Array<IChoicesWithHeading>;
-  value?: string | number;
-  isRequired?: boolean;
-  size?: "sm" | "base" | "lg";
-  isBlock?: boolean;
-  onSelect?: (newValue: number | string) => void;
-}
-
-interface IWidgetState {
-  isOpen: boolean;
-}
-
-const Dropdown: Component<IPropTypes> = (props) => {
-  const [widgetState, setWidgetState] = createSignal<IWidgetState>({
-    isOpen: false,
-  });
+const Dropdown: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
   const getSizeClass = createMemo(() => {
     switch (props.size) {
@@ -41,105 +12,54 @@ const Dropdown: Component<IPropTypes> = (props) => {
         return "px-6 py-3 text-xl font-bold";
       case "base":
       default:
-        return "px-4 py-2 text-base font-normal";
+        return "px-2 py-0.5 text-base font-normal";
     }
   });
 
-  const buttonClasses =
+  const classes =
     getSizeClass() +
-    " rounded-md select-none cursor-pointer border hover:shadow-lg " +
-    `${props.isBlock && "w-full"}`;
+    " rounded-md border hover:shadow-lg " +
+    `${props.displayBlock && "w-full"}`;
 
-  const getLabel = createMemo(() => {
-    if (!!props.value && !!props.choices) {
-      return (
-        (!!props.label ? props.label + ": " : "") +
-        props.choices?.find((x) => x.key === props.value)?.label
-      );
-    } else if (!!props.value && !!props.choicesWithHeadings) {
-      const choiceHead = props.choicesWithHeadings.find((x) =>
-        x.choices.find((y) => y.key === props.value)
-      );
-      const choice = choiceHead?.choices.find(
-        (y) => y.key === props.value
-      )?.label;
-      return (
-        (!!props.label ? props.label + ": " : "") +
-        choiceHead?.name +
-        " / " +
-        choice
-      );
-    } else {
-      return props.label || "";
-    }
-  });
-
-  const handlClick = () => {
-    setWidgetState({ isOpen: !widgetState().isOpen });
-  };
-
-  const handleChoiceSelect = (selected: number | string) => {
-    setWidgetState({
-      isOpen: false,
-    });
-
-    if (!!props.onSelect) {
-      props.onSelect(selected);
+  const handleChange: JSX.EventHandler<HTMLSelectElement, Event> = (event) => {
+    if (!!props.onChange) {
+      props.onChange(props.name, event.currentTarget.value);
     }
   };
 
   return (
-    <div class="relative">
-      <button
-        class={buttonClasses}
-        onClick={handlClick}
-        style={{
-          "background-color": getColors().colors["input.background"],
-          "border-color": getColors().colors["input.border"],
-          color: getColors().colors["input.foreground"],
-        }}
-      >
-        {getLabel()} <i class="ml-1 fa-solid fa-chevron-down" />
-      </button>
-      {!!widgetState().isOpen && (
-        <div
-          class="absolute top-10 z-10 border p-1 px-3 rounded-md"
-          style={{
-            "background-color": getColors().colors["input.background"],
-            "border-color": getColors().colors["input.border"],
-          }}
-        >
-          {!!props.choicesWithHeadings ? (
-            <For each={props.choicesWithHeadings}>
-              {(heading) => (
-                <>
-                  <DropdownHeading label={heading.name} />
+    <select
+      onChange={handleChange}
+      class={classes}
+      style={{
+        "background-color": getColors().colors["input.background"],
+        "border-color": getColors().colors["input.border"],
+        color: getColors().colors["input.foreground"],
+      }}
+    >
+      {!!props.choicesWithHeadings ? (
+        <For each={props.choicesWithHeadings}>
+          {(heading) => (
+            <>
+              {/* <DropdownHeading label={heading.name} />
                   <For each={heading.choices}>
                     {(choice) => (
                       <DropdownItem
-                        key={choice.key}
-                        label={choice.label}
+                        key={choice[0]}
+                        label={choice[1]}
                         onSelect={handleChoiceSelect}
                       />
                     )}
-                  </For>
-                </>
-              )}
-            </For>
-          ) : (
-            <For each={props.choices}>
-              {(choice) => (
-                <DropdownItem
-                  key={choice.key}
-                  label={choice.label}
-                  onSelect={handleChoiceSelect}
-                />
-              )}
-            </For>
+                  </For> */}
+            </>
           )}
-        </div>
+        </For>
+      ) : (
+        <For each={props.choices}>
+          {(choice) => <option value={choice[0]}>{choice[1]}</option>}
+        </For>
       )}
-    </div>
+    </select>
   );
 };
 
