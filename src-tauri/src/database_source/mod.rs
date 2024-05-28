@@ -1,4 +1,5 @@
 use crate::error::DwataError;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use std::str::FromStr;
@@ -48,20 +49,20 @@ pub struct DatabaseSource {
     // This is needed for TCP/IP based connections, including to localhost
     pub database_host: Option<String>,
     pub database_port: Option<u16>,
-
     // Authentication may not be needed for locally hosted databases
     pub database_username: Option<String>,
-    // If the user wants to prompt for the database password instead of storing it in Dwata
-    // pub prompt_database_password: Option<bool>,
     pub database_password: Option<String>,
+    // Some hosted databases require an API key for authentication
     pub database_api_key: Option<String>,
+
     // These are for connection over SSH
-    // pub ssh_username: Option<String>,
-    // If the user wants to prompt for the SSH password instead of storing it in Dwata
-    // pub prompt_ssh_password: Option<bool>,
-    // pub ssh_password: Option<String>,
-    // pub ssh_key_path: Option<String>,
-    // pub ssh_port: Option<u16>,
+    pub ssh_host: Option<String>,
+    pub ssh_port: Option<u16>,
+    pub ssh_username: Option<String>,
+    pub ssh_password: Option<String>,
+    pub ssh_key_path: Option<String>,
+
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, TS)]

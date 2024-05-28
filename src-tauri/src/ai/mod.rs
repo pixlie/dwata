@@ -63,19 +63,23 @@ impl AIProvider {
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct AIIntegration {
-    id: i64,
-    ai_provider: AIProvider,
-    api_key: Option<String>,
-    display_label: Option<String>,
+    pub id: i64,
+    pub label: Option<String>,
+    pub ai_provider: AIProvider,
+    pub api_key: Option<String>,
+
+    // In case of a self-hosted AI provider
+    pub endpoint_url: Option<String>,
+
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Deserialize, TS)]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct AIIntegrationCreateUpdate {
-    ai_provider: Option<String>,
-    api_key: Option<String>,
-    display_label: Option<String>,
-    pub created_at: DateTime<Utc>,
+    pub label: Option<String>,
+    pub ai_provider: Option<String>,
+    pub api_key: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]

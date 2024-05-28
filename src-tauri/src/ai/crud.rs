@@ -21,8 +21,8 @@ impl CRUDHelperCreateUpdate for AIIntegrationCreateUpdate {
         if let Some(x) = &self.api_key {
             name_values.push_name_value("api_key", InputValue::Text(x.clone()));
         }
-        if let Some(x) = &self.display_label {
-            name_values.push_name_value("display_label", InputValue::Text(x.clone()));
+        if let Some(x) = &self.label {
+            name_values.push_name_value("label", InputValue::Text(x.clone()));
         }
         name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         name_values
