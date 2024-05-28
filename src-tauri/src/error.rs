@@ -1,4 +1,7 @@
+use log::error;
 use serde::{Deserialize, Serialize};
+use sqlx::migrate::MigrateError;
+use std::error::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum DwataError {
@@ -8,6 +11,17 @@ pub enum DwataError {
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
 
+    // Internal SQLite DB for Dwata
+    CouldNotCreateDwataDB,
+    CouldNotConnectToDwataDB,
+    CouldNotInsertToDwataDB,
+    CouldNotUpdateDwataDB,
+    CouldNotFetchRowsFromDwataDB,
+    CouldNotMigrateDwataDB,
+
+    // Blanket error for sqlx
+    SqlxError,
+
     // Workspace and configuration
     ModuleNotFound,
 
@@ -16,13 +30,6 @@ pub enum DwataError {
     CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
     FeatureNotAvailableWithAIProvider,
-
-    // Internal SQLite DB for Dwata
-    CouldNotCreateDwataDB,
-    CouldNotConnectToDwataDB,
-    CouldNotInsertToDwataDB,
-    CouldNotUpdateDwataDB,
-    CouldNotFetchRowsFromDwataDB,
 
     // Integrated vector DB
     CouldNotConnectToVectorDB,
@@ -36,7 +43,26 @@ pub enum DwataError {
 
 impl From<sqlx::Error> for DwataError {
     fn from(err: sqlx::Error) -> Self {
-        println!("{:?}", err);
-        DwataError::CouldNotQueryDatabase
+        error!("Got an sqlx error\n Error: {}", err);
+        DwataError::SqlxError
+    }
+}
+
+impl From<MigrateError> for DwataError {
+    fn from(err: MigrateError) -> Self {
+        error!("Could not migrate Dwata DB\n Error: {}", err);
+        DwataError::CouldNotMigrateDwataDB
+    }
+}
+
+impl Error for DwataError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+impl std::fmt::Display for DwataError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
     }
 }

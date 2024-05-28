@@ -9,7 +9,7 @@ pub mod configuration;
 pub mod crud;
 pub mod helpers;
 
-pub type DwataDb = Mutex<Option<SqliteConnection>>;
+pub type DwataDb = Mutex<SqliteConnection>;
 
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[ts(export, rename = "Module", export_to = "../src/api_types/")]

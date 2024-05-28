@@ -24,7 +24,7 @@ pub struct DatabaseSource {
     pub database_type: DatabaseType,
 
     // An in memory database may not have a name
-    pub name: Option<String>,
+    pub database_name: Option<String>,
 
     // This can be path to file based or in memory databases
     pub path_to_local_database: Option<String>,
@@ -36,17 +36,17 @@ pub struct DatabaseSource {
     // Authentication may not be needed for locally hosted databases
     pub database_username: Option<String>,
     // If the user wants to prompt for the database password instead of storing it in Dwata
-    pub prompt_database_password: Option<bool>,
+    // pub prompt_database_password: Option<bool>,
     pub database_password: Option<String>,
     pub database_api_key: Option<String>,
 
     // These are for connection over SSH
-    pub ssh_username: Option<String>,
+    // pub ssh_username: Option<String>,
     // If the user wants to prompt for the SSH password instead of storing it in Dwata
-    pub prompt_ssh_password: Option<bool>,
-    pub ssh_password: Option<String>,
-    pub ssh_key_path: Option<String>,
-    pub ssh_port: Option<u16>,
+    // pub prompt_ssh_password: Option<bool>,
+    // pub ssh_password: Option<String>,
+    // pub ssh_key_path: Option<String>,
+    // pub ssh_port: Option<u16>,
 }
 
 #[derive(Debug, Deserialize, TS)]

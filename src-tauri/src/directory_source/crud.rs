@@ -4,13 +4,13 @@ use chrono::Utc;
 
 impl CRUD for DirectorySource {
     fn table_name() -> String {
-        "directory".to_string()
+        "directory_source".to_string()
     }
 }
 
 impl CRUDHelperCreate for DirectorySourceCreateUpdate {
     fn table_name() -> String {
-        "directory".to_string()
+        "directory_source".to_string()
     }
 
     fn get_column_names_values(&self) -> VecColumnNameValue {
