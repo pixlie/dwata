@@ -3,12 +3,14 @@ import type { AIProvider } from "./AIProvider";
 
 export interface AIModel {
   id: bigint;
-  aiProvider: AIProvider;
   label: string;
+  aiProvider: AIProvider;
   apiName: string;
   latestVersionApiName: string | null;
   contextWindow: number | null;
   pricePerMillionInputTokens: number | null;
   pricePerMillionOutputTokens: number | null;
   linkToModelDocumentation: string | null;
+  createdAt: string;
+  modifiedAt: string | null;
 }

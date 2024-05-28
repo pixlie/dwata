@@ -5,7 +5,7 @@ import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 import SettingsSourceList from "../widgets/source/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
-import SettingsAIIntegrationList from "../widgets/ai/SettingsIntegrationList";
+import SettingsAIIntegrationList from "../widgets/settings/SettingsIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useUserInterface } from "../stores/userInterface";
 

@@ -6,11 +6,13 @@ import { Module } from "../api_types/Module";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 import { DirectorySource } from "../api_types/DirectorySource";
 import { DatabaseSource } from "../api_types/DatabaseSource";
+import { AIIntegration } from "../api_types/AIIntegration";
 
 const makeStore = () => {
   const [store, setStore] = createStore<IWorkspace>({
     directoryList: [],
     databaseList: [],
+    aiIntegrationList: [],
 
     isReady: false,
     isFetching: false,
@@ -59,6 +61,29 @@ const makeStore = () => {
           databaseList:
             "DatabaseSource" in response
               ? (response.DatabaseSource as Array<DatabaseSource>)
+              : [],
+          isReady: true,
+          isFetching: false,
+        }));
+      },
+
+      readAIIntegrationList: async () => {
+        if (store.isFetching) {
+          return;
+        }
+        setStore({
+          ...store,
+          isFetching: true,
+        });
+        // We invoke the Tauri API to load workspace
+        const response: ModuleDataReadList = await invoke("read_module_list", {
+          module: "AIIntegration" as Module,
+        });
+        setStore((state) => ({
+          ...state,
+          aiIntegrationList:
+            "AIIntegration" in response
+              ? (response.AIIntegration as Array<AIIntegration>)
               : [],
           isReady: true,
           isFetching: false,
