@@ -8,5 +8,7 @@ CREATE TABLE user_account
     last_name           VARCHAR(60),
     email               VARCHAR(255),
     is_system_user      BOOL,
-    created_at          DATETIME NOT NULL
+
+    created_at          DATETIME NOT NULL,
+    modified_at         DATETIME
 );
