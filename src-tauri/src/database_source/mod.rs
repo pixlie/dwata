@@ -63,6 +63,7 @@ pub struct DatabaseSource {
     pub ssh_key_path: Option<String>,
 
     pub created_at: DateTime<Utc>,
+    pub modified_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize, TS)]

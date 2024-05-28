@@ -33,7 +33,9 @@ pub struct DirectorySource {
     pub include_patterns: Json<Vec<String>>,
     #[ts(type = "Vec<String>")]
     pub exclude_patterns: Option<Json<Vec<String>>>,
+
     pub created_at: DateTime<Utc>,
+    pub modified_at: Option<DateTime<Utc>>,
 }
 
 impl DirectorySource {
