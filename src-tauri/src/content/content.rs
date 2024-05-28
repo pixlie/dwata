@@ -67,7 +67,7 @@ pub enum ContentType {
 pub struct ContentSpec {
     pub text_type: Option<TextType>,
     pub length_limits: Option<(usize, usize)>,
-    pub choices_with_string_keys: Option<Vec<(String, String)>>,
+    pub choices: Option<Vec<(String, String)>>,
     // Text can be a prompt to AI model
     pub is_prompt: Option<bool>,
     // BulletPoints,

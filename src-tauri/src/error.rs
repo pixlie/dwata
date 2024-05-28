@@ -10,6 +10,7 @@ pub enum DwataError {
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
+    DatabaseTypeNotSupported,
 
     // Internal SQLite DB for Dwata
     CouldNotCreateDwataDB,

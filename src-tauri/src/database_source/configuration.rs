@@ -8,7 +8,7 @@ impl Configurable for DatabaseSource {
         let database_type_content_spec: ContentSpec = ContentSpec {
             text_type: None,
             length_limits: None,
-            choices_with_string_keys: Some(vec![
+            choices: Some(vec![
                 ("PostgreSQL".to_string(), "PostgreSQL".to_string()),
                 ("MySQL".to_string(), "MySQL".to_string()),
                 ("SQLite".to_string(), "SQLite".to_string()),
@@ -30,7 +30,7 @@ impl Configurable for DatabaseSource {
                     Some(true),
                 ),
                 FormField::new(
-                    "database_type",
+                    "databaseType",
                     "Database type",
                     None,
                     ContentType::SingleChoice,
@@ -39,25 +39,7 @@ impl Configurable for DatabaseSource {
                     Some(true),
                 ),
                 FormField::new(
-                    "database_host",
-                    "Database host",
-                    None,
-                    ContentType::Text,
-                    ContentSpec::default(),
-                    Some(true),
-                    Some(true),
-                ),
-                FormField::new(
-                    "database_port",
-                    "Database port",
-                    None,
-                    ContentType::Text,
-                    ContentSpec::default(),
-                    Some(false),
-                    Some(true),
-                ),
-                FormField::new(
-                    "database_name",
+                    "databaseName",
                     "Database name",
                     None,
                     ContentType::Text,
@@ -66,7 +48,25 @@ impl Configurable for DatabaseSource {
                     Some(true),
                 ),
                 FormField::new(
-                    "database_username",
+                    "databaseHost",
+                    "Database host",
+                    None,
+                    ContentType::Text,
+                    ContentSpec::default(),
+                    Some(true),
+                    Some(true),
+                ),
+                FormField::new(
+                    "databasePort",
+                    "Database port",
+                    None,
+                    ContentType::Text,
+                    ContentSpec::default(),
+                    Some(false),
+                    Some(true),
+                ),
+                FormField::new(
+                    "databaseUsername",
                     "Database username",
                     None,
                     ContentType::Text,
@@ -75,7 +75,7 @@ impl Configurable for DatabaseSource {
                     Some(true),
                 ),
                 FormField::new(
-                    "database_password",
+                    "databasePassword",
                     "Database password",
                     None,
                     ContentType::Text,

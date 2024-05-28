@@ -105,15 +105,21 @@ impl VecColumnNameValue {
     }
 }
 
-pub trait CRUDHelperCreate {
+pub trait CRUDHelperCreateUpdate {
     fn table_name() -> String;
 
     fn get_column_names_values(&self) -> VecColumnNameValue;
+
+    async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
+        Ok(())
+    }
 
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
     ) -> Result<i64, DwataError> {
+        // Just calling this so if it fails the error will propagate up
+        self.pre_insert(db_connection).await?;
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",

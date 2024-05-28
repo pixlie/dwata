@@ -17,7 +17,7 @@ pub(crate) async fn get_database_connection(
     path.push("dwata.sqlite3");
     let db_path = path.to_str().unwrap();
     if !sqlx::Sqlite::database_exists(db_path).await? {
-        error!("Could not find existing Dwata DB, creating");
+        info!("Could not find existing Dwata DB, creating");
         sqlx::Sqlite::create_database(db_path).await?;
     }
     match SqliteConnection::connect(path.to_str().unwrap()).await {

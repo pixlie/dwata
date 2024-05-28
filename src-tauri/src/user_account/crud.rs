@@ -1,5 +1,5 @@
 use super::{UserAccount, UserAccountCreateUpdate};
-use crate::workspace::crud::{CRUDHelperCreate, InputValue, VecColumnNameValue, CRUD};
+use crate::workspace::crud::{CRUDHelperCreateUpdate, InputValue, VecColumnNameValue, CRUD};
 
 impl CRUD for UserAccount {
     fn table_name() -> String {
@@ -7,7 +7,7 @@ impl CRUD for UserAccount {
     }
 }
 
-impl CRUDHelperCreate for UserAccountCreateUpdate {
+impl CRUDHelperCreateUpdate for UserAccountCreateUpdate {
     fn table_name() -> String {
         "user_account".to_string()
     }

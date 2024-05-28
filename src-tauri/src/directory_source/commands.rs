@@ -3,7 +3,6 @@ use crate::content::containers::HeterogeneousContentArray;
 use crate::error::DwataError;
 use crate::workspace::crud::CRUD;
 use crate::workspace::DwataDb;
-use log::error;
 use std::path::PathBuf;
 use tauri::State;
 
@@ -13,11 +12,11 @@ pub(crate) async fn fetch_file_list_in_directory(
     db: State<'_, DwataDb>,
 ) -> Result<Vec<File>, DwataError> {
     let mut db_guard = db.lock().await;
-            // Find the Directory matching the given folder_id
-            match DirectorySource::read_one_by_pk(directory_id, &mut db_guard).await {
-                Ok(directory) => Ok(directory.get_file_list()),
-                Err(x) => Err(x),
-            }
+    // Find the Directory matching the given folder_id
+    match DirectorySource::read_one_by_pk(directory_id, &mut db_guard).await {
+        Ok(directory) => Ok(directory.get_file_list()),
+        Err(x) => Err(x),
+    }
 }
 
 #[tauri::command]

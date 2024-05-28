@@ -1,6 +1,6 @@
 use super::{
     configuration::{Configurable, Configuration},
-    crud::{CRUDHelperCreate, ModuleDataCreateUpdate, ModuleDataReadList},
+    crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
 use crate::ai::AIIntegration;
@@ -9,11 +9,8 @@ use crate::directory_source::DirectorySource;
 use crate::error::DwataError;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::{ModuleDataRead, CRUD};
-use log::error;
 use sqlx::SqliteConnection;
 use std::ops::DerefMut;
-use tauri::path::BaseDirectory::Data;
-use tauri::process::restart;
 use tauri::State;
 
 #[tauri::command]
@@ -126,11 +123,9 @@ pub async fn upsert_module_item(
     let mut db_guard = db.lock().await;
     let db_connection = db_guard.deref_mut();
     let existing = match data {
-        ModuleDataCreateUpdate::UserAccount(_) => {
-            UserAccount::read_one_by_pk(pk, db_connection)
-                .await
-                .and_then(|x| Ok(ModuleDataRead::UserAccount(x)))
-        }
+        ModuleDataCreateUpdate::UserAccount(_) => UserAccount::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
         ModuleDataCreateUpdate::DirectorySource(_) => {
             DirectorySource::read_one_by_pk(pk, db_connection)
                 .await
