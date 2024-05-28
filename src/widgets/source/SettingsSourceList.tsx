@@ -23,7 +23,7 @@ const DatabaseSourceItem: Component<DatabaseSource> = (props) => {
       onClick={handleClick}
     >
       <i class="fa-solid fa-database w-6 text-gray-500" />
-      {props.label || props.name}
+      {props.label || props.databaseName}
       <div>
         <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
           Database
@@ -62,10 +62,11 @@ const DirectorySourceItem: Component<DirectorySource> = (props) => {
 };
 
 const SettingsSourceList: Component = () => {
-  const [workspace, { readDirectoryList }] = useWorkspace();
+  const [workspace, { readDirectoryList, readDatabaseList }] = useWorkspace();
 
   onMount(async () => {
     await readDirectoryList();
+    await readDatabaseList();
   });
 
   const databaseSources = createMemo(() => {
@@ -93,6 +94,7 @@ const SettingsSourceList: Component = () => {
           {(directory) => <DirectorySourceItem {...directory} />}
         </For>
       </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
         <For each={databaseSources()}>
           {(dataSource) => <DatabaseSourceItem {...dataSource} />}

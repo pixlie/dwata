@@ -15,7 +15,7 @@ interface IPropTypes {
 
 const Form: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
-  const { handleInput, formConfiguration, formDataHashMap, handleSubmit } =
+  const { handleChange, formConfiguration, formDataHashMap, handleSubmit } =
     props.configuredForm;
 
   return (
@@ -45,7 +45,7 @@ const Form: Component<IPropTypes> = (props) => {
             <>
               <FormField
                 {...field}
-                onInput={handleInput}
+                onChange={handleChange}
                 value={formDataHashMap()[field.name]}
               />
               <div class="mt-4" />

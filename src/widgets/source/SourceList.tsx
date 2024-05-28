@@ -11,7 +11,7 @@ const SourceList: Component = () => {
 
   const dataSources = createMemo(() => {
     if (!workspace.isFetching && !!workspace.isReady) {
-      return workspace.dataSourceList;
+      return [...workspace.directoryList, ...workspace.databaseList];
     }
     return [];
   });

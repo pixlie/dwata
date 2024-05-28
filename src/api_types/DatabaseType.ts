@@ -4,6 +4,5 @@ export type DatabaseType =
   | "PostgreSQL"
   | "MySQL"
   | "SQLite"
-  | "MSSQL"
   | "MongoDB"
   | "Qdrant";

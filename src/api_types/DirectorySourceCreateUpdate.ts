@@ -3,6 +3,6 @@
 export interface DirectorySourceCreateUpdate {
   path: string | null;
   label: string | null;
-  includePatterns: Array<string>;
-  excludePatterns: Array<string>;
+  includePatterns: Array<string> | null;
+  excludePatterns: Array<string> | null;
 }

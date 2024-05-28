@@ -3,7 +3,7 @@
 export interface DatabaseSourceCreateUpdate {
   label: string | null;
   databaseType: string | null;
-  name: string | null;
+  databaseName: string | null;
   databaseHost: string | null;
   databasePort: number | null;
   databaseUsername: string | null;

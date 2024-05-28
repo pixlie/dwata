@@ -19,11 +19,11 @@ const TextInput: Component<IFormField> = (props) => {
     }
   }
 
-  const handleInput: JSX.InputEventHandler<HTMLInputElement, InputEvent> = (
+  const handleChange: JSX.ChangeEventHandler<HTMLInputElement, Event> = (
     event,
   ) => {
-    if (!!props.onInput) {
-      props.onInput(props.name, event.currentTarget.value);
+    if (!!props.onChange) {
+      props.onChange(props.name, event.currentTarget.value);
     }
   };
 
@@ -46,7 +46,7 @@ const TextInput: Component<IFormField> = (props) => {
           }}
           placeholder={props.placeholder || undefined}
           value={props.value}
-          onInput={handleInput}
+          onChange={handleChange}
           onFocus={props.onFocus}
         />
       </div>

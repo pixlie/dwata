@@ -26,11 +26,20 @@ interface APIGridData {
 }
 
 type IFormFieldValue = string | number | Array<string> | undefined;
-type IFormData = {[key: string]: IFormFieldValue};
+type IFormData = { [key: string]: IFormFieldValue };
+
+export interface IChoicesWithHeading {
+  name: string;
+  choices: Array<[string, string]>;
+}
 
 interface IFormField extends FormField {
+  size?: "xs" | "sm" | "base" | "lg";
+  displayBlock?: boolean;
   value?: IFormFieldValue;
-  onInput?: (name: string, value: IFormFieldValue) => void;
+  choices?: Array<[string, string]>;
+  choicesWithHeadings?: Array<IChoicesWithHeading>;
+  onChange?: (name: string, value: IFormFieldValue) => void;
   onFocus?: () => void;
 }
 

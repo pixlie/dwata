@@ -4,7 +4,6 @@ import { Configuration } from "../api_types/Configuration";
 import { invoke } from "@tauri-apps/api/core";
 import { IFormFieldValue } from "./types";
 import { ModuleDataRead } from "../api_types/ModuleDataRead";
-import { ModuleDataCreateUpdate } from "../api_types/ModuleDataCreateUpdate";
 import { useNavigate } from "@solidjs/router";
 
 // interface IFormState {
@@ -39,6 +38,7 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
       module: options.module,
     });
     setFormConfiguration(response as Configuration);
+    console.info("Form configuration:", response);
 
     if (options.existingItemId) {
       let result: ModuleDataRead = await invoke("read_module_item_by_pk", {
@@ -68,7 +68,7 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
       : {};
   });
 
-  const handleInput = (name: string, value: IFormFieldValue) => {
+  const handleChange = (name: string, value: IFormFieldValue) => {
     setFormData((state) => ({
       ...state,
       [name]: value,
@@ -91,6 +91,10 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
         navigate(options.navtigateToAfterSave);
       }
     } else {
+      console.info(
+        `Submitting form data for insert into module: ${options.module}`,
+        formData(),
+      );
       const response = await invoke("insert_module_item", {
         data: {
           [options.module]: formData(),
@@ -103,7 +107,7 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
   };
 
   return {
-    handleInput,
+    handleChange,
     formData,
     formConfiguration,
     formDataHashMap,
