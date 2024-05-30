@@ -3,7 +3,6 @@
 use crate::error::DwataError;
 use env_logger;
 use log::{error, info};
-use sqlx::SqliteConnection;
 use std::path::PathBuf;
 use tauri::{App, Manager};
 

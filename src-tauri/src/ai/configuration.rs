@@ -14,8 +14,8 @@ impl Configurable for AIIntegration {
             choices: Some(vec![
                 ("OpenAI".to_string(), "OpenAI".to_string()),
                 ("Groq".to_string(), "Groq".to_string()),
-                ("Anthropic".to_string(), "Anthropic".to_string()),
-                ("Ollama".to_string(), "Ollama".to_string()),
+                // ("Anthropic".to_string(), "Anthropic".to_string()),
+                // ("Ollama".to_string(), "Ollama".to_string()),
             ]),
             is_prompt: None,
         };
@@ -26,7 +26,7 @@ impl Configurable for AIIntegration {
             You can have more than one integration to the same provider.",
             vec![
                 FormField::new(
-                    "display_label",
+                    "label",
                     "Label",
                     Some("An easy to remember label for this AI integration"),
                     ContentType::Text,
@@ -35,7 +35,7 @@ impl Configurable for AIIntegration {
                     Some(true),
                 ),
                 FormField::new(
-                    "ai_provider",
+                    "aiProvider",
                     "Select AI provider",
                     None,
                     ContentType::SingleChoice,
@@ -44,7 +44,7 @@ impl Configurable for AIIntegration {
                     Some(true),
                 ),
                 FormField::new(
-                    "api_key",
+                    "apiKey",
                     "API key",
                     Some("You will find this in your AI providers account settings"),
                     ContentType::Text,

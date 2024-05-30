@@ -8,9 +8,7 @@ use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::sqlite::SqliteRow;
-use sqlx::{
-    query_as, Database, Encode, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection, Type,
-};
+use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
 use ts_rs::TS;
 
 pub trait CRUD {

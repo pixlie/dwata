@@ -42,6 +42,18 @@ pub enum DwataError {
     CouldNotOpenDirectory,
 }
 
+impl Error for DwataError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+impl std::fmt::Display for DwataError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<sqlx::Error> for DwataError {
     fn from(err: sqlx::Error) -> Self {
         error!("Got an sqlx error\n Error: {}", err);
@@ -53,17 +65,5 @@ impl From<MigrateError> for DwataError {
     fn from(err: MigrateError) -> Self {
         error!("Could not migrate Dwata DB\n Error: {}", err);
         DwataError::CouldNotMigrateDwataDB
-    }
-}
-
-impl Error for DwataError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-}
-
-impl std::fmt::Display for DwataError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
     }
 }

@@ -6,13 +6,11 @@ use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 use ts_rs::TS;
-use url::Url;
 
-// pub mod api_types;
-// pub mod commands;
 // pub mod helpers;
 pub mod configuration;
 pub mod crud;
+pub mod models;
 pub mod providers;
 
 #[derive(Debug, Deserialize, Serialize, Clone, TS, Type)]
@@ -20,8 +18,36 @@ pub mod providers;
 pub enum AIProvider {
     OpenAI,
     Groq,
-    Anthropic,
-    Ollama,
+    // Anthropic,
+    // Ollama,
+    // Mistral,
+}
+
+impl TryFrom<String> for AIProvider {
+    type Error = DwataError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "openai" => Ok(Self::OpenAI),
+            "groq" => Ok(Self::Groq),
+            // "anthropic" => Ok(Self::Anthropic),
+            // "ollama" => Ok(Self::Ollama),
+            // "mistral" => Ok(Self::Mistral),
+            _ => Err(DwataError::InvalidAIProvider),
+        }
+    }
+}
+
+impl From<AIProvider> for String {
+    fn from(value: AIProvider) -> Self {
+        match value {
+            AIProvider::OpenAI => "openai".to_string(),
+            AIProvider::Groq => "groq".to_string(),
+            // AIProvider::Anthropic => "anthropic".to_string(),
+            // AIProvider::Ollama => "ollama".to_string(),
+            // AIProvider::Mistral => "mistral".to_string(),
+        }
+    }
 }
 
 impl AIProvider {
@@ -30,8 +56,9 @@ impl AIProvider {
         match self {
             Self::OpenAI => Some("https://api.openai.com/v1/chat/completions".to_string()),
             Self::Groq => Some("https://api.groq.com/openai/v1/chat/completions".to_string()),
-            Self::Anthropic => Some("https://api.anthropic.com/v1/messages".to_string()),
-            Self::Ollama => Some("http://localhost:11434/api/chat".to_string()),
+            // Self::Anthropic => Some("https://api.anthropic.com/v1/messages".to_string()),
+            // Self::Ollama => Some("http://localhost:11434/api/chat".to_string()),
+            // Self::MistralAI => Some("https://api.mistral.ai/v1/chat/completions".to_string()),
         }
     }
 
@@ -63,7 +90,8 @@ impl AIProvider {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, FromRow, TS)]
+#[derive(Debug, Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct AIIntegration {
     pub id: i64,
@@ -79,27 +107,10 @@ pub struct AIIntegration {
 }
 
 #[derive(Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct AIIntegrationCreateUpdate {
     pub label: Option<String>,
     pub ai_provider: Option<String>,
     pub api_key: Option<String>,
-}
-
-#[derive(Debug, Deserialize, Serialize, FromRow, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
-pub struct AIModel {
-    pub id: i64,
-    pub label: String,
-    pub ai_provider: AIProvider,
-    pub api_name: String,
-    pub latest_version_api_name: Option<String>,
-    pub context_window: Option<i32>,
-    // Prices are in US cents
-    pub price_per_million_input_tokens: Option<i32>,
-    pub price_per_million_output_tokens: Option<i32>,
-    pub link_to_model_documentation: Option<Url>,
-
-    pub created_at: DateTime<Utc>,
-    pub modified_at: Option<DateTime<Utc>>,
 }
