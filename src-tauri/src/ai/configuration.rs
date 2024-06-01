@@ -4,7 +4,7 @@ use crate::content::{
 };
 use crate::workspace::configuration::{Configurable, Configuration};
 
-use super::AIIntegration;
+use super::{AIIntegration, AIProvider};
 
 impl Configurable for AIIntegration {
     fn get_schema() -> Configuration {
@@ -12,10 +12,11 @@ impl Configurable for AIIntegration {
             text_type: None,
             length_limits: None,
             choices: Some(vec![
-                ("OpenAI".to_string(), "OpenAI".to_string()),
-                ("Groq".to_string(), "Groq".to_string()),
-                // ("Anthropic".to_string(), "Anthropic".to_string()),
-                // ("Ollama".to_string(), "Ollama".to_string()),
+                (String::from(AIProvider::OpenAI), "OpenAI".to_string()),
+                (String::from(AIProvider::Groq), "Groq".to_string()),
+                // (String::from(AIProvider::Anthropic), "Anthropic".to_string()),
+                // (String::from(AIProvider::Ollama), "Ollama".to_string()),
+                // (String::from(AIProvider::Mistral), "Mistral".to_string()),
             ]),
             is_prompt: None,
         };

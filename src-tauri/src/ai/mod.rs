@@ -14,6 +14,7 @@ pub mod models;
 pub mod providers;
 
 #[derive(Debug, Deserialize, Serialize, Clone, TS, Type)]
+#[sqlx(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum AIProvider {
     OpenAI,

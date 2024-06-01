@@ -38,7 +38,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(err) => {
             error!("Could not connect to Dwata DB\n Error: {:?}", err);
-            return Err(Box::new(DwataError::CouldNotConnectToDwataDB));
+            return Err(Box::new(err));
         }
     }
     Ok(())
