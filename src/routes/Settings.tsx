@@ -1,13 +1,14 @@
-import { Component } from "solid-js";
+import { Component, onMount } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
-import SettingsSourceList from "../widgets/source/SettingsSourceList";
+import SettingsSourceList from "../widgets/settings/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
 import SettingsAIIntegrationList from "../widgets/settings/SettingsIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useUserInterface } from "../stores/userInterface";
+import { useWorkspace } from "../stores/workspace";
 
 const SettingsIndex: Component = () => {
   const [_, { getColors }] = useUserInterface();
@@ -68,6 +69,15 @@ const SettingsWrapper: Component<RouteSectionProps> = (props) => {
 };
 
 const SettingsRoutes: Component = () => {
+  const [_, { readDirectoryList, readDatabaseList, readAIIntegrationList }] =
+    useWorkspace();
+
+  onMount(async () => {
+    await readDirectoryList();
+    await readDatabaseList();
+    await readAIIntegrationList();
+  });
+
   return (
     <>
       <Route path="/database-source/add" component={DatabaseSourceForm} />
