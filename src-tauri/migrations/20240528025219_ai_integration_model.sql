@@ -3,6 +3,7 @@
 CREATE TABLE ai_integration
 (
     id                  INTEGER PRIMARY KEY,
+
     label               VARCHAR(30),
     ai_provider         VARCHAR(30) NOT NULL,
     api_key             VARCHAR(255),
@@ -10,4 +11,16 @@ CREATE TABLE ai_integration
 
     created_at          DATETIME NOT NULL,
     modified_at         DATETIME
+);
+
+CREATE TABLE ai_model_used
+(
+    id                  INTEGER PRIMARY KEY,
+    label               VARCHAR(30),
+    ai_provider         VARCHAR(30) NOT NULL,
+    ai_integration_id   INTEGER NOT NULL,
+    api_name            VARCHAR(60),
+
+    created_at          DATETIME NOT NULL,
+    FOREIGN KEY (ai_integration_id) REFERENCES ai_integration (id)
 );

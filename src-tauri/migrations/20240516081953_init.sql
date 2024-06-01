@@ -4,6 +4,7 @@
 CREATE TABLE user_account
 (
     id                  INTEGER PRIMARY KEY,
+
     first_name          VARCHAR(60),
     last_name           VARCHAR(60),
     email               VARCHAR(255),
