@@ -30,9 +30,12 @@ const makeStore = () => {
           isFetching: true,
         });
         // We invoke the Tauri API to load workspace
-        const response: ModuleDataReadList = await invoke("read_module_list", {
-          module: "DirectorySource" as Module,
-        });
+        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
+          "read_module_list",
+          {
+            module: "DirectorySource" as Module,
+          },
+        );
         setStore((state) => ({
           ...state,
           directoryList:
@@ -53,9 +56,12 @@ const makeStore = () => {
           isFetching: true,
         });
         // We invoke the Tauri API to load workspace
-        const response: ModuleDataReadList = await invoke("read_module_list", {
-          module: "DatabaseSource" as Module,
-        });
+        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
+          "read_module_list",
+          {
+            module: "DatabaseSource" as Module,
+          },
+        );
         setStore((state) => ({
           ...state,
           databaseList:
@@ -76,9 +82,12 @@ const makeStore = () => {
           isFetching: true,
         });
         // We invoke the Tauri API to load workspace
-        const response: ModuleDataReadList = await invoke("read_module_list", {
-          module: "AIIntegration" as Module,
-        });
+        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
+          "read_module_list",
+          {
+            module: "AIIntegration" as Module,
+          },
+        );
         setStore((state) => ({
           ...state,
           aiIntegrationList:

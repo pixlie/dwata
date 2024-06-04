@@ -1,14 +1,15 @@
-import { Component, JSX, createContext, useContext } from "solid-js";
+import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
-import { APIChatThread } from "../api_types/APIChatThread";
 import { invoke } from "@tauri-apps/api/core";
-import { APIChatReply } from "../api_types/APIChatReply";
 import { IProviderPropTypes } from "../utils/types";
+import { ChatThread } from "../api_types/ChatThread";
+import { ChatReply } from "../api_types/ChatReply";
+import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 
 interface IStore {
-  threadList: Array<APIChatThread>;
-  threadDetail?: APIChatThread;
-  replyListForThread?: Array<APIChatReply>;
+  threadList: Array<ChatThread>;
+  threadDetail?: ChatThread;
+  replyListForThread?: Array<ChatReply>;
 
   isFetching: boolean;
   isReady: boolean;
@@ -25,8 +26,10 @@ const makeStore = () => {
     store,
     {
       fetchChatThreads: async () => {
-        const result = await invoke("fetch_chat_thread_list");
-        setStore({ ...store, threadList: result as Array<APIChatThread> });
+        const result = await invoke<ModuleDataReadList>(
+          "fetch_chat_thread_list",
+        );
+        setStore({ ...store, threadList: result as Array<ChatThread> });
       },
 
       fetchThreadDetail: async (threadId: number) => {

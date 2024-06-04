@@ -12,6 +12,14 @@ import { useWorkspace } from "../stores/workspace";
 
 const SettingsIndex: Component = () => {
   const [_, { getColors }] = useUserInterface();
+  const [_w, { readDirectoryList, readDatabaseList, readAIIntegrationList }] =
+    useWorkspace();
+
+  onMount(async () => {
+    await readDirectoryList();
+    await readDatabaseList();
+    await readAIIntegrationList();
+  });
 
   return (
     <>
@@ -69,15 +77,6 @@ const SettingsWrapper: Component<RouteSectionProps> = (props) => {
 };
 
 const SettingsRoutes: Component = () => {
-  const [_, { readDirectoryList, readDatabaseList, readAIIntegrationList }] =
-    useWorkspace();
-
-  onMount(async () => {
-    await readDirectoryList();
-    await readDatabaseList();
-    await readAIIntegrationList();
-  });
-
   return (
     <>
       <Route path="/database-source/add" component={DatabaseSourceForm} />

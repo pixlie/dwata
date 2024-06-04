@@ -18,9 +18,6 @@ const FormField: Component<IFormField> = (props) => {
       break;
     }
     case "SingleChoice": {
-      if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
-        props.choices = props.contentSpec.choices;
-      }
       Field = Dropdown;
       break;
     }

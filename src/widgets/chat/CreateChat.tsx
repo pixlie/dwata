@@ -1,15 +1,14 @@
 import { Component, For, createMemo, createSignal, onMount } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import Button from "../interactable/Button";
-import Dropdown, { IChoicesWithHeading } from "../interactable/Dropdown";
-import { APIAIProvider } from "../../api_types/APIAIProvider";
-import { APIAIModel } from "../../api_types/APIAIModel";
+import Dropdown from "../interactable/Dropdown";
 import { useWorkspace } from "../../stores/workspace";
 import { useNavigate } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 import TextArea from "../interactable/TextArea";
 import Heading from "../typography/Heading";
 import ChatContext from "./ChatContext";
+import { AIModel } from "../../api_types/AIModel";
 
 interface INewThreadFormData {
   message: string;
@@ -21,7 +20,7 @@ interface IFormState {
   chatContexts: Array<string>;
 }
 
-const NewThread: Component = () => {
+const CreateChat: Component = () => {
   const [formData, setFormData] = createSignal<INewThreadFormData>({
     message: "",
     aiProvider: null,
@@ -31,7 +30,7 @@ const NewThread: Component = () => {
     chatContexts: [],
   });
   const [aiProvidersAndModels, setAiProvidersAndModels] =
-    createSignal<Array<APIAIProvider>>();
+    createSignal<Array<AIModel>>();
   const [workspace] = useWorkspace();
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
@@ -51,18 +50,16 @@ const NewThread: Component = () => {
   };
 
   onMount(async () => {
-    const firstProvider = workspace.aiIntegrationList[0];
-    const response = await invoke<Array<APIAIProvider>>(
-      "fetch_list_of_ai_providers_and_models"
-    );
+    const firstAIIntegration = workspace.aiIntegrationList[0];
+    const response = await invoke<Array<AIModel>>("get_list_of_ai_models");
     setAiProvidersAndModels(response);
     const firstModel = response.find(
-      (provider) => provider.name === firstProvider.aiProvider
-    )?.aiModelList[0];
+      (integration) => integration.aiProvider === firstAIIntegration.aiProvider,
+    );
 
     setFormData({
       ...formData(),
-      aiProvider: firstProvider.aiProvider,
+      aiProvider: firstAIIntegration.aiProvider,
       aiModel: firstModel?.apiName || null,
     });
   });
@@ -74,7 +71,7 @@ const NewThread: Component = () => {
     return aiProvidersAndModels()!.reduce(
       (collector: Array<IChoicesWithHeading>, item: APIAIProvider) => {
         const aiIntegration = workspace.aiIntegrationList.find(
-          (x) => x.aiProvider === item.name
+          (x) => x.aiProvider === item.name,
         );
         if (!aiIntegration) {
           return collector;
@@ -90,7 +87,7 @@ const NewThread: Component = () => {
           },
         ];
       },
-      []
+      [],
     );
   });
 
@@ -164,4 +161,4 @@ const NewThread: Component = () => {
   );
 };
 
-export default NewThread;
+export default CreateChat;

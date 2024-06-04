@@ -27,6 +27,13 @@ const Dropdown: Component<IFormField> = (props) => {
     }
   };
 
+  const getChoices = createMemo<Array<[string, string]>>(() => {
+    if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
+      return props.contentSpec.choices;
+    }
+    return [];
+  });
+
   return (
     <select
       onChange={handleChange}
@@ -55,7 +62,7 @@ const Dropdown: Component<IFormField> = (props) => {
           )}
         </For>
       ) : (
-        <For each={props.choices}>
+        <For each={getChoices()}>
           {(choice) => <option value={choice[0]}>{choice[1]}</option>}
         </For>
       )}

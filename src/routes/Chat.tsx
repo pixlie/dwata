@@ -3,7 +3,7 @@ import Thread from "../widgets/chat/Thread";
 import { Route, RouteSectionProps, useParams } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
 import { ChatThreadProvider, useChatThread } from "../stores/chatThread";
-import NewThread from "../widgets/chat/NewThread";
+import CreateChat from "../widgets/chat/CreateChat";
 import ReplyItem from "../widgets/chat/ReplyItem";
 
 const ChatThreadIndex: Component = () => {
@@ -54,8 +54,8 @@ const ChatWrapper: Component<RouteSectionProps> = (props) => {
 const ChatRoutes: Component = () => {
   return (
     <ChatThreadProvider>
-      <Route path="/start" component={NewThread} />
-      <Route path="/:threadId" component={ChatThreadIndex} />
+      <Route path="/thread/:threadId" component={ChatThreadIndex} />
+      <Route path="/start" component={CreateChat} />
 
       <Route path="/" component={ChatThreadIndex} />
     </ChatThreadProvider>
