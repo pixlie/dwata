@@ -1,5 +1,4 @@
 -- This table stores all the directories that we will look for files
-
 CREATE TABLE directory_source
 (
     id                  INTEGER PRIMARY KEY,

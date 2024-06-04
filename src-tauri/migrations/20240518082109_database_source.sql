@@ -1,5 +1,4 @@
 -- This table stores database sources that are connected to Dwata
-
 CREATE TABLE database_source
 (
     id                          INTEGER PRIMARY KEY,
