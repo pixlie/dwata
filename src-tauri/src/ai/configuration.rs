@@ -9,16 +9,14 @@ use super::{AIIntegration, AIProvider};
 impl Configurable for AIIntegration {
     fn get_schema() -> Configuration {
         let ai_provider_spec: ContentSpec = ContentSpec {
-            text_type: None,
-            length_limits: None,
             choices: Some(vec![
                 (String::from(AIProvider::OpenAI), "OpenAI".to_string()),
                 (String::from(AIProvider::Groq), "Groq".to_string()),
                 // (String::from(AIProvider::Anthropic), "Anthropic".to_string()),
-                // (String::from(AIProvider::Ollama), "Ollama".to_string()),
+                (String::from(AIProvider::Ollama), "Ollama".to_string()),
                 // (String::from(AIProvider::Mistral), "Mistral".to_string()),
             ]),
-            is_prompt: None,
+            ..ContentSpec::default()
         };
 
         Configuration::new(

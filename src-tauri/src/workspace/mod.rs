@@ -18,8 +18,7 @@ pub enum Module {
     DirectorySource,
     DatabaseSource,
     AIIntegration,
-    // ChatThread,
-    // ChatReply,
+    // Chat,
 }
 
 // impl ChatContextNode for Config {

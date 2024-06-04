@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 use ts_rs::TS;
 
-// pub mod helpers;
+pub mod commands;
 pub mod configuration;
 pub mod crud;
 pub mod models;
@@ -20,7 +20,7 @@ pub enum AIProvider {
     OpenAI,
     Groq,
     // Anthropic,
-    // Ollama,
+    Ollama,
     // Mistral,
 }
 
@@ -45,7 +45,7 @@ impl From<AIProvider> for String {
             AIProvider::OpenAI => "openai".to_string(),
             AIProvider::Groq => "groq".to_string(),
             // AIProvider::Anthropic => "anthropic".to_string(),
-            // AIProvider::Ollama => "ollama".to_string(),
+            AIProvider::Ollama => "ollama".to_string(),
             // AIProvider::Mistral => "mistral".to_string(),
         }
     }
@@ -58,7 +58,7 @@ impl AIProvider {
             Self::OpenAI => Some("https://api.openai.com/v1/chat/completions".to_string()),
             Self::Groq => Some("https://api.groq.com/openai/v1/chat/completions".to_string()),
             // Self::Anthropic => Some("https://api.anthropic.com/v1/messages".to_string()),
-            // Self::Ollama => Some("http://localhost:11434/api/chat".to_string()),
+            Self::Ollama => Some("http://localhost:11434/api/chat".to_string()),
             // Self::MistralAI => Some("https://api.mistral.ai/v1/chat/completions".to_string()),
         }
     }

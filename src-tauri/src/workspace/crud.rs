@@ -1,4 +1,5 @@
 use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::chat::Chat;
 use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
@@ -70,22 +71,25 @@ pub trait CRUD {
     }
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
     DirectorySource(DirectorySource),
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
+    ChatThread(Vec<Chat>),
+    ChatReply(Vec<Chat>),
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
     DirectorySource(Vec<DirectorySource>),
     DatabaseSource(Vec<DatabaseSource>),
     AIIntegration(Vec<AIIntegration>),
+    Chat(Vec<Chat>),
 }
 
 pub enum InputValue {

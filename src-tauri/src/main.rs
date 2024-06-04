@@ -1,6 +1,5 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use crate::error::DwataError;
 use env_logger;
 use log::{error, info};
 use std::path::PathBuf;
@@ -18,6 +17,7 @@ mod content;
 // mod embedding;
 // mod schema;
 mod user_account;
+mod workflow;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -57,13 +57,9 @@ fn main() {
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
-            // labels::commands::load_labels,
+            ai::commands::get_list_of_ai_models,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
-            // workspace::commands::create_database_source,
-            // workspace::commands::create_folder_source,
-            // workspace::commands::create_ai_integration,
-            // workspace::commands::update_ai_integration,
             // chat::commands::start_chat_thread,
             // chat::commands::fetch_chat_thread_list,
             // chat::commands::fetch_chat_thread_detail,

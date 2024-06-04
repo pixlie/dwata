@@ -1,17 +1,20 @@
-use super::{
-    configuration::{Configurable, Configuration},
-    crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
-    DwataDb, Module,
-};
+use std::ops::DerefMut;
+
+use sqlx::SqliteConnection;
+use tauri::State;
+
 use crate::ai::AIIntegration;
 use crate::database_source::DatabaseSource;
 use crate::directory_source::DirectorySource;
 use crate::error::DwataError;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::{ModuleDataRead, CRUD};
-use sqlx::SqliteConnection;
-use std::ops::DerefMut;
-use tauri::State;
+
+use super::{
+    configuration::{Configurable, Configuration},
+    crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
+    DwataDb, Module,
+};
 
 #[tauri::command]
 pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
