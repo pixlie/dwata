@@ -2,14 +2,13 @@ import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { IProviderPropTypes } from "../utils/types";
-import { ChatThread } from "../api_types/ChatThread";
-import { ChatReply } from "../api_types/ChatReply";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
+import { Chat } from "../api_types/Chat";
+import { Module } from "../api_types/Module";
 
 interface IStore {
-  threadList: Array<ChatThread>;
-  threadDetail?: ChatThread;
-  replyListForThread?: Array<ChatReply>;
+  chatList: Array<Chat>;
+  chatReplyList: { [rootChatId: number]: Array<Chat> };
 
   isFetching: boolean;
   isReady: boolean;
@@ -17,7 +16,9 @@ interface IStore {
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
-    threadList: [],
+    chatList: [],
+    chatReplyList: {},
+
     isFetching: false,
     isReady: false,
   });
@@ -25,27 +26,35 @@ const makeStore = () => {
   return [
     store,
     {
-      fetchChatThreads: async () => {
+      fetchChats: async () => {
         const result = await invoke<ModuleDataReadList>(
-          "fetch_chat_thread_list",
+          "read_row_list_for_module",
+          {
+            module: "Chat" as Module,
+          },
         );
-        setStore({ ...store, threadList: result as Array<ChatThread> });
-      },
-
-      fetchThreadDetail: async (threadId: number) => {
-        const result = await invoke("fetch_chat_thread_detail", { threadId });
-        setStore({
-          ...store,
-          threadDetail: result as APIChatThread,
-        });
+        if ("Chat" in result) {
+          setStore({ ...store, chatList: result["Chat"] as Array<Chat> });
+        }
       },
 
       fetchChatReplies: async (threadId: number) => {
-        const result = await invoke("fetch_chat_reply_list", { threadId });
-        setStore({
-          ...store,
-          replyListForThread: result as Array<APIChatReply>,
-        });
+        const result = await invoke<ModuleDataReadList>(
+          "read_row_list_for_module",
+          {
+            module: "Chat" as Module,
+            filter: { rootChatId: threadId },
+          },
+        );
+        if ("Chat" in result) {
+          setStore({
+            ...store,
+            chatReplyList: {
+              ...store.chatReplyList,
+              [threadId]: result["Chat"] as Array<Chat>,
+            },
+          });
+        }
       },
     },
   ] as const; // `as const` forces tuple type inference
@@ -54,14 +63,14 @@ const makeStore = () => {
 type TStoreAndFunctions = ReturnType<typeof makeStore>;
 export const chatThreadStore = makeStore();
 
-const ChatThreadContext = createContext<TStoreAndFunctions>(chatThreadStore);
+const ChatContext = createContext<TStoreAndFunctions>(chatThreadStore);
 
-export const ChatThreadProvider: Component<IProviderPropTypes> = (props) => {
+export const ChatProvider: Component<IProviderPropTypes> = (props) => {
   return (
-    <ChatThreadContext.Provider value={chatThreadStore}>
+    <ChatContext.Provider value={chatThreadStore}>
       {props.children}
-    </ChatThreadContext.Provider>
+    </ChatContext.Provider>
   );
 };
 
-export const useChatThread = () => useContext(ChatThreadContext);
+export const useChat = () => useContext(ChatContext);

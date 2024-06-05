@@ -1,16 +1,17 @@
-import { Component } from "solid-js";
+import { Component, JSX } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
+import { IFormField } from "../../utils/types";
 
-interface IPropTypes {
-  label?: string;
-  placeholder?: string;
-  value?: string;
-  isRequired?: boolean;
-  onInput?: (newValue: string) => void;
-}
-
-const TextArea: Component<IPropTypes> = (props) => {
+const TextArea: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
+
+  const handleChange: JSX.ChangeEventHandler<HTMLTextAreaElement, Event> = (
+    event,
+  ) => {
+    if (!!props.onChange) {
+      props.onChange(props.name, event.currentTarget.value);
+    }
+  };
 
   return (
     <>
@@ -20,16 +21,16 @@ const TextArea: Component<IPropTypes> = (props) => {
         </label>
       )}
       <textarea
-        required={props.isRequired}
+        required={props.isRequired !== null ? props.isRequired : false}
         class="block w-full rounded-md px-2 py-1.5 border text-lg"
         style={{
           "background-color": getColors().colors["input.background"],
           "border-color": getColors().colors["input.border"],
           color: getColors().colors["input.foreground"],
         }}
-        placeholder={props.placeholder}
+        placeholder={props.placeholder !== null ? props.placeholder : ""}
         value={props.value || ""}
-        onInput={(e) => props.onInput?.(e.currentTarget.value)}
+        onChange={handleChange}
       />
     </>
   );

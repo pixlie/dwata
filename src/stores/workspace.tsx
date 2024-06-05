@@ -31,7 +31,7 @@ const makeStore = () => {
         });
         // We invoke the Tauri API to load workspace
         const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
-          "read_module_list",
+          "read_row_list_for_module",
           {
             module: "DirectorySource" as Module,
           },
@@ -57,7 +57,7 @@ const makeStore = () => {
         });
         // We invoke the Tauri API to load workspace
         const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
-          "read_module_list",
+          "read_row_list_for_module",
           {
             module: "DatabaseSource" as Module,
           },
@@ -83,7 +83,7 @@ const makeStore = () => {
         });
         // We invoke the Tauri API to load workspace
         const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
-          "read_module_list",
+          "read_row_list_for_module",
           {
             module: "AIIntegration" as Module,
           },

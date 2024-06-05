@@ -10,5 +10,4 @@ export type ModuleDataRead =
   | { DirectorySource: DirectorySource }
   | { DatabaseSource: DatabaseSource }
   | { AIIntegration: AIIntegration }
-  | { ChatThread: Array<Chat> }
-  | { ChatReply: Array<Chat> };
+  | { Chat: Chat };

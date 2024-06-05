@@ -3,7 +3,8 @@
 export type TextType =
   | "Email"
   | "Password"
-  | "Text"
+  | "SingleLine"
+  | "MultiLine"
   | "Link"
   | "Code"
   | "FilePath";

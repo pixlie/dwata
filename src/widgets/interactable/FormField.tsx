@@ -4,13 +4,31 @@ import TextInput from "./TextInput";
 import { IFormField } from "../../utils/types";
 import TextInputArray from "./TextInputArray";
 import Dropdown from "./Dropdown";
+import TextArea from "./TextArea";
 
 const FormField: Component<IFormField> = (props) => {
   let Field: Component<IFormField> | null = null; // Initialize Field with a default value
 
   switch (props.contentType) {
     case "Text": {
-      Field = TextInput;
+      if ("textType" in props.contentSpec && !!props.contentSpec.textType) {
+        switch (props.contentSpec.textType) {
+          case "Email":
+            Field = TextInput;
+            break;
+          case "Password":
+            Field = TextInput;
+            break;
+          case "MultiLine":
+            Field = TextArea;
+            break;
+          default:
+            Field = TextInput;
+            break;
+        }
+      } else {
+        Field = TextInput;
+      }
       break;
     }
     case "TextArray": {
@@ -21,10 +39,6 @@ const FormField: Component<IFormField> = (props) => {
       Field = Dropdown;
       break;
     }
-    // case "multiLineText": {
-    //   Field = TextArea;
-    //   break;
-    // }
   }
 
   if (!Field) {

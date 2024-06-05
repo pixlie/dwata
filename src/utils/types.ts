@@ -38,8 +38,6 @@ interface IFormField extends FormField {
   size?: "xs" | "sm" | "base" | "lg";
   displayBlock?: boolean;
   value?: IFormFieldValue;
-  choices?: Array<[string, string]>;
-  choicesWithHeadings?: Array<IChoicesWithHeading>;
   onChange?: (name: string, value: IFormFieldValue) => void;
   onFocus?: () => void;
 }

@@ -1,9 +1,9 @@
 import { Component } from "solid-js";
-import { APIChatReply } from "../../api_types/APIChatReply";
 // import { SolidMarkdown } from "solid-markdown";
 import { useUserInterface } from "../../stores/userInterface";
+import { Chat } from "../../api_types/Chat";
 
-const ReplyItem: Component<APIChatReply> = (props) => {
+const ReplyItem: Component<Chat> = (props) => {
   const [_, { getColors }] = useUserInterface();
 
   return (
