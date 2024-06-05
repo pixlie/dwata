@@ -1,16 +1,17 @@
-use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
-use crate::chat::Chat;
-use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
-use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::error::DwataError;
-use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use sqlx::{Execute, FromRow, query_as, QueryBuilder, Sqlite, SqliteConnection};
 use sqlx::sqlite::SqliteRow;
-use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
 use ts_rs::TS;
+
+use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::chat::{Chat, ChatCreateUpdate};
+use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
+use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
+use crate::error::DwataError;
+use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 
 pub trait CRUD {
     fn table_name() -> String;
@@ -78,8 +79,7 @@ pub enum ModuleDataRead {
     DirectorySource(DirectorySource),
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
-    ChatThread(Vec<Chat>),
-    ChatReply(Vec<Chat>),
+    Chat(Chat),
 }
 
 #[derive(Serialize, TS)]
@@ -94,6 +94,8 @@ pub enum ModuleDataReadList {
 
 pub enum InputValue {
     Text(String),
+    ID(i64),
+    Bool(bool),
     Json(Value),
     DateTime(DateTime<Utc>),
 }
@@ -146,6 +148,12 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
+                InputValue::ID(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::Bool(x) => {
+                    builder.push_bind(x);
+                }
             }
             count += 1;
             if count < limit {
@@ -191,6 +199,12 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
+                InputValue::ID(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::Bool(x) => {
+                    builder.push_bind(x);
+                }
             }
             count += 1;
             if count < limit {
@@ -223,4 +237,5 @@ pub enum ModuleDataCreateUpdate {
     DirectorySource(DirectorySourceCreateUpdate),
     DatabaseSource(DatabaseSourceCreateUpdate),
     AIIntegration(AIIntegrationCreateUpdate),
+    Chat(ChatCreateUpdate),
 }

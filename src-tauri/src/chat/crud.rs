@@ -4,13 +4,38 @@ use serde_json::json;
 use sqlx::{query, SqliteConnection};
 
 use crate::error::DwataError;
-use crate::workspace::crud::CRUD;
+use crate::workspace::crud::{CRUD, CRUDHelperCreateUpdate, InputValue, VecColumnNameValue};
 
-use super::{Chat, ContentFormat};
+use super::{Chat, ChatCreateUpdate, ContentFormat};
 
 impl CRUD for Chat {
     fn table_name() -> String {
-        "chat_thread".to_string()
+        "chat".to_string()
+    }
+}
+
+impl CRUDHelperCreateUpdate for ChatCreateUpdate {
+    fn table_name() -> String {
+        "chat".to_string()
+    }
+
+    fn get_column_names_values(&self) -> VecColumnNameValue {
+        let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
+        if let Some(x) = &self.message {
+            name_values.push_name_value("message", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.requested_ai_model_api_name {
+            name_values.push_name_value("requested_ai_model_api_name", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.previous_chat_id {
+            name_values.push_name_value("previous_chat_id", InputValue::ID(*x));
+        }
+        // if let Some(x)= &self.requested_content_format {
+        //     name_values.push_name_value("requested_content_format", )
+        // }
+        name_values.push_name_value("is_system_chat", InputValue::Bool(false));
+        name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
+        name_values
     }
 }
 

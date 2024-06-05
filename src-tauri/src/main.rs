@@ -1,8 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+use std::path::PathBuf;
+
 use env_logger;
 use log::{error, info};
-use std::path::PathBuf;
 use tauri::{App, Manager};
 
 mod database_source;
@@ -50,14 +52,15 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             workspace::commands::get_module_configuration,
-            workspace::commands::read_module_list,
+            workspace::commands::read_row_list_for_module,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
-            ai::commands::get_list_of_ai_models,
+            ai::commands::get_ai_model_list,
+            ai::commands::get_ai_model_choice_list,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

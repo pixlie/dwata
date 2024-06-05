@@ -1,8 +1,10 @@
-use super::AIProvider;
-use serde::Serialize;
 use std::collections::HashSet;
+
+use serde::Serialize;
 use ts_rs::TS;
 use url::Url;
+
+use super::AIProvider;
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]

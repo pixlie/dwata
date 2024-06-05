@@ -43,7 +43,8 @@ pub struct Code {
 pub enum TextType {
     Email,
     Password,
-    Text,
+    SingleLine,
+    MultiLine,
     Link,
     Code,
     FilePath,
