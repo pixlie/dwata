@@ -1,10 +1,9 @@
 -- This table stores database sources that are connected to Dwata
-
 CREATE TABLE database_source
 (
     id                          INTEGER PRIMARY KEY,
-    label                       VARCHAR(30),
 
+    label                       VARCHAR(30),
     database_type               VARCHAR(30) NOT NULL,
     database_name               VARCHAR(255),
     path_to_local_database      TEXT,

@@ -12,4 +12,11 @@ export interface DatabaseSource {
   databaseUsername: string | null;
   databasePassword: string | null;
   databaseApiKey: string | null;
+  sshHost: string | null;
+  sshPort: number | null;
+  sshUsername: string | null;
+  sshPassword: string | null;
+  sshKeyPath: string | null;
+  createdAt: string;
+  modifiedAt: string | null;
 }

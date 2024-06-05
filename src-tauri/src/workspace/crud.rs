@@ -1,17 +1,17 @@
-use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
-use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
-use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::error::DwataError;
-use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use sqlx::{Execute, FromRow, query_as, QueryBuilder, Sqlite, SqliteConnection};
 use sqlx::sqlite::SqliteRow;
-use sqlx::{
-    query_as, Database, Encode, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection, Type,
-};
 use ts_rs::TS;
+
+use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::chat::{Chat, ChatCreateUpdate};
+use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
+use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
+use crate::error::DwataError;
+use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 
 pub trait CRUD {
     fn table_name() -> String;
@@ -72,26 +72,30 @@ pub trait CRUD {
     }
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
     DirectorySource(DirectorySource),
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
+    Chat(Chat),
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
     DirectorySource(Vec<DirectorySource>),
     DatabaseSource(Vec<DatabaseSource>),
     AIIntegration(Vec<AIIntegration>),
+    Chat(Vec<Chat>),
 }
 
 pub enum InputValue {
     Text(String),
+    ID(i64),
+    Bool(bool),
     Json(Value),
     DateTime(DateTime<Utc>),
 }
@@ -144,6 +148,12 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
+                InputValue::ID(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::Bool(x) => {
+                    builder.push_bind(x);
+                }
             }
             count += 1;
             if count < limit {
@@ -189,6 +199,12 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::DateTime(x) => {
                     builder.push_bind(x);
                 }
+                InputValue::ID(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::Bool(x) => {
+                    builder.push_bind(x);
+                }
             }
             count += 1;
             if count < limit {
@@ -221,4 +237,5 @@ pub enum ModuleDataCreateUpdate {
     DirectorySource(DirectorySourceCreateUpdate),
     DatabaseSource(DatabaseSourceCreateUpdate),
     AIIntegration(AIIntegrationCreateUpdate),
+    Chat(ChatCreateUpdate),
 }

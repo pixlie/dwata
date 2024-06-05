@@ -7,4 +7,5 @@ export interface DirectorySource {
   includePatterns: Vec<String>;
   excludePatterns: Vec<String>;
   createdAt: string;
+  modifiedAt: string | null;
 }

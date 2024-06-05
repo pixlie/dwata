@@ -7,4 +7,5 @@ export interface UserAccount {
   email: string | null;
   isSystemUser: boolean | null;
   createdAt: string;
+  modifiedAt: string | null;
 }

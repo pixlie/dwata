@@ -5,6 +5,7 @@ import { ContentSpec } from "../api_types/ContentSpec";
 import { Content } from "../api_types/Content";
 import { DirectorySource } from "../api_types/DirectorySource";
 import { DatabaseSource } from "../api_types/DatabaseSource";
+import { AIIntegration } from "../api_types/AIIntegration";
 
 interface ILabel {
   id: number;
@@ -37,8 +38,6 @@ interface IFormField extends FormField {
   size?: "xs" | "sm" | "base" | "lg";
   displayBlock?: boolean;
   value?: IFormFieldValue;
-  choices?: Array<[string, string]>;
-  choicesWithHeadings?: Array<IChoicesWithHeading>;
   onChange?: (name: string, value: IFormFieldValue) => void;
   onFocus?: () => void;
 }
@@ -46,6 +45,7 @@ interface IFormField extends FormField {
 interface IWorkspace {
   directoryList: Array<DirectorySource>;
   databaseList: Array<DatabaseSource>;
+  aiIntegrationList: Array<AIIntegration>;
 
   isReady: boolean;
   isFetching: boolean;

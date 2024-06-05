@@ -1,4 +1,4 @@
-import { Component, For, createMemo, onMount } from "solid-js";
+import { Component, For, createMemo } from "solid-js";
 import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { useNavigate } from "@solidjs/router";
@@ -62,12 +62,7 @@ const DirectorySourceItem: Component<DirectorySource> = (props) => {
 };
 
 const SettingsSourceList: Component = () => {
-  const [workspace, { readDirectoryList, readDatabaseList }] = useWorkspace();
-
-  onMount(async () => {
-    await readDirectoryList();
-    await readDatabaseList();
-  });
+  const [workspace] = useWorkspace();
 
   const databaseSources = createMemo(() => {
     if (!workspace.isFetching && !!workspace.isReady) {

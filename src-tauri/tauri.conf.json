@@ -1,6 +1,6 @@
 {
   "productName": "dwata",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "identifier": "com.dwata.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -32,8 +32,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "migrations/*"
-    ]
+    "resources": ["migrations/*"]
   }
 }

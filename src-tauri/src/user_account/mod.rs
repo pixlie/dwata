@@ -17,7 +17,9 @@ pub struct UserAccount {
     pub email: Option<String>,
     // Users that provide services within Dwata
     pub is_system_user: Option<bool>,
+
     pub created_at: DateTime<Utc>,
+    pub modified_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Deserialize, TS)]

@@ -4,4 +4,5 @@ export type Module =
   | "UserAccount"
   | "DirectorySource"
   | "DatabaseSource"
-  | "AIIntegration";
+  | "AIIntegration"
+  | "Chat";

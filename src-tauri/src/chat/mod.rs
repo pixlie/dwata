@@ -1,73 +1,72 @@
+use chrono::{DateTime, Utc};
 // use crate::chat::api_types::APIChatContextNode;
 use chrono::serde::ts_milliseconds;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{types::Json, FromRow, Type};
 use ts_rs::TS;
 
-// pub(crate) mod api_types;
-// pub(crate) mod commands;
-// mod crud;
-// mod helpers;
+// pub mod commands;
+pub mod configuration;
+pub mod crud;
 
-#[derive(Debug, FromRow, Serialize)]
-pub struct Thread {
-    id: i64,
-    title: String,
-    summary: Option<String>,
-    labels: Vec<String>,
-
-    // Default AI model for chats in this thread
-    ai_model_id: Option<i64>,
-
-    created_by_id: i64,
-    #[serde(with = "ts_milliseconds")]
-    created_at: DateTime<Utc>,
+#[derive(Deserialize, Serialize, FromRow, TS)]
+#[ts(export, export_to = "../src/api_types/")]
+pub struct ChatToolResponse {
+    pub tool_name: String,
+    pub tool_type: String,
+    pub arguments: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub(crate) struct ChatToolResponse {
-    tool_name: String,
-    tool_type: String,
-    arguments: String,
+#[derive(Deserialize, Serialize, TS, Type)]
+#[ts(export, export_to = "../src/api_types/")]
+pub enum ContentFormat {
+    Text,
 }
 
-impl ChatToolResponse {
-    pub fn new(tool_name: String, tool_type: String, arguments: String) -> Self {
-        Self {
-            tool_name,
-            tool_type,
-            arguments,
-        }
-    }
-}
+#[derive(Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct Chat {
+    pub id: i64,
 
-#[derive(Debug, Serialize, FromRow, TS)]
-pub(crate) struct Reply {
-    id: i64,
-    thread_id: i64,
+    // This is null for the first chat
+    pub previous_chat_id: Option<i64>,
 
-    // In case there is a tool response, the message is a blank string
-    message: Option<String>,
+    // In case there is a tool response from AI model, there may not be a message
+    pub message: Option<String>,
+    // Dwata will set the prompt to request LLM to respond in the requested format
+    // pub requested_content_format: Option<ContentFormat>,
 
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // tool_response: Option<Vec<ChatToolResponse>>,
+    // Default is empty vector
+    #[ts(type = "Vec<ChatToolResponse>")]
+    pub tool_response: Option<Json<Vec<ChatToolResponse>>>,
 
-    // These are messages created by Dwata to get meta information about a chat,
+    // These are messages created by Dwata to get meta information,
     // shown to user only when they want
-    is_system_message: Option<bool>,
+    pub is_system_chat: bool,
 
-    // For prompts that need to be processed by an AI model and
-    // in case the model is different from the default model for this thread
-    ai_model_id: Option<i64>,
-    // For messages that need to be processed by AI, either system generated prompts or general user prompt
-    is_processed_by_ai: Option<bool>,
+    // For prompts that need to be processed by an AI model
+    pub requested_ai_model_api_name: Option<String>,
+    pub is_processed_by_ai: Option<bool>,
+
+    // Only stored if there is an API error
+    pub api_error_response: Option<String>,
 
     // User who posted this reply, if this reply was created by user
-    created_by_id: Option<i64>,
+    pub created_by_id: Option<i64>,
 
     #[serde(with = "ts_milliseconds")]
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct ChatCreateUpdate {
+    pub previous_chat_id: Option<i64>,
+    pub message: Option<String>,
+    // pub requested_content_format: Option<String>,
+    pub requested_ai_model_api_name: Option<String>,
 }
 
 // pub(crate) trait ChatContextNode {

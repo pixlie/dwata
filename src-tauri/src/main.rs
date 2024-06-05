@@ -1,10 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use crate::error::DwataError;
+
+use std::path::PathBuf;
+
 use env_logger;
 use log::{error, info};
-use sqlx::SqliteConnection;
-use std::path::PathBuf;
 use tauri::{App, Manager};
 
 mod database_source;
@@ -19,6 +19,7 @@ mod content;
 // mod embedding;
 // mod schema;
 mod user_account;
+mod workflow;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -39,7 +40,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         }
         Err(err) => {
             error!("Could not connect to Dwata DB\n Error: {:?}", err);
-            return Err(Box::new(DwataError::CouldNotConnectToDwataDB));
+            return Err(Box::new(err));
         }
     }
     Ok(())
@@ -51,20 +52,17 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             workspace::commands::get_module_configuration,
-            workspace::commands::read_module_list,
+            workspace::commands::read_row_list_for_module,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
-            // labels::commands::load_labels,
+            ai::commands::get_ai_model_list,
+            ai::commands::get_ai_model_choice_list,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
-            // workspace::commands::create_database_source,
-            // workspace::commands::create_folder_source,
-            // workspace::commands::create_ai_integration,
-            // workspace::commands::update_ai_integration,
             // chat::commands::start_chat_thread,
             // chat::commands::fetch_chat_thread_list,
             // chat::commands::fetch_chat_thread_detail,

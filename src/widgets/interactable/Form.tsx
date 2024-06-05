@@ -1,4 +1,4 @@
-import { Component, For, JSX, createMemo } from "solid-js";
+import { Component, For, JSX } from "solid-js";
 import Heading from "../typography/Heading";
 import Button from "./Button";
 import FormField from "./FormField";

@@ -1,9 +1,18 @@
-import { Component, For, JSX, createMemo } from "solid-js";
+import {
+  Component,
+  For,
+  JSX,
+  createComputed,
+  createMemo,
+  createSignal,
+} from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { IFormField } from "../../utils/types";
+import { invoke } from "@tauri-apps/api/core";
 
 const Dropdown: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  const [choices, setChoices] = createSignal<Array<[string, string]>>([]);
   const getSizeClass = createMemo(() => {
     switch (props.size) {
       case "sm":
@@ -27,6 +36,24 @@ const Dropdown: Component<IFormField> = (props) => {
     }
   };
 
+  createComputed(async () => {
+    console.log(props.contentSpec);
+    if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
+      setChoices(props.contentSpec.choices);
+    } else if (
+      "choicesFromFunction" in props.contentSpec &&
+      !!props.contentSpec.choicesFromFunction
+    ) {
+      const response = await invoke(props.contentSpec.choicesFromFunction);
+      console.log(response);
+
+      if (response) {
+        setChoices(response as Array<[string, string]>);
+      }
+    }
+    return [];
+  });
+
   return (
     <select
       onChange={handleChange}
@@ -37,11 +64,14 @@ const Dropdown: Component<IFormField> = (props) => {
         color: getColors().colors["input.foreground"],
       }}
     >
-      {!!props.choicesWithHeadings ? (
+      <For each={choices()}>
+        {(choice) => <option value={choice[0]}>{choice[1]}</option>}
+      </For>
+      {/* {!!props.choicesWithHeadings ? (
         <For each={props.choicesWithHeadings}>
           {(heading) => (
             <>
-              {/* <DropdownHeading label={heading.name} />
+              <DropdownHeading label={heading.name} />
                   <For each={heading.choices}>
                     {(choice) => (
                       <DropdownItem
@@ -50,15 +80,12 @@ const Dropdown: Component<IFormField> = (props) => {
                         onSelect={handleChoiceSelect}
                       />
                     )}
-                  </For> */}
+                  </For>
             </>
           )}
         </For>
       ) : (
-        <For each={props.choices}>
-          {(choice) => <option value={choice[0]}>{choice[1]}</option>}
-        </For>
-      )}
+      )} */}
     </select>
   );
 };

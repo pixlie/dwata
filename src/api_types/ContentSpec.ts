@@ -5,5 +5,6 @@ export interface ContentSpec {
   textType: TextType | null;
   lengthLimits: [number, number] | null;
   choices: Array<[string, string]> | null;
+  choicesFromFunction: string | null;
   isPrompt: boolean | null;
 }

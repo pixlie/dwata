@@ -3,7 +3,10 @@ import type { AIProvider } from "./AIProvider";
 
 export interface AIIntegration {
   id: bigint;
+  label: string | null;
   aiProvider: AIProvider;
   apiKey: string | null;
-  displayLabel: string | null;
+  endpointUrl: string | null;
+  createdAt: string;
+  modifiedAt: string | null;
 }

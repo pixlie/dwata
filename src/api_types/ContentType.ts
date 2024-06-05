@@ -5,7 +5,4 @@ export type ContentType =
   | "TextArray"
   | "SingleChoice"
   | "Image"
-  | "Link"
-  | "Code"
-  | "FilePath"
   | "DateTime";

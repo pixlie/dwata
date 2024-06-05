@@ -1,15 +1,15 @@
 import { Component, For } from "solid-js";
 import Heading from "../typography/Heading";
-import { APIChatThread } from "../../api_types/APIChatThread";
 import { useNavigate } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
+import { Chat } from "../../api_types/Chat";
 
-const Thread: Component<APIChatThread> = (props) => {
+const Thread: Component<Chat> = (props) => {
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
   const handleClick = () => {
-    navigate(`/chat/${props.id}`);
+    navigate(`/chat/thread/${props.id}`);
   };
 
   return (
@@ -21,17 +21,17 @@ const Thread: Component<APIChatThread> = (props) => {
       }}
       onClick={handleClick}
     >
-      <Heading size="base">{props.title}</Heading>
+      <Heading size="base">{props.message}</Heading>
       <div class="flex flex-row">
         <div class="grow" />
         <div>
           <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-1 cursor-default">
-            {props.aiProvider} / {props.aiModel}
+            {props.requestedAiModelApiName} / {props.aiModel}
           </span>
         </div>
       </div>
-      <p class="text-zinc-400 text-sm">{props.summary}</p>
-      {!!props.labels && props.labels.length && (
+      {/* <p class="text-zinc-400 text-sm">{props.summary}</p> */}
+      {/* {!!props.labels && props.labels.length && (
         <div class="mt-2">
           <For each={props.labels}>
             {(label) => (
@@ -41,7 +41,7 @@ const Thread: Component<APIChatThread> = (props) => {
             )}
           </For>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

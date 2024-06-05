@@ -1,5 +1,5 @@
 #[derive(Deserialize, Serialize)]
-pub(crate) enum ToolParameterType {
+pub enum ToolParameterType {
     String,
     Number,
     Boolean,

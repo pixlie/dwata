@@ -6,14 +6,12 @@ use crate::workspace::configuration::{Configurable, Configuration};
 impl Configurable for DatabaseSource {
     fn get_schema() -> Configuration {
         let database_type_content_spec: ContentSpec = ContentSpec {
-            text_type: None,
-            length_limits: None,
             choices: Some(vec![
                 ("PostgreSQL".to_string(), "PostgreSQL".to_string()),
                 ("MySQL".to_string(), "MySQL".to_string()),
                 ("SQLite".to_string(), "SQLite".to_string()),
             ]),
-            is_prompt: None,
+            ..ContentSpec::default()
         };
 
         Configuration::new(

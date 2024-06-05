@@ -4,18 +4,19 @@ import withConfiguredForm from "../../utils/configuredForm";
 import { Module } from "../../api_types/Module";
 import { useParams } from "@solidjs/router";
 import Form from "../interactable/Form";
+import { AIIntegrationCreateUpdate } from "../../api_types/AIIntegrationCreateUpdate";
 
 const AIIntegrationForm: Component = () => {
   const [_, { getColors }] = useUserInterface();
   const params = useParams();
 
-  const configuredForm = withConfiguredForm({
-    module: "AIIntegration",
+  const configuredForm = withConfiguredForm<AIIntegrationCreateUpdate>({
+    module: "AIIntegration" as Module,
     existingItemId: !!params.id ? parseInt(params.id) : undefined,
     initialData: {
+      label: "OpenAI personal",
+      aiProvider: "OpenAI",
       apiKey: "",
-      aiProvider: "openai",
-      displayLabel: "OpenAI personal",
     },
     navtigateToAfterSave: "/settings",
   });

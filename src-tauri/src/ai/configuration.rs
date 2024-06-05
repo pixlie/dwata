@@ -4,19 +4,19 @@ use crate::content::{
 };
 use crate::workspace::configuration::{Configurable, Configuration};
 
-use super::AIIntegration;
+use super::{AIIntegration, AIProvider};
 
 impl Configurable for AIIntegration {
     fn get_schema() -> Configuration {
         let ai_provider_spec: ContentSpec = ContentSpec {
-            text_type: None,
-            length_limits: None,
             choices: Some(vec![
-                ("OpenAI".to_string(), "OpenAI".to_string()),
-                ("Groq".to_string(), "Groq".to_string()),
-                ("Anthropic".to_string(), "Anthropic".to_string()),
+                (String::from(AIProvider::OpenAI), "OpenAI".to_string()),
+                (String::from(AIProvider::Groq), "Groq".to_string()),
+                // (String::from(AIProvider::Anthropic), "Anthropic".to_string()),
+                (String::from(AIProvider::Ollama), "Ollama".to_string()),
+                // (String::from(AIProvider::Mistral), "Mistral".to_string()),
             ]),
-            is_prompt: None,
+            ..ContentSpec::default()
         };
 
         Configuration::new(
@@ -25,16 +25,7 @@ impl Configurable for AIIntegration {
             You can have more than one integration to the same provider.",
             vec![
                 FormField::new(
-                    "ai_provider",
-                    "Select AI provider",
-                    None,
-                    ContentType::SingleChoice,
-                    ai_provider_spec,
-                    Some(true),
-                    Some(true),
-                ),
-                FormField::new(
-                    "display_label",
+                    "label",
                     "Label",
                     Some("An easy to remember label for this AI integration"),
                     ContentType::Text,
@@ -43,7 +34,16 @@ impl Configurable for AIIntegration {
                     Some(true),
                 ),
                 FormField::new(
-                    "api_key",
+                    "aiProvider",
+                    "Select AI provider",
+                    None,
+                    ContentType::SingleChoice,
+                    ai_provider_spec,
+                    Some(true),
+                    Some(true),
+                ),
+                FormField::new(
+                    "apiKey",
                     "API key",
                     Some("You will find this in your AI providers account settings"),
                     ContentType::Text,

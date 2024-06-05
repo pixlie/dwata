@@ -1,17 +1,21 @@
+use std::ops::DerefMut;
+
+use sqlx::SqliteConnection;
+use tauri::State;
+
+use crate::ai::AIIntegration;
+use crate::chat::Chat;
+use crate::database_source::DatabaseSource;
+use crate::directory_source::DirectorySource;
+use crate::error::DwataError;
+use crate::user_account::UserAccount;
+use crate::workspace::crud::{CRUD, ModuleDataRead};
+
 use super::{
     configuration::{Configurable, Configuration},
     crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
-use crate::ai::AIIntegration;
-use crate::database_source::DatabaseSource;
-use crate::directory_source::DirectorySource;
-use crate::error::DwataError;
-use crate::user_account::UserAccount;
-use crate::workspace::crud::{ModuleDataRead, CRUD};
-use sqlx::SqliteConnection;
-use std::ops::DerefMut;
-use tauri::State;
 
 #[tauri::command]
 pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
@@ -20,11 +24,12 @@ pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataEr
         Module::DirectorySource => Ok(DirectorySource::get_schema()),
         Module::DatabaseSource => Ok(DatabaseSource::get_schema()),
         Module::AIIntegration => Ok(AIIntegration::get_schema()),
+        Module::Chat => Ok(Chat::get_schema()),
     }
 }
 
 #[tauri::command]
-pub async fn read_module_list(
+pub async fn read_row_list_for_module(
     module: Module,
     db: State<'_, DwataDb>,
 ) -> Result<ModuleDataReadList, DwataError> {
@@ -43,6 +48,9 @@ pub async fn read_module_list(
         Module::AIIntegration => AIIntegration::read_all(db_connection)
             .await
             .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
+        Module::Chat => Chat::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
     }
 }
 
@@ -67,6 +75,9 @@ pub async fn read_module_item_by_pk(
         Module::AIIntegration => AIIntegration::read_one_by_pk(pk, db_connection)
             .await
             .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
+        Module::Chat => Chat::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::Chat(x))),
     }
 }
 
@@ -79,6 +90,7 @@ pub async fn insert_helper(
         ModuleDataCreateUpdate::DirectorySource(x) => x.insert_module_data(db_connection).await,
         ModuleDataCreateUpdate::DatabaseSource(x) => x.insert_module_data(db_connection).await,
         ModuleDataCreateUpdate::AIIntegration(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::Chat(x) => x.insert_module_data(db_connection).await,
     }
 }
 
@@ -101,6 +113,7 @@ pub async fn update_helper(
         ModuleDataCreateUpdate::DirectorySource(x) => x.update_module_data(pk, db_connection).await,
         ModuleDataCreateUpdate::DatabaseSource(x) => x.update_module_data(pk, db_connection).await,
         ModuleDataCreateUpdate::AIIntegration(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::Chat(x) => x.update_module_data(pk, db_connection).await,
     }
 }
 
@@ -141,6 +154,9 @@ pub async fn upsert_module_item(
                 .await
                 .and_then(|x| Ok(ModuleDataRead::AIIntegration(x)))
         }
+        ModuleDataCreateUpdate::Chat(_) => Chat::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::Chat(x))),
     };
     match existing {
         Ok(_) => {
