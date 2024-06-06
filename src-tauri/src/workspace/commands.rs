@@ -1,21 +1,19 @@
-use std::ops::DerefMut;
-
-use sqlx::SqliteConnection;
-use tauri::State;
-
-use crate::ai::AIIntegration;
-use crate::chat::Chat;
-use crate::database_source::DatabaseSource;
-use crate::directory_source::DirectorySource;
-use crate::error::DwataError;
-use crate::user_account::UserAccount;
-use crate::workspace::crud::{CRUD, ModuleDataRead};
-
+use super::crud::InsertUpdateResponse;
 use super::{
     configuration::{Configurable, Configuration},
     crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
+use crate::ai_integration::AIIntegration;
+use crate::chat::Chat;
+use crate::database_source::DatabaseSource;
+use crate::directory_source::DirectorySource;
+use crate::error::DwataError;
+use crate::user_account::UserAccount;
+use crate::workspace::crud::{ModuleDataRead, CRUD};
+use sqlx::SqliteConnection;
+use std::ops::DerefMut;
+use tauri::State;
 
 #[tauri::command]
 pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
@@ -84,7 +82,7 @@ pub async fn read_module_item_by_pk(
 pub async fn insert_helper(
     data: ModuleDataCreateUpdate,
     db_connection: &mut SqliteConnection,
-) -> Result<i64, DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     match data {
         ModuleDataCreateUpdate::UserAccount(x) => x.insert_module_data(db_connection).await,
         ModuleDataCreateUpdate::DirectorySource(x) => x.insert_module_data(db_connection).await,
@@ -98,7 +96,7 @@ pub async fn insert_helper(
 pub async fn insert_module_item(
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
-) -> Result<i64, DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     let mut db_connection = db.lock().await;
     insert_helper(data, &mut db_connection).await
 }
@@ -107,7 +105,7 @@ pub async fn update_helper(
     pk: i64,
     data: ModuleDataCreateUpdate,
     db_connection: &mut SqliteConnection,
-) -> Result<i64, DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     match data {
         ModuleDataCreateUpdate::UserAccount(x) => x.update_module_data(pk, db_connection).await,
         ModuleDataCreateUpdate::DirectorySource(x) => x.update_module_data(pk, db_connection).await,
@@ -122,7 +120,7 @@ pub async fn update_module_item(
     pk: i64,
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
-) -> Result<i64, DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     let mut db_guard = db.lock().await;
     update_helper(pk, data, &mut db_guard).await
 }
@@ -132,7 +130,7 @@ pub async fn upsert_module_item(
     pk: i64,
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
-) -> Result<i64, DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     let mut db_guard = db.lock().await;
     let db_connection = db_guard.deref_mut();
     let existing = match data {

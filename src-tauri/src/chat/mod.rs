@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::{types::Json, FromRow, Type};
 use ts_rs::TS;
 
-// pub mod commands;
 pub mod configuration;
 pub mod crud;
 

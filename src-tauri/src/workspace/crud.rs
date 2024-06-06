@@ -1,17 +1,16 @@
-use chrono::{DateTime, Utc};
-use log::{error, info};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use sqlx::{Execute, FromRow, query_as, QueryBuilder, Sqlite, SqliteConnection};
-use sqlx::sqlite::SqliteRow;
-use ts_rs::TS;
-
-use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate};
 use crate::chat::{Chat, ChatCreateUpdate};
 use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
+use chrono::{DateTime, Utc};
+use log::{error, info};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use sqlx::sqlite::SqliteRow;
+use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
+use ts_rs::TS;
 
 pub trait CRUD {
     fn table_name() -> String;
@@ -109,6 +108,13 @@ impl VecColumnNameValue {
     }
 }
 
+#[derive(Serialize, TS)]
+#[ts(export, export_to = "../src/api_types/")]
+pub struct InsertUpdateResponse {
+    pk: i64,
+    next_task: Option<String>,
+}
+
 pub trait CRUDHelperCreateUpdate {
     fn table_name() -> String;
 
@@ -121,7 +127,7 @@ pub trait CRUDHelperCreateUpdate {
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
-    ) -> Result<i64, DwataError> {
+    ) -> Result<InsertUpdateResponse, DwataError> {
         // Just calling this so if it fails the error will propagate up
         self.pre_insert(db_connection).await?;
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
@@ -164,7 +170,10 @@ pub trait CRUDHelperCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(result) => Ok(result.last_insert_rowid()),
+            Ok(result) => Ok(InsertUpdateResponse {
+                pk: result.last_insert_rowid(),
+                next_task: None,
+            }),
             Err(err) => {
                 error!(
                     "Could not insert into Dwata DB, table {}:\nSQL: {}\nError: {:?}",
@@ -177,11 +186,15 @@ pub trait CRUDHelperCreateUpdate {
         }
     }
 
+    async fn post_insert(&self, _db_connection: &mut SqliteConnection) -> Option<String> {
+        None
+    }
+
     async fn update_module_data(
         &self,
         pk: i64,
         db_connection: &mut SqliteConnection,
-    ) -> Result<i64, DwataError> {
+    ) -> Result<InsertUpdateResponse, DwataError> {
         let mut builder: QueryBuilder<Sqlite> =
             QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
@@ -216,7 +229,10 @@ pub trait CRUDHelperCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(_) => Ok(pk),
+            Ok(_) => Ok(InsertUpdateResponse {
+                pk,
+                next_task: None,
+            }),
             Err(err) => {
                 error!(
                     "Could not update Dwata DB, table {}:\nSQL: {}\nError: {:?}",

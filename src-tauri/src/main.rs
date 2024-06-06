@@ -14,9 +14,10 @@ mod error;
 mod chat;
 mod relational_database;
 // mod saved_query;
-mod ai;
+mod ai_integration;
 mod content;
-// mod embedding;
+mod embedding;
+mod text_generation;
 // mod schema;
 mod user_account;
 mod workflow;
@@ -59,8 +60,8 @@ fn main() {
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
-            ai::commands::get_ai_model_list,
-            ai::commands::get_ai_model_choice_list,
+            ai_integration::commands::get_ai_model_list,
+            ai_integration::commands::get_ai_model_choice_list,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

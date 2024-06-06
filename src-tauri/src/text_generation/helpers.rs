@@ -1,4 +1,4 @@
-use super::{AIIntegration, Tool};
+use crate::ai_integration::AIIntegration;
 use crate::chat::ChatToolResponse;
 use crate::error::DwataError;
 use openai::types::chat_completion_message_tool_call::Type;
@@ -8,12 +8,9 @@ pub async fn get_chat_response_from_ai_provider(
     ai_integration: AIIntegration,
     ai_model: String,
     message_to_send: String,
-    tool_list: Vec<Tool>,
+    // tool_list: Vec<Tool>,
 ) -> Result<(String, Option<Vec<ChatToolResponse>>), DwataError> {
-    let request =
-        ai_integration
-            .ai_provider
-            .build_chat_https_request(ai_model, message_to_send, tool_list);
+    let request = ai_integration.build_chat_https_request(ai_model, message_to_send); //, tool_list);
 
     let response = request.send().await;
     match response {
@@ -57,7 +54,7 @@ pub async fn get_chat_response_from_ai_provider(
                     }
                     Err(err) => {
                         println!("{:?}", err);
-                        Err(DwataError::CouldNotConnectToAiProvider)
+                        Err(DwataError::CouldNotConnectToAIProvider)
                     }
                 }
             } else {
@@ -66,10 +63,10 @@ pub async fn get_chat_response_from_ai_provider(
                     response.status(),
                     response.text().await.unwrap()
                 );
-                Err(DwataError::CouldNotConnectToAiProvider)
+                Err(DwataError::CouldNotConnectToAIProvider)
             }
         }
-        Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+        Err(_) => Err(DwataError::CouldNotConnectToAIProvider),
     }
 }
 
@@ -78,9 +75,7 @@ pub async fn get_embedding_from_ai_provider(
     ai_model: String,
     text_to_embed: String,
 ) -> Result<Vec<f32>, DwataError> {
-    let request = ai_integration
-        .ai_provider
-        .build_embedding_https_request(ai_model, text_to_embed);
+    let request = ai_integration.build_embedding_https_request(ai_model, text_to_embed);
 
     let response = request.send().await;
     match response {
@@ -94,7 +89,7 @@ pub async fn get_embedding_from_ai_provider(
                         .collect()),
                     Err(err) => {
                         println!("{:?}", err);
-                        Err(DwataError::CouldNotConnectToAiProvider)
+                        Err(DwataError::CouldNotConnectToAIProvider)
                     }
                 }
             } else {
@@ -103,9 +98,9 @@ pub async fn get_embedding_from_ai_provider(
                     response.status(),
                     response.text().await.unwrap()
                 );
-                Err(DwataError::CouldNotConnectToAiProvider)
+                Err(DwataError::CouldNotConnectToAIProvider)
             }
         }
-        Err(_) => Err(DwataError::CouldNotConnectToAiProvider),
+        Err(_) => Err(DwataError::CouldNotConnectToAIProvider),
     }
 }

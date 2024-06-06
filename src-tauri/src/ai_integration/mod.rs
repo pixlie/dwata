@@ -1,8 +1,5 @@
-use crate::ai::providers::openai::{ChatRequestMessage, OpenAIChatRequest};
 use crate::error::DwataError;
 use chrono::{DateTime, Utc};
-use log::info;
-use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
 use ts_rs::TS;
@@ -19,8 +16,8 @@ pub mod providers;
 pub enum AIProvider {
     OpenAI,
     Groq,
-    // Anthropic,
     Ollama,
+    // Anthropic,
     // Mistral,
 }
 
@@ -31,8 +28,8 @@ impl TryFrom<String> for AIProvider {
         match value.to_lowercase().as_str() {
             "openai" => Ok(Self::OpenAI),
             "groq" => Ok(Self::Groq),
+            "ollama" => Ok(Self::Ollama),
             // "anthropic" => Ok(Self::Anthropic),
-            // "ollama" => Ok(Self::Ollama),
             // "mistral" => Ok(Self::Mistral),
             _ => Err(DwataError::InvalidAIProvider),
         }
@@ -44,50 +41,10 @@ impl From<AIProvider> for String {
         match value {
             AIProvider::OpenAI => "openai".to_string(),
             AIProvider::Groq => "groq".to_string(),
-            // AIProvider::Anthropic => "anthropic".to_string(),
             AIProvider::Ollama => "ollama".to_string(),
+            // AIProvider::Anthropic => "anthropic".to_string(),
             // AIProvider::Mistral => "mistral".to_string(),
         }
-    }
-}
-
-impl AIProvider {
-    // Chat related
-    pub fn get_chat_url(&self) -> Option<String> {
-        match self {
-            Self::OpenAI => Some("https://api.openai.com/v1/chat/completions".to_string()),
-            Self::Groq => Some("https://api.groq.com/openai/v1/chat/completions".to_string()),
-            // Self::Anthropic => Some("https://api.anthropic.com/v1/messages".to_string()),
-            Self::Ollama => Some("http://localhost:11434/api/chat".to_string()),
-            // Self::MistralAI => Some("https://api.mistral.ai/v1/chat/completions".to_string()),
-        }
-    }
-
-    pub fn build_chat_https_request(
-        &self,
-        api_key: String,
-        ai_model: String,
-        message_to_send: String,
-    ) -> Result<RequestBuilder, DwataError> {
-        let chat_url = self.get_chat_url();
-        if chat_url.is_none() {
-            return Err(DwataError::FeatureNotAvailableWithAIProvider);
-        }
-        let https_client = reqwest::Client::new();
-        let payload: OpenAIChatRequest = OpenAIChatRequest {
-            model: ai_model,
-            messages: vec![ChatRequestMessage {
-                role: "user".to_string(),
-                content: message_to_send,
-            }],
-            tools: vec![],
-        };
-        let request_builder = https_client
-            .post(chat_url.unwrap())
-            .header("Authorization", format!("Bearer {}", api_key))
-            .json::<OpenAIChatRequest>(&payload);
-        info!("{}", serde_json::to_string_pretty(&payload).unwrap());
-        Ok(request_builder)
     }
 }
 
