@@ -56,8 +56,8 @@ pub enum ContentType {
     Text,
     TextArray,
     SingleChoice,
-    Image,
-    DateTime,
+    // Image,
+    // DateTime,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
@@ -91,9 +91,6 @@ impl Default for ContentSpec {
 #[ts(export, rename = "Content", export_to = "../src/api_types/")]
 pub enum Content {
     Text(String),
-    Image(Image),
-    Link(Link),
-    // Code(Code),
-    // FilePath(PathBuf),
-    DateTime(DateTime<Utc>),
+    // Image(Image),
+    // DateTime(DateTime<Utc>),
 }

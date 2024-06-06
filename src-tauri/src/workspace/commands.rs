@@ -97,8 +97,8 @@ pub async fn insert_module_item(
     data: ModuleDataCreateUpdate,
     db: State<'_, DwataDb>,
 ) -> Result<InsertUpdateResponse, DwataError> {
-    let mut db_connection = db.lock().await;
-    insert_helper(data, &mut db_connection).await
+    let mut db_guard = db.lock().await;
+    insert_helper(data, &mut db_guard).await
 }
 
 pub async fn update_helper(

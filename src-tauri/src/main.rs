@@ -62,6 +62,7 @@ fn main() {
             directory_source::commands::fetch_file_content_list,
             ai_integration::commands::get_ai_model_list,
             ai_integration::commands::get_ai_model_choice_list,
+            text_generation::commands::generate_text_for_chat,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

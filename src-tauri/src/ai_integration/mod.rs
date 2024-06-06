@@ -2,6 +2,7 @@ use crate::error::DwataError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
+use std::{path::Display, str::FromStr};
 use ts_rs::TS;
 
 pub mod commands;
@@ -21,11 +22,11 @@ pub enum AIProvider {
     // Mistral,
 }
 
-impl TryFrom<String> for AIProvider {
-    type Error = DwataError;
+impl FromStr for AIProvider {
+    type Err = DwataError;
 
-    fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.to_lowercase().as_str() {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
             "openai" => Ok(Self::OpenAI),
             "groq" => Ok(Self::Groq),
             "ollama" => Ok(Self::Ollama),
@@ -36,9 +37,21 @@ impl TryFrom<String> for AIProvider {
     }
 }
 
-impl From<AIProvider> for String {
-    fn from(value: AIProvider) -> Self {
-        match value {
+// impl From<AIProvider> for String {
+//     fn from(value: AIProvider) -> Self {
+//         match value {
+//             AIProvider::OpenAI => "openai".to_string(),
+//             AIProvider::Groq => "groq".to_string(),
+//             AIProvider::Ollama => "ollama".to_string(),
+//             // AIProvider::Anthropic => "anthropic".to_string(),
+//             // AIProvider::Mistral => "mistral".to_string(),
+//         }
+//     }
+// }
+
+impl ToString for AIProvider {
+    fn to_string(&self) -> String {
+        match self {
             AIProvider::OpenAI => "openai".to_string(),
             AIProvider::Groq => "groq".to_string(),
             AIProvider::Ollama => "ollama".to_string(),

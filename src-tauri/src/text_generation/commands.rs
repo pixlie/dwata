@@ -1,59 +1,51 @@
-use crate::ai_integration::helpers::get_chat_response_from_ai_provider;
+use super::helpers::generate_text_with_ai_model;
+use crate::ai_integration::models::AIModel;
+use crate::chat::{Chat, ChatCreateUpdate};
 // use crate::ai::AITools;
 // use crate::chat::api_types::{APIChatContextNode, APIChatReply, APIChatThread};
-use crate::chat::crud::{create_chat_reply, create_chat_thread, update_reply_sent_to_ai};
-use crate::chat::{ChatContextNode, ChatReplyRow, ChatThreadRow};
 use crate::error::DwataError;
-use crate::workspace::helpers::load_ai_integration;
-use crate::workspace::{DwataDb, Store};
-use sqlx::query_as;
+use crate::workspace::crud::{CRUDHelperCreateUpdate, InsertUpdateResponse, CRUD};
+use crate::workspace::DwataDb;
 use tauri::State;
 
 #[tauri::command]
-pub(crate) async fn send_chat_to_ai(
+pub async fn generate_text_for_chat(
     chat_id: i64,
-    message: String,
-    ai_provider: String,
-    ai_model: String,
     db: State<'_, DwataDb>,
-) -> Result<(i64, i64), DwataError> {
+) -> Result<InsertUpdateResponse, DwataError> {
     let mut db_guard = db.lock().await;
-    // The default user has ID 1
-    let config_guard = store.config.lock().await;
-    match load_ai_integration(&config_guard, &ai_provider) {
-        Some(ai_integration) => {
-            // It does not matter if we fail this request, we will try again later
-            match get_chat_response_from_ai_provider(
-                ai_integration,
-                ai_model.to_string(),
-                message.to_string(),
-                config_guard.get_self_tool_list(),
-            )
-            .await
-            {
-                Ok(reply_from_ai) => {
-                    let _ = create_chat_reply(
-                        reply_from_ai,
-                        false,
-                        false,
-                        true,
-                        inserted_ids.0,
-                        created_by_id,
-                        conn,
-                    )
-                    .await;
-                    update_reply_sent_to_ai(inserted_ids.1, conn).await;
-                }
-                Err(x) => {
-                    println!("{:?}", x);
-                }
-            }
-        }
-        None => {
-            println!("Could not load ai integration");
-        }
+    let chat = Chat::read_one_by_pk(chat_id, &mut db_guard).await?;
+    if chat.message.is_none() {
+        return Err(DwataError::ChatDoesNotHaveMessage);
     }
-    Ok(inserted_ids)
+    if chat.requested_ai_model.is_none() {
+        return Err(DwataError::ChatDoesNotHaveAIModel);
+    }
+    let model = AIModel::from_string(chat.requested_ai_model.unwrap())?;
+    let ai_integration = model.get_integration(&mut db_guard).await?;
+
+    let reply_from_ai =
+        generate_text_with_ai_model(ai_integration, model, chat.message.unwrap()).await?;
+    let (message_opt, tool_responses_opt) = reply_from_ai;
+    if let Some(message) = message_opt {
+        let new_chat = ChatCreateUpdate {
+            role: None,
+            previous_chat_id: Some(chat_id),
+            message: Some(message),
+            requested_ai_model: None,
+            tool_response: None,
+        };
+        new_chat.insert_module_data(&mut db_guard).await
+    } else {
+        let new_chat = ChatCreateUpdate {
+            role: None,
+            previous_chat_id: Some(chat_id),
+            message: None,
+            requested_ai_model: None,
+            tool_response: tool_responses_opt,
+        };
+        new_chat.insert_module_data(&mut db_guard).await
+    }
 }
 
 // #[tauri::command]

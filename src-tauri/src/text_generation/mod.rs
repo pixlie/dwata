@@ -1,5 +1,6 @@
 use crate::{
     ai_integration::{
+        models::AIModel,
         providers::openai::{ChatRequestMessage, OpenAIChatRequest},
         AIIntegration, AIProvider,
     },
@@ -8,6 +9,7 @@ use crate::{
 use log::info;
 use reqwest::RequestBuilder;
 
+pub mod commands;
 pub mod helpers;
 
 impl AIIntegration {
@@ -22,10 +24,9 @@ impl AIIntegration {
         }
     }
 
-    pub fn build_chat_https_request(
+    pub fn build_text_generation_https_request(
         &self,
-        api_key: String,
-        ai_model: String,
+        ai_model: AIModel,
         message_to_send: String,
     ) -> Result<RequestBuilder, DwataError> {
         let chat_url = self.get_text_generation_url();
@@ -34,7 +35,7 @@ impl AIIntegration {
         }
         let https_client = reqwest::Client::new();
         let payload: OpenAIChatRequest = OpenAIChatRequest {
-            model: ai_model,
+            model: ai_model.api_name,
             messages: vec![ChatRequestMessage {
                 role: "user".to_string(),
                 content: message_to_send,
@@ -43,7 +44,10 @@ impl AIIntegration {
         };
         let request_builder: RequestBuilder = https_client
             .post(chat_url.unwrap())
-            .header("Authorization", format!("Bearer {}", api_key))
+            .header(
+                "Authorization",
+                format!("Bearer {}", self.api_key.as_ref().unwrap()),
+            )
             .json(&payload);
         info!("{}", serde_json::to_string_pretty(&payload).unwrap());
         Ok(request_builder)

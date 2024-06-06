@@ -21,13 +21,14 @@ pub enum DatabaseType {
 
 impl FromStr for DatabaseType {
     type Err = DwataError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "PostgreSQL" => Ok(DatabaseType::PostgreSQL),
-            "MySQL" => Ok(DatabaseType::MySQL),
-            "SQLite" => Ok(DatabaseType::SQLite),
-            "MongoDB" => Ok(DatabaseType::MongoDB),
-            "Qdrant" => Ok(DatabaseType::Qdrant),
+        match s.to_lowercase().as_str() {
+            "postgresql" => Ok(DatabaseType::PostgreSQL),
+            "mysql" => Ok(DatabaseType::MySQL),
+            "sqlite" => Ok(DatabaseType::SQLite),
+            "mongodb" => Ok(DatabaseType::MongoDB),
+            "qdrant" => Ok(DatabaseType::Qdrant),
             _ => Err(DwataError::DatabaseTypeNotSupported),
         }
     }

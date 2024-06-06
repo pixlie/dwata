@@ -1,10 +1,13 @@
 use std::collections::HashSet;
 
 use serde::Serialize;
+use sqlx::SqliteConnection;
 use ts_rs::TS;
 use url::Url;
 
-use super::AIProvider;
+use crate::error::DwataError;
+
+use super::{AIIntegration, AIProvider};
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
@@ -76,6 +79,33 @@ impl AIModel {
             link_to_model_documentation: link_to_model_documentation
                 .and_then(|x| Url::parse(x).ok()),
         }
+    }
+
+    pub fn get_all_models() -> Vec<AIModel> {
+        let mut result: Vec<AIModel> = vec![];
+        result.extend(AIModel::get_models_for_openai());
+        result.extend(AIModel::get_models_for_groq());
+        result.extend(AIModel::get_models_for_anthropic());
+        result.extend(AIModel::get_models_for_ollama());
+        result.extend(AIModel::get_models_for_mistral());
+        result
+    }
+
+    pub fn from_string(requested_ai_model: String) -> Result<Self, DwataError> {
+        let (provider_name, model_name) = requested_ai_model.split_once("::").unwrap();
+        let all_models = Self::get_all_models();
+        let model = all_models
+            .into_iter()
+            .find(|x| x.ai_provider.to_string() == provider_name && x.api_name == model_name)
+            .ok_or(DwataError::InvalidAIModel)?;
+        Ok(model)
+    }
+
+    pub async fn get_integration(
+        &self,
+        _db_connection: &mut SqliteConnection,
+    ) -> Result<AIIntegration, DwataError> {
+        return Err(DwataError::InvalidAIProvider);
     }
 }
 

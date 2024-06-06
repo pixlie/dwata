@@ -1,7 +1,5 @@
-use crate::{
-    ai_integration::{AIIntegration, AIProvider},
-    error::DwataError,
-};
+use crate::ai_integration::{AIIntegration, AIProvider};
+use crate::error::DwataError;
 use openai::types::{CreateEmbeddingRequest, CreateEmbeddingRequestInput};
 use reqwest::RequestBuilder;
 

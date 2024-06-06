@@ -1,5 +1,6 @@
 use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate};
 use crate::chat::{Chat, ChatCreateUpdate};
+use crate::content::content::{Content, ContentType};
 use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
@@ -111,8 +112,9 @@ impl VecColumnNameValue {
 #[derive(Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub struct InsertUpdateResponse {
-    pk: i64,
-    next_task: Option<String>,
+    pub pk: i64,
+    pub next_command: Option<String>,
+    pub arguments: Vec<(String, ContentType, Content)>,
 }
 
 pub trait CRUDHelperCreateUpdate {
@@ -170,10 +172,16 @@ pub trait CRUDHelperCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(result) => Ok(InsertUpdateResponse {
-                pk: result.last_insert_rowid(),
-                next_task: None,
-            }),
+            Ok(result) => Ok(self
+                .post_insert(
+                    InsertUpdateResponse {
+                        pk: result.last_insert_rowid(),
+                        next_command: None,
+                        arguments: vec![],
+                    },
+                    db_connection,
+                )
+                .await),
             Err(err) => {
                 error!(
                     "Could not insert into Dwata DB, table {}:\nSQL: {}\nError: {:?}",
@@ -186,8 +194,12 @@ pub trait CRUDHelperCreateUpdate {
         }
     }
 
-    async fn post_insert(&self, _db_connection: &mut SqliteConnection) -> Option<String> {
-        None
+    async fn post_insert(
+        &self,
+        response: InsertUpdateResponse,
+        _db_connection: &mut SqliteConnection,
+    ) -> InsertUpdateResponse {
+        response
     }
 
     async fn update_module_data(
@@ -231,7 +243,8 @@ pub trait CRUDHelperCreateUpdate {
         match executable.execute(&mut *db_connection).await {
             Ok(_) => Ok(InsertUpdateResponse {
                 pk,
-                next_task: None,
+                next_command: None,
+                arguments: vec![],
             }),
             Err(err) => {
                 error!(
@@ -246,7 +259,7 @@ pub trait CRUDHelperCreateUpdate {
     }
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Deserialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
