@@ -11,6 +11,7 @@ pub enum DwataError {
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
     InvalidDatabaseType,
+    FilterNotSupported,
 
     // Internal SQLite DB for Dwata
     CouldNotCreateDwataDB,

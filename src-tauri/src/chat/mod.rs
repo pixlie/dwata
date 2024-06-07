@@ -45,10 +45,11 @@ pub struct ChatToolResponse {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct Chat {
+    #[ts(type = "number")]
     pub id: i64,
 
     // This is null for the first chat
-    pub previous_chat_id: Option<i64>,
+    pub root_chat_id: Option<i64>,
 
     pub role: Option<Role>,
     // In case there is a tool response from AI model, there may not be a message
@@ -83,12 +84,22 @@ pub struct Chat {
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ChatCreateUpdate {
     pub role: Option<String>,
-    pub previous_chat_id: Option<i64>,
+    pub root_chat_id: Option<i64>,
     pub message: Option<String>,
     // pub requested_content_format: Option<String>,
     pub requested_ai_model: Option<String>,
     pub tool_response: Option<Vec<ChatToolResponse>>,
     pub is_processed_by_ai: Option<bool>,
+}
+
+#[derive(Default, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct ChatFilters {
+    pub role: Option<String>,
+    #[ts(type = "number")]
+    pub root_chat_id: Option<i64>,
+    pub requested_ai_model: Option<String>,
 }
 
 // pub(crate) trait ChatContextNode {

@@ -3,6 +3,8 @@ use sqlx::SqliteConnection;
 use tokio::sync::Mutex;
 use ts_rs::TS;
 
+use crate::{ai_integration::AIIntegrationFilters, chat::ChatFilters};
+
 // pub mod api_types;
 pub mod commands;
 pub mod configuration;
@@ -11,14 +13,21 @@ pub mod helpers;
 
 pub type DwataDb = Mutex<SqliteConnection>;
 
-#[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename = "Module", export_to = "../src/api_types/")]
+#[derive(Deserialize, TS)]
+#[ts(export, export_to = "../src/api_types/")]
 pub enum Module {
     UserAccount,
     DirectorySource,
     DatabaseSource,
     AIIntegration,
     Chat,
+}
+
+#[derive(Deserialize, TS)]
+#[ts(export, export_to = "../src/api_types/")]
+pub enum ModuleFilters {
+    AIIntegration(AIIntegrationFilters),
+    Chat(ChatFilters),
 }
 
 // impl ChatContextNode for Config {

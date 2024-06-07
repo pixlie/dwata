@@ -27,7 +27,7 @@ pub trait CRUDRead {
         {
             Ok(result) => {
                 info!(
-                    "Fetched {} rows from Dwata DB::{}",
+                    "Fetched {} rows from Dwata DBm, table {}",
                     result.len(),
                     Self::table_name()
                 );
@@ -62,7 +62,7 @@ pub trait CRUDRead {
         match result {
             Ok(row) => {
                 info!(
-                    "Fetched one row from Dwata DB::{}, ID {}",
+                    "Fetched one row from Dwata DBm, table{}, ID {}",
                     Self::table_name(),
                     pk
                 );
@@ -79,29 +79,51 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_with_filter(
-        filter: String,
+    async fn read_with_filter<T>(
+        filters: T,
         db_connection: &mut SqliteConnection,
     ) -> Result<Vec<Self>, DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
+        T: CRUDReadFilter,
     {
-        // TODO: Use proper SQLx bind for filters
-        let result: Result<Vec<Self>, sqlx::Error> = query_as(&format!(
-            "SELECT * FROM {} WHERE {}",
-            Self::table_name(),
-            filter
-        ))
-        .fetch_all(db_connection)
-        .await;
-        match result {
+        let mut builder: QueryBuilder<Sqlite> =
+            QueryBuilder::new(format!("SELECT * FROM {} WHERE ", Self::table_name()));
+        let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
+        let mut count = 0;
+        let limit = column_names_values.0.len();
+        for (name, data) in column_names_values.0 {
+            builder.push(format!("{} = ", name));
+            match data {
+                InputValue::Text(x) => {
+                    builder.push_bind(x.clone());
+                }
+                InputValue::Json(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::DateTime(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::ID(x) => {
+                    builder.push_bind(x);
+                }
+                InputValue::Bool(x) => {
+                    builder.push_bind(x);
+                }
+            }
+            count += 1;
+            if count < limit {
+                builder.push("AND ");
+            }
+        }
+        let executable = builder.build_query_as();
+        match executable.fetch_all(&mut *db_connection).await {
             Ok(rows) => {
                 info!(
-                    "Fetched {} rows from Dwata DB::{}, filter {}",
+                    "Fetched {} rows from Dwata DB, table {}",
                     rows.len(),
                     Self::table_name(),
-                    filter
                 );
                 Ok(rows)
             }
@@ -114,6 +136,12 @@ pub trait CRUDRead {
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
             }
         }
+    }
+}
+
+pub trait CRUDReadFilter {
+    fn get_column_names_values_to_filter(&self) -> VecColumnNameValue {
+        VecColumnNameValue::default()
     }
 }
 

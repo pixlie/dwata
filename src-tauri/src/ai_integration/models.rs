@@ -1,13 +1,11 @@
-use std::collections::HashSet;
-
+use super::{AIIntegration, AIIntegrationFilters, AIProvider};
+use crate::{error::DwataError, workspace::crud::CRUDRead};
+use log::error;
 use serde::Serialize;
 use sqlx::SqliteConnection;
+use std::collections::HashSet;
 use ts_rs::TS;
 use url::Url;
-
-use crate::{error::DwataError, workspace::crud::CRUDRead};
-
-use super::{AIIntegration, AIProvider};
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
@@ -106,15 +104,17 @@ impl AIModel {
         &self,
         db_connection: &mut SqliteConnection,
     ) -> Result<AIIntegration, DwataError> {
-        match AIIntegration::read_with_filter(
-            format!("ai_provider = {}", self.ai_provider.to_string()),
-            db_connection,
-        )
-        .await
-        {
+        let filters = AIIntegrationFilters {
+            ai_provider: Some(self.ai_provider.to_string()),
+            ..Default::default()
+        };
+        match AIIntegration::read_with_filter(filters, db_connection).await {
             Ok(results) => match results.into_iter().nth(0) {
                 Some(x) => Ok(x),
-                None => Err(DwataError::CouldNotConnectToAIProvider),
+                None => {
+                    error!("Could not find AI Integration");
+                    Err(DwataError::CouldNotConnectToAIProvider)
+                }
             },
             Err(x) => Err(x),
         }

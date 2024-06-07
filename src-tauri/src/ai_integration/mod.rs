@@ -73,3 +73,12 @@ pub struct AIIntegrationCreateUpdate {
     pub ai_provider: Option<String>,
     pub api_key: Option<String>,
 }
+
+#[derive(Clone, Default, Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct AIIntegrationFilters {
+    #[ts(type = "number")]
+    pub id: Option<i64>,
+    pub ai_provider: Option<String>,
+}

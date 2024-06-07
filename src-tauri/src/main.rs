@@ -54,6 +54,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             workspace::commands::get_module_configuration,
             workspace::commands::read_row_list_for_module,
+            workspace::commands::read_row_list_for_module_with_filter,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::update_module_item,

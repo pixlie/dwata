@@ -36,14 +36,14 @@ pub async fn generate_text_for_chat(
         .await?;
     if let Some(message) = message_opt {
         let new_chat = ChatCreateUpdate {
-            previous_chat_id: Some(chat_id),
+            root_chat_id: Some(chat_id),
             message: Some(message),
             ..ChatCreateUpdate::default()
         };
         new_chat.insert_module_data(db_connection).await
     } else {
         let new_chat = ChatCreateUpdate {
-            previous_chat_id: Some(chat_id),
+            root_chat_id: Some(chat_id),
             tool_response: tool_responses_opt,
             ..ChatCreateUpdate::default()
         };

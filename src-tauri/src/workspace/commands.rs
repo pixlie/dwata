@@ -1,4 +1,5 @@
-use super::crud::InsertUpdateResponse;
+use super::crud::{CRUDReadFilter, InsertUpdateResponse};
+use super::ModuleFilters;
 use super::{
     configuration::{Configurable, Configuration},
     crud::{CRUDCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
@@ -47,6 +48,22 @@ pub async fn read_row_list_for_module(
             .await
             .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
         Module::Chat => Chat::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
+    }
+}
+
+#[tauri::command]
+pub async fn read_row_list_for_module_with_filter(
+    filters: ModuleFilters,
+    db: State<'_, DwataDb>,
+) -> Result<ModuleDataReadList, DwataError> {
+    let mut db_guard = db.lock().await;
+    match filters {
+        ModuleFilters::AIIntegration(x) => AIIntegration::read_with_filter(x, &mut db_guard)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
+        ModuleFilters::Chat(x) => Chat::read_with_filter(x, &mut db_guard)
             .await
             .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
     }

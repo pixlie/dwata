@@ -3,7 +3,7 @@ CREATE TABLE chat
 (
     id                          INTEGER PRIMARY KEY,
 
-    previous_chat_id            INTEGER,
+    root_chat_id                INTEGER,
     role                        VARCHAR(60),
     message                     TEXT,
     requested_content_format    JSONB,
@@ -15,6 +15,6 @@ CREATE TABLE chat
 
     created_by_id               INTEGER,
     created_at                  DATETIME NOT NULL,
-    FOREIGN KEY (previous_chat_id) REFERENCES chat (id) ON DELETE CASCADE,
+    FOREIGN KEY (root_chat_id) REFERENCES chat (id) ON DELETE CASCADE,
     FOREIGN KEY (created_by_id) REFERENCES user_account (id)
 );

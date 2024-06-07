@@ -1,9 +1,10 @@
-use super::{Chat, ChatCreateUpdate};
+use super::{Chat, ChatCreateUpdate, ChatFilters};
 use crate::{
     content::content::{Content, ContentType},
     error::DwataError,
     workspace::crud::{
-        CRUDCreateUpdate, CRUDRead, InputValue, InsertUpdateResponse, VecColumnNameValue,
+        CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, InsertUpdateResponse,
+        VecColumnNameValue,
     },
 };
 use chrono::Utc;
@@ -24,8 +25,8 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
         if let Some(x) = &self.role {
             name_values.push_name_value("role", InputValue::Text(x.clone()));
         }
-        if let Some(x) = &self.previous_chat_id {
-            name_values.push_name_value("previous_chat_id", InputValue::ID(*x));
+        if let Some(x) = &self.root_chat_id {
+            name_values.push_name_value("root_chat_id", InputValue::ID(*x));
         }
         if let Some(x) = &self.message {
             name_values.push_name_value("message", InputValue::Text(x.clone()));
@@ -55,6 +56,22 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
             )]),
             ..response
         })
+    }
+}
+
+impl CRUDReadFilter for ChatFilters {
+    fn get_column_names_values_to_filter(&self) -> VecColumnNameValue {
+        let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
+        if let Some(x) = &self.role {
+            name_values.push_name_value("role", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.root_chat_id {
+            name_values.push_name_value("root_chat_id", InputValue::ID(*x));
+        }
+        if let Some(x) = &self.requested_ai_model {
+            name_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
+        }
+        name_values
     }
 }
 
