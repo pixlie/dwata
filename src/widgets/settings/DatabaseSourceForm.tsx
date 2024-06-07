@@ -16,7 +16,7 @@ const DatabaseSourceForm: Component = () => {
       databaseUsername: "postgres",
       databasePassword: "",
     },
-    navtigateToAfterSave: "/settings",
+    postSaveNavigateTo: "/settings",
   });
   return (
     <div class="max-w-screen-sm">

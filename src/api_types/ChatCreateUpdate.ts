@@ -3,7 +3,7 @@ import type { ChatToolResponse } from "./ChatToolResponse";
 
 export interface ChatCreateUpdate {
   role: string | null;
-  previousChatId: bigint | null;
+  rootChatId: bigint | null;
   message: string | null;
   requestedAiModel: string | null;
   toolResponse: Array<ChatToolResponse> | null;

@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { Component } from "solid-js";
 import Heading from "../typography/Heading";
 import { useNavigate } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
@@ -26,7 +26,7 @@ const Thread: Component<Chat> = (props) => {
         <div class="grow" />
         <div>
           <span class="inline-block text-xs bg-gray-500 text-gray-900 rounded-sm px-2 mr-1 cursor-default">
-            {props.requestedAiModelApiName} / {props.aiModel}
+            {props.requestedAiModel}
           </span>
         </div>
       </div>

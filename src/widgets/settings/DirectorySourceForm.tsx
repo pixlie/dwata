@@ -17,7 +17,7 @@ const DirectorySourceForm: Component = () => {
       includePatterns: [""],
       excludePatterns: [],
     },
-    navtigateToAfterSave: "/settings",
+    postSaveNavigateTo: "/settings",
   });
 
   return (

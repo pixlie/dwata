@@ -2,8 +2,8 @@
 import type { Role } from "./Role";
 
 export interface Chat {
-  id: bigint;
-  previousChatId: bigint | null;
+  id: number;
+  rootChatId: bigint | null;
   role: Role | null;
   message: string | null;
   toolResponse: Vec<ChatToolResponse>;

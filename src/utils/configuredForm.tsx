@@ -5,6 +5,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { IFormFieldValue } from "./types";
 import { ModuleDataRead } from "../api_types/ModuleDataRead";
 import { useNavigate } from "@solidjs/router";
+import { InsertUpdateResponse } from "../api_types/InsertUpdateResponse";
+import { nextTaskStore } from "../stores/nextTask";
 
 // interface IFormState {
 //   isEditing: boolean;
@@ -16,7 +18,8 @@ interface IConfiguredFormProps<T> {
   module: Module;
   existingItemId?: number;
   initialData?: Partial<T>;
-  navtigateToAfterSave?: string;
+  postSaveNavigateTo?: string;
+  initiateNextTask?: boolean;
 }
 
 const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
@@ -82,30 +85,51 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
         `Submitting form data to update module ${options.module}, item ID ${options.existingItemId}`,
         formData(),
       );
-      const response = await invoke("update_module_item", {
-        pk: options.existingItemId,
-        data: {
-          [options.module]: dirty().reduce(
-            (acc, name) => ({ ...acc, [name]: formData()[name] }),
-            {},
-          ),
+      const response = await invoke<InsertUpdateResponse>(
+        "update_module_item",
+        {
+          pk: options.existingItemId,
+          data: {
+            [options.module]: dirty().reduce(
+              (acc, name) => ({ ...acc, [name]: formData()[name] }),
+              {},
+            ),
+          },
         },
-      });
-      if (!!response && !!options.navtigateToAfterSave) {
-        navigate(options.navtigateToAfterSave);
+      );
+      if (!!response && !!options.postSaveNavigateTo) {
+        navigate(options.postSaveNavigateTo);
       }
     } else {
       console.info(
         `Submitting form data to insert into module: ${options.module}`,
         formData(),
       );
-      const response = await invoke("insert_module_item", {
-        data: {
-          [options.module]: formData(),
+      const response = await invoke<InsertUpdateResponse>(
+        "insert_module_item",
+        {
+          data: {
+            [options.module]: formData(),
+          },
         },
-      });
-      if (!!response && !!options.navtigateToAfterSave) {
-        navigate(options.navtigateToAfterSave);
+      );
+      if (!!response) {
+        if (!!options.initialData && !!response.nextTask) {
+          console.log(response);
+
+          nextTaskStore[1].initiateTask({
+            name: response.nextTask,
+            arguments: response.arguments,
+          });
+          if (!!options.postSaveNavigateTo) {
+            navigate(
+              options.postSaveNavigateTo + "?nextTask=" + response.nextTask,
+            );
+          }
+        }
+        if (!!options.postSaveNavigateTo) {
+          navigate(options.postSaveNavigateTo);
+        }
       }
     }
   };
