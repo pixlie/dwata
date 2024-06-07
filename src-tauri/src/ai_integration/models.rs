@@ -5,7 +5,7 @@ use sqlx::SqliteConnection;
 use ts_rs::TS;
 use url::Url;
 
-use crate::error::DwataError;
+use crate::{error::DwataError, workspace::crud::CRUDRead};
 
 use super::{AIIntegration, AIProvider};
 
@@ -94,6 +94,7 @@ impl AIModel {
     pub fn from_string(requested_ai_model: String) -> Result<Self, DwataError> {
         let (provider_name, model_name) = requested_ai_model.split_once("::").unwrap();
         let all_models = Self::get_all_models();
+        // TODO: If AI provider is invalid, then return corresponding error
         let model = all_models
             .into_iter()
             .find(|x| x.ai_provider.to_string() == provider_name && x.api_name == model_name)
@@ -103,9 +104,20 @@ impl AIModel {
 
     pub async fn get_integration(
         &self,
-        _db_connection: &mut SqliteConnection,
+        db_connection: &mut SqliteConnection,
     ) -> Result<AIIntegration, DwataError> {
-        return Err(DwataError::InvalidAIProvider);
+        match AIIntegration::read_with_filter(
+            format!("ai_provider = {}", self.ai_provider.to_string()),
+            db_connection,
+        )
+        .await
+        {
+            Ok(results) => match results.into_iter().nth(0) {
+                Some(x) => Ok(x),
+                None => Err(DwataError::CouldNotConnectToAIProvider),
+            },
+            Err(x) => Err(x),
+        }
     }
 }
 

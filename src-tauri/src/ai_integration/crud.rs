@@ -1,14 +1,14 @@
 use super::{AIIntegration, AIIntegrationCreateUpdate};
-use crate::workspace::crud::{CRUDHelperCreateUpdate, InputValue, VecColumnNameValue, CRUD};
+use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
 use chrono::Utc;
 
-impl CRUD for AIIntegration {
+impl CRUDRead for AIIntegration {
     fn table_name() -> String {
         "ai_integration".to_string()
     }
 }
 
-impl CRUDHelperCreateUpdate for AIIntegrationCreateUpdate {
+impl CRUDCreateUpdate for AIIntegrationCreateUpdate {
     fn table_name() -> String {
         "ai_integration".to_string()
     }

@@ -78,7 +78,7 @@ pub struct Chat {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Deserialize, TS)]
+#[derive(Default, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ChatCreateUpdate {
@@ -88,6 +88,7 @@ pub struct ChatCreateUpdate {
     // pub requested_content_format: Option<String>,
     pub requested_ai_model: Option<String>,
     pub tool_response: Option<Vec<ChatToolResponse>>,
+    pub is_processed_by_ai: Option<bool>,
 }
 
 // pub(crate) trait ChatContextNode {

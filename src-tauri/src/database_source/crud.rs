@@ -1,18 +1,18 @@
 use super::{DatabaseSource, DatabaseSourceCreateUpdate, DatabaseType};
 use crate::database_source::helpers::check_database_connection;
 use crate::error::DwataError;
-use crate::workspace::crud::{CRUDHelperCreateUpdate, InputValue, VecColumnNameValue, CRUD};
+use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
 use chrono::Utc;
 use sqlx::SqliteConnection;
 use std::str::FromStr;
 
-impl CRUD for DatabaseSource {
+impl CRUDRead for DatabaseSource {
     fn table_name() -> String {
         "database_source".to_string()
     }
 }
 
-impl CRUDHelperCreateUpdate for DatabaseSourceCreateUpdate {
+impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
     fn table_name() -> String {
         "database_source".to_string()
     }

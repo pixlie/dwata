@@ -37,18 +37,6 @@ impl FromStr for AIProvider {
     }
 }
 
-// impl From<AIProvider> for String {
-//     fn from(value: AIProvider) -> Self {
-//         match value {
-//             AIProvider::OpenAI => "openai".to_string(),
-//             AIProvider::Groq => "groq".to_string(),
-//             AIProvider::Ollama => "ollama".to_string(),
-//             // AIProvider::Anthropic => "anthropic".to_string(),
-//             // AIProvider::Mistral => "mistral".to_string(),
-//         }
-//     }
-// }
-
 impl ToString for AIProvider {
     fn to_string(&self) -> String {
         match self {

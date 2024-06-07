@@ -10,7 +10,7 @@ pub enum DwataError {
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
-    DatabaseTypeNotSupported,
+    InvalidDatabaseType,
 
     // Internal SQLite DB for Dwata
     CouldNotCreateDwataDB,
@@ -35,6 +35,7 @@ pub enum DwataError {
     FeatureNotAvailableWithAIProvider,
     ChatDoesNotHaveMessage,
     ChatDoesNotHaveAIModel,
+    ChatHasBeenProcessedByAI,
 
     // Integrated vector DB
     CouldNotConnectToVectorDB,
@@ -44,6 +45,9 @@ pub enum DwataError {
 
     // Directory related
     CouldNotOpenDirectory,
+
+    // Task related
+    InvalidTaskStatus,
 }
 
 impl Error for DwataError {

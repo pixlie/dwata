@@ -51,6 +51,7 @@ impl DirectorySource {
                                             accumulator.join(" ")
                                         ))
                                     }
+                                    _ => {}
                                 }
                             }
                             _ => {

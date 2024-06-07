@@ -1,7 +1,7 @@
 use super::crud::InsertUpdateResponse;
 use super::{
     configuration::{Configurable, Configuration},
-    crud::{CRUDHelperCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
+    crud::{CRUDCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
 use crate::ai_integration::AIIntegration;
@@ -10,7 +10,7 @@ use crate::database_source::DatabaseSource;
 use crate::directory_source::DirectorySource;
 use crate::error::DwataError;
 use crate::user_account::UserAccount;
-use crate::workspace::crud::{ModuleDataRead, CRUD};
+use crate::workspace::crud::{CRUDRead, ModuleDataRead};
 use sqlx::SqliteConnection;
 use std::ops::DerefMut;
 use tauri::State;

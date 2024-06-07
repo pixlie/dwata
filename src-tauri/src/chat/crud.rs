@@ -1,16 +1,20 @@
 use super::{Chat, ChatCreateUpdate};
-use crate::workspace::crud::{
-    CRUDHelperCreateUpdate, InputValue, InsertUpdateResponse, VecColumnNameValue, CRUD,
+use crate::{
+    content::content::{Content, ContentType},
+    error::DwataError,
+    workspace::crud::{
+        CRUDCreateUpdate, CRUDRead, InputValue, InsertUpdateResponse, VecColumnNameValue,
+    },
 };
 use chrono::Utc;
 
-impl CRUD for Chat {
+impl CRUDRead for Chat {
     fn table_name() -> String {
         "chat".to_string()
     }
 }
 
-impl CRUDHelperCreateUpdate for ChatCreateUpdate {
+impl CRUDCreateUpdate for ChatCreateUpdate {
     fn table_name() -> String {
         "chat".to_string()
     }
@@ -41,11 +45,16 @@ impl CRUDHelperCreateUpdate for ChatCreateUpdate {
         &self,
         response: InsertUpdateResponse,
         _db_connection: &mut sqlx::SqliteConnection,
-    ) -> InsertUpdateResponse {
-        InsertUpdateResponse {
-            next_command: Some("generate_text_for_chat".to_string()),
+    ) -> Result<InsertUpdateResponse, DwataError> {
+        Ok(InsertUpdateResponse {
+            next_task: Some("chat_with_ai".to_string()),
+            arguments: Some(vec![(
+                "chatId".to_string(),
+                ContentType::ID,
+                Content::ID(response.pk),
+            )]),
             ..response
-        }
+        })
     }
 }
 

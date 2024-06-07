@@ -29,7 +29,7 @@ impl FromStr for DatabaseType {
             "sqlite" => Ok(DatabaseType::SQLite),
             "mongodb" => Ok(DatabaseType::MongoDB),
             "qdrant" => Ok(DatabaseType::Qdrant),
-            _ => Err(DwataError::DatabaseTypeNotSupported),
+            _ => Err(DwataError::InvalidDatabaseType),
         }
     }
 }
@@ -67,7 +67,7 @@ pub struct DatabaseSource {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DatabaseSourceCreateUpdate {

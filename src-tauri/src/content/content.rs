@@ -54,6 +54,7 @@ pub enum TextType {
 #[ts(export, rename = "ContentType", export_to = "../src/api_types/")]
 pub enum ContentType {
     Text,
+    ID,
     TextArray,
     SingleChoice,
     // Image,
@@ -91,6 +92,7 @@ impl Default for ContentSpec {
 #[ts(export, rename = "Content", export_to = "../src/api_types/")]
 pub enum Content {
     Text(String),
+    ID(i64),
     // Image(Image),
     // DateTime(DateTime<Utc>),
 }
