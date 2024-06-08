@@ -99,6 +99,7 @@ pub struct ChatFilters {
     pub role: Option<String>,
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+    pub root_chat_null: Option<bool>,
     pub requested_ai_model: Option<String>,
 }
 

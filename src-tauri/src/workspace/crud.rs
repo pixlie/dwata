@@ -9,14 +9,20 @@ use chrono::{DateTime, Utc};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::sqlite::SqliteRow;
-use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
+use sqlx::sqlite::{SqliteArgumentValue, SqliteRow};
+use sqlx::{query_as, Encode, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection, Type};
 use ts_rs::TS;
+
+use super::ModuleFilters;
 
 pub trait CRUDRead {
     fn table_name() -> String;
 
-    async fn read_all(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
+    fn set_default_filters() -> Option<ModuleFilters> {
+        None
+    }
+
+    async fn read_all_helper(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
@@ -41,6 +47,24 @@ pub trait CRUDRead {
                 );
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
             }
+        }
+    }
+
+    async fn read_all(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+    {
+        // We check if there are default filters to apply
+        let default_filters = Self::set_default_filters();
+        match default_filters {
+            Some(filters) => match filters {
+                ModuleFilters::AIIntegration(x) => {
+                    Self::read_with_filter_helper(x, db_connection).await
+                }
+                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, db_connection).await,
+            },
+            None => Self::read_all_helper(db_connection).await,
         }
     }
 
@@ -79,7 +103,7 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_with_filter<T>(
+    async fn read_with_filter_helper<T>(
         filters: T,
         db_connection: &mut SqliteConnection,
     ) -> Result<Vec<Self>, DwataError>
@@ -94,22 +118,30 @@ pub trait CRUDRead {
         let mut count = 0;
         let limit = column_names_values.0.len();
         for (name, data) in column_names_values.0 {
-            builder.push(format!("{} = ", name));
             match data {
-                InputValue::Text(x) => {
-                    builder.push_bind(x.clone());
+                InputValue::Null => {
+                    builder.push(format!("{} IS null", name));
                 }
-                InputValue::Json(x) => {
-                    builder.push_bind(x);
-                }
-                InputValue::DateTime(x) => {
-                    builder.push_bind(x);
-                }
-                InputValue::ID(x) => {
-                    builder.push_bind(x);
-                }
-                InputValue::Bool(x) => {
-                    builder.push_bind(x);
+                _ => {
+                    builder.push(format!("{} = ", name));
+                    match data {
+                        InputValue::Text(x) => {
+                            builder.push_bind(x.clone());
+                        }
+                        InputValue::ID(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::Bool(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::Json(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::DateTime(x) => {
+                            builder.push_bind(x);
+                        }
+                        _ => {}
+                    }
                 }
             }
             count += 1;
@@ -136,6 +168,18 @@ pub trait CRUDRead {
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
             }
         }
+    }
+
+    async fn read_with_filter<T>(
+        filters: T,
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+        T: CRUDReadFilter,
+    {
+        Self::read_with_filter_helper(filters, db_connection).await
     }
 }
 
@@ -171,6 +215,7 @@ pub enum InputValue {
     Bool(bool),
     Json(Value),
     DateTime(DateTime<Utc>),
+    Null,
 }
 
 #[derive(Default)]
@@ -238,6 +283,7 @@ pub trait CRUDCreateUpdate {
                 InputValue::Bool(x) => {
                     builder.push_bind(x);
                 }
+                _ => {}
             }
             count += 1;
             if count < limit {
@@ -307,6 +353,7 @@ pub trait CRUDCreateUpdate {
                 InputValue::Bool(x) => {
                     builder.push_bind(x);
                 }
+                _ => {}
             }
             count += 1;
             if count < limit {

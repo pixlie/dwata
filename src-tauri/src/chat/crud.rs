@@ -2,9 +2,12 @@ use super::{Chat, ChatCreateUpdate, ChatFilters};
 use crate::{
     content::content::{Content, ContentType},
     error::DwataError,
-    workspace::crud::{
-        CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, InsertUpdateResponse,
-        VecColumnNameValue,
+    workspace::{
+        crud::{
+            CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, InsertUpdateResponse,
+            VecColumnNameValue,
+        },
+        ModuleFilters,
     },
 };
 use chrono::Utc;
@@ -12,6 +15,13 @@ use chrono::Utc;
 impl CRUDRead for Chat {
     fn table_name() -> String {
         "chat".to_string()
+    }
+
+    fn set_default_filters() -> Option<ModuleFilters> {
+        Some(ModuleFilters::Chat(ChatFilters {
+            root_chat_null: Some(true),
+            ..Default::default()
+        }))
     }
 }
 
@@ -67,6 +77,9 @@ impl CRUDReadFilter for ChatFilters {
         }
         if let Some(x) = &self.root_chat_id {
             name_values.push_name_value("root_chat_id", InputValue::ID(*x));
+        }
+        if let Some(true) = &self.root_chat_null {
+            name_values.push_name_value("root_chat_id", InputValue::Null);
         }
         if let Some(x) = &self.requested_ai_model {
             name_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
