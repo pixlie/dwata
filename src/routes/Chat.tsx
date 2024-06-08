@@ -1,4 +1,4 @@
-import { Component, For, createComputed, onMount } from "solid-js";
+import { Component, For, createComputed, createMemo, onMount } from "solid-js";
 import Thread from "../widgets/chat/Thread";
 import { Route, RouteSectionProps, useParams } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
@@ -26,11 +26,14 @@ const ChatThreadIndex: Component = () => {
   const handleResendChatsToAI = () => {
     // We invoke the Tauri API to resend chats in this thread to AI models
     // We send only the first chat (which was initiated by the user)
-
     invoke("chat_with_ai", {
       chatId: chat.chatReplyList[parseInt(params.threadId)][0].id,
     });
   };
+
+  const getRootChat = createMemo(() =>
+    chat.chatList.find((x) => x.id === parseInt(params.threadId)),
+  );
 
   return (
     <div class="flex gap-4 h-full">
@@ -39,13 +42,23 @@ const ChatThreadIndex: Component = () => {
         <For each={chat.chatList}>{(thread) => <Thread {...thread} />}</For>
       </div>
 
-      <div class="w-3/5 overflow-y-auto">
-        <Button onClick={handleResendChatsToAI} label="Resend chats to AI" />
-        {!!params.threadId && (
-          <For each={chat.chatReplyList[parseInt(params.threadId)]}>
-            {(reply) => <ReplyItem {...reply} />}
-          </For>
-        )}
+      <div class="w-3/5 overflow-y-auto pr-3">
+        {!!getRootChat() ? (
+          <>
+            <ReplyItem {...getRootChat()!} />
+            <div class="my-4 flex">
+              <div class="grow" />
+              <Button
+                onClick={handleResendChatsToAI}
+                label="Resend chat to AI"
+                size="sm"
+              />
+            </div>
+            <For each={chat.chatReplyList[parseInt(params.threadId)]}>
+              {(reply) => <ReplyItem {...reply} />}
+            </For>
+          </>
+        ) : null}
       </div>
     </div>
   );

@@ -53,18 +53,11 @@ const makeStore = () => {
         );
 
         if ("Chat" in result) {
-          // The result contains all the chat replies to the parent
-          // We insert the parent or root chat
-          let withRootChat: Array<Chat> = [];
-          if (store.chatList.find((x) => x.id === threadId)) {
-            withRootChat = [store.chatList.find((x) => x.id === threadId)!];
-          }
-          withRootChat = withRootChat.concat(result["Chat"] as Array<Chat>);
           setStore({
             ...store,
             chatReplyList: {
               ...store.chatReplyList,
-              [threadId]: withRootChat,
+              [threadId]: result["Chat"] as Array<Chat>,
             },
           });
         }

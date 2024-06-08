@@ -3,5 +3,6 @@
 export interface ChatFilters {
   role: string | null;
   rootChatId: number;
+  rootChatNull: boolean | null;
   requestedAiModel: string | null;
 }

@@ -8,7 +8,7 @@ const ReplyItem: Component<Chat> = (props) => {
 
   return (
     <div
-      class="p-3 rounded-md mb-4 border overflow-x-scroll"
+      class="p-3 rounded-md border overflow-x-scroll"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
@@ -16,7 +16,7 @@ const ReplyItem: Component<Chat> = (props) => {
     >
       <div style={{ color: getColors().colors["editor.foreground"] }}>
         {/* <SolidMarkdown children={props.message} /> */}
-        {props.message}
+        <div class="whitespace-pre-wrap">{props.message}</div>
       </div>
     </div>
   );
