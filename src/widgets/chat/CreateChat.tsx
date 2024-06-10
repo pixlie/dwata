@@ -1,39 +1,26 @@
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 import Button from "../interactable/Button";
-import ChatContext from "./ChatContext";
+// import ChatContext from "./ChatContext";
 import withConfiguredForm from "../../utils/configuredForm";
 import { ChatCreateUpdate } from "../../api_types/ChatCreateUpdate";
-import { ContentFormat } from "../../api_types/ContentFormat";
 import { Module } from "../../api_types/Module";
 import Form from "../interactable/Form";
-
-interface INewThreadFormData {
-  message: string;
-  aiProvider: string | null;
-  aiModel: string | null;
-}
-
-interface IFormState {
-  chatContexts: Array<string>;
-}
+import { useParams } from "@solidjs/router";
 
 const CreateChat: Component = () => {
-  const [formData, setFormData] = createSignal<INewThreadFormData>({
-    message: "",
-    aiProvider: null,
-    aiModel: null,
-  });
-  const [formState, setFormState] = createSignal<IFormState>({
-    chatContexts: [],
-  });
+  // const [formState, setFormState] = createSignal<IFormState>({
+  //   chatContexts: [],
+  // });
+  const params = useParams();
 
   const configuredForm = withConfiguredForm<ChatCreateUpdate>({
     module: "Chat" as Module,
     initialData: {
       message: "",
-      requestedContentFormat: "Text" as ContentFormat,
+      rootChatId: "threadId" in params ? parseInt(params.threadId) : undefined,
+      // requestedContentFormat: "Text" as ContentFormat,
     },
-    navtigateToAfterSave: "/chat",
+    postSaveNavigateTo: "/chat",
   });
 
   return (

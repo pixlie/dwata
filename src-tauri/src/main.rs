@@ -14,9 +14,10 @@ mod error;
 mod chat;
 mod relational_database;
 // mod saved_query;
-mod ai;
+mod ai_integration;
 mod content;
-// mod embedding;
+mod embedding;
+mod text_generation;
 // mod schema;
 mod user_account;
 mod workflow;
@@ -53,14 +54,16 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             workspace::commands::get_module_configuration,
             workspace::commands::read_row_list_for_module,
+            workspace::commands::read_row_list_for_module_with_filter,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
             workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
-            ai::commands::get_ai_model_list,
-            ai::commands::get_ai_model_choice_list,
+            ai_integration::commands::get_ai_model_list,
+            ai_integration::commands::get_ai_model_choice_list,
+            text_generation::commands::chat_with_ai,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

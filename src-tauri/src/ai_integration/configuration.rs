@@ -10,11 +10,9 @@ impl Configurable for AIIntegration {
     fn get_schema() -> Configuration {
         let ai_provider_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
-                (String::from(AIProvider::OpenAI), "OpenAI".to_string()),
-                (String::from(AIProvider::Groq), "Groq".to_string()),
-                // (String::from(AIProvider::Anthropic), "Anthropic".to_string()),
-                (String::from(AIProvider::Ollama), "Ollama".to_string()),
-                // (String::from(AIProvider::Mistral), "Mistral".to_string()),
+                (AIProvider::OpenAI.to_string(), "OpenAI".to_string()),
+                (AIProvider::Groq.to_string(), "Groq".to_string()),
+                (AIProvider::Ollama.to_string(), "Ollama".to_string()),
             ]),
             ..ContentSpec::default()
         };

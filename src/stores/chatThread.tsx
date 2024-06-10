@@ -5,6 +5,7 @@ import { IProviderPropTypes } from "../utils/types";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 import { Chat } from "../api_types/Chat";
 import { Module } from "../api_types/Module";
+import { ModuleFilters } from "../api_types/ModuleFilters";
 
 interface IStore {
   chatList: Array<Chat>;
@@ -40,12 +41,17 @@ const makeStore = () => {
 
       fetchChatReplies: async (threadId: number) => {
         const result = await invoke<ModuleDataReadList>(
-          "read_row_list_for_module",
+          "read_row_list_for_module_with_filter",
           {
             module: "Chat" as Module,
-            filter: { rootChatId: threadId },
+            filters: {
+              Chat: {
+                rootChatId: threadId,
+              },
+            } as ModuleFilters,
           },
         );
+
         if ("Chat" in result) {
           setStore({
             ...store,

@@ -3,12 +3,16 @@ import { Component } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { Chat } from "../../api_types/Chat";
 
-const ReplyItem: Component<Chat> = (props) => {
+interface IPropTypes extends Chat {
+  showModel?: boolean;
+}
+
+const ReplyItem: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
 
   return (
     <div
-      class="p-3 rounded-md mb-4 border overflow-x-scroll"
+      class="p-3 rounded-md border overflow-x-scroll"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
@@ -16,7 +20,28 @@ const ReplyItem: Component<Chat> = (props) => {
     >
       <div style={{ color: getColors().colors["editor.foreground"] }}>
         {/* <SolidMarkdown children={props.message} /> */}
-        {props.message}
+        <div
+          class="whitespace-pre-wrap font-normal"
+          style={{
+            "font-family": `"Noto Sans", sans-serif`,
+            "font-optical-sizing": "auto",
+          }}
+        >
+          {props.message}
+        </div>
+        {props.showModel ? (
+          <div class="flex">
+            <div class="grow" />
+            <div
+              class="text-xs my-1 px-1"
+              style={{
+                "background-color": getColors().colors["editor.background"],
+              }}
+            >
+              Model: {props.requestedAiModel}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

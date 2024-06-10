@@ -1,14 +1,14 @@
 use super::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::workspace::crud::{CRUDHelperCreateUpdate, InputValue, VecColumnNameValue, CRUD};
+use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
 use chrono::Utc;
 
-impl CRUD for DirectorySource {
+impl CRUDRead for DirectorySource {
     fn table_name() -> String {
         "directory_source".to_string()
     }
 }
 
-impl CRUDHelperCreateUpdate for DirectorySourceCreateUpdate {
+impl CRUDCreateUpdate for DirectorySourceCreateUpdate {
     fn table_name() -> String {
         "directory_source".to_string()
     }

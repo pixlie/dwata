@@ -1,18 +1,18 @@
+use crate::ai_integration::{AIIntegration, AIProvider};
+use crate::error::DwataError;
 use openai::types::{CreateEmbeddingRequest, CreateEmbeddingRequestInput};
 use reqwest::RequestBuilder;
-
-use crate::{ai::AIProvider, error::DwataError};
 
 // pub mod commands;
 // pub mod storage;
 
-impl AIProvider {
-    // Embedding related
+impl AIIntegration {
     pub fn get_embedding_url(&self) -> Option<String> {
-        match self {
-            Self::OpenAI => Some("https://api.openai.com/v1/embeddings".to_string()),
-            Self::Groq => None,
-            Self::Anthropic => None,
+        match self.ai_provider {
+            AIProvider::OpenAI => Some("https://api.openai.com/v1/embeddings".to_string()),
+            AIProvider::Groq => None,
+            AIProvider::Ollama => Some("http://localhost:11434/api/embeddings".to_string()),
+            // AIProvider::Anthropic => None,
         }
     }
 

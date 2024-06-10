@@ -1,5 +1,4 @@
 -- Workflow table to store repeatable tasks
-
 CREATE TABLE workflow
 (
     id                      INTEGER PRIMARY KEY,
@@ -13,6 +12,7 @@ CREATE TABLE workflow
     FOREIGN KEY (ai_model_id) REFERENCES ai_model_used (id),
     FOREIGN KEY (created_by_id) REFERENCES user_account (id)
 );
+
 
 CREATE TABLE step_template
 (

@@ -51,6 +51,11 @@ interface IWorkspace {
   isFetching: boolean;
 }
 
+interface INextTask {
+  name: string;
+  arguments?: Array<[string, ContentType, Content]>;
+}
+
 type IHeterogenousContent = [ContentType, ContentSpec, Content];
 
 type uiThemes = "gitHubDark" | "gitHubLight";
@@ -64,6 +69,7 @@ export type {
   IFormData,
   IFormField,
   IWorkspace,
+  INextTask,
   IHeterogenousContent,
   uiThemes,
 };

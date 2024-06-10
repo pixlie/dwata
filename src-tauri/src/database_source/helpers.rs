@@ -28,7 +28,7 @@ pub async fn check_database_connection(
             format!("sqlite3://{username}{opt_password}@{host}{opt_port}/{name}")
         }
         _ => {
-            return Err(DwataError::DatabaseTypeNotSupported);
+            return Err(DwataError::InvalidDatabaseType);
         }
     };
 

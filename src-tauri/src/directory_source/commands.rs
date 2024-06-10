@@ -1,7 +1,7 @@
 use super::{DirectorySource, File};
 use crate::content::containers::HeterogeneousContentArray;
 use crate::error::DwataError;
-use crate::workspace::crud::CRUD;
+use crate::workspace::crud::CRUDRead;
 use crate::workspace::DwataDb;
 use std::path::PathBuf;
 use tauri::State;

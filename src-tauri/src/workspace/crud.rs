@@ -1,22 +1,27 @@
-use chrono::{DateTime, Utc};
-use log::{error, info};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use sqlx::{Execute, FromRow, query_as, QueryBuilder, Sqlite, SqliteConnection};
-use sqlx::sqlite::SqliteRow;
-use ts_rs::TS;
-
-use crate::ai::{AIIntegration, AIIntegrationCreateUpdate};
+use super::ModuleFilters;
+use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate};
 use crate::chat::{Chat, ChatCreateUpdate};
+use crate::content::content::{Content, ContentType};
 use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::error::DwataError;
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
+use chrono::{DateTime, Utc};
+use log::{error, info};
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use sqlx::sqlite::SqliteRow;
+use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
+use ts_rs::TS;
 
-pub trait CRUD {
+pub trait CRUDRead {
     fn table_name() -> String;
 
-    async fn read_all(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
+    fn set_default_filters() -> Option<ModuleFilters> {
+        None
+    }
+
+    async fn read_all_helper(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
@@ -27,16 +32,38 @@ pub trait CRUD {
         {
             Ok(result) => {
                 info!(
-                    "Fetched {} rows from Dwata DB::{}",
+                    "Fetched {} rows from Dwata DBm, table {}",
                     result.len(),
                     Self::table_name()
                 );
                 Ok(result)
             }
             Err(err) => {
-                println!("Could not fetch rows from Dwata DB.\nError: {}", err);
+                error!(
+                    "Could not fetch rows from Dwata DB, table {}.\nError: {}",
+                    Self::table_name(),
+                    err
+                );
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
             }
+        }
+    }
+
+    async fn read_all(db_connection: &mut SqliteConnection) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+    {
+        // We check if there are default filters to apply
+        let default_filters = Self::set_default_filters();
+        match default_filters {
+            Some(filters) => match filters {
+                ModuleFilters::AIIntegration(x) => {
+                    Self::read_with_filter_helper(x, db_connection).await
+                }
+                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, db_connection).await,
+            },
+            None => Self::read_all_helper(db_connection).await,
         }
     }
 
@@ -49,7 +76,7 @@ pub trait CRUD {
         for<'r> Self: FromRow<'r, SqliteRow>,
     {
         let result: Result<Self, sqlx::Error> = query_as(&format!(
-            "SELECT * FROM {} WHERE id = ?1",
+            "SELECT * FROM {} WHERE id = ?",
             Self::table_name()
         ))
         .bind(pk)
@@ -58,17 +85,106 @@ pub trait CRUD {
         match result {
             Ok(row) => {
                 info!(
-                    "Fetched one row from Dwata DB::{}, ID {}",
+                    "Fetched one row from Dwata DBm, table{}, ID {}",
                     Self::table_name(),
                     pk
                 );
                 Ok(row)
             }
             Err(err) => {
-                println!("Could not fetch rows from Dwata DB.\nError: {}", err);
+                error!(
+                    "Could not fetch rows from Dwata DB, table {}.\nError: {}",
+                    Self::table_name(),
+                    err
+                );
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)
             }
         }
+    }
+
+    async fn read_with_filter_helper<T>(
+        filters: T,
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+        T: CRUDReadFilter,
+    {
+        let mut builder: QueryBuilder<Sqlite> =
+            QueryBuilder::new(format!("SELECT * FROM {} WHERE ", Self::table_name()));
+        let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
+        let mut count = 0;
+        let limit = column_names_values.0.len();
+        for (name, data) in column_names_values.0 {
+            match data {
+                InputValue::Null => {
+                    builder.push(format!("{} IS null", name));
+                }
+                _ => {
+                    builder.push(format!("{} = ", name));
+                    match data {
+                        InputValue::Text(x) => {
+                            builder.push_bind(x.clone());
+                        }
+                        InputValue::ID(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::Bool(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::Json(x) => {
+                            builder.push_bind(x);
+                        }
+                        InputValue::DateTime(x) => {
+                            builder.push_bind(x);
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            count += 1;
+            if count < limit {
+                builder.push("AND ");
+            }
+        }
+        let executable = builder.build_query_as();
+        match executable.fetch_all(&mut *db_connection).await {
+            Ok(rows) => {
+                info!(
+                    "Fetched {} rows from Dwata DB, table {}",
+                    rows.len(),
+                    Self::table_name(),
+                );
+                Ok(rows)
+            }
+            Err(err) => {
+                error!(
+                    "Could not fetch rows from Dwata DB, table {}.\nError: {}",
+                    Self::table_name(),
+                    err
+                );
+                Err(DwataError::CouldNotFetchRowsFromDwataDB)
+            }
+        }
+    }
+
+    async fn read_with_filter<T>(
+        filters: T,
+        db_connection: &mut SqliteConnection,
+    ) -> Result<Vec<Self>, DwataError>
+    where
+        Self: Sized + Send + Unpin,
+        for<'r> Self: FromRow<'r, SqliteRow>,
+        T: CRUDReadFilter,
+    {
+        Self::read_with_filter_helper(filters, db_connection).await
+    }
+}
+
+pub trait CRUDReadFilter {
+    fn get_column_names_values_to_filter(&self) -> VecColumnNameValue {
+        VecColumnNameValue::default()
     }
 }
 
@@ -98,6 +214,7 @@ pub enum InputValue {
     Bool(bool),
     Json(Value),
     DateTime(DateTime<Utc>),
+    Null,
 }
 
 #[derive(Default)]
@@ -109,7 +226,18 @@ impl VecColumnNameValue {
     }
 }
 
-pub trait CRUDHelperCreateUpdate {
+#[derive(Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+pub struct InsertUpdateResponse {
+    pub pk: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_task: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub arguments: Option<Vec<(String, ContentType, Content)>>,
+}
+
+pub trait CRUDCreateUpdate {
     fn table_name() -> String;
 
     fn get_column_names_values(&self) -> VecColumnNameValue;
@@ -121,7 +249,7 @@ pub trait CRUDHelperCreateUpdate {
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
-    ) -> Result<i64, DwataError> {
+    ) -> Result<InsertUpdateResponse, DwataError> {
         // Just calling this so if it fails the error will propagate up
         self.pre_insert(db_connection).await?;
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
@@ -154,6 +282,7 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::Bool(x) => {
                     builder.push_bind(x);
                 }
+                _ => {}
             }
             count += 1;
             if count < limit {
@@ -164,10 +293,20 @@ pub trait CRUDHelperCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(result) => Ok(result.last_insert_rowid()),
+            Ok(result) => {
+                self.post_insert(
+                    InsertUpdateResponse {
+                        pk: result.last_insert_rowid(),
+                        next_task: None,
+                        arguments: None,
+                    },
+                    db_connection,
+                )
+                .await
+            }
             Err(err) => {
                 error!(
-                    "Could not insert into Dwata DB, table {}:\nSQL: {}\nError: {:?}",
+                    "Could not insert into Dwata DB, table {}:\nSQL: {}\nError: {}",
                     Self::table_name(),
                     sql,
                     err
@@ -177,11 +316,19 @@ pub trait CRUDHelperCreateUpdate {
         }
     }
 
+    async fn post_insert(
+        &self,
+        response: InsertUpdateResponse,
+        _db_connection: &mut SqliteConnection,
+    ) -> Result<InsertUpdateResponse, DwataError> {
+        Ok(response)
+    }
+
     async fn update_module_data(
         &self,
         pk: i64,
         db_connection: &mut SqliteConnection,
-    ) -> Result<i64, DwataError> {
+    ) -> Result<InsertUpdateResponse, DwataError> {
         let mut builder: QueryBuilder<Sqlite> =
             QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
         let column_names_values: VecColumnNameValue = self.get_column_names_values();
@@ -205,6 +352,7 @@ pub trait CRUDHelperCreateUpdate {
                 InputValue::Bool(x) => {
                     builder.push_bind(x);
                 }
+                _ => {}
             }
             count += 1;
             if count < limit {
@@ -216,10 +364,14 @@ pub trait CRUDHelperCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(_) => Ok(pk),
+            Ok(_) => Ok(InsertUpdateResponse {
+                pk,
+                next_task: None,
+                arguments: None,
+            }),
             Err(err) => {
                 error!(
-                    "Could not update Dwata DB, table {}:\nSQL: {}\nError: {:?}",
+                    "Could not update Dwata DB, table {}:\nSQL: {}\nError: {}",
                     Self::table_name(),
                     sql,
                     err
@@ -230,7 +382,7 @@ pub trait CRUDHelperCreateUpdate {
     }
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Deserialize, TS)]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),

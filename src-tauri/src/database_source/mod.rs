@@ -21,14 +21,15 @@ pub enum DatabaseType {
 
 impl FromStr for DatabaseType {
     type Err = DwataError;
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "PostgreSQL" => Ok(DatabaseType::PostgreSQL),
-            "MySQL" => Ok(DatabaseType::MySQL),
-            "SQLite" => Ok(DatabaseType::SQLite),
-            "MongoDB" => Ok(DatabaseType::MongoDB),
-            "Qdrant" => Ok(DatabaseType::Qdrant),
-            _ => Err(DwataError::DatabaseTypeNotSupported),
+        match s.to_lowercase().as_str() {
+            "postgresql" => Ok(DatabaseType::PostgreSQL),
+            "mysql" => Ok(DatabaseType::MySQL),
+            "sqlite" => Ok(DatabaseType::SQLite),
+            "mongodb" => Ok(DatabaseType::MongoDB),
+            "qdrant" => Ok(DatabaseType::Qdrant),
+            _ => Err(DwataError::InvalidDatabaseType),
         }
     }
 }
@@ -66,7 +67,7 @@ pub struct DatabaseSource {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct DatabaseSourceCreateUpdate {

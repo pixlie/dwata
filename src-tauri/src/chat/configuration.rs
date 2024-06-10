@@ -23,7 +23,7 @@ impl Configurable for Chat {
                     Some(true)
                 ),
                 FormField::new(
-                    "requestedAiModelId",
+                    "requestedAiModel",
                     "AI Model",
                     Some("What AI model would you like to use?"),
                     ContentType::SingleChoice,

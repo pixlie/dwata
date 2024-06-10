@@ -10,7 +10,8 @@ pub enum DwataError {
     CouldNotConnectToDatabase,
     CouldNotQueryDatabase,
     CouldNotCreateDatabase,
-    DatabaseTypeNotSupported,
+    InvalidDatabaseType,
+    FilterNotSupported,
 
     // Internal SQLite DB for Dwata
     CouldNotCreateDwataDB,
@@ -28,9 +29,14 @@ pub enum DwataError {
 
     // AI providers/models/features
     InvalidAIProvider,
+    InvalidAIModel,
+    InvalidChatRole,
     CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
     FeatureNotAvailableWithAIProvider,
+    ChatDoesNotHaveMessage,
+    ChatDoesNotHaveAIModel,
+    ChatHasBeenProcessedByAI,
 
     // Integrated vector DB
     CouldNotConnectToVectorDB,
@@ -40,6 +46,12 @@ pub enum DwataError {
 
     // Directory related
     CouldNotOpenDirectory,
+
+    // Task related
+    InvalidTaskStatus,
+
+    // API requests related
+    CouldNotConnectToAPI,
 }
 
 impl Error for DwataError {
@@ -65,5 +77,12 @@ impl From<MigrateError> for DwataError {
     fn from(err: MigrateError) -> Self {
         error!("Could not migrate Dwata DB\n Error: {}", err);
         DwataError::CouldNotMigrateDwataDB
+    }
+}
+
+impl From<reqwest::Error> for DwataError {
+    fn from(err: reqwest::Error) -> Self {
+        error!("Could not connect to API\n Error: {}", err);
+        DwataError::CouldNotConnectToAPI
     }
 }

@@ -18,7 +18,7 @@ const AIIntegrationForm: Component = () => {
       aiProvider: "OpenAI",
       apiKey: "",
     },
-    navtigateToAfterSave: "/settings",
+    postSaveNavigateTo: "/settings",
   });
 
   return (
