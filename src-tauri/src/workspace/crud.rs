@@ -1,3 +1,4 @@
+use super::ModuleFilters;
 use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate};
 use crate::chat::{Chat, ChatCreateUpdate};
 use crate::content::content::{Content, ContentType};
@@ -9,11 +10,9 @@ use chrono::{DateTime, Utc};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::sqlite::{SqliteArgumentValue, SqliteRow};
-use sqlx::{query_as, Encode, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection, Type};
+use sqlx::sqlite::SqliteRow;
+use sqlx::{query_as, Execute, FromRow, QueryBuilder, Sqlite, SqliteConnection};
 use ts_rs::TS;
-
-use super::ModuleFilters;
 
 pub trait CRUDRead {
     fn table_name() -> String;

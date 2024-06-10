@@ -49,6 +49,9 @@ pub enum DwataError {
 
     // Task related
     InvalidTaskStatus,
+
+    // API requests related
+    CouldNotConnectToAPI,
 }
 
 impl Error for DwataError {
@@ -74,5 +77,12 @@ impl From<MigrateError> for DwataError {
     fn from(err: MigrateError) -> Self {
         error!("Could not migrate Dwata DB\n Error: {}", err);
         DwataError::CouldNotMigrateDwataDB
+    }
+}
+
+impl From<reqwest::Error> for DwataError {
+    fn from(err: reqwest::Error) -> Self {
+        error!("Could not connect to API\n Error: {}", err);
+        DwataError::CouldNotConnectToAPI
     }
 }

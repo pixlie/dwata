@@ -11,12 +11,13 @@ pub mod crud;
 pub mod models;
 pub mod providers;
 
-#[derive(Debug, Deserialize, Serialize, Clone, TS, Type)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, TS, Type)]
 #[sqlx(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum AIProvider {
     OpenAI,
     Groq,
+    #[default]
     Ollama,
     // Anthropic,
     // Mistral,
