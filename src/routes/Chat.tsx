@@ -27,7 +27,7 @@ const ChatThreadIndex: Component = () => {
     // We invoke the Tauri API to resend chats in this thread to AI models
     // We send only the first chat (which was initiated by the user)
     invoke("chat_with_ai", {
-      chatId: chat.chatReplyList[parseInt(params.threadId)][0].id,
+      chatId: chat.chatList.find((x) => x.id === parseInt(params.threadId))?.id,
     });
   };
 
@@ -45,7 +45,8 @@ const ChatThreadIndex: Component = () => {
       <div class="w-3/5 overflow-y-auto pr-3">
         {!!getRootChat() ? (
           <>
-            <ReplyItem {...getRootChat()!} />
+            <ReplyItem {...getRootChat()!} showModel />
+
             <div class="my-4 flex">
               <div class="grow" />
               <Button
@@ -54,9 +55,12 @@ const ChatThreadIndex: Component = () => {
                 size="sm"
               />
             </div>
+
             <For each={chat.chatReplyList[parseInt(params.threadId)]}>
               {(reply) => <ReplyItem {...reply} />}
             </For>
+
+            <CreateChat />
           </>
         ) : null}
       </div>
