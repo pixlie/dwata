@@ -16,6 +16,10 @@ In Dwata, we can have a chat with AI (Artificial Intelligence). We break the pro
 
 ![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads_0.0.2.png?raw=true "Recent chats with AI models")
 
+## Want to try out Dwata?
+
+[Instructions to setup Dwata from sources](./docs/SETUP.md)
+
 ## What does general purpose mean?
 
 Dwata is not geared toward a type of problem. It centers around the fact that recent AI models have become really good at comprehending human language. It is a new interface to the computer.

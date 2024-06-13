@@ -1,7 +1,7 @@
 {
   "name": "dwata",
-  "version": "0.0.1",
-  "description": "AI enabled Business Intelligence (desktop) app",
+  "version": "0.0.8",
+  "description": "General purpose AI Studio",
   "type": "module",
   "scripts": {
     "start": "vite",

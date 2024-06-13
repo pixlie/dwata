@@ -26,12 +26,12 @@ mod workspace;
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     info!("Setting up Dwata");
-    #[cfg(debug_assertions)] // only include this code on debug builds
-    {
-        let window = app.get_webview_window("main").unwrap();
-        window.open_devtools();
-        window.close_devtools();
-    }
+    // #[cfg(debug_assertions)] // only include this code on debug builds
+    // {
+    //     let window = app.get_webview_window("main").unwrap();
+    //     window.open_devtools();
+    //     window.close_devtools();
+    // }
     let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
     match tauri::async_runtime::block_on(async {
         workspace::helpers::get_database_connection(&app_config_dir).await
