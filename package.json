@@ -1,6 +1,6 @@
 {
   "name": "dwata",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "General purpose AI Studio",
   "type": "module",
   "scripts": {
