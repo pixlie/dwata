@@ -3,8 +3,8 @@ members = ["openai"]
 
 [package]
 name = "dwata"
-version = "0.0.8"
-description = "An AI studio whee you connect your data sources and have convesations with AI"
+version = "0.0.9"
+description = "General purpose AI Studio"
 authors = ["Sumit Datta <sumitd@dwata.com>"]
 license = "Apache-2.0 license"
 repository = "https://github.com/brainless/dwata"
