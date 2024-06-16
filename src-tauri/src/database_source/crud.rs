@@ -18,30 +18,30 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
     }
 
     fn get_column_names_values(&self) -> VecColumnNameValue {
-        let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
+        let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.label {
-            name_values.push_name_value("label", InputValue::Text(x.clone()));
+            names_values.push_name_value("label", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.database_type {
-            name_values.push_name_value("database_type", InputValue::Text(x.clone()));
+            names_values.push_name_value("database_type", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.database_name {
-            name_values.push_name_value("database_name", InputValue::Text(x.clone()));
+            names_values.push_name_value("database_name", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.database_host {
-            name_values.push_name_value("database_host", InputValue::Text(x.clone()));
+            names_values.push_name_value("database_host", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.database_port {
-            name_values.push_name_value("database_port", InputValue::Text(x.to_string()));
+            names_values.push_name_value("database_port", InputValue::Text(x.to_string()));
         }
         if let Some(x) = &self.database_username {
-            name_values.push_name_value("database_username", InputValue::Text(x.clone()));
+            names_values.push_name_value("database_username", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.database_password {
-            name_values.push_name_value("database_password", InputValue::Text(x.clone()));
+            names_values.push_name_value("database_password", InputValue::Text(x.clone()));
         }
-        name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        name_values
+        names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
+        names_values
     }
 
     async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
