@@ -3,7 +3,7 @@ import Heading from "../widgets/typography/Heading";
 import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
-import SettingsSourceList from "../widgets/settings/SettingsSourceList";
+// import SettingsSourceList from "../widgets/settings/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
 import SettingsAIIntegrationList from "../widgets/settings/SettingsIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
@@ -23,7 +23,7 @@ const SettingsIndex: Component = () => {
 
   return (
     <>
-      <Heading size="3xl">Data Sources</Heading>
+      {/* <Heading size="xl">Data Sources</Heading>
       <p
         class="p-4 text-white rounded-md border cursor-default select-none text-sm mb-2"
         style={{
@@ -50,7 +50,7 @@ const SettingsIndex: Component = () => {
           size="sm"
         ></Button>
       </div>
-      <div class="mb-6" />
+      <div class="mb-6" /> */}
 
       <Heading size="xl">AI Providers</Heading>
       <SettingsAIIntegrationList />

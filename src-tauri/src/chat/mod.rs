@@ -49,6 +49,7 @@ pub struct Chat {
     pub id: i64,
 
     // This is null for the first chat
+    #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
 
     pub role: Option<Role>,
@@ -84,6 +85,7 @@ pub struct Chat {
 #[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
 pub struct ChatCreateUpdate {
     pub role: Option<String>,
+    #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
     pub message: Option<String>,
     // pub requested_content_format: Option<String>,

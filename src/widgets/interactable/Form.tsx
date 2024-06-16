@@ -10,6 +10,7 @@ interface IPropTypes {
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
+  showPrelude?: boolean;
   handleSubmit?: () => {};
 }
 
@@ -18,52 +19,64 @@ const Form: Component<IPropTypes> = (props) => {
   const { handleChange, formConfiguration, formDataHashMap, handleSubmit } =
     props.configuredForm;
 
-  return (
-    <div
-      class="w-full rounded-md border"
-      style={{
-        "background-color": getColors().colors["inlineChat.background"],
-        "border-color": getColors().colors["inlineChat.border"],
-      }}
-    >
+  const Inner = () => (
+    <>
+      <For each={formConfiguration()?.fields}>
+        {(field) => (
+          <>
+            <FormField
+              {...field}
+              onChange={handleChange}
+              value={formDataHashMap()[field.name]}
+            />
+            <div class="mt-4" />
+          </>
+        )}
+      </For>
+
+      {!!props.submitButton ? (
+        props.submitButton
+      ) : (
+        <Button
+          label={props.submitButtomLabel || "Save"}
+          onClick={props.handleSubmit || handleSubmit}
+        />
+      )}
+    </>
+  );
+
+  if (props.showPrelude !== undefined && !props.showPrelude) {
+    return <Inner />;
+  } else {
+    return (
       <div
-        class="px-2 py-2 rounded-md rounded-b-none border-b"
+        class="w-full rounded-md border"
         style={{
-          "border-color": getColors().colors["editorWidget.border"],
+          "background-color": getColors().colors["inlineChat.background"],
+          "border-color": getColors().colors["inlineChat.border"],
         }}
       >
-        <Heading size="xl">{formConfiguration()?.title || props.title}</Heading>
+        <div
+          class="px-2 py-2 rounded-md rounded-b-none border-b"
+          style={{
+            "border-color": getColors().colors["editorWidget.border"],
+          }}
+        >
+          <Heading size="xl">
+            {formConfiguration()?.title || props.title}
+          </Heading>
 
-        <p style={{ color: getColors().colors["editor.foreground"] }}>
-          {formConfiguration()?.description}
-        </p>
+          <p style={{ color: getColors().colors["editor.foreground"] }}>
+            {formConfiguration()?.description}
+          </p>
+        </div>
+
+        <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
+          <Inner />
+        </div>
       </div>
-
-      <div class="px-2 pt-2 pb-3 rounded-md rounded-t-none">
-        <For each={formConfiguration()?.fields}>
-          {(field) => (
-            <>
-              <FormField
-                {...field}
-                onChange={handleChange}
-                value={formDataHashMap()[field.name]}
-              />
-              <div class="mt-4" />
-            </>
-          )}
-        </For>
-
-        {!!props.submitButton ? (
-          props.submitButton
-        ) : (
-          <Button
-            label={props.submitButtomLabel || "Save"}
-            onClick={props.handleSubmit || handleSubmit}
-          />
-        )}
-      </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default Form;

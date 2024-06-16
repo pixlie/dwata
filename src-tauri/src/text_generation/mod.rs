@@ -1,8 +1,6 @@
 use log::{error, info};
 use reqwest::RequestBuilder;
-
 use openai::types::{chat_completion_message_tool_call::Type, CreateChatCompletionResponse};
-
 use crate::{
     ai_integration::{
         AIIntegration,
@@ -12,14 +10,11 @@ use crate::{
     chat::ChatToolResponse,
     error::DwataError,
 };
-use crate::ai_integration::models::OllamaModel;
 use crate::ai_integration::providers::ollama::{
     OllamaTextGenerationRequest, OllamaTextGenerationResponse,
 };
-
 pub mod commands;
 pub mod helpers;
-
 pub enum TextGenerationResponse {
     Message(String),
     Tool(Vec<ChatToolResponse>),

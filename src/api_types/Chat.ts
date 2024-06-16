@@ -3,7 +3,7 @@ import type { Role } from "./Role";
 
 export interface Chat {
   id: number;
-  rootChatId: bigint | null;
+  rootChatId: number;
   role: Role | null;
   message: string | null;
   toolResponse: Vec<ChatToolResponse>;

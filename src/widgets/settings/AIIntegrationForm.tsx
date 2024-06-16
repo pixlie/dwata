@@ -51,8 +51,9 @@ const AIIntegrationForm: Component = () => {
               pricing
             </a>
           </li>
+
           <li class="ml-8">
-            <span class="font-bold">Groq</span>{" "}
+            <span class="font-bold">Groq</span>:{" "}
             <a
               href="https://console.groq.com/keys"
               target="_blank"
@@ -68,6 +69,11 @@ const AIIntegrationForm: Component = () => {
             >
               pricing
             </a>
+          </li>
+
+          <li class="ml-8">
+            <span class="font-bold">Ollama</span>: localhost only for now, API
+            keys not needed
           </li>
         </ul>
       </div>
