@@ -1,4 +1,4 @@
-use super::{Chat, ChatCreateUpdate, ChatFilters};
+use super::{Chat, ChatCreateUpdate, ChatFilters, Role};
 use crate::{
     content::content::{Content, ContentType},
     error::DwataError,
@@ -47,6 +47,11 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
         // if let Some(x)= &self.requested_content_format {
         //     name_values.push_name_value("requested_content_format", )
         // }
+        if let Some(x) = &self.role {
+            names_values.push_name_value("role", InputValue::Text(x.clone()));
+        } else {
+            names_values.push_name_value("role", InputValue::Text(Role::User.to_string()));
+        }
         names_values.push_name_value("is_system_chat", InputValue::Bool(false));
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         names_values

@@ -1,18 +1,18 @@
-use std::str::FromStr;
-
 use chrono::{DateTime, Utc};
+use std::str::FromStr;
 // use crate::chat::api_types::APIChatContextNode;
+use crate::error::DwataError;
 use chrono::serde::ts_milliseconds;
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow, Type};
+use sqlx::{types::Json, FromRow, SqliteConnection, Type};
 use ts_rs::TS;
-
-use crate::error::DwataError;
 
 pub mod configuration;
 pub mod crud;
 
-#[derive(Serialize, Type, TS)]
+#[derive(Deserialize, Serialize, Type, TS)]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
 #[ts(export, export_to = "../src/api_types/")]
 pub enum Role {
     User,
@@ -29,6 +29,16 @@ impl FromStr for Role {
             "assistant" => Ok(Role::Assistant),
             "system" => Ok(Role::System),
             _ => Err(DwataError::InvalidChatRole),
+        }
+    }
+}
+
+impl ToString for Role {
+    fn to_string(&self) -> String {
+        match self {
+            Role::User => "user".to_string(),
+            Role::Assistant => "assistant".to_string(),
+            Role::System => "system".to_string(),
         }
     }
 }

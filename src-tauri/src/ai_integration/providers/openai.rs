@@ -2,6 +2,8 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::text_generation::TextGenerationRequest;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Usage {
     pub(crate) prompt_tokens: i64,
@@ -54,16 +56,10 @@ pub(crate) struct LogProb {
     pub(crate) content: Option<Vec<LogProbContent>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct ChatRequestMessage {
-    pub(crate) role: String,
-    pub(crate) content: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 pub(crate) struct OpenAIChatRequest {
     pub(crate) model: String,
-    pub(crate) messages: Vec<ChatRequestMessage>,
+    pub(crate) messages: Vec<TextGenerationRequest>,
     pub(crate) tools: Vec<OpenAITool>,
 }
 

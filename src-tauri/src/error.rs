@@ -34,9 +34,12 @@ pub enum DwataError {
     CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
     FeatureNotAvailableWithAIProvider,
-    ChatDoesNotHaveMessage,
-    ChatDoesNotHaveAIModel,
-    ChatHasBeenProcessedByAI,
+
+    // Chat and its processing related
+    ChatHasNoMessage,
+    NoRequestedAIModel,
+    AlreadyProcessedByAI,
+    ChatHasNoRootId,
 
     // Integrated vector DB
     CouldNotConnectToVectorDB,
