@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { DatabaseSourceCreateUpdate } from "../../api_types/DatabaseSourceCreateUpdate";
 import withConfiguredForm from "../../utils/configuredForm";
 import { Module } from "../../api_types/Module";
-import Form from "../interactable/Form";
+import Form from "../interactable/ConfiguredForm";
 
 const DatabaseSourceForm: Component = () => {
   const configuredForm = withConfiguredForm<DatabaseSourceCreateUpdate>({
@@ -20,7 +20,12 @@ const DatabaseSourceForm: Component = () => {
   });
   return (
     <div class="max-w-screen-sm">
-      <Form configuredForm={configuredForm} />
+      <Form
+        formConfiguration={configuredForm.formConfiguration}
+        formData={configuredForm.formData}
+        handleChange={configuredForm.handleChange}
+        handleSubmit={configuredForm.handleSubmit}
+      />
     </div>
   );
 };

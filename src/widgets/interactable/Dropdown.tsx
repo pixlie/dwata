@@ -37,7 +37,6 @@ const Dropdown: Component<IFormField> = (props) => {
   };
 
   createComputed(async () => {
-    console.log(props.contentSpec);
     if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
       setChoices(props.contentSpec.choices);
     } else if (
@@ -45,7 +44,6 @@ const Dropdown: Component<IFormField> = (props) => {
       !!props.contentSpec.choicesFromFunction
     ) {
       const response = await invoke(props.contentSpec.choicesFromFunction);
-      console.log(response);
 
       if (response) {
         setChoices(response as Array<[string, string]>);

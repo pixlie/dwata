@@ -1,45 +1,52 @@
-import { Component, For, JSX } from "solid-js";
+import { Accessor, Component, For, JSX } from "solid-js";
 import Heading from "../typography/Heading";
 import Button from "./Button";
 import FormField from "./FormField";
 import { useUserInterface } from "../../stores/userInterface";
-import { TConfiguredForm } from "../../utils/configuredForm";
+import { Configuration } from "../../api_types/Configuration";
+import { IFormFieldValue } from "../../utils/types";
 
 interface IPropTypes {
-  configuredForm: TConfiguredForm;
+  formConfiguration: Accessor<Configuration>;
+  formData: Accessor<{ [key: string]: IFormFieldValue }>;
+  handleChange: (name: string, value: IFormFieldValue) => void;
+  handleSubmit: () => Promise<void>;
   title?: string;
   submitButtomLabel?: string;
   submitButton?: JSX.Element;
   showPrelude?: boolean;
-  handleSubmit?: () => {};
 }
 
 const Form: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
-  const { handleChange, formConfiguration, formDataHashMap, handleSubmit } =
-    props.configuredForm;
 
   const Inner = () => (
     <>
-      <For each={formConfiguration()?.fields}>
-        {(field) => (
-          <>
-            <FormField
-              {...field}
-              onChange={handleChange}
-              value={formDataHashMap()[field.name]}
-            />
-            <div class="mt-4" />
-          </>
-        )}
-      </For>
+      {!!props.formConfiguration && (
+        <For each={props.formConfiguration()?.fields}>
+          {(field) => (
+            <>
+              <FormField
+                {...field}
+                onChange={props.handleChange}
+                value={
+                  !!props.formData && field.name in props.formData()
+                    ? props.formData()[field.name]
+                    : undefined
+                }
+              />
+              <div class="mt-4" />
+            </>
+          )}
+        </For>
+      )}
 
       {!!props.submitButton ? (
         props.submitButton
       ) : (
         <Button
           label={props.submitButtomLabel || "Save"}
-          onClick={props.handleSubmit || handleSubmit}
+          onClick={props.handleSubmit}
         />
       )}
     </>
@@ -63,11 +70,11 @@ const Form: Component<IPropTypes> = (props) => {
           }}
         >
           <Heading size="xl">
-            {formConfiguration()?.title || props.title}
+            {props.formConfiguration()?.title || props.title}
           </Heading>
 
           <p style={{ color: getColors().colors["editor.foreground"] }}>
-            {formConfiguration()?.description}
+            {props.formConfiguration()?.description}
           </p>
         </div>
 

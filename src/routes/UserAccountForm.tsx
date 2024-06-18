@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import Form from "../widgets/interactable/Form";
+import Form from "../widgets/interactable/ConfiguredForm";
 import { invoke } from "@tauri-apps/api/core";
 import { useNavigate } from "@solidjs/router";
 import { Module } from "../api_types/Module";
@@ -37,7 +37,9 @@ const UserAccountForm: Component = () => {
   return (
     <div class="max-w-screen-sm">
       <Form
-        configuredForm={configuredForm}
+        formConfiguration={configuredForm.formConfiguration}
+        formData={configuredForm.formData}
+        handleChange={configuredForm.handleChange}
         title="My account"
         submitButtomLabel="Save"
         handleSubmit={handleSubmit}

@@ -12,7 +12,7 @@ const ReplyItem: Component<IPropTypes> = (props) => {
 
   return (
     <div
-      class="p-3 rounded-md border overflow-x-scroll"
+      class="p-3 rounded-md border overflow-x-scroll mb-4"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],

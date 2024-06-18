@@ -3,7 +3,7 @@ import { useUserInterface } from "../../stores/userInterface";
 import withConfiguredForm from "../../utils/configuredForm";
 import { Module } from "../../api_types/Module";
 import { useParams } from "@solidjs/router";
-import Form from "../interactable/Form";
+import Form from "../interactable/ConfiguredForm";
 import { AIIntegrationCreateUpdate } from "../../api_types/AIIntegrationCreateUpdate";
 
 const AIIntegrationForm: Component = () => {
@@ -79,7 +79,12 @@ const AIIntegrationForm: Component = () => {
       </div>
 
       <div class="max-w-screen-sm">
-        <Form configuredForm={configuredForm} />
+        <Form
+          formConfiguration={configuredForm.formConfiguration}
+          formData={configuredForm.formData}
+          handleChange={configuredForm.handleChange}
+          handleSubmit={configuredForm.handleSubmit}
+        />
       </div>
     </>
   );

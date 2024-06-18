@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onMount } from "solid-js";
+import { createComputed, createEffect, createSignal } from "solid-js";
 import { Module } from "../api_types/Module";
 import { Configuration } from "../api_types/Configuration";
 import { invoke } from "@tauri-apps/api/core";
@@ -22,12 +22,13 @@ interface IConfiguredFormProps<T> {
   initiateNextTask?: boolean;
 }
 
-const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
-  const [formConfiguration, setFormConfiguration] =
-    createSignal<Configuration>();
-  const [formData, setFormData] = createSignal<T>(
-    (options.initialData as T) || ({} as T),
+const withConfiguredForm = <T extends { [key: string]: IFormFieldValue }>(
+  options: IConfiguredFormProps<T>,
+) => {
+  const [formConfiguration, setFormConfiguration] = createSignal<Configuration>(
+    {} as Configuration,
   );
+  const [formData, setFormData] = createSignal<T>({} as T);
   const [dirty, setDirty] = createSignal<Array<string>>([]);
   const navigate = useNavigate();
   // const [formState, setFormState] = createSignal<IFormState>({
@@ -36,12 +37,18 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
   //   isFetchingInitial: false,
   // })
 
-  onMount(async () => {
+  createEffect((previousValuData) => {
+    if (previousValuData !== options.initialData) {
+      setFormData((state) => ({ ...state, ...options.initialData }));
+    }
+  }, {} as T);
+
+  createComputed(async () => {
     const response = await invoke("get_module_configuration", {
       module: options.module,
     });
     setFormConfiguration(response as Configuration);
-    console.info("Form configuration:", response);
+    // console.info("Form configuration:", response);
 
     if (options.existingItemId) {
       let result: ModuleDataRead = await invoke("read_module_item_by_pk", {
@@ -62,15 +69,6 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
     }
   });
 
-  const formDataHashMap = createMemo(() => {
-    return !!formData()
-      ? Object.entries(formData()).reduce(
-          (acc, [key, value]) => ({ ...acc, [key as string]: value }),
-          {},
-        )
-      : {};
-  });
-
   const handleChange = (name: string, value: IFormFieldValue) => {
     setFormData((state) => ({
       ...state,
@@ -81,10 +79,10 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
 
   const handleSubmit = async () => {
     if (!!options.existingItemId) {
-      console.info(
-        `Submitting form data to update module ${options.module}, item ID ${options.existingItemId}`,
-        formData(),
-      );
+      // console.info(
+      //   `Submitting form data to update module ${options.module}, item ID ${options.existingItemId}`,
+      //   formData(),
+      // );
       const response = await invoke<InsertUpdateResponse>(
         "update_module_item",
         {
@@ -101,10 +99,10 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
         navigate(options.postSaveNavigateTo);
       }
     } else {
-      console.info(
-        `Submitting form data to insert into module: ${options.module}`,
-        formData(),
-      );
+      // console.info(
+      //   `Submitting form data to insert into module: ${options.module}`,
+      //   formData(),
+      // );
       const response = await invoke<InsertUpdateResponse>(
         "insert_module_item",
         {
@@ -135,10 +133,9 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
   };
 
   return {
-    handleChange,
-    formData,
     formConfiguration,
-    formDataHashMap,
+    formData,
+    handleChange,
     handleSubmit,
   } as const;
 };
