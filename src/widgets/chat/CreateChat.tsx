@@ -16,7 +16,9 @@ const ChatForm: Component = () => {
         rootChatId: !!params.threadId ? parseInt(params.threadId) : undefined,
         // requestedContentFormat: "Text" as ContentFormat,
       },
-      postSaveNavigateTo: "/chat",
+      postSaveNavigateTo: !!params.threadId
+        ? `/chat/thread/${params.threadId}`
+        : "/chat",
     });
   });
 

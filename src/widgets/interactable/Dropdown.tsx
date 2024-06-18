@@ -53,22 +53,28 @@ const Dropdown: Component<IFormField> = (props) => {
   });
 
   return (
-    <select
-      onChange={handleChange}
-      class={classes}
-      style={{
-        "border-color": getColors().colors["input.border"],
-        color: getColors().colors["input.background"],
-      }}
-    >
-      <For each={choices()}>
-        {(choice) => (
-          <option class="bg-white" value={choice[0]}>
-            {choice[1]}
-          </option>
-        )}
-      </For>
-      {/* {!!props.choicesWithHeadings ? (
+    <>
+      {!!props.label && (
+        <label class="block text-sm font-medium leading-6 text-gray-100 mb-2">
+          {props.label}
+        </label>
+      )}
+      <select
+        onChange={handleChange}
+        class={classes}
+        style={{
+          "border-color": getColors().colors["input.border"],
+          color: getColors().colors["input.background"],
+        }}
+      >
+        <For each={choices()}>
+          {(choice) => (
+            <option class="bg-white" value={choice[0]}>
+              {choice[1]}
+            </option>
+          )}
+        </For>
+        {/* {!!props.choicesWithHeadings ? (
         <For each={props.choicesWithHeadings}>
           {(heading) => (
             <>
@@ -87,7 +93,8 @@ const Dropdown: Component<IFormField> = (props) => {
         </For>
       ) : (
       )} */}
-    </select>
+      </select>
+    </>
   );
 };
 

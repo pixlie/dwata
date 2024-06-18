@@ -33,9 +33,10 @@ const ReplyItem: Component<IPropTypes> = (props) => {
           <div class="flex">
             <div class="grow" />
             <div
-              class="text-xs my-1 px-1"
+              class="text-sm mt-2 px-1 rounded font-thin"
               style={{
-                "background-color": getColors().colors["editor.background"],
+                "background-color": getColors().colors["editor.foreground"],
+                color: getColors().colors["editor.background"],
               }}
             >
               Model: {props.requestedAiModel}

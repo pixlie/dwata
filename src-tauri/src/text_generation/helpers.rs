@@ -77,7 +77,7 @@ pub async fn generate_text_for_chat(
     match reply_from_ai {
         TextGenerationResponse::Message(message) => {
             let new_chat = ChatCreateUpdate {
-                root_chat_id: Some(chat_id),
+                root_chat_id: Some(root_chat.id),
                 message: Some(message),
                 role: Some(Role::Assistant.to_string()),
                 ..ChatCreateUpdate::default()
@@ -86,7 +86,7 @@ pub async fn generate_text_for_chat(
         }
         TextGenerationResponse::Tool(tool_response) => {
             let new_chat = ChatCreateUpdate {
-                root_chat_id: Some(chat_id),
+                root_chat_id: Some(root_chat.id),
                 tool_response: Some(tool_response),
                 role: Some(Role::Assistant.to_string()),
                 ..ChatCreateUpdate::default()
