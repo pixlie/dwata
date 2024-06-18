@@ -21,24 +21,23 @@ pub async fn generate_text_for_chat(
     chat_id: i64,
     db_connection: &mut SqliteConnection,
 ) -> Result<InsertUpdateResponse, DwataError> {
-    let chat = Chat::read_one_by_pk(chat_id, db_connection).await?;
-    if chat.message.is_none() {
+    let mut root_chat = Chat::read_one_by_pk(chat_id, db_connection).await?;
+    if root_chat.message.is_none() {
         return Err(DwataError::ChatHasNoMessage);
     }
-    if chat.requested_ai_model.is_none() {
+    if root_chat.requested_ai_model.is_none() {
         return Err(DwataError::NoRequestedAIModel);
     }
-    if chat.is_processed_by_ai.is_some_and(|x| x) {
+    if root_chat.is_processed_by_ai.is_some_and(|x| x) {
         return Err(DwataError::AlreadyProcessedByAI);
     }
-    let model = AIModel::from_string(chat.requested_ai_model.unwrap()).await?;
+    let model = AIModel::from_string(root_chat.requested_ai_model.unwrap()).await?;
     let ai_integration = model.get_integration(db_connection).await?;
 
-    // Get the root chat of this thread
-    if chat.root_chat_id.is_none() {
-        return Err(DwataError::ChatHasNoRootId);
+    // Get the root chat of this thread (the first chat in the thread)
+    if root_chat.root_chat_id.is_some() {
+        root_chat = Chat::read_one_by_pk(root_chat.root_chat_id.unwrap(), db_connection).await?;
     }
-    let root_chat = Chat::read_one_by_pk(chat.root_chat_id.unwrap(), db_connection).await?;
 
     // Get all the chats in this thread
     let chats = Chat::read_with_filter(
@@ -73,7 +72,7 @@ pub async fn generate_text_for_chat(
         ..ChatCreateUpdate::default()
     };
     existing_chat
-        .update_module_data(chat.id, db_connection)
+        .update_module_data(root_chat.id, db_connection)
         .await?;
     match reply_from_ai {
         TextGenerationResponse::Message(message) => {

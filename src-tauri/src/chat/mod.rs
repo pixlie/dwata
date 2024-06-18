@@ -4,7 +4,7 @@ use std::str::FromStr;
 use crate::error::DwataError;
 use chrono::serde::ts_milliseconds;
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow, SqliteConnection, Type};
+use sqlx::{types::Json, FromRow, Type};
 use ts_rs::TS;
 
 pub mod configuration;
