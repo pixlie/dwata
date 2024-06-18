@@ -3,10 +3,8 @@ import Thread from "../widgets/chat/Thread";
 import { Route, RouteSectionProps, useParams } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
 import { ChatProvider, useChat } from "../stores/chatThread";
-import CreateChat from "../widgets/chat/CreateChat";
+import ChatForm from "../widgets/chat/CreateChat";
 import ReplyItem from "../widgets/chat/ReplyItem";
-import Button from "../widgets/interactable/Button";
-import { invoke } from "@tauri-apps/api/core";
 
 const ChatThreadIndex: Component = () => {
   const [chat, { fetchChats, fetchChatReplies }] = useChat();
@@ -22,14 +20,6 @@ const ChatThreadIndex: Component = () => {
       await fetchChatReplies(threadId);
     }
   });
-
-  const handleResendChatsToAI = () => {
-    // We invoke the Tauri API to resend chats in this thread to AI models
-    // We send only the first chat (which was initiated by the user)
-    invoke("chat_with_ai", {
-      chatId: chat.chatList.find((x) => x.id === parseInt(params.threadId))?.id,
-    });
-  };
 
   const getRootChat = createMemo(() =>
     chat.chatList.find((x) => x.id === parseInt(params.threadId)),
@@ -47,20 +37,11 @@ const ChatThreadIndex: Component = () => {
           <>
             <ReplyItem {...getRootChat()!} showModel />
 
-            <div class="my-4 flex">
-              <div class="grow" />
-              <Button
-                onClick={handleResendChatsToAI}
-                label="Resend chat to AI"
-                size="sm"
-              />
-            </div>
-
             <For each={chat.chatReplyList[parseInt(params.threadId)]}>
               {(reply) => <ReplyItem {...reply} />}
             </For>
 
-            <CreateChat />
+            <ChatForm />
           </>
         ) : null}
       </div>
@@ -76,7 +57,7 @@ const ChatRoutes: Component = () => {
   return (
     <ChatProvider>
       <Route path="/thread/:threadId" component={ChatThreadIndex} />
-      <Route path="/start" component={CreateChat} />
+      <Route path="/start" component={ChatForm} />
 
       <Route path="/" component={ChatThreadIndex} />
     </ChatProvider>

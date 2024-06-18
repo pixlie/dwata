@@ -7,7 +7,7 @@ impl Configurable for Chat {
     fn get_schema() -> Configuration {
         Configuration::new(
             "Chat with AI",
-            "Chat with AI models (or other users), sharing your objectives and let AI help you find solutions",
+            "Chat with AI models, sharing your objectives and let AI help you find solutions",
             vec![
                 FormField::new(
                     "message",

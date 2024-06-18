@@ -294,6 +294,11 @@ pub trait CRUDCreateUpdate {
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
             Ok(result) => {
+                info!(
+                    "Inserted into Dwata DB, table {}:\nSQL: {}",
+                    Self::table_name(),
+                    sql
+                );
                 self.post_insert(
                     InsertUpdateResponse {
                         pk: result.last_insert_rowid(),
@@ -364,11 +369,18 @@ pub trait CRUDCreateUpdate {
         let executable = builder.build();
         let sql = &executable.sql();
         match executable.execute(&mut *db_connection).await {
-            Ok(_) => Ok(InsertUpdateResponse {
-                pk,
-                next_task: None,
-                arguments: None,
-            }),
+            Ok(_) => {
+                info!(
+                    "Updated Dwata DB, table {}:\nSQL: {}",
+                    Self::table_name(),
+                    sql
+                );
+                Ok(InsertUpdateResponse {
+                    pk,
+                    next_task: None,
+                    arguments: None,
+                })
+            }
             Err(err) => {
                 error!(
                     "Could not update Dwata DB, table {}:\nSQL: {}\nError: {}",

@@ -6,6 +6,16 @@ use crate::workspace::crud::InsertUpdateResponse;
 use crate::workspace::DwataDb;
 use tauri::State;
 
+/// Tauri command to generate response for a chat thread.
+///
+/// # Arguments
+///
+/// * `root_chat_id` - The ID of the root chat of this thread to generate text for.
+/// * `db` - The Dwata database connection.
+///
+/// # Returns
+///
+/// * `Result<InsertUpdateResponse, DwataError>` - The response from the AI model.
 #[tauri::command]
 pub async fn chat_with_ai(
     chat_id: i64,

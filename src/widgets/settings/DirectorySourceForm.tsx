@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { useParams } from "@solidjs/router";
-import Form from "../interactable/Form";
+import Form from "../interactable/ConfiguredForm";
 import { Module } from "../../api_types/Module";
 import withConfiguredForm from "../../utils/configuredForm";
 import { DirectorySourceCreateUpdate } from "../../api_types/DirectorySourceCreateUpdate";
@@ -22,7 +22,12 @@ const DirectorySourceForm: Component = () => {
 
   return (
     <div class="max-w-screen-sm">
-      <Form configuredForm={configuredForm} />
+      <Form
+        formConfiguration={configuredForm.formConfiguration}
+        formData={configuredForm.formData}
+        handleChange={configuredForm.handleChange}
+        handleSubmit={configuredForm.handleSubmit}
+      />
     </div>
   );
 };

@@ -1,3 +1,5 @@
+use chrono::Utc;
+
 use super::{UserAccount, UserAccountCreateUpdate};
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
 
@@ -23,6 +25,7 @@ impl CRUDCreateUpdate for UserAccountCreateUpdate {
         if let Some(x) = &self.email {
             names_values.push_name_value("email", InputValue::Text(x.clone()));
         }
+        names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         names_values
     }
 }

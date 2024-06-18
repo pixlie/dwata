@@ -3,7 +3,7 @@ import { useUserInterface } from "../../stores/userInterface";
 import withConfiguredForm from "../../utils/configuredForm";
 import { Module } from "../../api_types/Module";
 import { useParams } from "@solidjs/router";
-import Form from "../interactable/Form";
+import Form from "../interactable/ConfiguredForm";
 import { AIIntegrationCreateUpdate } from "../../api_types/AIIntegrationCreateUpdate";
 
 const AIIntegrationForm: Component = () => {
@@ -51,8 +51,9 @@ const AIIntegrationForm: Component = () => {
               pricing
             </a>
           </li>
+
           <li class="ml-8">
-            <span class="font-bold">Groq</span>{" "}
+            <span class="font-bold">Groq</span>:{" "}
             <a
               href="https://console.groq.com/keys"
               target="_blank"
@@ -69,11 +70,21 @@ const AIIntegrationForm: Component = () => {
               pricing
             </a>
           </li>
+
+          <li class="ml-8">
+            <span class="font-bold">Ollama</span>: localhost only for now, API
+            keys not needed
+          </li>
         </ul>
       </div>
 
       <div class="max-w-screen-sm">
-        <Form configuredForm={configuredForm} />
+        <Form
+          formConfiguration={configuredForm.formConfiguration}
+          formData={configuredForm.formData}
+          handleChange={configuredForm.handleChange}
+          handleSubmit={configuredForm.handleSubmit}
+        />
       </div>
     </>
   );

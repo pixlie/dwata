@@ -1,11 +1,11 @@
-import { Component, createMemo } from "solid-js";
+import { Component, JSX, createMemo } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
   label: string;
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
-  onClick?: () => void;
+  onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
   href?: string;
 }
 

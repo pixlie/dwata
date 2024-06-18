@@ -1,4 +1,4 @@
-use super::{Chat, ChatCreateUpdate, ChatFilters};
+use super::{Chat, ChatCreateUpdate, ChatFilters, Role};
 use crate::{
     content::content::{Content, ContentType},
     error::DwataError,
@@ -31,25 +31,30 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
     }
 
     fn get_column_names_values(&self) -> VecColumnNameValue {
-        let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
+        let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.role {
-            name_values.push_name_value("role", InputValue::Text(x.clone()));
+            names_values.push_name_value("role", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.root_chat_id {
-            name_values.push_name_value("root_chat_id", InputValue::ID(*x));
+            names_values.push_name_value("root_chat_id", InputValue::ID(*x));
         }
         if let Some(x) = &self.message {
-            name_values.push_name_value("message", InputValue::Text(x.clone()));
+            names_values.push_name_value("message", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.requested_ai_model {
-            name_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
+            names_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
         }
         // if let Some(x)= &self.requested_content_format {
         //     name_values.push_name_value("requested_content_format", )
         // }
-        name_values.push_name_value("is_system_chat", InputValue::Bool(false));
-        name_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        name_values
+        if let Some(x) = &self.role {
+            names_values.push_name_value("role", InputValue::Text(x.clone()));
+        } else {
+            names_values.push_name_value("role", InputValue::Text(Role::User.to_string()));
+        }
+        names_values.push_name_value("is_system_chat", InputValue::Bool(false));
+        names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
+        names_values
     }
 
     async fn post_insert(

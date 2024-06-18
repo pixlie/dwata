@@ -1,11 +1,10 @@
+use crate::text_generation::TextGenerationRequest;
 use serde::{Deserialize, Serialize};
-
-use super::openai::ChatRequestMessage;
 
 #[derive(Serialize)]
 pub struct OllamaTextGenerationRequest {
     pub model: String,
-    pub messages: Vec<ChatRequestMessage>,
+    pub messages: Vec<TextGenerationRequest>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
 }
@@ -30,7 +29,7 @@ pub struct OllamaTextGenerationRequest {
 pub struct OllamaTextGenerationResponse {
     pub model: String,
     pub created_at: String,
-    pub message: ChatRequestMessage,
+    pub message: TextGenerationRequest,
     pub done: bool,
     pub total_duration: u64,
     pub load_duration: u64,

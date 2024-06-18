@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import SidebarHeading from "./SidebarHeading";
-import SourceList from "../source/SourceList";
+// import SourceList from "../source/SourceList";
 import { useUserInterface } from "../../stores/userInterface";
 import Button from "../interactable/Button";
 
@@ -34,7 +34,7 @@ const Sidebar: Component = () => {
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}
       />
-      <SourceList />
+      {/* <SourceList /> */}
       <div class="flex-grow" />
       {/* <div
         class="mt-4 border-b"

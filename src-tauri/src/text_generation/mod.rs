@@ -1,28 +1,29 @@
-use log::{error, info};
-use reqwest::RequestBuilder;
-
-use openai::types::{chat_completion_message_tool_call::Type, CreateChatCompletionResponse};
-
+use crate::ai_integration::providers::ollama::{
+    OllamaTextGenerationRequest, OllamaTextGenerationResponse,
+};
+use crate::chat::Role;
 use crate::{
     ai_integration::{
-        AIIntegration,
-        AIProvider,
-        models::AIModel, providers::openai::{ChatRequestMessage, OpenAIChatRequest},
+        models::AIModel, providers::openai::OpenAIChatRequest, AIIntegration, AIProvider,
     },
     chat::ChatToolResponse,
     error::DwataError,
 };
-use crate::ai_integration::models::OllamaModel;
-use crate::ai_integration::providers::ollama::{
-    OllamaTextGenerationRequest, OllamaTextGenerationResponse,
-};
-
+use log::{error, info};
+use openai::types::{chat_completion_message_tool_call::Type, CreateChatCompletionResponse};
+use reqwest::RequestBuilder;
+use serde::{Deserialize, Serialize};
 pub mod commands;
 pub mod helpers;
-
 pub enum TextGenerationResponse {
     Message(String),
     Tool(Vec<ChatToolResponse>),
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TextGenerationRequest {
+    pub role: Role,
+    pub content: String,
 }
 
 impl AIIntegration {
@@ -41,7 +42,7 @@ impl AIIntegration {
     pub fn build_text_generation_https_request(
         &self,
         ai_model: AIModel,
-        message_to_send: String,
+        messages_to_send: Vec<TextGenerationRequest>,
     ) -> Result<RequestBuilder, DwataError> {
         let chat_url = self.get_text_generation_url()?;
         let https_client = reqwest::Client::new();
@@ -49,10 +50,7 @@ impl AIIntegration {
             AIProvider::OpenAI | AIProvider::Groq => {
                 let payload: OpenAIChatRequest = OpenAIChatRequest {
                     model: ai_model.api_name,
-                    messages: vec![ChatRequestMessage {
-                        role: "user".to_string(),
-                        content: message_to_send,
-                    }],
+                    messages: messages_to_send,
                     tools: vec![],
                 };
                 let request_builder: RequestBuilder = https_client
@@ -68,10 +66,7 @@ impl AIIntegration {
             AIProvider::Ollama => {
                 let payload: OllamaTextGenerationRequest = OllamaTextGenerationRequest {
                     model: ai_model.api_name,
-                    messages: vec![ChatRequestMessage {
-                        role: "user".to_string(),
-                        content: message_to_send,
-                    }],
+                    messages: messages_to_send,
                     stream: Some(false),
                 };
                 let request_builder: RequestBuilder = https_client.post(chat_url).json(&payload);
@@ -87,27 +82,20 @@ impl AIIntegration {
     pub async fn generate_text_with_ai(
         &self,
         ai_model: AIModel,
-        message_to_send: String,
+        messages_to_send: Vec<TextGenerationRequest>,
     ) -> Result<TextGenerationResponse, DwataError> {
         match self.ai_provider {
             AIProvider::OpenAI => {
-                self.generate_text_with_ai_openai_compatible(ai_model, message_to_send)
+                self.generate_text_with_ai_openai_compatible(ai_model, messages_to_send)
                     .await
             }
             AIProvider::Groq => {
-                self.generate_text_with_ai_openai_compatible(ai_model, message_to_send)
+                self.generate_text_with_ai_openai_compatible(ai_model, messages_to_send)
                     .await
             }
             AIProvider::Ollama => {
-                self.generate_text_with_ai_ollama(ai_model, message_to_send)
+                self.generate_text_with_ai_ollama(ai_model, messages_to_send)
                     .await
-            }
-            _ => {
-                error!(
-                    "AI Provider {} does not support text generation",
-                    self.ai_provider.to_string()
-                );
-                Err(DwataError::FeatureNotAvailableWithAIProvider)
             } // AIProvider::Anthropic => self.generate_text_with_ai_anthropic(ai_model, message_to_send).await,
               // AIProvider::MistralAI => self.generate_text_with_ai_mistral(ai_model, message_to_send).await,
         }
@@ -119,10 +107,10 @@ impl AIIntegration {
     pub async fn generate_text_with_ai_openai_compatible(
         &self,
         ai_model: AIModel,
-        message_to_send: String,
+        messages_to_send: Vec<TextGenerationRequest>,
         // tool_list: Vec<Tool>,
     ) -> Result<TextGenerationResponse, DwataError> {
-        let request = self.build_text_generation_https_request(ai_model, message_to_send)?; //, tool_list);
+        let request = self.build_text_generation_https_request(ai_model, messages_to_send)?; //, tool_list);
         let response = request.send().await;
         match response {
             Ok(response) => {
@@ -184,9 +172,9 @@ impl AIIntegration {
     pub async fn generate_text_with_ai_ollama(
         &self,
         ai_model: AIModel,
-        message_to_send: String,
+        messages_to_send: Vec<TextGenerationRequest>,
     ) -> Result<TextGenerationResponse, DwataError> {
-        let request = self.build_text_generation_https_request(ai_model, message_to_send)?; //, tool_list);
+        let request = self.build_text_generation_https_request(ai_model, messages_to_send)?; //, tool_list);
         let response = request.send().await;
         match response {
             Ok(response) => {

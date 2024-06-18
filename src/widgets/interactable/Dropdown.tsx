@@ -27,7 +27,7 @@ const Dropdown: Component<IFormField> = (props) => {
 
   const classes =
     getSizeClass() +
-    " rounded-md border hover:shadow-lg " +
+    " rounded-md border " +
     `${props.displayBlock && "w-full"}`;
 
   const handleChange: JSX.EventHandler<HTMLSelectElement, Event> = (event) => {
@@ -37,7 +37,6 @@ const Dropdown: Component<IFormField> = (props) => {
   };
 
   createComputed(async () => {
-    console.log(props.contentSpec);
     if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
       setChoices(props.contentSpec.choices);
     } else if (
@@ -45,7 +44,6 @@ const Dropdown: Component<IFormField> = (props) => {
       !!props.contentSpec.choicesFromFunction
     ) {
       const response = await invoke(props.contentSpec.choicesFromFunction);
-      console.log(response);
 
       if (response) {
         setChoices(response as Array<[string, string]>);
@@ -55,19 +53,28 @@ const Dropdown: Component<IFormField> = (props) => {
   });
 
   return (
-    <select
-      onChange={handleChange}
-      class={classes}
-      style={{
-        "background-color": getColors().colors["input.background"],
-        "border-color": getColors().colors["input.border"],
-        color: getColors().colors["input.foreground"],
-      }}
-    >
-      <For each={choices()}>
-        {(choice) => <option value={choice[0]}>{choice[1]}</option>}
-      </For>
-      {/* {!!props.choicesWithHeadings ? (
+    <>
+      {!!props.label && (
+        <label class="block text-sm font-medium leading-6 text-gray-100 mb-2">
+          {props.label}
+        </label>
+      )}
+      <select
+        onChange={handleChange}
+        class={classes}
+        style={{
+          "border-color": getColors().colors["input.border"],
+          color: getColors().colors["input.background"],
+        }}
+      >
+        <For each={choices()}>
+          {(choice) => (
+            <option class="bg-white" value={choice[0]}>
+              {choice[1]}
+            </option>
+          )}
+        </For>
+        {/* {!!props.choicesWithHeadings ? (
         <For each={props.choicesWithHeadings}>
           {(heading) => (
             <>
@@ -86,7 +93,8 @@ const Dropdown: Component<IFormField> = (props) => {
         </For>
       ) : (
       )} */}
-    </select>
+      </select>
+    </>
   );
 };
 

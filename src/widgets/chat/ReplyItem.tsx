@@ -12,7 +12,7 @@ const ReplyItem: Component<IPropTypes> = (props) => {
 
   return (
     <div
-      class="p-3 rounded-md border overflow-x-scroll"
+      class="p-3 rounded-md border overflow-x-scroll mb-4"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
@@ -33,9 +33,10 @@ const ReplyItem: Component<IPropTypes> = (props) => {
           <div class="flex">
             <div class="grow" />
             <div
-              class="text-xs my-1 px-1"
+              class="text-sm mt-2 px-1 rounded font-thin"
               style={{
-                "background-color": getColors().colors["editor.background"],
+                "background-color": getColors().colors["editor.foreground"],
+                color: getColors().colors["editor.background"],
               }}
             >
               Model: {props.requestedAiModel}
