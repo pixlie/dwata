@@ -11,9 +11,19 @@ const Thread: Component<Chat> = (props) => {
     navigate(`/chat/thread/${props.id}`);
   };
 
+  const message = () => {
+    if (!!props.message) {
+      return props.message.length > 150
+        ? props.message.slice(0, 150) + "..."
+        : props.message;
+    } else {
+      return "";
+    }
+  };
+
   return (
     <div
-      class="my-3 p-3 py-4 rounded-md cursor-pointer border font-normal"
+      class="my-3 p-3 rounded-md cursor-pointer border text-lg overflow-hidden text-ellipsis"
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
@@ -23,7 +33,7 @@ const Thread: Component<Chat> = (props) => {
       }}
       onClick={handleClick}
     >
-      {props.message}
+      {message()}
     </div>
   );
 };

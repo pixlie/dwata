@@ -38,7 +38,7 @@ const App: Component<RouteSectionProps> = (props) => {
                 <WorkspaceLoader />
                 <NavigationBar />
 
-                <div class="flex bg-gray-300 grow h-full">
+                <div class="flex bg-gray-300 grow h-full overflow-hidden">
                   <Sidebar />
 
                   <MainContent {...props} />

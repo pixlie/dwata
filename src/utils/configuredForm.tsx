@@ -113,7 +113,7 @@ const withConfiguredForm = <T extends { [key: string]: IFormFieldValue }>(
       );
       if (!!response) {
         if (!!options.initialData && !!response.nextTask) {
-          console.log(response);
+          // console.log(response);
 
           nextTaskStore[1].initiateTask({
             name: response.nextTask,

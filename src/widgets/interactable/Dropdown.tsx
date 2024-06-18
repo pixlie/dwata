@@ -27,7 +27,7 @@ const Dropdown: Component<IFormField> = (props) => {
 
   const classes =
     getSizeClass() +
-    " rounded-md border hover:shadow-lg " +
+    " rounded-md border " +
     `${props.displayBlock && "w-full"}`;
 
   const handleChange: JSX.EventHandler<HTMLSelectElement, Event> = (event) => {
@@ -57,13 +57,16 @@ const Dropdown: Component<IFormField> = (props) => {
       onChange={handleChange}
       class={classes}
       style={{
-        "background-color": getColors().colors["input.background"],
         "border-color": getColors().colors["input.border"],
-        color: getColors().colors["input.foreground"],
+        color: getColors().colors["input.background"],
       }}
     >
       <For each={choices()}>
-        {(choice) => <option value={choice[0]}>{choice[1]}</option>}
+        {(choice) => (
+          <option class="bg-white" value={choice[0]}>
+            {choice[1]}
+          </option>
+        )}
       </For>
       {/* {!!props.choicesWithHeadings ? (
         <For each={props.choicesWithHeadings}>
