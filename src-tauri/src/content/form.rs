@@ -4,12 +4,7 @@ use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(
-    export,
-    rename = "FormField",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase")]
 pub struct FormField {
     // A unique identifier within a form or schema
     pub name: String,
@@ -48,7 +43,7 @@ impl FormField {
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename = "FormFieldData", export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum FormFieldData {
     Single(Content),
     Array(Vec<Content>),

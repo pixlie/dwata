@@ -13,7 +13,7 @@ pub mod crud;
 #[derive(Deserialize, Serialize, Type, TS)]
 #[sqlx(rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum Role {
     User,
     Assistant,
@@ -44,7 +44,7 @@ impl ToString for Role {
 }
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub struct ChatToolResponse {
     pub tool_name: String,
     pub tool_type: String,
@@ -53,7 +53,7 @@ pub struct ChatToolResponse {
 
 #[derive(Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct Chat {
     #[ts(type = "number")]
     pub id: i64,
@@ -69,7 +69,7 @@ pub struct Chat {
     // pub requested_content_format: Option<ContentFormat>,
 
     // Default is empty vector
-    #[ts(type = "Vec<ChatToolResponse>")]
+    #[ts(as = "Vec<ChatToolResponse>")]
     pub tool_response: Option<Json<Vec<ChatToolResponse>>>,
 
     // These are messages created by Dwata to get meta information,
@@ -92,7 +92,7 @@ pub struct Chat {
 
 #[derive(Default, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct ChatCreateUpdate {
     pub role: Option<String>,
     #[ts(type = "number")]
@@ -106,7 +106,7 @@ pub struct ChatCreateUpdate {
 
 #[derive(Default, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct ChatFilters {
     pub role: Option<String>,
     #[ts(type = "number")]

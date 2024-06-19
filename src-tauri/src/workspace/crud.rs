@@ -189,7 +189,7 @@ pub trait CRUDReadFilter {
 }
 
 #[derive(Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),
     DirectorySource(DirectorySource),
@@ -199,7 +199,7 @@ pub enum ModuleDataRead {
 }
 
 #[derive(Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
     DirectorySource(Vec<DirectorySource>),
@@ -228,7 +228,7 @@ impl VecColumnNameValue {
 
 #[derive(Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct InsertUpdateResponse {
     pub pk: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -395,7 +395,7 @@ pub trait CRUDCreateUpdate {
 }
 
 #[derive(Deserialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum ModuleDataCreateUpdate {
     UserAccount(UserAccountCreateUpdate),
     DirectorySource(DirectorySourceCreateUpdate),

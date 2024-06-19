@@ -1,45 +1,29 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "Image",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase")]
 pub struct Image {
     pub url: String,
     pub caption: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "Link",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase")]
 pub struct Link {
     pub url: String,
     pub caption: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(
-    export,
-    rename = "Code",
-    rename_all = "camelCase",
-    export_to = "../src/api_types/"
-)]
+#[ts(export, rename_all = "camelCase")]
 pub struct Code {
     pub language: String,
     pub lines: Vec<(usize, String)>,
 }
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
-#[ts(export, rename = "TextType", export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum TextType {
     Email,
     Password,
@@ -51,7 +35,7 @@ pub enum TextType {
 }
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export, rename = "ContentType", export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum ContentType {
     Text,
     ID,
@@ -63,7 +47,7 @@ pub enum ContentType {
 
 #[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct ContentSpec {
     pub text_type: Option<TextType>,
     pub length_limits: Option<(usize, usize)>,
@@ -89,7 +73,7 @@ impl Default for ContentSpec {
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export, rename = "Content", export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum Content {
     Text(String),
     ID(i64),

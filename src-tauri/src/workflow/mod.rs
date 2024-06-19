@@ -8,7 +8,7 @@ pub mod actionable;
 
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct Workflow {
     pub id: i64,
     pub title: Option<String>,
@@ -18,7 +18,7 @@ pub struct Workflow {
     // Default AI integration and model for this workflow
     // This can be overridden for different actions in this workflow
     pub ai_model_id: Option<i64>,
-    #[ts(type = "Vec<Objective>")]
+    #[ts(as = "Vec<Objective>")]
     pub objective_list: Json<Vec<Objective>>,
     #[sqlx(skip)]
     pub step_list: Vec<Step>,
@@ -29,7 +29,7 @@ pub struct Workflow {
 
 #[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct Objective {
     pub id: i64,
     pub item: String,
@@ -55,7 +55,7 @@ impl Objective {
 /// Or they can be direct UI action for the user.
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct Step {
     pub id: i64,
 

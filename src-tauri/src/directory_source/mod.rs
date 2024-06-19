@@ -12,7 +12,7 @@ pub mod file_contents;
 
 #[derive(Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct File {
     #[serde(skip_serializing)]
     pub base_path: Option<PathBuf>,
@@ -23,15 +23,15 @@ pub struct File {
 
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct DirectorySource {
     pub id: i64,
     #[sqlx(try_from = "String")]
     pub path: PathBuf,
     pub label: Option<String>,
-    #[ts(type = "Vec<String>")]
+    #[ts(as = "Vec<String>")]
     pub include_patterns: Json<Vec<String>>,
-    #[ts(type = "Vec<String>")]
+    #[ts(as = "Vec<String>")]
     pub exclude_patterns: Option<Json<Vec<String>>>,
 
     pub created_at: DateTime<Utc>,
@@ -71,7 +71,7 @@ impl DirectorySource {
 
 #[derive(Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct DirectorySourceCreateUpdate {
     pub path: Option<String>,
     pub label: Option<String>,
