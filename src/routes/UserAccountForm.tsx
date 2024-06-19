@@ -5,7 +5,7 @@ import { useNavigate } from "@solidjs/router";
 import { Module } from "../api_types/Module";
 import { ModuleDataCreateUpdate } from "../api_types/ModuleDataCreateUpdate";
 import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
-import withConfiguredForm from "../utils/configuredForm";
+import withConfiguredForm from "../utils/withConfiguredForm";
 
 const UserAccountForm: Component = () => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { Component, createMemo } from "solid-js";
-import withConfiguredForm from "../../utils/configuredForm";
+import withConfiguredForm from "../../utils/withConfiguredForm";
 import { ChatCreateUpdate } from "../../api_types/ChatCreateUpdate";
 import { Module } from "../../api_types/Module";
 import Form from "../interactable/ConfiguredForm";
