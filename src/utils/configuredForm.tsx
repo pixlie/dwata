@@ -22,13 +22,13 @@ interface IConfiguredFormProps<T> {
   initiateNextTask?: boolean;
 }
 
-const withConfiguredForm = <T extends { [key: string]: IFormFieldValue }>(
-  options: IConfiguredFormProps<T>,
-) => {
+const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
   const [formConfiguration, setFormConfiguration] = createSignal<Configuration>(
     {} as Configuration,
   );
-  const [formData, setFormData] = createSignal<T>({} as T);
+  const [formData, setFormData] = createSignal<{
+    [key: string]: IFormFieldValue;
+  }>({} as T);
   const [dirty, setDirty] = createSignal<Array<string>>([]);
   const navigate = useNavigate();
   // const [formState, setFormState] = createSignal<IFormState>({
@@ -57,11 +57,13 @@ const withConfiguredForm = <T extends { [key: string]: IFormFieldValue }>(
       });
 
       if (!!result && options.module in result) {
-        for (const [key, value] of Object.entries(result[options.module])) {
+        for (const [key, value] of Object.entries(
+          result[options.module as keyof ModuleDataRead],
+        )) {
           if (key in formData()) {
             setFormData((state) => ({
               ...state,
-              [key]: value,
+              [key as string]: value as IFormFieldValue,
             }));
           }
         }
