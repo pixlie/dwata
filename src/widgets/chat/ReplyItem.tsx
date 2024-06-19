@@ -1,7 +1,7 @@
-import { Component } from "solid-js";
-// import { SolidMarkdown } from "solid-markdown";
+import { Component, onMount } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { Chat } from "../../api_types/Chat";
+import { marked } from "marked";
 
 interface IPropTypes extends Chat {
   showModel?: boolean;
@@ -9,6 +9,13 @@ interface IPropTypes extends Chat {
 
 const ReplyItem: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  let refMarkedContent: HTMLDivElement | undefined;
+
+  onMount(() => {
+    if (!!props.message && !!refMarkedContent) {
+      refMarkedContent.innerHTML = marked.parse(props.message);
+    }
+  });
 
   return (
     <div
@@ -19,16 +26,17 @@ const ReplyItem: Component<IPropTypes> = (props) => {
       }}
     >
       <div style={{ color: getColors().colors["editor.foreground"] }}>
-        {/* <SolidMarkdown children={props.message} /> */}
         <div
           class="whitespace-pre-wrap font-normal"
           style={{
             "font-family": `"Noto Sans", sans-serif`,
             "font-optical-sizing": "auto",
           }}
+          ref={refMarkedContent}
         >
           {props.message}
         </div>
+
         {props.showModel ? (
           <div class="flex">
             <div class="grow" />
