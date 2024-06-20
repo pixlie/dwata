@@ -6,18 +6,19 @@ use crate::{
     ai_integration::{
         models::AIModel, providers::openai::OpenAIChatRequest, AIIntegration, AIProvider,
     },
-    chat::ChatToolResponse,
     error::DwataError,
 };
 use log::{error, info};
 use openai::types::{chat_completion_message_tool_call::Type, CreateChatCompletionResponse};
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
+
 pub mod commands;
 pub mod helpers;
+
 pub enum TextGenerationResponse {
     Message(String),
-    Tool(Vec<ChatToolResponse>),
+    // Tool(Vec<ChatToolResponse>),
 }
 
 #[derive(Deserialize, Serialize)]
@@ -119,22 +120,23 @@ impl AIIntegration {
                         Ok(response) => {
                             if response.choices[0].message.tool_calls.is_some() {
                                 // We have received a tool call
-                                Ok(TextGenerationResponse::Tool(
-                                    response.choices[0]
-                                        .message
-                                        .tool_calls
-                                        .clone()
-                                        .unwrap()
-                                        .iter()
-                                        .map(|x| ChatToolResponse {
-                                            tool_name: x.function.name.clone(),
-                                            tool_type: match x.r#type {
-                                                Type::Function => "function".to_string(),
-                                            },
-                                            arguments: x.function.arguments.clone(),
-                                        })
-                                        .collect(),
-                                ))
+                                // Ok(TextGenerationResponse::Tool(
+                                //     response.choices[0]
+                                //         .message
+                                //         .tool_calls
+                                //         .clone()
+                                //         .unwrap()
+                                //         .iter()
+                                //         .map(|x| ChatToolResponse {
+                                //             tool_name: x.function.name.clone(),
+                                //             tool_type: match x.r#type {
+                                //                 Type::Function => "function".to_string(),
+                                //             },
+                                //             arguments: x.function.arguments.clone(),
+                                //         })
+                                //         .collect(),
+                                // ))
+                                return Err(DwataError::ToolUseNotSupported);
                             } else {
                                 Ok(TextGenerationResponse::Message(
                                     response.choices[0]

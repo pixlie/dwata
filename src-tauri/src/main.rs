@@ -1,10 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::path::PathBuf;
-
 use env_logger;
 use log::{error, info};
+use std::path::PathBuf;
 use tauri::{App, Manager};
 
 mod database_source;

@@ -38,8 +38,10 @@ pub enum DwataError {
     // Chat and its processing related
     ChatHasNoMessage,
     NoRequestedAIModel,
+    BeingProcessedByAI,
     AlreadyProcessedByAI,
     ChatHasNoRootId,
+    ToolUseNotSupported,
 
     // Integrated vector DB
     CouldNotConnectToVectorDB,

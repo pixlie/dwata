@@ -1,5 +1,8 @@
 use super::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
+use crate::{
+    error::DwataError,
+    workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
+};
 use chrono::Utc;
 
 impl CRUDRead for DirectorySource {
@@ -13,7 +16,7 @@ impl CRUDCreateUpdate for DirectorySourceCreateUpdate {
         "directory_source".to_string()
     }
 
-    fn get_column_names_values(&self) -> VecColumnNameValue {
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.path {
             names_values.push_name_value("path", InputValue::Text(x.clone()));
@@ -30,6 +33,6 @@ impl CRUDCreateUpdate for DirectorySourceCreateUpdate {
                 .push_name_value("exclude_patterns", InputValue::Json(serde_json::json!(x)));
         }
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        names_values
+        Ok(names_values)
     }
 }

@@ -1,6 +1,7 @@
 use super::{AIIntegration, AIIntegrationCreateUpdate, AIIntegrationFilters};
-use crate::workspace::crud::{
-    CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue,
+use crate::{
+    error::DwataError,
+    workspace::crud::{CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue},
 };
 use chrono::Utc;
 
@@ -15,7 +16,7 @@ impl CRUDCreateUpdate for AIIntegrationCreateUpdate {
         "ai_integration".to_string()
     }
 
-    fn get_column_names_values(&self) -> VecColumnNameValue {
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.label {
             names_values.push_name_value("label", InputValue::Text(x.clone()));
@@ -27,7 +28,7 @@ impl CRUDCreateUpdate for AIIntegrationCreateUpdate {
             names_values.push_name_value("api_key", InputValue::Text(x.clone()));
         }
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        names_values
+        Ok(names_values)
     }
 }
 

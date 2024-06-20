@@ -240,7 +240,7 @@ pub struct InsertUpdateResponse {
 pub trait CRUDCreateUpdate {
     fn table_name() -> String;
 
-    fn get_column_names_values(&self) -> VecColumnNameValue;
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError>;
 
     async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
         Ok(())
@@ -252,7 +252,7 @@ pub trait CRUDCreateUpdate {
     ) -> Result<InsertUpdateResponse, DwataError> {
         // Just calling this so if it fails the error will propagate up
         self.pre_insert(db_connection).await?;
-        let column_names_values: VecColumnNameValue = self.get_column_names_values();
+        let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
             Self::table_name(),
@@ -336,7 +336,7 @@ pub trait CRUDCreateUpdate {
     ) -> Result<InsertUpdateResponse, DwataError> {
         let mut builder: QueryBuilder<Sqlite> =
             QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
-        let column_names_values: VecColumnNameValue = self.get_column_names_values();
+        let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
         let mut count = 0;
         let limit = column_names_values.0.len();
         for (name, data) in column_names_values.0 {

@@ -21,8 +21,7 @@ pub async fn chat_with_ai(
     chat_id: i64,
     db: State<'_, DwataDb>,
 ) -> Result<InsertUpdateResponse, DwataError> {
-    let mut db_guard = db.lock().await;
-    generate_text_for_chat(chat_id, &mut db_guard).await
+    generate_text_for_chat(chat_id, db).await
 }
 
 // #[tauri::command]

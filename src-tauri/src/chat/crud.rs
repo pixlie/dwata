@@ -30,31 +30,28 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
         "chat".to_string()
     }
 
-    fn get_column_names_values(&self) -> VecColumnNameValue {
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
-        if let Some(x) = &self.role {
-            names_values.push_name_value("role", InputValue::Text(x.clone()));
-        }
         if let Some(x) = &self.root_chat_id {
             names_values.push_name_value("root_chat_id", InputValue::ID(*x));
         }
         if let Some(x) = &self.message {
+            if x.chars().count() == 0 {
+                return Err(DwataError::ChatHasNoMessage);
+            }
             names_values.push_name_value("message", InputValue::Text(x.clone()));
         }
         if let Some(x) = &self.requested_ai_model {
             names_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
         }
-        // if let Some(x)= &self.requested_content_format {
-        //     name_values.push_name_value("requested_content_format", )
-        // }
         if let Some(x) = &self.role {
             names_values.push_name_value("role", InputValue::Text(x.clone()));
         } else {
             names_values.push_name_value("role", InputValue::Text(Role::User.to_string()));
         }
-        names_values.push_name_value("is_system_chat", InputValue::Bool(false));
+        // names_values.push_name_value("is_system_chat", InputValue::Bool(false));
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        names_values
+        Ok(names_values)
     }
 
     async fn post_insert(
