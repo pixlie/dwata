@@ -26,7 +26,7 @@ const ChatThreadIndex: Component = () => {
   );
 
   return (
-    <div class="flex gap-4 h-full">
+    <div class="flex h-full">
       <div class="w-2/5 overflow-y-auto pr-4">
         <Heading size="3xl">Chats with AI</Heading>
         <For each={chat.chatList}>{(thread) => <Thread {...thread} />}</For>
@@ -35,10 +35,10 @@ const ChatThreadIndex: Component = () => {
       <div class="w-3/5 overflow-y-auto pr-3">
         {!!getRootChat() ? (
           <>
-            <ReplyItem {...getRootChat()!} showModel />
+            <ReplyItem {...getRootChat()!} isRootChat index={0} />
 
             <For each={chat.chatReplyList[parseInt(params.threadId)]}>
-              {(reply) => <ReplyItem {...reply} />}
+              {(reply, index) => <ReplyItem {...reply} index={index()} />}
             </For>
 
             <ChatForm />

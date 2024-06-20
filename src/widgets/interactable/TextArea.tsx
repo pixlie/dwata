@@ -22,7 +22,7 @@ const TextArea: Component<IFormField> = (props) => {
       )}
       <textarea
         required={props.isRequired !== null ? props.isRequired : false}
-        class="block w-full rounded-md px-2 py-1.5 border text-lg"
+        class="block w-full rounded-md px-2 py-1.5 border text-lg font-content"
         style={{
           "background-color": getColors().colors["input.background"],
           "border-color": getColors().colors["input.border"],

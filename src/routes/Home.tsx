@@ -1,6 +1,7 @@
 import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import { useUserInterface } from "../stores/userInterface";
+import Button from "../widgets/interactable/Button";
 
 const Home: Component = () => {
   const [_, { getColors }] = useUserInterface();
@@ -27,25 +28,13 @@ const Home: Component = () => {
       </p>
 
       <p style={{ color: getColors().colors["editor.foreground"] }}>
-        To get started, please do the following:
+        To get started, please{" "}
+        <Button
+          href="/settings/ai-provider/add"
+          size="sm"
+          label="add an AI provider"
+        />
       </p>
-
-      <ul
-        class="mb-4 list-decimal"
-        style={{ color: getColors().colors["editor.foreground"] }}
-      >
-        <li class="ml-8">
-          <a href="/user" class="underline text-blue-600">
-            Create your account
-          </a>{" "}
-          (stored on your computer)
-        </li>
-        <li class="ml-8">
-          <a href="/settings/ai-provider/add" class="underline text-blue-600">
-            Add an AI provider
-          </a>
-        </li>
-      </ul>
     </div>
   );
 };

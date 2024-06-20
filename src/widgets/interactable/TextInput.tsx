@@ -38,7 +38,7 @@ const TextInput: Component<IFormField> = (props) => {
         <input
           type={inputType}
           required={props.isRequired || undefined}
-          class="block w-full rounded-md px-2 py-1.5 border"
+          class="block w-full rounded-md px-2 py-1.5 border font-content"
           style={{
             "background-color": getColors().colors["input.background"],
             "border-color": getColors().colors["input.border"],

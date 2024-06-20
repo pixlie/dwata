@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {},
+    fontFamily: {
+      "content": ["Manrope", "sans-serif"]
+    }
   },
   plugins: [],
 };

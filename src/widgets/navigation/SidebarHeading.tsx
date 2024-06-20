@@ -1,4 +1,5 @@
 import { Component } from "solid-js";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
   label: string;
@@ -9,6 +10,8 @@ interface IPropTypes {
 }
 
 const SidebarHeading: Component<IPropTypes> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
   const Tag = () =>
     !!props.infoTag ? (
       <div>
@@ -23,11 +26,17 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
       <a
         class={
           "mx-2 my-2 px-2 py-1 block select-none rounded-md hover:bg-zinc-700 " +
-          (!!props.isActive ? "font-bold text-white" : "text-gray-400")
+          (!!props.isActive ? "font-bold" : "")
         }
+        style={{
+          color: getColors().colors["sideBar.foreground"],
+        }}
         href={props.href}
       >
-        <i class={`${props.icon} w-6 text-gray-500`} />
+        <i
+          class={`${props.icon} w-6`}
+          style={{ color: getColors().colors["sideBar.foreground"] }}
+        />
         {props.label}
         <Tag />
       </a>

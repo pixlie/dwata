@@ -2,7 +2,7 @@
 @import "../node_modules/@fortawesome/fontawesome-free/css/solid.css";
 @import "../node_modules/@fortawesome/fontawesome-free/css/regular.css";
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -27,4 +27,41 @@ div#root {
 table.dwata-grid tr td {
   overflow: hidden;
   overflow-wrap: break-word;
+}
+
+div.markdown {
+  font-family: "Manrope", sans-serif;
+}
+
+div.markdown p {
+  margin-top: 0.5rem; /* 8px */
+  margin-bottom:0.5rem;
+}
+
+div.markdown h1 {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+  margin-top: 1rem; /* 8px */
+  margin-bottom: 1rem;
+}
+
+div.markdown ol {
+  list-style-type: decimal;
+  list-style-position: inside;
+  margin-left: 0.5rem;
+}
+
+div.markdown ol li {
+  margin-bottom: 0.5rem;
+}
+
+div.markdown ul {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin-left: 0.5rem;
+}
+
+div.markdown ul li {
+  margin-bottom: 0.5rem;
 }
