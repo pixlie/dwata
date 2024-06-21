@@ -1,7 +1,5 @@
 use chrono::{DateTime, Utc};
-use std::{default, str::FromStr};
 // use crate::chat::api_types::APIChatContextNode;
-use crate::error::DwataError;
 use chrono::serde::ts_milliseconds;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
@@ -70,10 +68,6 @@ pub struct Chat {
 
     // Only stored if there is an API error
     // pub api_error_response: Option<String>,
-
-    // User who posted this reply, if this reply was created by user
-    pub created_by_id: Option<i64>,
-
     #[serde(with = "ts_milliseconds")]
     pub created_at: DateTime<Utc>,
 }

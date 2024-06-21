@@ -5,6 +5,7 @@ use crate::chat::{Chat, ChatCreateUpdate, ChatFilters, ProcessStatus, Role};
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InsertUpdateResponse};
 use crate::workspace::DwataDb;
+use chrono::{Duration, Utc};
 use log::info;
 use tauri::State;
 
@@ -43,9 +44,17 @@ pub async fn generate_text_for_chat(
             return Err(DwataError::NoRequestedAIModel);
         }
         match chat.process_status {
-            Some(ProcessStatus::Pending) => return Err(DwataError::BeingProcessedByAI),
-            Some(ProcessStatus::ResponseReceived) => return Err(DwataError::AlreadyProcessedByAI),
-            Some(ProcessStatus::ErrorReceived) => return Err(DwataError::AlreadyProcessedByAI),
+            Some(ProcessStatus::Pending) => {
+                // Check current time and see if the chat is more than 2 minutes old
+                // If it is, then we allow the user to resend the chat to the AI model
+                let current_time = Utc::now();
+                if current_time < chat.created_at + Duration::minutes(2) {
+                    return Err(DwataError::BeingProcessedByAI);
+                }
+            }
+            Some(ProcessStatus::ResponseReceived) | Some(ProcessStatus::ErrorReceived) => {
+                return Err(DwataError::AlreadyProcessedByAI)
+            }
             _ => {}
         }
         model = AIModel::from_string(chat.requested_ai_model.unwrap()).await?;
