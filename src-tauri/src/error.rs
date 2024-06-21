@@ -34,6 +34,7 @@ pub enum DwataError {
     CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
     FeatureNotAvailableWithAIProvider,
+    InvalidProcessStatus,
 
     // Chat and its processing related
     ChatHasNoMessage,

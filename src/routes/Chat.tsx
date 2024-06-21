@@ -1,18 +1,59 @@
-import { Component, For, createComputed, createMemo, onMount } from "solid-js";
+import {
+  Component,
+  For,
+  createComputed,
+  createEffect,
+  createMemo,
+  createResource,
+  onMount,
+} from "solid-js";
 import Thread from "../widgets/chat/Thread";
-import { Route, RouteSectionProps, useParams } from "@solidjs/router";
+import {
+  Route,
+  RouteSectionProps,
+  useLocation,
+  useParams,
+} from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
 import { ChatProvider, useChat } from "../stores/chatThread";
 import ChatForm from "../widgets/chat/CreateChat";
 import ReplyItem from "../widgets/chat/ReplyItem";
 
+interface LocationProps {
+  pathname: string;
+  search: string;
+  hash: string;
+}
+
 const ChatThreadIndex: Component = () => {
   const [chat, { fetchChats, fetchChatReplies }] = useChat();
   const params = useParams();
-
-  onMount(async () => {
+  const location = useLocation();
+  const [_x, { refetch }] = createResource(async () => {
     await fetchChats();
   });
+
+  createComputed<LocationProps>(
+    (prev) => {
+      if (
+        prev.pathname !== location.pathname ||
+        prev.search !== location.search ||
+        prev.hash !== location.hash
+      ) {
+        refetch();
+      }
+      return {
+        pathname: location.pathname,
+        search: location.search,
+        hash: location.hash,
+      } as LocationProps;
+    },
+    {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+    } as LocationProps,
+  );
 
   createComputed(async () => {
     if (!!params.threadId) {

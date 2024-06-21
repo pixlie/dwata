@@ -38,7 +38,7 @@ pub enum Role {
 pub enum ProcessStatus {
     #[default]
     NotApplicable,
-    RequestSent,
+    Pending,
     ResponseReceived,
     ErrorReceived,
 }

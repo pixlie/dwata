@@ -1,4 +1,4 @@
-use super::{Chat, ChatCreateUpdate, ChatFilters, Role};
+use super::{Chat, ChatCreateUpdate, ChatFilters, ProcessStatus, Role};
 use crate::{
     content::content::{Content, ContentType},
     error::DwataError,
@@ -11,6 +11,7 @@ use crate::{
     },
 };
 use chrono::Utc;
+use std::str::FromStr;
 
 impl CRUDRead for Chat {
     fn table_name() -> String {
@@ -43,6 +44,16 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
         }
         if let Some(x) = &self.requested_ai_model {
             names_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.process_status {
+            match ProcessStatus::from_str(x) {
+                Ok(x) => {
+                    names_values.push_name_value("process_status", InputValue::Text(x.to_string()))
+                }
+                Err(_) => {
+                    return Err(DwataError::InvalidProcessStatus);
+                }
+            }
         }
         if let Some(x) = &self.role {
             names_values.push_name_value("role", InputValue::Text(x.clone()));

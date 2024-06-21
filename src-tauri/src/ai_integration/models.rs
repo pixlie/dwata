@@ -73,7 +73,7 @@ impl AIModel {
     }
 
     pub async fn from_string(requested_ai_model: String) -> Result<Self, DwataError> {
-        let (provider_name, model_name) = requested_ai_model.split_once("::").unwrap();
+        let (provider_name, model_name) = requested_ai_model.split_once("/").unwrap();
         let all_models = Self::get_all_models().await;
         // TODO: If AI provider is invalid, then return corresponding error
         let model = all_models

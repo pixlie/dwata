@@ -81,10 +81,10 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
 
   const handleSubmit = async () => {
     if (!!options.existingItemId) {
-      // console.info(
-      //   `Submitting form data to update module ${options.module}, item ID ${options.existingItemId}`,
-      //   formData(),
-      // );
+      console.info(
+        `Submitting form data to update module ${options.module}, item ID ${options.existingItemId}`,
+        formData(),
+      );
       const response = await invoke<InsertUpdateResponse>(
         "update_module_item",
         {
@@ -101,10 +101,10 @@ const withConfiguredForm = <T extends {}>(options: IConfiguredFormProps<T>) => {
         navigate(options.postSaveNavigateTo);
       }
     } else {
-      // console.info(
-      //   `Submitting form data to insert into module: ${options.module}`,
-      //   formData(),
-      // );
+      console.info(
+        `Submitting form data to insert into module: ${options.module}`,
+        formData(),
+      );
       const response = await invoke<InsertUpdateResponse>(
         "insert_module_item",
         {

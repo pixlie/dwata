@@ -6,6 +6,8 @@ import { Role } from "../../api_types/Role";
 import { ProcessStatus } from "../../api_types/ProcessStatus";
 import { useChat } from "../../stores/chatThread";
 import { useParams } from "@solidjs/router";
+import Button from "../interactable/Button";
+import { invoke } from "@tauri-apps/api/core";
 
 interface IPropTypes extends Chat {
   index: number;
@@ -39,6 +41,12 @@ const ReplyItem: Component<IPropTypes> = (props) => {
       return chat.chatReplyList[parseInt(params.threadId)][props.index - 1];
     }
   });
+
+  const handleResendChat = () => {
+    invoke("chat_with_ai", {
+      chatId: props.id,
+    });
+  };
 
   return (
     <>
@@ -95,7 +103,7 @@ const ReplyItem: Component<IPropTypes> = (props) => {
         ) : null}
       </div>
 
-      {props.processStatus === ("request_sent" as ProcessStatus) ? (
+      {props.processStatus === ("pending" as ProcessStatus) ? (
         <div
           class="p-3 rounded-md border overflow-x-scroll mb-4"
           style={{
@@ -117,6 +125,17 @@ const ReplyItem: Component<IPropTypes> = (props) => {
             <div class="w-full h-8 bg-gray-600 rounded mb-2"></div>
             <div class="w-full h-8 bg-gray-700 rounded mb-2"></div>
             <div class="w-1/2 h-8 bg-gray-600 rounded"></div>
+          </div>
+
+          <div class="flex mt-4">
+            <div class="grow" />
+            <div>
+              <Button
+                size="sm"
+                label="Resend to AI"
+                onClick={handleResendChat}
+              />
+            </div>
           </div>
         </div>
       ) : null}

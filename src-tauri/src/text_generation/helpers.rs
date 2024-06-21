@@ -5,6 +5,7 @@ use crate::chat::{Chat, ChatCreateUpdate, ChatFilters, ProcessStatus, Role};
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InsertUpdateResponse};
 use crate::workspace::DwataDb;
+use log::info;
 use tauri::State;
 
 /// Generates response for a chat thread.
@@ -34,8 +35,7 @@ pub async fn generate_text_for_chat(
     // Text generation with Ollama takes a lot of time and we don't want to keep the connection open during this
     {
         let mut db_guard = db.lock().await;
-        let db_connection = &mut db_guard;
-        chat = Chat::read_one_by_pk(chat_id, db_connection).await?;
+        chat = Chat::read_one_by_pk(chat_id, &mut db_guard).await?;
         if chat.message.is_none() {
             return Err(DwataError::ChatHasNoMessage);
         }
@@ -43,21 +43,21 @@ pub async fn generate_text_for_chat(
             return Err(DwataError::NoRequestedAIModel);
         }
         match chat.process_status {
-            Some(ProcessStatus::RequestSent) => return Err(DwataError::BeingProcessedByAI),
+            Some(ProcessStatus::Pending) => return Err(DwataError::BeingProcessedByAI),
             Some(ProcessStatus::ResponseReceived) => return Err(DwataError::AlreadyProcessedByAI),
             Some(ProcessStatus::ErrorReceived) => return Err(DwataError::AlreadyProcessedByAI),
             _ => {}
         }
         model = AIModel::from_string(chat.requested_ai_model.unwrap()).await?;
-        ai_integration = model.get_integration(db_connection).await?;
+        ai_integration = model.get_integration(&mut db_guard).await?;
 
         // Get the root chat of this thread (the first chat in the thread)
         match chat.root_chat_id {
             None => {
-                return Err(DwataError::ChatHasNoRootId);
+                root_chat = Chat::read_one_by_pk(chat.id, &mut db_guard).await?;
             }
             Some(x) => {
-                root_chat = Chat::read_one_by_pk(x, db_connection).await?;
+                root_chat = Chat::read_one_by_pk(x, &mut db_guard).await?;
             }
         }
 
@@ -67,15 +67,15 @@ pub async fn generate_text_for_chat(
                 root_chat_id: Some(root_chat.id),
                 ..Default::default()
             },
-            db_connection,
+            &mut db_guard,
         )
         .await?;
 
         ChatCreateUpdate {
-            process_status: Some(ProcessStatus::RequestSent.to_string()),
+            process_status: Some(ProcessStatus::Pending.to_string()),
             ..ChatCreateUpdate::default()
         }
-        .update_module_data(chat_id, db_connection)
+        .update_module_data(chat_id, &mut db_guard)
         .await?;
     }
 
@@ -101,12 +101,11 @@ pub async fn generate_text_for_chat(
 
     {
         let mut db_guard = db.lock().await;
-        let db_connection = &mut db_guard;
         ChatCreateUpdate {
             process_status: Some(ProcessStatus::ResponseReceived.to_string()),
             ..ChatCreateUpdate::default()
         }
-        .update_module_data(chat_id, db_connection)
+        .update_module_data(chat_id, &mut db_guard)
         .await?;
         match reply_from_ai {
             TextGenerationResponse::Message(message) => {
@@ -116,7 +115,7 @@ pub async fn generate_text_for_chat(
                     role: Some(Role::Assistant.to_string()),
                     ..ChatCreateUpdate::default()
                 };
-                new_chat.insert_module_data(db_connection).await
+                new_chat.insert_module_data(&mut db_guard).await
             } // TextGenerationResponse::Tool(tool_response) => {
               //     let new_chat = ChatCreateUpdate {
               //         root_chat_id: Some(root_chat.id),
@@ -124,7 +123,7 @@ pub async fn generate_text_for_chat(
               //         role: Some(Role::Assistant.to_string()),
               //         ..ChatCreateUpdate::default()
               //     };
-              //     new_chat.insert_module_data(db_connection).await
+              //     new_chat.insert_module_data(&mut db_guard).await
               //     return Err(DwataError::ToolUseNotSupported);
               // }
         }
