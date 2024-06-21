@@ -5,7 +5,7 @@ use ts_rs::TS;
 
 #[derive(Clone, Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub enum APIQueryOrder {
     Asc,
     Desc,
@@ -13,7 +13,7 @@ pub enum APIQueryOrder {
 
 #[derive(Clone, Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct APIGridQuery {
     source: String,
     schema: Option<String>,

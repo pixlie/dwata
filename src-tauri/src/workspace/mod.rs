@@ -14,7 +14,7 @@ pub mod helpers;
 pub type DwataDb = Mutex<SqliteConnection>;
 
 #[derive(Deserialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum Module {
     UserAccount,
     DirectorySource,
@@ -24,7 +24,7 @@ pub enum Module {
 }
 
 #[derive(Deserialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum ModuleFilters {
     AIIntegration(AIIntegrationFilters),
     Chat(ChatFilters),

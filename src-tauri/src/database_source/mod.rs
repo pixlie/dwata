@@ -10,7 +10,7 @@ pub mod crud;
 pub mod helpers;
 
 #[derive(Debug, Deserialize, Serialize, Type, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum DatabaseType {
     PostgreSQL,
     MySQL,
@@ -35,7 +35,7 @@ impl FromStr for DatabaseType {
 }
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct DatabaseSource {
     id: i64,
     pub label: Option<String>,
@@ -69,7 +69,7 @@ pub struct DatabaseSource {
 
 #[derive(Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct DatabaseSourceCreateUpdate {
     pub label: Option<String>,
     pub database_type: Option<String>,

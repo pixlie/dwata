@@ -1,10 +1,11 @@
-import { Component } from "solid-js";
-import { useNavigate } from "@solidjs/router";
+import { Component, createMemo } from "solid-js";
+import { useNavigate, useParams } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 import { Chat } from "../../api_types/Chat";
 
 const Thread: Component<Chat> = (props) => {
   const navigate = useNavigate();
+  const params = useParams();
   const [_, { getColors }] = useUserInterface();
 
   const handleClick = () => {
@@ -21,14 +22,20 @@ const Thread: Component<Chat> = (props) => {
     }
   };
 
+  const isCurrentThread = createMemo(() => {
+    if (!!params.threadId && props.id === parseInt(params.threadId)) {
+      return true;
+    }
+    return false;
+  });
+
   return (
     <div
-      class="my-3 p-3 rounded-md cursor-pointer border text-lg overflow-hidden text-ellipsis"
+      class={`my-3 p-3 rounded-md cursor-pointer ${isCurrentThread() ? "border-r-8" : ""} border text-lg overflow-hidden font-content`}
       style={{
         "background-color": getColors().colors["inlineChat.background"],
         "border-color": getColors().colors["inlineChat.border"],
         color: getColors().colors["editor.foreground"],
-        "font-family": `"Noto Sans", sans-serif`,
         "font-optical-sizing": "auto",
       }}
       onClick={handleClick}

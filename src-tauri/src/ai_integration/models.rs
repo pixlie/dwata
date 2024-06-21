@@ -14,7 +14,7 @@ use crate::{error::DwataError, workspace::crud::CRUDRead};
 use super::{AIIntegration, AIIntegrationFilters, AIProvider};
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum AIModelFeatures {
     TextGeneration,
     // Embedding,
@@ -25,7 +25,7 @@ pub enum AIModelFeatures {
 }
 
 #[derive(Debug, Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum AIModelDeveloper {
     SameAsProvider,
     // OpenAI,
@@ -37,7 +37,7 @@ pub enum AIModelDeveloper {
 
 #[derive(Debug, Default, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct AIModel {
     pub label: String,
     pub ai_provider: AIProvider,
@@ -73,7 +73,7 @@ impl AIModel {
     }
 
     pub async fn from_string(requested_ai_model: String) -> Result<Self, DwataError> {
-        let (provider_name, model_name) = requested_ai_model.split_once("::").unwrap();
+        let (provider_name, model_name) = requested_ai_model.split_once("/").unwrap();
         let all_models = Self::get_all_models().await;
         // TODO: If AI provider is invalid, then return corresponding error
         let model = all_models

@@ -3,7 +3,7 @@ import type { AIModelDeveloper } from "./AIModelDeveloper";
 import type { AIModelFeatures } from "./AIModelFeatures";
 import type { AIProvider } from "./AIProvider";
 
-export interface AIModel {
+export type AIModel = {
   label: string;
   aiProvider: AIProvider;
   developer: AIModelDeveloper | null;
@@ -15,4 +15,4 @@ export interface AIModel {
   pricePerMillionInputTokens: number | null;
   pricePerMillionOutputTokens: number | null;
   linkToModelDocumentation: string | null;
-}
+};

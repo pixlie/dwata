@@ -1,7 +1,9 @@
-use chrono::Utc;
-
 use super::{UserAccount, UserAccountCreateUpdate};
-use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
+use crate::{
+    error::DwataError,
+    workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
+};
+use chrono::Utc;
 
 impl CRUDRead for UserAccount {
     fn table_name() -> String {
@@ -14,7 +16,7 @@ impl CRUDCreateUpdate for UserAccountCreateUpdate {
         "user_account".to_string()
     }
 
-    fn get_column_names_values(&self) -> VecColumnNameValue {
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.first_name {
             names_values.push_name_value("first_name", InputValue::Text(x.clone()));
@@ -26,6 +28,6 @@ impl CRUDCreateUpdate for UserAccountCreateUpdate {
             names_values.push_name_value("email", InputValue::Text(x.clone()));
         }
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        names_values
+        Ok(names_values)
     }
 }

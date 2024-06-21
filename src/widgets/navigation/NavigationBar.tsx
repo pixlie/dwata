@@ -1,12 +1,12 @@
-import { Component, createSignal } from "solid-js";
+import { Component } from "solid-js";
 
-import NavigationButtom from "./NavigationButton";
+// import NavigationButtom from "./NavigationButton";
 import { useUserInterface } from "../../stores/userInterface";
 // import DropdownItem from "../interactable/DropdownItem";
 
 const NavigationBar: Component = () => {
-  const [isUserDropdownOpen, setIsUserDropdownOpen] =
-    createSignal<boolean>(false);
+  // const [isUserDropdownOpen, setIsUserDropdownOpen] =
+  //   createSignal<boolean>(false);
   const [_, { getColors }] = useUserInterface();
 
   // const handleUserDropdownClick = () => {
@@ -62,7 +62,7 @@ const NavigationBar: Component = () => {
           {/* <!-- Profile dropdown --> */}
           <div class="relative ml-3">
             <div>
-              <NavigationButtom label="Account" href="/user" />
+              {/* <NavigationButtom label="Account" href="/user" /> */}
               {/* <button
                 type="button"
                 class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -81,7 +81,7 @@ const NavigationBar: Component = () => {
               </button> */}
             </div>
 
-            {!!isUserDropdownOpen() && (
+            {/* {!!isUserDropdownOpen() && (
               <div
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                 role="menu"
@@ -89,12 +89,12 @@ const NavigationBar: Component = () => {
                 aria-labelledby="user-menu-button"
                 tabindex="-1"
               >
-                {/* <!-- Active: "bg-gray-100", Not Active: "" --> */}
-                {/* <DropdownItem label="Your Account" path="/user" />
+                <!-- Active: "bg-gray-100", Not Active: "" -->
+                <DropdownItem label="Your Account" path="/user" />
                 <DropdownItem label="Switch Organization" />
-                <DropdownItem label="Settings" /> */}
+                <DropdownItem label="Settings" />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

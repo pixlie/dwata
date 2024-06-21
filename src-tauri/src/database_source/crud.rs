@@ -17,7 +17,7 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
         "database_source".to_string()
     }
 
-    fn get_column_names_values(&self) -> VecColumnNameValue {
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.label {
             names_values.push_name_value("label", InputValue::Text(x.clone()));
@@ -41,7 +41,7 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
             names_values.push_name_value("database_password", InputValue::Text(x.clone()));
         }
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
-        names_values
+        Ok(names_values)
     }
 
     async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {

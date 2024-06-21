@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
-import withConfiguredForm from "../../utils/configuredForm";
+import withConfiguredForm from "../../utils/withConfiguredForm";
 import { Module } from "../../api_types/Module";
 import { useParams } from "@solidjs/router";
 import Form from "../interactable/ConfiguredForm";

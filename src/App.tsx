@@ -9,7 +9,6 @@ import {
   UserInterfaceProvider,
   useUserInterface,
 } from "./stores/userInterface";
-import WorkspaceLoader from "./widgets/workspace/Loader";
 import { NextTaskProvider } from "./stores/nextTask";
 
 const MainContent: Component<RouteSectionProps> = (props) => {
@@ -35,7 +34,6 @@ const App: Component<RouteSectionProps> = (props) => {
           <SchemaProvider>
             <NextTaskProvider>
               <div class="flex flex-col w-full h-full">
-                <WorkspaceLoader />
                 <NavigationBar />
 
                 <div class="flex bg-gray-300 grow h-full overflow-hidden">

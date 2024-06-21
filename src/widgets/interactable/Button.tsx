@@ -10,10 +10,12 @@ interface IPropTypes {
 }
 
 const Button: Component<IPropTypes> = (props) => {
+  const [_, { getColors }] = useUserInterface();
+
   const getSizeClass = createMemo(() => {
     switch (props.size) {
       case "sm":
-        return "px-2.5 py-1.5 text-sm font-normal";
+        return "px-2.5 py-1.5 text-sm font-thin";
       case "lg":
         return "px-6 py-3 text-xl font-bold";
       case "base":
@@ -22,7 +24,6 @@ const Button: Component<IPropTypes> = (props) => {
     }
   });
 
-  const [_, { getColors }] = useUserInterface();
   const buttonClasses =
     getSizeClass() +
     " rounded-md select-none cursor-pointer hover:shadow-lg " +

@@ -2,7 +2,7 @@ import { Component } from "solid-js";
 import { useParams } from "@solidjs/router";
 import Form from "../interactable/ConfiguredForm";
 import { Module } from "../../api_types/Module";
-import withConfiguredForm from "../../utils/configuredForm";
+import withConfiguredForm from "../../utils/withConfiguredForm";
 import { DirectorySourceCreateUpdate } from "../../api_types/DirectorySourceCreateUpdate";
 
 const DirectorySourceForm: Component = () => {

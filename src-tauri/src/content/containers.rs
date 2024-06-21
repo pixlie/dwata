@@ -5,13 +5,13 @@ use ts_rs::TS;
 pub type HeterogenousContent = (ContentType, ContentSpec, Content);
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub struct HeterogeneousContentArray {
     pub contents: Vec<HeterogenousContent>,
 }
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub struct HomogeneousContentArray {
     pub content_type: ContentType,
     pub content_type_spec: ContentSpec,

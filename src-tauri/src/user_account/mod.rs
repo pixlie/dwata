@@ -8,7 +8,7 @@ pub mod crud;
 
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct UserAccount {
     // First user, with ID one is used as default user
     pub id: i64,
@@ -24,7 +24,7 @@ pub struct UserAccount {
 
 #[derive(Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct UserAccountCreateUpdate {
     pub first_name: Option<String>,
     pub last_name: Option<String>,

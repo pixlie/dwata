@@ -5,14 +5,14 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize, TS, Builder)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 #[builder(default)]
 pub struct TypeInteger {
     byte_size: Option<u8>, // Can represent SMALLINT, INT, BIGINT, etc.
 }
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize, TS, Builder)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 #[builder(default)]
 pub struct TypeFloat {
     byte_size: Option<u8>,
@@ -25,14 +25,14 @@ pub enum TypeINet {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, TS, Builder)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct TypeArray {
     length: Option<i32>,
     // variable_length: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub enum ColumnDataType {
     SignedInteger(TypeInteger),
     // UnsignedInteger(TypeInteger),
@@ -51,14 +51,14 @@ pub enum ColumnDataType {
 
 #[derive(Debug, Clone, Deserialize, Serialize, TS)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct ForeignKey {
     foreign_table: String,
     foreign_column: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub enum IsForeignKey {
     No,
     Yes(ForeignKey),
@@ -66,7 +66,7 @@ pub enum IsForeignKey {
 
 #[derive(Debug, Clone, Deserialize, Serialize, TS, Builder)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct APIGridColumn {
     name: String,
     label: Option<String>,
@@ -86,7 +86,7 @@ impl APIGridColumn {
 
 #[derive(Debug, Default, Deserialize, Serialize, TS, Builder)]
 #[serde(rename_all(serialize = "camelCase"))]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 #[builder(pattern = "owned")]
 #[builder(default)]
 pub struct APIGridSchema {

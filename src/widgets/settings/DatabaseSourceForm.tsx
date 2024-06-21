@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 import { DatabaseSourceCreateUpdate } from "../../api_types/DatabaseSourceCreateUpdate";
-import withConfiguredForm from "../../utils/configuredForm";
+import withConfiguredForm from "../../utils/withConfiguredForm";
 import { Module } from "../../api_types/Module";
 import Form from "../interactable/ConfiguredForm";
 

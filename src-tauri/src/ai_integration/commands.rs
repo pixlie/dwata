@@ -1,13 +1,10 @@
-use log::error;
-use tauri::State;
-use tokio::task::spawn_blocking;
-
+use super::{models::AIModel, AIIntegration, AIProvider};
 use crate::{
     error::DwataError,
     workspace::{crud::CRUDRead, DwataDb},
 };
-
-use super::{models::AIModel, AIIntegration, AIProvider};
+use log::error;
+use tauri::State;
 
 #[tauri::command]
 pub async fn get_ai_model_list(_usable_only: Option<bool>) -> Result<Vec<AIModel>, DwataError> {
@@ -46,7 +43,7 @@ pub async fn get_ai_model_choice_list(
         .map(|x| {
             (
                 format!(
-                    "{}::{}",
+                    "{}/{}",
                     x.ai_provider.clone().to_string(),
                     x.api_name.clone()
                 ),

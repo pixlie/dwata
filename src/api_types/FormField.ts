@@ -2,7 +2,7 @@
 import type { ContentSpec } from "./ContentSpec";
 import type { ContentType } from "./ContentType";
 
-export interface FormField {
+export type FormField = {
   name: string;
   label: string;
   description: string | null;
@@ -11,4 +11,4 @@ export interface FormField {
   contentSpec: ContentSpec;
   isRequired: boolean | null;
   isEditable: boolean | null;
-}
+};

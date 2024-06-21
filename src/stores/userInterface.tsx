@@ -1,4 +1,4 @@
-import { Component, JSX, createContext, useContext } from "solid-js";
+import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { IProviderPropTypes, uiThemes } from "../utils/types";
 import getGitHubDarkColors from "../utils/colors/gitHubDark";

@@ -4,7 +4,7 @@ use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct Configuration {
     pub title: String,
     pub description: String,

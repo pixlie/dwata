@@ -13,7 +13,7 @@ pub mod providers;
 
 #[derive(Debug, Default, Deserialize, Serialize, Clone, TS, Type)]
 #[sqlx(rename_all = "lowercase")]
-#[ts(export, export_to = "../src/api_types/")]
+#[ts(export)]
 pub enum AIProvider {
     OpenAI,
     Groq,
@@ -52,7 +52,7 @@ impl ToString for AIProvider {
 
 #[derive(Debug, Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct AIIntegration {
     pub id: i64,
     pub label: Option<String>,
@@ -68,7 +68,7 @@ pub struct AIIntegration {
 
 #[derive(Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct AIIntegrationCreateUpdate {
     pub label: Option<String>,
     pub ai_provider: Option<String>,
@@ -77,7 +77,7 @@ pub struct AIIntegrationCreateUpdate {
 
 #[derive(Clone, Default, Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase", export_to = "../src/api_types/")]
+#[ts(export, rename_all = "camelCase")]
 pub struct AIIntegrationFilters {
     #[ts(type = "number")]
     pub id: Option<i64>,
