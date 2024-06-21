@@ -33,10 +33,10 @@ Note: `~` (tilde) means home folder on Linux/Mac OS, please change as per need.
 ```
 cd ~/Projects
 git clone git@github.com:brainless/dwata.git
-git checkout release
+git checkout beta
 ```
 
-Note: We use the `release` branch since the `main` branch may have breaking changes while the `release` branch is generally steady.
+Note: We use the `beta` branch since the `main` branch may receive code changes daily, thereby it may be unstable while the `beta` branch will be generally steady.
 
 ## Setup dwata related dependencies
 
@@ -57,7 +57,7 @@ Once we have installed the dependencies, then we can run the project in developm
 pnpm tauri dev
 ```
 
-This will run the project in development mode. Documentation will soon be updated to build the app in release mode once we are ready.
+This will run the project in development mode. Documentation will soon be updated to build the app in beta mode once we are ready.
 
 ## Get updates
 
@@ -68,4 +68,4 @@ cd ~/Projects/dwata
 git pull
 ```
 
-Note: This assumes we are still in the `release` branch.
+Note: This assumes we are still in the `beta` branch.
