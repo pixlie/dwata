@@ -128,7 +128,14 @@ const ReplyItem: Component<IPropTypes> = (props) => {
           </div>
 
           <div class="flex mt-4">
-            <div class="grow" />
+            <div
+              class="grow font-thin text-sm content-center"
+              style={{
+                color: getColors().colors["editor.foreground"],
+              }}
+            >
+              Resend chat to AI, only after 2 minutes
+            </div>
             <div>
               <Button
                 size="sm"

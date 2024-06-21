@@ -7,17 +7,16 @@ import Button from "../widgets/interactable/Button";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
 import SettingsAIIntegrationList from "../widgets/settings/SettingsIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
-import { useUserInterface } from "../stores/userInterface";
 import { useWorkspace } from "../stores/workspace";
 
 const SettingsIndex: Component = () => {
-  const [_, { getColors }] = useUserInterface();
-  const [_w, { readDirectoryList, readDatabaseList, readAIIntegrationList }] =
-    useWorkspace();
+  const [_w, { readAIIntegrationList }] = useWorkspace();
 
   onMount(async () => {
-    await readDirectoryList();
-    await readDatabaseList();
+    console.log("onMount SettingsIndex");
+
+    // await readDirectoryList();
+    // await readDatabaseList();
     await readAIIntegrationList();
   });
 
