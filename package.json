@@ -1,8 +1,13 @@
 {
   "name": "dwata",
-  "version": "0.0.9",
-  "description": "General purpose AI Studio",
+  "version": "0.1.0",
+  "description": "A general purpose, multi-model and multi-modal AI studio",
   "type": "module",
+  "author": {
+    "name": "Sumit Datta",
+    "email": "sumitdatta@gmail.com",
+    "url": "https://github.com/brainless"
+  },
   "scripts": {
     "start": "vite",
     "dev": "vite",

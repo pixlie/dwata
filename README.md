@@ -1,53 +1,60 @@
-# Dwata
+# dwata
 
-#### A general purpose, multi-model and multimodal AI Studio
+#### A general purpose, multi-model and multi-modal AI studio
 
 > [!WARNING]
 >
-> Dwata is in a very early and rapid stage of development.
-> It is missing some basic UX to continue a conversation with AI but it is getting close to an MVP.
+> dwata is in a very early stage of development.
+> At this moment only basic chat with large language models is available.
 > Please feel free to check Projects or Issues on GitHub for this project to get an idea of the status of development.
 
-## What does Dwata solve?
+## What does dwata solve?
 
 Let us imagine regular tasks or problems in our daily lives. How to market our website, manage our finances better or even coming up with gift suggestions. Really it could be any daily topic where we need a sounding board or an organiser.
 
-In Dwata, we can have a chat with AI (Artificial Intelligence). We break the problem into small chunks. The AI model(s) can ask for further information (access to website, emails, financial details, business database...). We try to come to some insight, actional item(s), a reminder or set of future tasks to tackle the original problem. That's it. It is your personal assistant.
+![Recent chats with AI models](docs/assets/List_chat_with_response_0.1.0.png?raw=true "Recent chats with AI models")
 
-![Recent chats with AI models](docs/assets/Home_screen_recent_chat_threads_0.0.2.png?raw=true "Recent chats with AI models")
+In dwata, we can have a chat with AI (Artificial Intelligence), mainly Large Language Models. We break the problem into small chunks. The AI model(s) can ask for further information (access to website, emails, financial details, business database...). We try to come to some insight, actional item(s), a reminder or set of future tasks to tackle the original problem. That's it. It is your personal assistant.
 
-## Want to try out Dwata?
+![Start a chat with any AI model](docs/assets/Start_chat_0.1.0.png?raw=true "Start a chat with any AI model")
 
-[Instructions to setup Dwata from sources](./docs/SETUP.md)
+## Want to try out dwata?
+
+> [!NOTICE]
+>
+> Since dwata is being updated almost daily, I am not releasing binary versions of the desktop app.
+> If you are comfortable setting up Node.js and Rust on your computer, then you can easily setup and run dwata.
+
+[Setup dwata from sources](./docs/SETUP.md)
 
 ## What does general purpose mean?
 
-Dwata is not geared toward a type of problem. It centers around the fact that recent AI models have become really good at comprehending human language. It is a new interface to the computer.
+dwata is not geared toward any specific type of problem. It it built around the fact that recent AI models have become really good at comprehending human language. It is a new interface to the computer.
 
-In Dwata, we start with chats on any daily topic that needs our attention. Then we (explicitly) give Dwata access to our data to be shared with AI. Dwata helps in reading data from many different sources and making it easy to be shared with AI. Dwata helps in figuring out the steps that an AI may want us to take, say access further data, set a calendar reminder or run a piece of code.
+In dwata, we start chats on any daily topic that needs our attention. Then we (explicitly) give access to our data to be shared with AI. dwata helps in reading data from many different sources and making it easy to be shared with AI. dwata helps in figuring out the steps that an AI may want us to take, say access further data, set a calendar reminder or run a piece of code.
 
-Therefore, Dwata does not focus on a type of problem and should be able to behave as an assistant to our day to day issues.
+Therefore, dwata does not focus on a type of problem and should be able to behave as an assistant to our day to day issues.
 
 ## What AI models can I connect to?
 
-Dwata is a multi-model app, as in it supports (or will support) connecting to AI models from these providers:
+dwata is a multi-model app, which means it supports (or will support) connecting to AI models from these providers:
 
 - [OpenAI](https://platform.openai.com/docs/models) - GPT-40, GPT-4, GPT-4 Turbo, GPT-3.5 Turbo, ...
 - [Groq](https://console.groq.com/docs/models) - Llama 3, LlaMA2-70b, Mixtral-8x7b, ...
-- [Anthropic](https://www.anthropic.com/product) - Claude 3, ...
 - [Ollama](https://ollama.com/library) - Llama 3, Llama 2, Mistral, Phi-2 Gemma, ...
+- [Anthropic](https://www.anthropic.com/product) - Claude 3, ...
 
-## What is multimodal?
+## What is multi-modal?
 
-Dwata is being built to be able to help us have conversations that include any type of "content", like text (usual chat conversations), code (like JavaScript), image (photo of a product for example), audio (speech to text for example) or even video (detect objects or even video creation). These content can be both input to AI or output from AI.
+dwata is being built to have chats that include any type of "content", like text, code (like JavaScript/Python), image (photo of a product for example), audio (speech to text for example) or even video (detect objects or even video creation). These content can be both input to AI or output from AI.
 
-## What is an AI Studio?
+## What is an AI studio?
 
-A Studio here means that Dwata is a general purpose software that allows mixing different questions, data and AI to accomplish our daily goals. We can save these as workflows and share with others. Thereby we can enable others to make AI based assistants easily.
+A studio here means that dwata is a general purpose software that allows mixing different questions, data and AI to accomplish our daily goals. We can save these as workflows and share with others. Thereby we can enable others to make AI based assistants easily.
 
-## What data sources can Dwata connect to?
+## What data sources can (will) dwata connect to?
 
-Dwata will be able to read data from:
+dwata will be able to read data from:
 
 - Databases like PostgreSQL, MySQL or MongoDB
 - SaaS products like Stripe or Shopify (API or CSV)
@@ -57,17 +64,17 @@ Dwata will be able to read data from:
 
 ## Can I compare chat from different models?
 
-Yes! In Dwata, you start a chat thread with an AI model. Then you can go into the thread and select to `compare` to any number of other models.
+Yes! In dwata, you start a chat thread with an AI model. Then you can go into the thread and select to `compare` to any number of other models.
 
-Dwata will have a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
+dwata will have a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
 
-## Does Dwata send any of my private/business data to your company?
+## Does dwata send any of my private/business data to your company?
 
-No, Dwata does not send me, Sumit, or my company, any of your private data. Your data will be sent to AI as per your choice in the chats.
+No, dwata does not send me, Sumit, or my company, any of your private data. Your data will be sent to AI as per your choice in the chats.
 
-Dwata will send basic product usage analytics and error reports to our company servers if you choose to send these. You will be asked explicitly.
+dwata will send basic product usage analytics and error reports to our company servers if you choose to send these. You will be asked explicitly.
 
-## How will Dwata make money?
+## How will dwata make money?
 
 Private collaboration: the desktop app is and will remain free (both in source code and price).
 
