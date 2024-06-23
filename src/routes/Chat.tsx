@@ -31,6 +31,9 @@ const ChatThreadIndex: Component = () => {
   const location = useLocation();
   const [_x, { refetch }] = createResource(async () => {
     await fetchChats();
+    if (!!params.threadId) {
+      await fetchChatReplies(parseInt(params.threadId));
+    }
   });
 
   createComputed<LocationProps>(
@@ -57,8 +60,7 @@ const ChatThreadIndex: Component = () => {
 
   createComputed(async () => {
     if (!!params.threadId) {
-      const threadId = parseInt(params.threadId);
-      await fetchChatReplies(threadId);
+      await fetchChatReplies(parseInt(params.threadId));
     }
   });
 
