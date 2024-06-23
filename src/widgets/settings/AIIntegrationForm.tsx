@@ -1,25 +1,12 @@
 import { Component } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
-import withConfiguredForm from "../../utils/withConfiguredForm";
 import { Module } from "../../api_types/Module";
 import { useParams } from "@solidjs/router";
 import Form from "../interactable/ConfiguredForm";
-import { AIIntegrationCreateUpdate } from "../../api_types/AIIntegrationCreateUpdate";
 
 const AIIntegrationForm: Component = () => {
   const [_, { getColors }] = useUserInterface();
   const params = useParams();
-
-  const configuredForm = withConfiguredForm<AIIntegrationCreateUpdate>({
-    module: "AIIntegration" as Module,
-    existingItemId: !!params.id ? parseInt(params.id) : undefined,
-    initialData: {
-      label: "OpenAI personal",
-      aiProvider: "OpenAI",
-      apiKey: "",
-    },
-    postSaveNavigateTo: "/settings",
-  });
 
   return (
     <>
@@ -80,10 +67,14 @@ const AIIntegrationForm: Component = () => {
 
       <div class="max-w-screen-sm">
         <Form
-          formConfiguration={configuredForm.formConfiguration}
-          formData={configuredForm.formData}
-          handleChange={configuredForm.handleChange}
-          handleSubmit={configuredForm.handleSubmit}
+          module={"AIIntegration" as Module}
+          existingItemId={!!params.id ? parseInt(params.id) : undefined}
+          initialData={{
+            label: "OpenAI personal",
+            aiProvider: "OpenAI",
+            apiKey: "",
+          }}
+          postSaveNavigateTo={"/settings"}
         />
       </div>
     </>

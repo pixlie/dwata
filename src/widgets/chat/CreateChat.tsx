@@ -1,6 +1,4 @@
-import { Component, createMemo } from "solid-js";
-import withConfiguredForm from "../../utils/withConfiguredForm";
-import { ChatCreateUpdate } from "../../api_types/ChatCreateUpdate";
+import { Component } from "solid-js";
 import { Module } from "../../api_types/Module";
 import Form from "../interactable/ConfiguredForm";
 import { useParams } from "@solidjs/router";
@@ -8,28 +6,21 @@ import { useParams } from "@solidjs/router";
 const ChatForm: Component = () => {
   const params = useParams();
 
-  const getConfiguredForm = createMemo(() => {
-    return withConfiguredForm<ChatCreateUpdate>({
-      module: "Chat" as Module,
-      initialData: {
-        message: "",
-        rootChatId: !!params.threadId ? parseInt(params.threadId) : undefined,
-        // requestedContentFormat: "Text" as ContentFormat,
-      },
-      postSaveNavigateTo: !!params.threadId
-        ? `/chat/thread/${params.threadId}`
-        : "/chat",
-    });
-  });
-
   if (!!params.threadId) {
     return (
       <div class="p-3 mb-10">
         <Form
-          formConfiguration={getConfiguredForm().formConfiguration}
-          formData={getConfiguredForm().formData}
-          handleChange={getConfiguredForm().handleChange}
-          handleSubmit={getConfiguredForm().handleSubmit}
+          module={"Chat" as Module}
+          initialData={{
+            message: "",
+            rootChatId: !!params.threadId
+              ? parseInt(params.threadId)
+              : undefined,
+            // requestedContentFormat: "Text" as ContentFormat,
+          }}
+          postSaveNavigateTo={
+            !!params.threadId ? `/chat/thread/${params.threadId}` : "/chat"
+          }
           submitButtomLabel={"Reply"}
           showPrelude={false}
         />
@@ -39,10 +30,17 @@ const ChatForm: Component = () => {
     return (
       <div class="max-w-screen-md mx-auto">
         <Form
-          formConfiguration={getConfiguredForm().formConfiguration}
-          formData={getConfiguredForm().formData}
-          handleChange={getConfiguredForm().handleChange}
-          handleSubmit={getConfiguredForm().handleSubmit}
+          module={"Chat" as Module}
+          initialData={{
+            message: "",
+            rootChatId: !!params.threadId
+              ? parseInt(params.threadId)
+              : undefined,
+            // requestedContentFormat: "Text" as ContentFormat,
+          }}
+          postSaveNavigateTo={
+            !!params.threadId ? `/chat/thread/${params.threadId}` : "/chat"
+          }
           submitButtomLabel={"Start a chat!"}
         />
       </div>
