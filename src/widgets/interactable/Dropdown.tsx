@@ -1,4 +1,11 @@
-import { Component, For, JSX, createMemo, createResource } from "solid-js";
+import {
+  Component,
+  For,
+  JSX,
+  createMemo,
+  createResource,
+  onMount,
+} from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { IFormField } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
@@ -40,6 +47,15 @@ const Dropdown: Component<IFormField> = (props) => {
     }
   };
 
+  onMount(() => {
+    if (
+      "choicesFromFunction" in props.contentSpec &&
+      !!props.contentSpec.choicesFromFunction
+    ) {
+      refetchChoices();
+    }
+  });
+
   const getChoices = createMemo(() => {
     if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
       return [
@@ -50,8 +66,6 @@ const Dropdown: Component<IFormField> = (props) => {
       "choicesFromFunction" in props.contentSpec &&
       !!props.contentSpec.choicesFromFunction
     ) {
-      refetchChoices();
-
       if (choicesFromFunction()) {
         return [
           ["__select__", "Select as AI model"],
