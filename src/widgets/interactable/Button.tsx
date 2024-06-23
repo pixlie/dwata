@@ -33,17 +33,23 @@ const Button: Component<IPropTypes> = (props) => {
     "background-color": getColors().colors["button.background"],
   };
 
-  if (!!props.onClick) {
-    return (
-      <button class={buttonClasses} onClick={props.onClick} style={styles}>
-        {props.label}
-      </button>
-    );
-  } else if (!!props.href) {
+  if (!!props.href) {
     return (
       <a class={buttonClasses} href={props.href} style={styles}>
         {props.label}
       </a>
+    );
+  } else if (!!props.onClick) {
+    return (
+      <button class={buttonClasses} style={styles} onClick={props.onClick}>
+        {props.label}
+      </button>
+    );
+  } else {
+    return (
+      <button class={buttonClasses} style={styles}>
+        {props.label}
+      </button>
     );
   }
 };

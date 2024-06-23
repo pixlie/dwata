@@ -4,21 +4,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { useNavigate } from "@solidjs/router";
 import { Module } from "../api_types/Module";
 import { ModuleDataCreateUpdate } from "../api_types/ModuleDataCreateUpdate";
-import { UserAccountCreateUpdate } from "../api_types/UserAccountCreateUpdate";
-import withConfiguredForm from "../utils/withConfiguredForm";
 
 const UserAccountForm: Component = () => {
   const navigate = useNavigate();
-
-  let configuredForm = withConfiguredForm<UserAccountCreateUpdate>({
-    module: "UserAccount" as Module,
-    existingItemId: 1,
-    initialData: {
-      firstName: null,
-      lastName: null,
-      email: null,
-    },
-  });
 
   const handleSubmit = async () => {
     await invoke("upsert_module_item", {
@@ -37,12 +25,16 @@ const UserAccountForm: Component = () => {
   return (
     <div class="max-w-screen-sm">
       <Form
-        formConfiguration={configuredForm.formConfiguration}
-        formData={configuredForm.formData}
-        handleChange={configuredForm.handleChange}
+        module={"UserAccount" as Module}
+        existingItemId={1}
+        initialData={{
+          firstName: "",
+          lastName: "",
+          email: "",
+        }}
         title="My account"
         submitButtomLabel="Save"
-        handleSubmit={handleSubmit}
+        // handleSubmit={handleSubmit}
       ></Form>
     </div>
   );
