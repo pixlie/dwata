@@ -1,18 +1,22 @@
-import {
-  Component,
-  For,
-  JSX,
-  createComputed,
-  createMemo,
-  createSignal,
-} from "solid-js";
+import { Component, For, JSX, createMemo, createResource } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
 import { IFormField } from "../../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 
 const Dropdown: Component<IFormField> = (props) => {
   const [_, { getColors }] = useUserInterface();
-  const [choices, setChoices] = createSignal<Array<[string, string]>>([]);
+  const [choicesFromFunction, { mutate: _m, refetch: refetchChoices }] =
+    createResource<Array<[string, string]> | null>(async () => {
+      if (
+        "choicesFromFunction" in props.contentSpec &&
+        !!props.contentSpec.choicesFromFunction
+      ) {
+        return await invoke<Array<[string, string]>>(
+          props.contentSpec.choicesFromFunction,
+        );
+      }
+      return null;
+    });
   const getSizeClass = createMemo(() => {
     switch (props.size) {
       case "sm":
@@ -36,17 +40,23 @@ const Dropdown: Component<IFormField> = (props) => {
     }
   };
 
-  createComputed(async () => {
+  const getChoices = createMemo(() => {
     if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
-      setChoices(props.contentSpec.choices);
+      return [
+        ["__select__", "Select as AI model"],
+        ...props.contentSpec.choices,
+      ];
     } else if (
       "choicesFromFunction" in props.contentSpec &&
       !!props.contentSpec.choicesFromFunction
     ) {
-      const response = await invoke(props.contentSpec.choicesFromFunction);
+      refetchChoices();
 
-      if (response) {
-        setChoices(response as Array<[string, string]>);
+      if (choicesFromFunction()) {
+        return [
+          ["__select__", "Select as AI model"],
+          ...(choicesFromFunction() as Array<[string, string]>),
+        ];
       }
     }
     return [];
@@ -67,7 +77,7 @@ const Dropdown: Component<IFormField> = (props) => {
           color: getColors().colors["input.background"],
         }}
       >
-        <For each={choices()}>
+        <For each={getChoices()}>
           {(choice) => (
             <option class="bg-white" value={choice[0]}>
               {choice[1]}

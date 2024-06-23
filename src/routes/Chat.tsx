@@ -2,10 +2,8 @@ import {
   Component,
   For,
   createComputed,
-  createEffect,
   createMemo,
   createResource,
-  onMount,
 } from "solid-js";
 import Thread from "../widgets/chat/Thread";
 import {
