@@ -9,13 +9,12 @@ pub(crate) async fn get_database_connection(
     app_config_dir: &PathBuf,
 ) -> Result<SqliteConnection, DwataError> {
     let mut path = app_config_dir.clone();
-    // We return a temporary in-memory DB in case we cannot create on disk DB
-    // let mut db_path = "sqlite::memory:";
     if let Ok(false) = Path::try_exists(app_config_dir) {
         create_dir_all(path.as_path()).unwrap_or_else(|_| {});
     }
     path.push("dwata.sqlite3");
     let db_path = path.to_str().unwrap();
+    info!("Path to Dwata DB: {}", db_path);
     if !sqlx::Sqlite::database_exists(db_path).await? {
         info!("Could not find existing Dwata DB, creating");
         sqlx::Sqlite::create_database(db_path).await?;

@@ -10,9 +10,9 @@ pub mod configuration;
 pub mod crud;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum Role {
     User,

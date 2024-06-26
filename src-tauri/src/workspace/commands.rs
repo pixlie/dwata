@@ -1,4 +1,4 @@
-use super::crud::{CRUDReadFilter, InsertUpdateResponse};
+use super::crud::InsertUpdateResponse;
 use super::ModuleFilters;
 use super::{
     configuration::{Configurable, Configuration},

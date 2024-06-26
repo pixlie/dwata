@@ -9,7 +9,7 @@ use crate::{
     error::DwataError,
 };
 use log::{error, info};
-use openai::types::{chat_completion_message_tool_call::Type, CreateChatCompletionResponse};
+use openai::types::CreateChatCompletionResponse;
 use reqwest::RequestBuilder;
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +34,6 @@ impl AIIntegration {
             AIProvider::OpenAI => Ok("https://api.openai.com/v1/chat/completions".to_string()),
             AIProvider::Groq => Ok("https://api.groq.com/openai/v1/chat/completions".to_string()),
             AIProvider::Ollama => Ok("http://localhost:11434/api/chat".to_string()),
-            _ => Err(DwataError::FeatureNotAvailableWithAIProvider),
             // AIProvider::Anthropic => Some("https://api.anthropic.com/v1/messages".to_string()),
             // AIProvider::MistralAI => Some("https://api.mistral.ai/v1/chat/completions".to_string()),
         }

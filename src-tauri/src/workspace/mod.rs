@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
+use crate::{ai_integration::AIIntegrationFilters, chat::ChatFilters};
+use serde::Deserialize;
 use sqlx::SqliteConnection;
 use tokio::sync::Mutex;
 use ts_rs::TS;
-
-use crate::{ai_integration::AIIntegrationFilters, chat::ChatFilters};
 
 // pub mod api_types;
 pub mod commands;
