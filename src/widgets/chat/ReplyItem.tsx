@@ -12,6 +12,7 @@ import { invoke } from "@tauri-apps/api/core";
 interface IPropTypes extends Chat {
   index: number;
   isRootChat?: boolean;
+  isComparing?: boolean;
 }
 
 const ReplyItem: Component<IPropTypes> = (props) => {
@@ -32,6 +33,8 @@ const ReplyItem: Component<IPropTypes> = (props) => {
     }
   });
 
+  /* This function is used to find the AI model that was used to create this
+  chat reply. This information is available in the previous message. */
   const getPreviousChat = createMemo(() => {
     if (props.index === 0) {
       return chat.chatList.find(
@@ -87,7 +90,7 @@ const ReplyItem: Component<IPropTypes> = (props) => {
           {props.message}
         </div>
 
-        {props.isRootChat ? (
+        {props.isRootChat && !props.isComparing ? (
           <div class="flex">
             <div class="grow" />
             <div

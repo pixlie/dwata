@@ -16,6 +16,9 @@ import Heading from "../widgets/typography/Heading";
 import { ChatProvider, useChat } from "../stores/chatThread";
 import ChatForm from "../widgets/chat/CreateChat";
 import ReplyItem from "../widgets/chat/ReplyItem";
+import CompareChats from "./CompareChats";
+import Button from "../widgets/interactable/Button";
+import getColors from "../utils/colors/gitHubDark";
 
 interface LocationProps {
   pathname: string;
@@ -58,7 +61,7 @@ const ChatThreadIndex: Component = () => {
 
   createComputed(async () => {
     if (!!params.threadId) {
-      await fetchChatReplies(parseInt(params.threadId));
+      refetch();
     }
   });
 
@@ -78,11 +81,25 @@ const ChatThreadIndex: Component = () => {
           <>
             <ReplyItem {...getRootChat()!} isRootChat index={0} />
 
+            <div
+              class="mb-4 font-thin"
+              style={{ color: getColors().colors["editor.foreground"] }}
+            >
+              <Button
+                size="sm"
+                href={`/chat/compare/${params.threadId}`}
+                label="Compare"
+              />{" "}
+              responses from different AI models
+            </div>
+
             <For each={chat.chatReplyList[parseInt(params.threadId)]}>
               {(reply, index) => <ReplyItem {...reply} index={index()} />}
             </For>
 
-            <ChatForm />
+            <ChatForm
+              defaultAIModel={getRootChat()!.requestedAiModel || undefined}
+            />
           </>
         ) : null}
       </div>
@@ -98,6 +115,7 @@ const ChatRoutes: Component = () => {
   return (
     <ChatProvider>
       <Route path="/thread/:threadId" component={ChatThreadIndex} />
+      <Route path="/compare/:threadId" component={CompareChats} />
       <Route path="/start" component={ChatForm} />
 
       <Route path="/" component={ChatThreadIndex} />

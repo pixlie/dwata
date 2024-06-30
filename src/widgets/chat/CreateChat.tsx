@@ -3,7 +3,11 @@ import { Module } from "../../api_types/Module";
 import Form from "../interactable/ConfiguredForm";
 import { useParams } from "@solidjs/router";
 
-const ChatForm: Component = () => {
+interface IPropTypes {
+  defaultAIModel?: string;
+}
+
+const ChatForm: Component<IPropTypes> = (props) => {
   const params = useParams();
 
   if (!!params.threadId) {
@@ -16,6 +20,7 @@ const ChatForm: Component = () => {
             rootChatId: !!params.threadId
               ? parseInt(params.threadId)
               : undefined,
+            requestedAiModel: props.defaultAIModel,
             // requestedContentFormat: "Text" as ContentFormat,
           }}
           postSaveNavigateTo={

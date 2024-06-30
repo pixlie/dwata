@@ -93,7 +93,11 @@ const Dropdown: Component<IFormField> = (props) => {
       >
         <For each={getChoices()}>
           {(choice) => (
-            <option class="bg-white" value={choice[0]}>
+            <option
+              class="bg-white"
+              value={choice[0]}
+              selected={choice[0] === props.value}
+            >
               {choice[1]}
             </option>
           )}
