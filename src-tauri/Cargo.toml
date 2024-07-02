@@ -3,7 +3,7 @@ members = ["openai"]
 
 [package]
 name = "dwata"
-version = "0.1.0"
+version = "0.1.2"
 description = "A general purpose, multi-model and multi-modal AI studio"
 authors = ["Sumit Datta <sumitdatta@gmail.com>"]
 license = "Apache-2.0 license"

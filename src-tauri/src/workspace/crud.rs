@@ -145,10 +145,11 @@ pub trait CRUDRead {
             }
             count += 1;
             if count < limit {
-                builder.push("AND ");
+                builder.push(" AND ");
             }
         }
         let executable = builder.build_query_as();
+        let sql = &executable.sql();
         match executable.fetch_all(&mut *db_connection).await {
             Ok(rows) => {
                 info!(
@@ -160,8 +161,9 @@ pub trait CRUDRead {
             }
             Err(err) => {
                 error!(
-                    "Could not fetch rows from Dwata DB, table {}.\nError: {}",
+                    "Could not fetch rows from Dwata DB, table {}.\nSQL: {}\nError: {}",
                     Self::table_name(),
+                    sql,
                     err
                 );
                 Err(DwataError::CouldNotFetchRowsFromDwataDB)

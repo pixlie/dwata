@@ -4,25 +4,23 @@ import { Chat } from "../../api_types/Chat";
 import { marked } from "marked";
 import { Role } from "../../api_types/Role";
 import { ProcessStatus } from "../../api_types/ProcessStatus";
-import { useChat } from "../../stores/chatThread";
-import { useParams } from "@solidjs/router";
+import { useChat } from "../../stores/chat";
 import Button from "../interactable/Button";
 import { invoke } from "@tauri-apps/api/core";
 
 interface IPropTypes extends Chat {
   index: number;
-  isRootChat?: boolean;
+  isComparing?: boolean;
 }
 
 const ReplyItem: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
   const [chat] = useChat();
-  const params = useParams();
   let refMarkedContent: HTMLDivElement | undefined;
 
   onMount(() => {
     if (
-      !props.isRootChat &&
+      props.rootChatId !== null &&
       props.role === ("assistant" as Role) &&
       !!props.message &&
       !!refMarkedContent
@@ -32,13 +30,15 @@ const ReplyItem: Component<IPropTypes> = (props) => {
     }
   });
 
-  const getPreviousChat = createMemo(() => {
+  /* This function is used to find the AI model that was used to create this
+  chat reply. This information is available in the previous message. */
+  const getRequestedAIModel = createMemo(() => {
     if (props.index === 0) {
-      return chat.chatList.find(
-        (chat) => chat.id === parseInt(params.threadId),
-      );
+      return chat.chatList.find((chat) => chat.id === props.rootChatId)
+        ?.requestedAiModel;
     } else {
-      return chat.chatReplyList[parseInt(params.threadId)][props.index - 1];
+      return chat.chatReplyList[props.rootChatId][props.index - 1]
+        ?.requestedAiModel;
     }
   });
 
@@ -71,13 +71,12 @@ const ReplyItem: Component<IPropTypes> = (props) => {
               color: getColors().colors["editor.foreground"],
             }}
           >
-            <i class="fa-solid fa-robot" />{" "}
-            {!!getPreviousChat() ? getPreviousChat()?.requestedAiModel : "AI"}:
+            <i class="fa-solid fa-robot" /> {getRequestedAIModel()}:
           </div>
         )}
 
         <div
-          class={`${props.isRootChat ? "text-2xl leading-8 font-semibold" : "leading-6 font-normal"} overflow-x-auto font-content markdown`}
+          class={`${props.rootChatId === null ? "text-2xl leading-8 font-semibold" : "leading-6 font-normal"} overflow-x-auto font-content markdown`}
           style={{
             "font-optical-sizing": "auto",
             color: getColors().colors["editor.foreground"],
@@ -87,7 +86,7 @@ const ReplyItem: Component<IPropTypes> = (props) => {
           {props.message}
         </div>
 
-        {props.isRootChat ? (
+        {props.rootChatId === null && !props.isComparing ? (
           <div class="flex">
             <div class="grow" />
             <div

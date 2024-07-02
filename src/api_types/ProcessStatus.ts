@@ -2,6 +2,6 @@
 
 export type ProcessStatus =
   | "not_applicable"
-  | "request_sent"
+  | "pending"
   | "response_received"
   | "error_received";

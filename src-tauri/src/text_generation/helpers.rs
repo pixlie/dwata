@@ -6,7 +6,6 @@ use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InsertUpdateResponse};
 use crate::workspace::DwataDb;
 use chrono::{Duration, Utc};
-use log::info;
 use tauri::State;
 
 /// Generates response for a chat thread.

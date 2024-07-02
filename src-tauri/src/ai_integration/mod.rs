@@ -1,8 +1,7 @@
-use crate::error::DwataError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::{FromRow, Type};
-use std::{path::Display, str::FromStr};
+use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod commands;
@@ -11,8 +10,10 @@ pub mod crud;
 pub mod models;
 pub mod providers;
 
-#[derive(Debug, Default, Deserialize, Serialize, Clone, TS, Type)]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, TS, Type, EnumString, Display)]
 #[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum AIProvider {
     OpenAI,
@@ -21,33 +22,6 @@ pub enum AIProvider {
     Ollama,
     // Anthropic,
     // Mistral,
-}
-
-impl FromStr for AIProvider {
-    type Err = DwataError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "openai" => Ok(Self::OpenAI),
-            "groq" => Ok(Self::Groq),
-            "ollama" => Ok(Self::Ollama),
-            // "anthropic" => Ok(Self::Anthropic),
-            // "mistral" => Ok(Self::Mistral),
-            _ => Err(DwataError::InvalidAIProvider),
-        }
-    }
-}
-
-impl ToString for AIProvider {
-    fn to_string(&self) -> String {
-        match self {
-            AIProvider::OpenAI => "openai".to_string(),
-            AIProvider::Groq => "groq".to_string(),
-            AIProvider::Ollama => "ollama".to_string(),
-            // AIProvider::Anthropic => "anthropic".to_string(),
-            // AIProvider::Mistral => "mistral".to_string(),
-        }
-    }
 }
 
 #[derive(Debug, Serialize, FromRow, TS)]

@@ -13,8 +13,6 @@ const SettingsIndex: Component = () => {
   const [_w, { readAIIntegrationList }] = useWorkspace();
 
   onMount(async () => {
-    console.log("onMount SettingsIndex");
-
     // await readDirectoryList();
     // await readDatabaseList();
     await readAIIntegrationList();

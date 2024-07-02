@@ -1,15 +1,17 @@
-use crate::error::DwataError;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
-use std::str::FromStr;
+use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod configuration;
 pub mod crud;
 pub mod helpers;
 
-#[derive(Debug, Deserialize, Serialize, Type, TS)]
+#[derive(Debug, Deserialize, Serialize, Type, TS, EnumString, Display)]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum DatabaseType {
     PostgreSQL,
@@ -17,21 +19,6 @@ pub enum DatabaseType {
     SQLite,
     MongoDB,
     Qdrant,
-}
-
-impl FromStr for DatabaseType {
-    type Err = DwataError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "postgresql" => Ok(DatabaseType::PostgreSQL),
-            "mysql" => Ok(DatabaseType::MySQL),
-            "sqlite" => Ok(DatabaseType::SQLite),
-            "mongodb" => Ok(DatabaseType::MongoDB),
-            "qdrant" => Ok(DatabaseType::Qdrant),
-            _ => Err(DwataError::InvalidDatabaseType),
-        }
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]

@@ -13,9 +13,12 @@ import {
   useParams,
 } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
-import { ChatProvider, useChat } from "../stores/chatThread";
-import ChatForm from "../widgets/chat/CreateChat";
+import { ChatProvider, useChat } from "../stores/chat";
+import ChatForm, { NewChatForm } from "../widgets/chat/ChatForm";
 import ReplyItem from "../widgets/chat/ReplyItem";
+import CompareChats from "./CompareChats";
+import Button from "../widgets/interactable/Button";
+import getColors from "../utils/colors/gitHubDark";
 
 interface LocationProps {
   pathname: string;
@@ -58,7 +61,7 @@ const ChatThreadIndex: Component = () => {
 
   createComputed(async () => {
     if (!!params.threadId) {
-      await fetchChatReplies(parseInt(params.threadId));
+      refetch();
     }
   });
 
@@ -70,19 +73,38 @@ const ChatThreadIndex: Component = () => {
     <div class="flex h-full">
       <div class="w-2/5 overflow-y-auto pr-4">
         <Heading size="3xl">Chats with AI</Heading>
-        <For each={chat.chatList}>{(thread) => <Thread {...thread} />}</For>
+        <For
+          each={chat.chatList.filter((x) => x.comparedToRootChatId === null)}
+        >
+          {(thread) => <Thread {...thread} />}
+        </For>
       </div>
 
       <div class="w-3/5 overflow-y-auto pr-3">
         {!!getRootChat() ? (
           <>
-            <ReplyItem {...getRootChat()!} isRootChat index={0} />
+            <ReplyItem {...getRootChat()!} index={0} />
+
+            <div
+              class="mb-4 font-thin"
+              style={{ color: getColors().colors["editor.foreground"] }}
+            >
+              <Button
+                size="sm"
+                href={`/chat/compare/${params.threadId}`}
+                label="Compare"
+              />{" "}
+              responses from different AI models
+            </div>
 
             <For each={chat.chatReplyList[parseInt(params.threadId)]}>
               {(reply, index) => <ReplyItem {...reply} index={index()} />}
             </For>
 
-            <ChatForm />
+            <ChatForm
+              rootChatId={parseInt(params.threadId)}
+              defaultAIModel={getRootChat()!.requestedAiModel || undefined}
+            />
           </>
         ) : null}
       </div>
@@ -98,7 +120,8 @@ const ChatRoutes: Component = () => {
   return (
     <ChatProvider>
       <Route path="/thread/:threadId" component={ChatThreadIndex} />
-      <Route path="/start" component={ChatForm} />
+      <Route path="/compare/:threadId" component={CompareChats} />
+      <Route path="/start" component={NewChatForm} />
 
       <Route path="/" component={ChatThreadIndex} />
     </ChatProvider>

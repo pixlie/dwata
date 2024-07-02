@@ -28,9 +28,7 @@ pub enum DwataError {
     ModuleNotFound,
 
     // AI providers/models/features
-    InvalidAIProvider,
     InvalidAIModel,
-    InvalidChatRole,
     CouldNotConnectToAIProvider,
     CouldNotGenerateEmbedding,
     FeatureNotAvailableWithAIProvider,
@@ -58,6 +56,9 @@ pub enum DwataError {
 
     // API requests related
     CouldNotConnectToAPI,
+
+    // Enum related
+    CouldNotParseEnum,
 }
 
 impl Error for DwataError {
@@ -90,5 +91,12 @@ impl From<reqwest::Error> for DwataError {
     fn from(err: reqwest::Error) -> Self {
         error!("Could not connect to API\n Error: {}", err);
         DwataError::CouldNotConnectToAPI
+    }
+}
+
+impl From<strum::ParseError> for DwataError {
+    fn from(err: strum::ParseError) -> Self {
+        error!("Could not parse enum\n Error: {}", err);
+        DwataError::CouldNotParseEnum
     }
 }

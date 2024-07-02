@@ -10,9 +10,9 @@ pub mod configuration;
 pub mod crud;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "snake_case")]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum Role {
     User,
@@ -51,6 +51,8 @@ pub struct Chat {
     // This is null for the first chat
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
 
     pub role: Option<Role>,
     // In case there is a tool response from AI model, there may not be a message
@@ -79,6 +81,10 @@ pub struct ChatCreateUpdate {
     pub role: Option<String>,
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
+
     pub message: Option<String>,
     // pub requested_content_format: Option<String>,
     pub requested_ai_model: Option<String>,
@@ -94,6 +100,11 @@ pub struct ChatFilters {
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
     pub root_chat_null: Option<bool>,
+
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
+    pub compared_to_root_chat_null: Option<bool>,
+
     pub requested_ai_model: Option<String>,
 }
 

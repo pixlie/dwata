@@ -57,8 +57,8 @@ const Form: Component<IPropTypes> = (props) => {
       });
     });
 
-  createEffect((previousValuData) => {
-    if (previousValuData !== props.initialData) {
+  createEffect((previousData) => {
+    if (previousData !== props.initialData) {
       setFormData((state) => ({ ...state, ...props.initialData }));
 
       setDirty((state) => [

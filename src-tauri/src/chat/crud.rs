@@ -36,6 +36,9 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
         if let Some(x) = &self.root_chat_id {
             names_values.push_name_value("root_chat_id", InputValue::ID(*x));
         }
+        if let Some(x) = &self.compared_to_root_chat_id {
+            names_values.push_name_value("compared_to_root_chat_id", InputValue::ID(*x));
+        }
         if let Some(x) = &self.message {
             if x.chars().count() == 0 {
                 return Err(DwataError::ChatHasNoMessage);
@@ -94,16 +97,15 @@ impl CRUDReadFilter for ChatFilters {
         if let Some(true) = &self.root_chat_null {
             name_values.push_name_value("root_chat_id", InputValue::Null);
         }
+        if let Some(x) = &self.compared_to_root_chat_id {
+            name_values.push_name_value("compared_to_root_chat_id", InputValue::ID(*x));
+        }
+        if let Some(true) = &self.compared_to_root_chat_null {
+            name_values.push_name_value("compared_to_root_chat_id", InputValue::Null);
+        }
         if let Some(x) = &self.requested_ai_model {
             name_values.push_name_value("requested_ai_model", InputValue::Text(x.clone()));
         }
         name_values
     }
 }
-
-// pub(crate) async fn update_reply_sent_to_ai(chat_reply_id: i64, connection: &mut SqliteConnection) {
-//     query("UPDATE chat_reply SET json_data = json_set(json_data, '$.is_sent_to_ai', json('true')) WHERE id = ?1")
-//     .bind(chat_reply_id)
-//     .execute(connection)
-//     .await.unwrap();
-// }
