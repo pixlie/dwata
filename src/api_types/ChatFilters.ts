@@ -4,5 +4,7 @@ export type ChatFilters = {
   role: string | null;
   rootChatId: number;
   rootChatNull: boolean | null;
+  comparedToRootChatId: number;
+  comparedToRootChatNull: boolean | null;
   requestedAiModel: string | null;
 };

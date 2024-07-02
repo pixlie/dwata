@@ -9,6 +9,7 @@ import { ModuleFilters } from "../api_types/ModuleFilters";
 
 interface IStore {
   chatList: Array<Chat>;
+  comparisonList: { [rootChatId: number]: Array<number> };
   chatReplyList: { [rootChatId: number]: Array<Chat> };
 
   isFetching: boolean;
@@ -18,6 +19,7 @@ interface IStore {
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
     chatList: [],
+    comparisonList: {},
     chatReplyList: {},
 
     isFetching: false,
@@ -39,14 +41,14 @@ const makeStore = () => {
         }
       },
 
-      fetchChatReplies: async (threadId: number) => {
+      fetchChatReplies: async (rootChatId: number) => {
         const result = await invoke<ModuleDataReadList>(
           "read_row_list_for_module_with_filter",
           {
             module: "Chat" as Module,
             filters: {
               Chat: {
-                rootChatId: threadId,
+                rootChatId,
               },
             } as ModuleFilters,
           },
@@ -57,9 +59,57 @@ const makeStore = () => {
             ...store,
             chatReplyList: {
               ...store.chatReplyList,
-              [threadId]: result["Chat"] as Array<Chat>,
+              [rootChatId]: result["Chat"] as Array<Chat>,
             },
           });
+        }
+      },
+
+      fetchChatComparisons: async (rootChatId: number) => {
+        const result = await invoke<ModuleDataReadList>(
+          "read_row_list_for_module_with_filter",
+          {
+            module: "Chat" as Module,
+            filters: {
+              Chat: {
+                comparedToRootChatId: rootChatId,
+              },
+            } as ModuleFilters,
+          },
+        );
+
+        if ("Chat" in result) {
+          setStore({
+            ...store,
+            comparisonList: {
+              ...store.comparisonList,
+              [rootChatId]: (result["Chat"] as Array<Chat>).map((x) => x.id),
+            },
+          });
+
+          for (const comparedChatId of store.comparisonList[rootChatId]) {
+            const result = await invoke<ModuleDataReadList>(
+              "read_row_list_for_module_with_filter",
+              {
+                module: "Chat" as Module,
+                filters: {
+                  Chat: {
+                    rootChatId: comparedChatId,
+                  },
+                } as ModuleFilters,
+              },
+            );
+
+            if ("Chat" in result) {
+              setStore({
+                ...store,
+                chatReplyList: {
+                  ...store.chatReplyList,
+                  [comparedChatId]: result["Chat"] as Array<Chat>,
+                },
+              });
+            }
+          }
         }
       },
     },

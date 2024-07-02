@@ -38,8 +38,8 @@ const Dropdown: Component<IFormField> = (props) => {
 
   const classes =
     getSizeClass() +
-    " rounded-md border " +
-    `${props.displayBlock && "w-full"}`;
+    " rounded-md border" +
+    `${!!props.displayBlock ? " w-full" : " max-w-full"}`;
 
   const handleChange: JSX.EventHandler<HTMLSelectElement, Event> = (event) => {
     if (!!props.onChange) {

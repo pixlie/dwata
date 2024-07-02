@@ -5,10 +5,10 @@ import type { Role } from "./Role";
 export type Chat = {
   id: number;
   rootChatId: number;
+  comparedToRootChatId: number;
   role: Role | null;
   message: string | null;
   requestedAiModel: string | null;
   processStatus: ProcessStatus | null;
-  createdById: bigint | null;
   createdAt: string;
 };

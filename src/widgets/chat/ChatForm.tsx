@@ -1,31 +1,31 @@
 import { Component } from "solid-js";
 import { Module } from "../../api_types/Module";
 import Form from "../interactable/ConfiguredForm";
-import { useParams } from "@solidjs/router";
+import { useLocation } from "@solidjs/router";
 
 interface IPropTypes {
+  rootChatId?: number;
   defaultAIModel?: string;
 }
 
 const ChatForm: Component<IPropTypes> = (props) => {
-  const params = useParams();
+  const location = useLocation();
 
-  if (!!params.threadId) {
+  if (props.rootChatId !== undefined) {
+    const postSaveNavigateTo = location.pathname.includes("compare")
+      ? `/chat/compare/${props.rootChatId}?newReply=true`
+      : `/chat/thread/${props.rootChatId}?newReply=true`;
+
     return (
       <div class="p-3 mb-10">
         <Form
           module={"Chat" as Module}
           initialData={{
             message: "",
-            rootChatId: !!params.threadId
-              ? parseInt(params.threadId)
-              : undefined,
+            rootChatId: props.rootChatId,
             requestedAiModel: props.defaultAIModel,
-            // requestedContentFormat: "Text" as ContentFormat,
           }}
-          postSaveNavigateTo={
-            !!params.threadId ? `/chat/thread/${params.threadId}` : "/chat"
-          }
+          postSaveNavigateTo={postSaveNavigateTo}
           submitButtomLabel={"Reply"}
           showPrelude={false}
         />
@@ -38,19 +38,15 @@ const ChatForm: Component<IPropTypes> = (props) => {
           module={"Chat" as Module}
           initialData={{
             message: "",
-            rootChatId: !!params.threadId
-              ? parseInt(params.threadId)
-              : undefined,
-            // requestedContentFormat: "Text" as ContentFormat,
           }}
-          postSaveNavigateTo={
-            !!params.threadId ? `/chat/thread/${params.threadId}` : "/chat"
-          }
+          postSaveNavigateTo="/chat"
           submitButtomLabel={"Start a chat!"}
         />
       </div>
     );
   }
 };
+
+export const NewChatForm: Component = () => <ChatForm />;
 
 export default ChatForm;
