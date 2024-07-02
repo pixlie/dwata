@@ -60,39 +60,39 @@ pub(crate) struct LogProb {
 pub(crate) struct OpenAIChatRequest {
     pub(crate) model: String,
     pub(crate) messages: Vec<TextGenerationRequest>,
-    pub(crate) tools: Vec<OpenAITool>,
+    // pub(crate) tools: Vec<OpenAITool>,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub(crate) struct OpenAIToolParameter {
-    #[serde(rename(serialize = "type"))]
-    pub(crate) _type: String,
-    pub(crate) description: String,
-    #[serde(rename(serialize = "enum"))]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) _enum: Option<Vec<String>>,
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// pub(crate) struct OpenAIToolParameter {
+//     #[serde(rename(serialize = "type"))]
+//     pub(crate) _type: String,
+//     pub(crate) description: String,
+//     #[serde(rename(serialize = "enum"))]
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub(crate) _enum: Option<Vec<String>>,
+// }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub(crate) struct OpenAIToolParameters {
-    #[serde(rename(serialize = "type"))]
-    pub(crate) _type: String,
-    pub(crate) properties: HashMap<String, OpenAIToolParameter>,
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// pub(crate) struct OpenAIToolParameters {
+//     #[serde(rename(serialize = "type"))]
+//     pub(crate) _type: String,
+//     pub(crate) properties: HashMap<String, OpenAIToolParameter>,
+// }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub(crate) struct OpenAIToolFunction {
-    pub(crate) name: String,
-    pub(crate) description: String,
-    pub(crate) parameters: OpenAIToolParameters,
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// pub(crate) struct OpenAIToolFunction {
+//     pub(crate) name: String,
+//     pub(crate) description: String,
+//     pub(crate) parameters: OpenAIToolParameters,
+// }
 
-#[derive(Deserialize, Serialize, Debug)]
-pub(crate) struct OpenAITool {
-    #[serde(rename(serialize = "type"))]
-    pub(crate) _type: String,
-    pub(crate) function: OpenAIToolFunction,
-}
+// #[derive(Deserialize, Serialize, Debug)]
+// pub(crate) struct OpenAITool {
+//     #[serde(rename(serialize = "type"))]
+//     pub(crate) _type: String,
+//     pub(crate) function: OpenAIToolFunction,
+// }
 
 // impl OpenAIChatRequest {
 //     pub(crate) fn add_tools(mut self, tool_list: Vec<Tool>) -> OpenAIChatRequest {

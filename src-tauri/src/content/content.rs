@@ -45,7 +45,7 @@ pub enum ContentType {
     // DateTime,
 }
 
-#[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
+#[derive(Default, Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct ContentSpec {
@@ -58,18 +58,6 @@ pub struct ContentSpec {
     // Text can be a prompt to AI model
     pub is_prompt: Option<bool>,
     // BulletPoints,
-}
-
-impl Default for ContentSpec {
-    fn default() -> Self {
-        Self {
-            text_type: None,
-            length_limits: None,
-            choices: None,
-            choices_from_function: None,
-            is_prompt: None,
-        }
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]

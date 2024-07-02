@@ -51,6 +51,8 @@ pub struct Chat {
     // This is null for the first chat
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
 
     pub role: Option<Role>,
     // In case there is a tool response from AI model, there may not be a message
@@ -79,6 +81,8 @@ pub struct ChatCreateUpdate {
     pub role: Option<String>,
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
     pub message: Option<String>,
     // pub requested_content_format: Option<String>,
     pub requested_ai_model: Option<String>,
@@ -94,6 +98,11 @@ pub struct ChatFilters {
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
     pub root_chat_null: Option<bool>,
+
+    #[ts(type = "number")]
+    pub compared_to_root_chat_id: Option<i64>,
+    pub compared_to_root_chat_null: Option<bool>,
+
     pub requested_ai_model: Option<String>,
 }
 

@@ -51,7 +51,7 @@ impl AIIntegration {
                 let payload: OpenAIChatRequest = OpenAIChatRequest {
                     model: ai_model.api_name,
                     messages: messages_to_send,
-                    tools: vec![],
+                    // tools: vec![],
                 };
                 let request_builder: RequestBuilder = https_client
                     .post(chat_url)
