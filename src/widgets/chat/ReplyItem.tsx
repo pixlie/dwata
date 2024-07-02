@@ -26,7 +26,10 @@ const ReplyItem: Component<IPropTypes> = (props) => {
       !!refMarkedContent
     ) {
       // This is an AI generated message, show as Markdown
-      refMarkedContent.innerHTML = marked.parse(props.message);
+      const parsed = marked.parse(props.message);
+      if (typeof parsed === "string") {
+        refMarkedContent.innerHTML = parsed;
+      }
     }
   });
 
