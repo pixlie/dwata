@@ -81,8 +81,10 @@ pub struct ChatCreateUpdate {
     pub role: Option<String>,
     #[ts(type = "number")]
     pub root_chat_id: Option<i64>,
+
     #[ts(type = "number")]
     pub compared_to_root_chat_id: Option<i64>,
+
     pub message: Option<String>,
     // pub requested_content_format: Option<String>,
     pub requested_ai_model: Option<String>,
