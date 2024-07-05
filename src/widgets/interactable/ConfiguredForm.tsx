@@ -3,7 +3,6 @@ import {
   For,
   JSX,
   createComputed,
-  createEffect,
   createResource,
   createSignal,
   onMount,
@@ -57,37 +56,49 @@ const Form: Component<IPropTypes> = (props) => {
       });
     });
 
-  createEffect((previousData) => {
-    if (previousData !== props.initialData) {
+  onMount(() => {
+    refetchModuleConfiguration();
+    if (props.initialData !== undefined) {
       setFormData((state) => ({ ...state, ...props.initialData }));
 
       setDirty((state) => [
         ...state,
-        ...Object.keys(props.initialData).filter((x) => !state.includes(x)),
+        ...Object.keys(props.initialData!).filter((x) => !state.includes(x)),
       ]);
     }
-  }, {});
-
-  onMount(() => {
-    refetchModuleConfiguration();
-    // setFormConfiguration(config() as Configuration);
 
     if (props.existingItemId) {
       refetchModuleData();
+    }
+  });
 
-      if (!!moduleData() && props.module in moduleData()!) {
-        for (const [key, value] of Object.entries(
-          moduleData()![props.module as keyof ModuleDataRead],
-        )) {
-          if (key in formData()) {
-            setFormData((state) => ({
-              ...state,
-              [key as string]: value as IFormFieldValue,
-            }));
-          }
+  createComputed((isSet) => {
+    if (!props.existingItemId) {
+      return false;
+    }
+
+    if (
+      !isSet &&
+      moduleData.state === "ready" &&
+      moduleData() !== undefined &&
+      props.module in moduleData()!
+    ) {
+      let _data: { [key: string]: IFormFieldValue } = {};
+      for (const [key, value] of Object.entries(
+        moduleData()![props.module as keyof ModuleDataRead],
+      )) {
+        if (key in formData()) {
+          _data[key] = value as IFormFieldValue;
         }
       }
+
+      setFormData((state) => ({
+        ...state,
+        ..._data,
+      }));
+      return true;
     }
+    return false;
   });
 
   const handleChange = (name: string, value: IFormFieldValue) => {
@@ -147,7 +158,7 @@ const Form: Component<IPropTypes> = (props) => {
 
           nextTaskStore[1].initiateTask({
             name: response.nextTask,
-            arguments: response.arguments,
+            arguments: response.arguments || undefined,
           });
           if (!!props.postSaveNavigateTo) {
             navigate(

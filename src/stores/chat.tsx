@@ -9,7 +9,7 @@ import { ModuleFilters } from "../api_types/ModuleFilters";
 
 interface IStore {
   chatList: Array<Chat>;
-  comparisonList: { [rootChatId: number]: Array<number> };
+  comparisonList: { [rootChatId: number]: Array<Chat> };
   chatReplyList: { [rootChatId: number]: Array<Chat> };
 
   isFetching: boolean;
@@ -83,18 +83,18 @@ const makeStore = () => {
             ...store,
             comparisonList: {
               ...store.comparisonList,
-              [rootChatId]: (result["Chat"] as Array<Chat>).map((x) => x.id),
+              [rootChatId]: result["Chat"] as Array<Chat>,
             },
           });
 
-          for (const comparedChatId of store.comparisonList[rootChatId]) {
+          for (const comparedChat of store.comparisonList[rootChatId]) {
             const result = await invoke<ModuleDataReadList>(
               "read_row_list_for_module_with_filter",
               {
                 module: "Chat" as Module,
                 filters: {
                   Chat: {
-                    rootChatId: comparedChatId,
+                    rootChatId: comparedChat.id,
                   },
                 } as ModuleFilters,
               },
@@ -105,7 +105,7 @@ const makeStore = () => {
                 ...store,
                 chatReplyList: {
                   ...store.chatReplyList,
-                  [comparedChatId]: result["Chat"] as Array<Chat>,
+                  [comparedChat.id]: result["Chat"] as Array<Chat>,
                 },
               });
             }

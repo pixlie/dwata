@@ -1,7 +1,7 @@
 {
   "name": "dwata",
-  "version": "0.1.2",
-  "description": "A general purpose, multi-model and multi-modal AI studio",
+  "version": "0.1.3",
+  "description": "AI assistants for everyone",
   "type": "module",
   "author": {
     "name": "Sumit Datta",

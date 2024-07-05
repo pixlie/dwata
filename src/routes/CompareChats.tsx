@@ -7,11 +7,11 @@ import {
 } from "solid-js";
 import { useLocation, useParams } from "@solidjs/router";
 import { useChat } from "../stores/chat";
-import ChatForm from "../widgets/chat/ChatForm";
 import ReplyItem from "../widgets/chat/ReplyItem";
 import CreateChatComparison from "../widgets/chat/CreateChatComparison";
 import Heading from "../widgets/typography/Heading";
 import { useUserInterface } from "../stores/userInterface";
+import ThreadView from "../widgets/chat/ThreadView";
 
 interface LocationProps {
   pathname: string;
@@ -75,30 +75,13 @@ const CompareChats: Component = () => {
 
       <div class="flex flex-row h-full">
         <div class="w-96 overflow-y-auto pr-3 pb-16">
-          <For each={chat.chatReplyList[getRootChatId()]}>
-            {(reply, index) => <ReplyItem {...reply} index={index()} />}
-          </For>
-
-          <ChatForm
-            rootChatId={getRootChatId()}
-            defaultAIModel={getRootChat()!.requestedAiModel || undefined}
-          />
+          <ThreadView rootChatId={getRootChatId()} isComparing />
         </div>
 
         <For each={chat.comparisonList[getRootChatId()]}>
-          {(comparisonChatId) => (
+          {(comparisonChat) => (
             <div class="w-96 overflow-y-auto pr-3 pb-16">
-              <For each={chat.chatReplyList[comparisonChatId]}>
-                {(reply, index) => <ReplyItem {...reply} index={index()} />}
-              </For>
-
-              <ChatForm
-                rootChatId={comparisonChatId}
-                defaultAIModel={
-                  chat.chatList.find((x) => x.id === comparisonChatId)!
-                    .requestedAiModel || undefined
-                }
-              />
+              <ThreadView rootChatId={comparisonChat.id} isComparing />
             </div>
           )}
         </For>

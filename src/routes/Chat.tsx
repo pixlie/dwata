@@ -1,11 +1,5 @@
-import {
-  Component,
-  For,
-  createComputed,
-  createMemo,
-  createResource,
-} from "solid-js";
-import Thread from "../widgets/chat/Thread";
+import { Component, For, createComputed, createResource } from "solid-js";
+import ThreadItem from "../widgets/chat/ThreadItem";
 import {
   Route,
   RouteSectionProps,
@@ -14,11 +8,9 @@ import {
 } from "@solidjs/router";
 import Heading from "../widgets/typography/Heading";
 import { ChatProvider, useChat } from "../stores/chat";
-import ChatForm, { NewChatForm } from "../widgets/chat/ChatForm";
-import ReplyItem from "../widgets/chat/ReplyItem";
+import { NewChatForm } from "../widgets/chat/ChatForm";
 import CompareChats from "./CompareChats";
-import Button from "../widgets/interactable/Button";
-import getColors from "../utils/colors/gitHubDark";
+import ThreadView from "../widgets/chat/ThreadView";
 
 interface LocationProps {
   pathname: string;
@@ -65,10 +57,6 @@ const ChatThreadIndex: Component = () => {
     }
   });
 
-  const getRootChat = createMemo(() =>
-    chat.chatList.find((x) => x.id === parseInt(params.threadId)),
-  );
-
   return (
     <div class="flex h-full">
       <div class="w-2/5 overflow-y-auto pr-4">
@@ -76,36 +64,13 @@ const ChatThreadIndex: Component = () => {
         <For
           each={chat.chatList.filter((x) => x.comparedToRootChatId === null)}
         >
-          {(thread) => <Thread {...thread} />}
+          {(thread) => <ThreadItem {...thread} />}
         </For>
       </div>
 
       <div class="w-3/5 overflow-y-auto pr-3">
-        {!!getRootChat() ? (
-          <>
-            <ReplyItem {...getRootChat()!} index={0} />
-
-            <div
-              class="mb-4 font-thin"
-              style={{ color: getColors().colors["editor.foreground"] }}
-            >
-              <Button
-                size="sm"
-                href={`/chat/compare/${params.threadId}`}
-                label="Compare"
-              />{" "}
-              responses from different AI models
-            </div>
-
-            <For each={chat.chatReplyList[parseInt(params.threadId)]}>
-              {(reply, index) => <ReplyItem {...reply} index={index()} />}
-            </For>
-
-            <ChatForm
-              rootChatId={parseInt(params.threadId)}
-              defaultAIModel={getRootChat()!.requestedAiModel || undefined}
-            />
-          </>
+        {!!params.threadId ? (
+          <ThreadView rootChatId={parseInt(params.threadId)} />
         ) : null}
       </div>
     </div>

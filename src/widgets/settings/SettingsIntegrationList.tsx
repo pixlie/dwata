@@ -9,7 +9,7 @@ const SettingsAIIntegrationItem: Component<AIIntegration> = (props) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/settings/ai-provider/edit/${props.id}`);
+    navigate(`/settings/ai-integration/edit/${props.id}`);
   };
 
   return (
