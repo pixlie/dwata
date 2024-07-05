@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { useUserInterface } from "../../stores/userInterface";
 import { Chat } from "../../api_types/Chat";
 
-const Thread: Component<Chat> = (props) => {
+const ThreadItem: Component<Chat> = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const [_, { getColors }] = useUserInterface();
@@ -45,4 +45,4 @@ const Thread: Component<Chat> = (props) => {
   );
 };
 
-export default Thread;
+export default ThreadItem;
