@@ -4,7 +4,6 @@ import { Chat } from "../../api_types/Chat";
 import { marked } from "marked";
 import { Role } from "../../api_types/Role";
 import { useChat } from "../../stores/chat";
-import { invoke } from "@tauri-apps/api/core";
 
 interface IPropTypes extends Chat {
   index: number;

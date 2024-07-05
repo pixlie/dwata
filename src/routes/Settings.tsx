@@ -54,7 +54,7 @@ const SettingsIndex: Component = () => {
       <div class="mb-2" />
       <Button
         label="Add an AI provider"
-        href="/settings/ai-provider/add"
+        href="/settings/ai-integration/add"
         size="sm"
       ></Button>
       <div class="mb-6" />
@@ -85,8 +85,8 @@ const SettingsRoutes: Component = () => {
         component={DirectorySourceForm}
       />
 
-      <Route path="/ai-provider/add" component={AIIntegrationForm} />
-      <Route path="/ai-provider/edit/:id" component={AIIntegrationForm} />
+      <Route path="/ai-integration/add" component={AIIntegrationForm} />
+      <Route path="/ai-integration/edit/:id" component={AIIntegrationForm} />
 
       <Route path="/" component={SettingsIndex} />
     </>

@@ -30,7 +30,7 @@ const Home: Component = () => {
       <p style={{ color: getColors().colors["editor.foreground"] }}>
         To get started, please{" "}
         <Button
-          href="/settings/ai-provider/add"
+          href="/settings/ai-integration/add"
           size="sm"
           label="add an AI provider"
         />
