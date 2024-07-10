@@ -7,12 +7,15 @@ import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 import { DirectorySource } from "../api_types/DirectorySource";
 import { DatabaseSource } from "../api_types/DatabaseSource";
 import { AIIntegration } from "../api_types/AIIntegration";
+import { OAuth2 } from "../api_types/OAuth2";
 
 const makeStore = () => {
   const [store, setStore] = createStore<IWorkspace>({
     directoryList: [],
     databaseList: [],
     aiIntegrationList: [],
+    oAuth2List: [],
+    emailAccountList: [],
 
     isReady: false,
     isFetching: false,
@@ -96,6 +99,28 @@ const makeStore = () => {
               : [],
           isReady: true,
           isFetching: false,
+        }));
+      },
+
+      readOAuth2List: async () => {
+        if (store.isFetching) {
+          return;
+        }
+        setStore({
+          ...store,
+          isFetching: true,
+        });
+        // We invoke the Tauri API to load workspace
+        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
+          "read_row_list_for_module",
+          {
+            module: "OAuth2" as Module,
+          },
+        );
+        setStore((state) => ({
+          ...state,
+          oAuth2List:
+            "OAuth2" in response ? (response.OAuth2 as Array<OAuth2>) : [],
         }));
       },
     },

@@ -58,17 +58,14 @@ const Dropdown: Component<IFormField> = (props) => {
 
   const getChoices = createMemo(() => {
     if ("choices" in props.contentSpec && !!props.contentSpec.choices) {
-      return [
-        ["__select__", "Select as AI model"],
-        ...props.contentSpec.choices,
-      ];
+      return [["__select__", "Select one"], ...props.contentSpec.choices];
     } else if (
       "choicesFromFunction" in props.contentSpec &&
       !!props.contentSpec.choicesFromFunction
     ) {
       if (choicesFromFunction()) {
         return [
-          ["__select__", "Select as AI model"],
+          ["__select__", "Select one"],
           ...(choicesFromFunction() as Array<[string, string]>),
         ];
       }

@@ -6,6 +6,8 @@ import { Content } from "../api_types/Content";
 import { DirectorySource } from "../api_types/DirectorySource";
 import { DatabaseSource } from "../api_types/DatabaseSource";
 import { AIIntegration } from "../api_types/AIIntegration";
+import { OAuth2 } from "../api_types/OAuth2";
+import { EmailAccount } from "../api_types/EmailAccount";
 
 interface ILabel {
   id: number;
@@ -46,6 +48,8 @@ interface IWorkspace {
   directoryList: Array<DirectorySource>;
   databaseList: Array<DatabaseSource>;
   aiIntegrationList: Array<AIIntegration>;
+  oAuth2List: Array<OAuth2>;
+  emailAccountList: Array<EmailAccount>;
 
   isReady: boolean;
   isFetching: boolean;

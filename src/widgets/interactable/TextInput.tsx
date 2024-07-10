@@ -36,6 +36,7 @@ const TextInput: Component<IFormField> = (props) => {
       )}
       <div class="mt-2">
         <input
+          name={props.name}
           type={inputType}
           required={props.isRequired || undefined}
           class="block w-full rounded-md px-2 py-1.5 border font-content"
@@ -45,9 +46,10 @@ const TextInput: Component<IFormField> = (props) => {
             color: getColors().colors["input.foreground"],
           }}
           placeholder={props.placeholder || undefined}
-          value={props.value}
+          value={props.value !== undefined ? props.value : ""}
           onChange={handleChange}
           onFocus={props.onFocus}
+          disabled={!props.isEditable}
         />
       </div>
     </>

@@ -1,8 +1,8 @@
 import { Component, JSX, createMemo } from "solid-js";
 import { useUserInterface } from "../../stores/userInterface";
+import { FormButton } from "../../api_types/FormButton";
 
-interface IPropTypes {
-  label: string;
+interface IPropTypes extends FormButton {
   size?: "sm" | "base" | "lg";
   isBlock?: boolean;
   onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>;
@@ -24,6 +24,9 @@ const Button: Component<IPropTypes> = (props) => {
     }
   });
 
+  const buttonType =
+    !!props.buttonType && props.buttonType === "Submit" ? "submit" : undefined;
+
   const buttonClasses =
     getSizeClass() +
     " rounded-md select-none cursor-pointer hover:shadow-lg " +
@@ -41,13 +44,18 @@ const Button: Component<IPropTypes> = (props) => {
     );
   } else if (!!props.onClick) {
     return (
-      <button class={buttonClasses} style={styles} onClick={props.onClick}>
+      <button
+        class={buttonClasses}
+        style={styles}
+        onClick={props.onClick}
+        type={buttonType}
+      >
         {props.label}
       </button>
     );
   } else {
     return (
-      <button class={buttonClasses} style={styles}>
+      <button class={buttonClasses} style={styles} type={buttonType}>
         {props.label}
       </button>
     );
