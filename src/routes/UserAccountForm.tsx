@@ -33,7 +33,6 @@ const UserAccountForm: Component = () => {
           email: "",
         }}
         title="My account"
-        submitButtomLabel="Save"
         // handleSubmit={handleSubmit}
       ></Form>
     </div>

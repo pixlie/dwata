@@ -5,9 +5,13 @@ import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 // import SettingsSourceList from "../widgets/settings/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
-import SettingsAIIntegrationList from "../widgets/settings/SettingsIntegrationList";
+import SettingsAIIntegrationList from "../widgets/settings/SettingsAIIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useWorkspace } from "../stores/workspace";
+import Oauth2Form from "../widgets/settings/OAuth2Form";
+import EmailAccountForm from "../widgets/settings/EmailAccountForm";
+import SettingsOAuth2List from "../widgets/settings/SettingsOAuth2List";
+import SettingsEmailAccountList from "../widgets/settings/SettingsEmailAccountList";
 
 const SettingsIndex: Component = () => {
   const [_w, { readAIIntegrationList }] = useWorkspace();
@@ -49,12 +53,32 @@ const SettingsIndex: Component = () => {
       </div>
       <div class="mb-6" /> */}
 
-      <Heading size="xl">AI Providers</Heading>
+      <Heading size="xl">AI integrations</Heading>
       <SettingsAIIntegrationList />
       <div class="mb-2" />
       <Button
-        label="Add an AI provider"
+        label="Add AI provider"
         href="/settings/ai-integration/add"
+        size="sm"
+      ></Button>
+      <div class="mb-6" />
+
+      <Heading size="xl">Oauth2 credentials</Heading>
+      <SettingsOAuth2List />
+      <div class="mb-2" />
+      <Button
+        label="Add Oauth2 credentials"
+        href="/settings/oauth2/add"
+        size="sm"
+      ></Button>
+      <div class="mb-6" />
+
+      <Heading size="xl">Email accounts</Heading>
+      <SettingsEmailAccountList />
+      <div class="mb-2" />
+      <Button
+        label="Add Email account"
+        href="/settings/email-account/add"
         size="sm"
       ></Button>
       <div class="mb-6" />
@@ -87,6 +111,12 @@ const SettingsRoutes: Component = () => {
 
       <Route path="/ai-integration/add" component={AIIntegrationForm} />
       <Route path="/ai-integration/edit/:id" component={AIIntegrationForm} />
+
+      <Route path="/oauth2/add" component={Oauth2Form} />
+      <Route path="/oauth2/edit/:id" component={Oauth2Form} />
+
+      <Route path="/email-account/add" component={EmailAccountForm} />
+      <Route path="/email-account/edit/:id" component={EmailAccountForm} />
 
       <Route path="/" component={SettingsIndex} />
     </>

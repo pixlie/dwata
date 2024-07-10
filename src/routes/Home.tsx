@@ -2,9 +2,18 @@ import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import { useUserInterface } from "../stores/userInterface";
 import Button from "../widgets/interactable/Button";
+import { invoke } from "@tauri-apps/api/core";
 
 const Home: Component = () => {
   const [_, { getColors }] = useUserInterface();
+
+  const handleGoogleAuth = async () => {
+    await invoke("google_oauth2");
+  };
+
+  const handleReadEmail = async () => {
+    await invoke("read_inbox");
+  };
 
   return (
     <div class="max-w-screen-md">
@@ -34,6 +43,14 @@ const Home: Component = () => {
           size="sm"
           label="add an AI provider"
         />
+      </p>
+
+      <p style={{ color: getColors().colors["editor.foreground"] }}>
+        Text <Button onClick={handleGoogleAuth} size="sm" label="Google Auth" />
+      </p>
+
+      <p style={{ color: getColors().colors["editor.foreground"] }}>
+        <Button onClick={handleReadEmail} size="sm" label="Read email" />
       </p>
     </div>
   );
