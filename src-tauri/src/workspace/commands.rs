@@ -1,7 +1,7 @@
 use super::crud::InsertUpdateResponse;
 use super::ModuleFilters;
 use super::{
-    configuration::{Configurable, Configuration},
+    api::{NextStep, Writable},
     crud::{CRUDCreateUpdate, ModuleDataCreateUpdate, ModuleDataReadList},
     DwataDb, Module,
 };
@@ -9,7 +9,9 @@ use crate::ai_integration::AIIntegration;
 use crate::chat::Chat;
 use crate::database_source::DatabaseSource;
 use crate::directory_source::DirectorySource;
+use crate::email_account::EmailAccount;
 use crate::error::DwataError;
+use crate::oauth2::OAuth2;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::{CRUDRead, ModuleDataRead};
 use sqlx::SqliteConnection;
@@ -17,13 +19,31 @@ use std::ops::DerefMut;
 use tauri::State;
 
 #[tauri::command]
-pub fn get_module_configuration(module: Module) -> Result<Configuration, DwataError> {
+pub fn module_insert_or_update_initiate(module: Module) -> Result<NextStep, DwataError> {
     match module {
-        Module::UserAccount => Ok(UserAccount::get_schema()),
-        Module::DirectorySource => Ok(DirectorySource::get_schema()),
-        Module::DatabaseSource => Ok(DatabaseSource::get_schema()),
-        Module::AIIntegration => Ok(AIIntegration::get_schema()),
-        Module::Chat => Ok(Chat::get_schema()),
+        Module::UserAccount => UserAccount::initiate(),
+        Module::DirectorySource => DirectorySource::initiate(),
+        Module::DatabaseSource => DatabaseSource::initiate(),
+        Module::AIIntegration => AIIntegration::initiate(),
+        Module::Chat => Chat::initiate(),
+        Module::EmailAccount => EmailAccount::initiate(),
+        Module::OAuth2 => OAuth2::initiate(),
+    }
+}
+
+#[tauri::command]
+pub async fn module_insert_or_update_next_step(
+    module: Module,
+    data: ModuleDataCreateUpdate,
+) -> Result<NextStep, DwataError> {
+    match module {
+        Module::UserAccount => UserAccount::next_step(data).await,
+        Module::DirectorySource => DirectorySource::next_step(data).await,
+        Module::DatabaseSource => DatabaseSource::next_step(data).await,
+        Module::AIIntegration => AIIntegration::next_step(data).await,
+        Module::Chat => Chat::next_step(data).await,
+        Module::EmailAccount => EmailAccount::next_step(data).await,
+        Module::OAuth2 => OAuth2::next_step(data).await,
     }
 }
 
@@ -50,6 +70,12 @@ pub async fn read_row_list_for_module(
         Module::Chat => Chat::read_all(db_connection)
             .await
             .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
+        Module::EmailAccount => EmailAccount::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::EmailAccount(result))),
+        Module::OAuth2 => OAuth2::read_all(db_connection)
+            .await
+            .and_then(|result| Ok(ModuleDataReadList::Oauth2(result))),
     }
 }
 
@@ -93,6 +119,12 @@ pub async fn read_module_item_by_pk(
         Module::Chat => Chat::read_one_by_pk(pk, db_connection)
             .await
             .and_then(|x| Ok(ModuleDataRead::Chat(x))),
+        Module::OAuth2 => OAuth2::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::OAuth2(x))),
+        Module::EmailAccount => EmailAccount::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::EmailAccount(x))),
     }
 }
 
@@ -106,6 +138,8 @@ pub async fn insert_helper(
         ModuleDataCreateUpdate::DatabaseSource(x) => x.insert_module_data(db_connection).await,
         ModuleDataCreateUpdate::AIIntegration(x) => x.insert_module_data(db_connection).await,
         ModuleDataCreateUpdate::Chat(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::OAuth2(x) => x.insert_module_data(db_connection).await,
+        ModuleDataCreateUpdate::EmailAccount(x) => x.insert_module_data(db_connection).await,
     }
 }
 
@@ -129,6 +163,8 @@ pub async fn update_helper(
         ModuleDataCreateUpdate::DatabaseSource(x) => x.update_module_data(pk, db_connection).await,
         ModuleDataCreateUpdate::AIIntegration(x) => x.update_module_data(pk, db_connection).await,
         ModuleDataCreateUpdate::Chat(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::OAuth2(x) => x.update_module_data(pk, db_connection).await,
+        ModuleDataCreateUpdate::EmailAccount(x) => x.update_module_data(pk, db_connection).await,
     }
 }
 
@@ -172,6 +208,12 @@ pub async fn upsert_module_item(
         ModuleDataCreateUpdate::Chat(_) => Chat::read_one_by_pk(pk, db_connection)
             .await
             .and_then(|x| Ok(ModuleDataRead::Chat(x))),
+        ModuleDataCreateUpdate::OAuth2(_) => OAuth2::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::OAuth2(x))),
+        ModuleDataCreateUpdate::EmailAccount(_) => EmailAccount::read_one_by_pk(pk, db_connection)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::EmailAccount(x))),
     };
     match existing {
         Ok(_) => {

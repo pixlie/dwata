@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use ts_rs::TS;
 
-pub mod configuration;
+pub mod api;
 pub mod crud;
 
 #[derive(Debug, Serialize, FromRow, TS)]

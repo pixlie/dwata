@@ -1,11 +1,12 @@
 use super::DirectorySource;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
-use crate::workspace::configuration::{Configurable, Configuration};
+use crate::error::DwataError;
+use crate::workspace::api::{Configuration, NextStep, Writable};
 
-impl Configurable for DirectorySource {
-    fn get_schema() -> Configuration {
-        Configuration::new(
+impl Writable for DirectorySource {
+    fn initiate() -> Result<NextStep, DwataError> {
+        Ok(NextStep::Initiate(Configuration::new(
             "Directory",
             "Directory containing files which match specified types",
             vec![
@@ -39,6 +40,6 @@ impl Configurable for DirectorySource {
                     Some(true),
                 ),
             ],
-        )
+        )))
     }
 }

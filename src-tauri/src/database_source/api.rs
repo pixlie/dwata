@@ -1,10 +1,11 @@
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
 use crate::database_source::DatabaseSource;
-use crate::workspace::configuration::{Configurable, Configuration};
+use crate::error::DwataError;
+use crate::workspace::api::{Configuration, NextStep, Writable};
 
-impl Configurable for DatabaseSource {
-    fn get_schema() -> Configuration {
+impl Writable for DatabaseSource {
+    fn initiate() -> Result<NextStep, DwataError> {
         let database_type_content_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
                 ("PostgreSQL".to_string(), "PostgreSQL".to_string()),
@@ -14,7 +15,7 @@ impl Configurable for DatabaseSource {
             ..ContentSpec::default()
         };
 
-        Configuration::new(
+        Ok(NextStep::Initiate(Configuration::new(
             "Database Source",
             "Database source details",
             vec![
@@ -82,6 +83,6 @@ impl Configurable for DatabaseSource {
                     Some(true),
                 ),
             ],
-        )
+        )))
     }
 }

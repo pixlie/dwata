@@ -44,7 +44,10 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
         Ok(names_values)
     }
 
-    async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
+    async fn pre_insert(
+        &self,
+        _db_connection: &mut SqliteConnection,
+    ) -> Result<VecColumnNameValue, DwataError> {
         // We connect to this database and check if it works
         check_database_connection(
             &DatabaseType::from_str(self.database_type.as_ref().unwrap())?,
@@ -57,6 +60,6 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
             self.database_name.as_ref().unwrap(),
         )
         .await?;
-        Ok(())
+        Ok(VecColumnNameValue::default())
     }
 }

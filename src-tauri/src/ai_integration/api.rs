@@ -1,13 +1,13 @@
+use super::{AIIntegration, AIProvider};
 use crate::content::{
     content::{ContentSpec, ContentType},
     form::FormField,
 };
-use crate::workspace::configuration::{Configurable, Configuration};
+use crate::error::DwataError;
+use crate::workspace::api::{Configuration, NextStep, Writable};
 
-use super::{AIIntegration, AIProvider};
-
-impl Configurable for AIIntegration {
-    fn get_schema() -> Configuration {
+impl Writable for AIIntegration {
+    fn initiate() -> Result<NextStep, DwataError> {
         let ai_provider_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
                 (AIProvider::OpenAI.to_string(), "OpenAI".to_string()),
@@ -17,7 +17,7 @@ impl Configurable for AIIntegration {
             ..ContentSpec::default()
         };
 
-        Configuration::new(
+        Ok(NextStep::Initiate(Configuration::new(
             "AI Integration",
             "API key based integration to an AI providers with your own API key.
             You can have more than one integration to the same provider.",
@@ -50,6 +50,6 @@ impl Configurable for AIIntegration {
                     Some(true),
                 ),
             ],
-        )
+        )))
     }
 }

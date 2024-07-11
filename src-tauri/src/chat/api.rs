@@ -1,11 +1,12 @@
 use crate::chat::Chat;
 use crate::content::content::{ContentSpec, ContentType, TextType};
 use crate::content::form::FormField;
-use crate::workspace::configuration::{Configurable, Configuration};
+use crate::error::DwataError;
+use crate::workspace::api::{Configuration, NextStep, Writable};
 
-impl Configurable for Chat {
-    fn get_schema() -> Configuration {
-        Configuration::new(
+impl Writable for Chat {
+    fn initiate() -> Result<NextStep, DwataError> {
+        Ok(NextStep::Initiate(Configuration::new(
             "Chat with AI",
             "Chat with AI models, sharing your objectives and let AI help you find solutions",
             vec![
@@ -35,6 +36,6 @@ impl Configurable for Chat {
                     Some(true)
                 ),
             ]
-        )
+        )))
     }
 }

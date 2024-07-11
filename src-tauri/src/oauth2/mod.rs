@@ -4,7 +4,7 @@ use sqlx::{FromRow, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
-pub mod configuration;
+pub mod api;
 pub mod crud;
 pub mod helpers;
 
@@ -58,4 +58,5 @@ pub struct Oauth2APIResponse {
     pub access_token: String,
     pub refresh_token: Option<String>,
     pub identifier: String,
+    pub handle: Option<String>,
 }

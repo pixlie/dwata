@@ -1,3 +1,5 @@
+use std::default;
+
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -34,9 +36,10 @@ pub enum TextType {
     FilePath,
 }
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Default, Deserialize, Serialize, TS)]
 #[ts(export)]
 pub enum ContentType {
+    #[default]
     Text,
     ID,
     TextArray,
@@ -57,14 +60,15 @@ pub struct ContentSpec {
     pub choices_from_function: Option<String>,
     // Text can be a prompt to AI model
     pub is_prompt: Option<bool>,
+    pub is_clickable: Option<bool>,
     // BulletPoints,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
 #[ts(export)]
 pub enum Content {
     Text(String),
-    ID(i64),
+    ID(#[ts(type = "number")] i64),
     // Image(Image),
     // DateTime(DateTime<Utc>),
 }

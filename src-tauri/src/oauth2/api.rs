@@ -7,7 +7,7 @@ use crate::content::{
     form::FormField,
 };
 use crate::error::DwataError;
-use crate::workspace::configuration::{Configuration, NextStep, Writable};
+use crate::workspace::api::{Configuration, NextStep, Writable};
 use crate::workspace::crud::ModuleDataCreateUpdate;
 
 impl OAuth2 {

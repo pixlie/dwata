@@ -13,7 +13,7 @@ use std::net::TcpListener;
 use url::Url;
 
 #[derive(Serialize, Deserialize)]
-pub struct UserInfo {
+pub struct GoogleUserInfo {
     pub id: String,
     pub email: String,
     pub verified_email: bool,
@@ -166,13 +166,14 @@ pub async fn get_google_oauth2_tokens(
         )
         .send()
         .await?
-        .json::<UserInfo>()
+        .json::<GoogleUserInfo>()
         .await?;
 
     Ok(Oauth2APIResponse {
         authorization_code: auth_code,
         access_token: token_response.access_token().secret().clone(),
         refresh_token: token_response.refresh_token().map(|x| x.secret().clone()),
-        identifier: user_info.email,
+        identifier: user_info.id,
+        handle: Some(user_info.email),
     })
 }

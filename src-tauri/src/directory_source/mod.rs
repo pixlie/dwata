@@ -5,8 +5,8 @@ use sqlx::{prelude::FromRow, types::Json};
 use std::path::PathBuf;
 use ts_rs::TS;
 
+pub mod api;
 pub mod commands;
-pub mod configuration;
 pub mod crud;
 pub mod file_contents;
 
@@ -25,9 +25,12 @@ pub struct File {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct DirectorySource {
+    #[ts(type = "number")]
     pub id: i64,
+
     #[sqlx(try_from = "String")]
     pub path: PathBuf,
+
     pub label: Option<String>,
     #[ts(as = "Vec<String>")]
     pub include_patterns: Json<Vec<String>>,

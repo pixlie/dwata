@@ -58,6 +58,9 @@ impl CRUDCreateUpdate for OAuth2CreateUpdate {
             InputValue::Text(oauth2_response.refresh_token.unwrap_or_default()),
         );
         name_values.push_name_value("identifier", InputValue::Text(oauth2_response.identifier));
+        if let Some(x) = oauth2_response.handle {
+            name_values.push_name_value("handle", InputValue::Text(x.clone()));
+        }
         Ok(name_values)
     }
 }

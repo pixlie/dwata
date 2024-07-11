@@ -26,6 +26,7 @@ pub enum DwataError {
 
     // Workspace and configuration
     ModuleNotFound,
+    NextStepNotAvailable,
 
     // AI providers/models/features
     InvalidAIModel,
@@ -59,6 +60,16 @@ pub enum DwataError {
 
     // Enum related
     CouldNotParseEnum,
+
+    // External authentication related
+    CouldNotFindOAuth2Config,
+    CouldNotCreateAuthURL,
+    CouldNotCreateTokenURL,
+    CouldNotGetTokenResponse,
+    CouldNotAuthenticateToService,
+
+    // Email related
+    CouldNotReadMailBody,
 }
 
 impl Error for DwataError {

@@ -6,7 +6,7 @@ use sqlx::{FromRow, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
-pub mod configuration;
+pub mod api;
 pub mod crud;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]

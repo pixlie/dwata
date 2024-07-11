@@ -1,11 +1,12 @@
 use super::UserAccount;
 use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
-use crate::workspace::configuration::{Configurable, Configuration};
+use crate::error::DwataError;
+use crate::workspace::api::{Configuration, NextStep, Writable};
 
-impl Configurable for UserAccount {
-    fn get_schema() -> Configuration {
-        Configuration::new(
+impl Writable for UserAccount {
+    fn initiate() -> Result<NextStep, DwataError> {
+        Ok(NextStep::Initiate(Configuration::new(
             "User Account",
             "User account details",
             vec![
@@ -37,6 +38,6 @@ impl Configurable for UserAccount {
                     Some(true),
                 ),
             ],
-        )
+        )))
     }
 }

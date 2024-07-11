@@ -4,8 +4,8 @@ use sqlx::prelude::{FromRow, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
+pub mod api;
 pub mod commands;
-pub mod configuration;
 pub mod crud;
 pub mod models;
 pub mod providers;
@@ -28,7 +28,9 @@ pub enum AIProvider {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct AIIntegration {
+    #[ts(type = "number")]
     pub id: i64,
+
     pub label: Option<String>,
     pub ai_provider: AIProvider,
     pub api_key: Option<String>,

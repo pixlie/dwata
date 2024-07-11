@@ -20,6 +20,8 @@ mod text_generation;
 // mod schema;
 mod user_account;
 // mod workflow;
+mod email_account;
+mod oauth2;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -51,7 +53,8 @@ fn main() {
         .setup(setup)
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            workspace::commands::get_module_configuration,
+            workspace::commands::module_insert_or_update_initiate,
+            workspace::commands::module_insert_or_update_next_step,
             workspace::commands::read_row_list_for_module,
             workspace::commands::read_row_list_for_module_with_filter,
             workspace::commands::read_module_item_by_pk,
@@ -63,6 +66,7 @@ fn main() {
             ai_integration::commands::get_ai_model_list,
             ai_integration::commands::get_ai_model_choice_list,
             text_generation::commands::chat_with_ai,
+            email_account::commands::read_inbox,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,
