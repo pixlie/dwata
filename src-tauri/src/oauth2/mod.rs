@@ -5,6 +5,7 @@ use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
+pub mod commands;
 pub mod crud;
 pub mod helpers;
 
@@ -47,10 +48,6 @@ pub struct OAuth2CreateUpdate {
     pub provider: Option<String>,
     pub client_id: Option<String>,
     pub client_secret: Option<String>,
-    // pub authorization_code: String,
-    // pub access_token: String,
-    // pub refresh_token: Option<String>,
-    // pub identifier: String,
 }
 
 pub struct Oauth2APIResponse {

@@ -69,6 +69,7 @@ pub enum DwataError {
     CouldNotAuthenticateToService,
 
     // Email related
+    InvalidEmailProvider,
     CouldNotReadMailBody,
 }
 

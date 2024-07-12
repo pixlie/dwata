@@ -6,7 +6,7 @@ use crate::workspace::api::{Configuration, NextStep, Writable};
 
 impl Writable for DirectorySource {
     fn initiate() -> Result<NextStep, DwataError> {
-        Ok(NextStep::Initiate(Configuration::new(
+        Ok(NextStep::Configure(Configuration::new(
             "Directory",
             "Directory containing files which match specified types",
             vec![

@@ -17,7 +17,7 @@ impl Writable for AIIntegration {
             ..ContentSpec::default()
         };
 
-        Ok(NextStep::Initiate(Configuration::new(
+        Ok(NextStep::Configure(Configuration::new(
             "AI Integration",
             "API key based integration to an AI providers with your own API key.
             You can have more than one integration to the same provider.",

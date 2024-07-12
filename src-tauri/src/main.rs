@@ -54,6 +54,7 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             workspace::commands::module_insert_or_update_initiate,
+            workspace::commands::module_insert_or_update_on_change,
             workspace::commands::module_insert_or_update_next_step,
             workspace::commands::read_row_list_for_module,
             workspace::commands::read_row_list_for_module_with_filter,
@@ -67,6 +68,7 @@ fn main() {
             ai_integration::commands::get_ai_model_choice_list,
             text_generation::commands::chat_with_ai,
             email_account::commands::read_inbox,
+            oauth2::commands::get_oauth2_choice_list,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

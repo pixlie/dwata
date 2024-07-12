@@ -15,7 +15,7 @@ impl Writable for DatabaseSource {
             ..ContentSpec::default()
         };
 
-        Ok(NextStep::Initiate(Configuration::new(
+        Ok(NextStep::Configure(Configuration::new(
             "Database Source",
             "Database source details",
             vec![

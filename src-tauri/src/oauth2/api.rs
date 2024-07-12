@@ -1,3 +1,5 @@
+use log::info;
+
 use super::helpers::get_google_oauth2_authorize_url;
 use super::{OAuth2, OAuth2Provider};
 use crate::content::content::{Content, TextType};
@@ -31,20 +33,16 @@ impl OAuth2 {
             },
             FormField::text_field("clientId", "Client ID"),
             FormField::text_field("clientSecret", "Client Secret"),
-            // FormField::hidden_field("authorizationCode"),
-            // FormField::hidden_field("accessToken"),
-            // FormField::hidden_field("refreshToken"),
-            // FormField::hidden_field("identifier"),
         ]
     }
 
     fn get_initial_configuration() -> Configuration {
         Configuration {
-            title: "OAuth2 Credentials".to_string(),
+            title: "OAuth2 credentials".to_string(),
             description: "OAuth2 credentials for third party services".to_string(),
             fields: Self::get_initial_form_fields(),
             buttons: vec![FormButton {
-                button_type: FormButtonType::Submit,
+                button_type: Some(FormButtonType::Submit),
                 label: "Proceed to authorization".to_string(),
             }],
             submit_implicitly: false,
@@ -54,7 +52,7 @@ impl OAuth2 {
 
 impl Writable for OAuth2 {
     fn initiate() -> Result<NextStep, DwataError> {
-        Ok(NextStep::Initiate(Self::get_initial_configuration()))
+        Ok(NextStep::Configure(Self::get_initial_configuration()))
     }
 
     async fn next_step(data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
@@ -66,7 +64,7 @@ impl Writable for OAuth2 {
                     || x.client_secret.is_none()
                     || x.client_secret == Some("".to_string())
                 {
-                    return Ok(NextStep::Continue(Self::get_initial_configuration()));
+                    return Ok(NextStep::Continue);
                 }
 
                 let authorize_url = get_google_oauth2_authorize_url(
@@ -74,9 +72,11 @@ impl Writable for OAuth2 {
                     x.client_secret.as_ref().unwrap().clone(),
                 )
                 .await?;
-                Ok(NextStep::AlterConfiguration(
+                info!("Generated Google OAuth2 authorize URL: {}", authorize_url);
+
+                Ok(NextStep::Configure(
                     Configuration {
-                        title: "OAuth2 Credentials".to_string(),
+                        title: "OAuth2 credentials".to_string(),
                         description: "Waiting for your authorization at the URL".to_string(),
                         fields: vec![FormField {
                             name: "googleAuthLink".to_string(),

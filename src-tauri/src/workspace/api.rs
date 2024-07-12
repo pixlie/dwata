@@ -24,7 +24,7 @@ impl Configuration {
             description: description.to_string(),
             fields,
             buttons: vec![FormButton {
-                button_type: FormButtonType::Submit,
+                button_type: Some(FormButtonType::Submit),
                 label: "Save".to_string(),
             }],
             submit_implicitly: false,
@@ -33,21 +33,24 @@ impl Configuration {
 }
 
 #[derive(Deserialize, Serialize, TS)]
+#[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum NextStep {
-    // This is the start of the state machine
-    Initiate(Configuration),
     // This is when we need to update the configuration for form/API
-    AlterConfiguration(Configuration),
+    Configure(Configuration),
     // This is when there is nothing to say given the current data/context
-    Continue(Configuration),
+    Continue,
 }
 
 pub trait Writable {
     fn initiate() -> Result<NextStep, DwataError>;
 
+    async fn on_change(_data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
+        return Ok(NextStep::Continue);
+    }
+
     async fn next_step(_data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
-        return Self::initiate();
+        return Ok(NextStep::Continue);
     }
 
     // async fn validate(_data: ModuleDataCreateUpdate) -> Result<Vec<(String, String)>, DwataError> {

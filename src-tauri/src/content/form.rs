@@ -89,6 +89,7 @@ impl FormField {
 #[ts(export)]
 pub enum FormButtonType {
     Submit,
+    Button,
     Cancel,
 }
 
@@ -96,7 +97,8 @@ pub enum FormButtonType {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct FormButton {
-    pub button_type: FormButtonType,
+    #[ts(optional = nullable)]
+    pub button_type: Option<FormButtonType>,
     pub label: String,
 }
 

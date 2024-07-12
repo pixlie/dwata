@@ -6,7 +6,7 @@ use crate::workspace::api::{Configuration, NextStep, Writable};
 
 impl Writable for Chat {
     fn initiate() -> Result<NextStep, DwataError> {
-        Ok(NextStep::Initiate(Configuration::new(
+        Ok(NextStep::Configure(Configuration::new(
             "Chat with AI",
             "Chat with AI models, sharing your objectives and let AI help you find solutions",
             vec![

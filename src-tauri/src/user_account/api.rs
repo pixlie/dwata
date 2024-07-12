@@ -6,7 +6,7 @@ use crate::workspace::api::{Configuration, NextStep, Writable};
 
 impl Writable for UserAccount {
     fn initiate() -> Result<NextStep, DwataError> {
-        Ok(NextStep::Initiate(Configuration::new(
+        Ok(NextStep::Configure(Configuration::new(
             "User Account",
             "User account details",
             vec![

@@ -205,6 +205,7 @@ pub enum ModuleDataRead {
 }
 
 #[derive(Serialize, TS)]
+#[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
@@ -212,7 +213,7 @@ pub enum ModuleDataReadList {
     DatabaseSource(Vec<DatabaseSource>),
     AIIntegration(Vec<AIIntegration>),
     Chat(Vec<Chat>),
-    Oauth2(Vec<OAuth2>),
+    OAuth2(Vec<OAuth2>),
     EmailAccount(Vec<EmailAccount>),
 }
 

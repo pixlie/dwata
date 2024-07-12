@@ -32,6 +32,22 @@ pub fn module_insert_or_update_initiate(module: Module) -> Result<NextStep, Dwat
 }
 
 #[tauri::command]
+pub async fn module_insert_or_update_on_change(
+    module: Module,
+    data: ModuleDataCreateUpdate,
+) -> Result<NextStep, DwataError> {
+    match module {
+        Module::UserAccount => UserAccount::on_change(data).await,
+        Module::DirectorySource => DirectorySource::on_change(data).await,
+        Module::DatabaseSource => DatabaseSource::on_change(data).await,
+        Module::AIIntegration => AIIntegration::on_change(data).await,
+        Module::Chat => Chat::on_change(data).await,
+        Module::EmailAccount => EmailAccount::on_change(data).await,
+        Module::OAuth2 => OAuth2::on_change(data).await,
+    }
+}
+
+#[tauri::command]
 pub async fn module_insert_or_update_next_step(
     module: Module,
     data: ModuleDataCreateUpdate,
@@ -75,7 +91,7 @@ pub async fn read_row_list_for_module(
             .and_then(|result| Ok(ModuleDataReadList::EmailAccount(result))),
         Module::OAuth2 => OAuth2::read_all(db_connection)
             .await
-            .and_then(|result| Ok(ModuleDataReadList::Oauth2(result))),
+            .and_then(|result| Ok(ModuleDataReadList::OAuth2(result))),
     }
 }
 
