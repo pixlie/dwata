@@ -7,4 +7,5 @@ export type ContentSpec = {
   choices: Array<[string, string]> | null;
   choicesFromFunction: string | null;
   isPrompt: boolean | null;
+  isClickable: boolean | null;
 };

@@ -2,7 +2,7 @@
 import type { AIProvider } from "./AIProvider";
 
 export type AIIntegration = {
-  id: bigint;
+  id: number;
   label: string | null;
   aiProvider: AIProvider;
   apiKey: string | null;

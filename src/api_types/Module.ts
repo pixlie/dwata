@@ -5,4 +5,6 @@ export type Module =
   | "DirectorySource"
   | "DatabaseSource"
   | "AIIntegration"
-  | "Chat";
+  | "Chat"
+  | "OAuth2"
+  | "EmailAccount";
