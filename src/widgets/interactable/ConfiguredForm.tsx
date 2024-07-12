@@ -42,50 +42,39 @@ const Form: Component<IPropTypes> = (props) => {
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
-  const [config, { mutate: _m, refetch: refetchModuleConfiguration }] =
-    createResource<Configuration | undefined>(
-      async (_source, { value: _value, refetching }) => {
-        if (typeof refetching === "object") {
-          // We are refetching the configuration on change
-          let response = await invoke<NextStep>(
-            "module_insert_or_update_next_step",
-            {
-              module: props.module,
-              data: refetching,
-            },
-          );
+  const [
+    config,
+    { mutate: mutateModuleConfiguration, refetch: refetchModuleConfiguration },
+  ] = createResource<Configuration | undefined>(
+    async (_source, { value, refetching }) => {
+      if (typeof refetching === "object") {
+        // We are refetching the configuration on change
+        let response = await invoke<NextStep>(
+          "module_insert_or_update_on_change",
+          {
+            module: props.module,
+            data: refetching,
+          },
+        );
 
-          if (
-            !!response &&
-            typeof response === "object" &&
-            "AlterConfiguration" in response
-          ) {
-            return (response as { AlterConfiguration: Configuration })
-              .AlterConfiguration;
-          } else if (
-            !!response &&
-            typeof response === "object" &&
-            "Continue" in response
-          ) {
-            return (response as { Continue: Configuration }).Continue;
-          }
-        } else {
-          let response = await invoke<NextStep>(
-            "module_insert_or_update_initiate",
-            {
-              module: props.module,
-            },
-          );
-          if (
-            !!response &&
-            typeof response === "object" &&
-            "Initiate" in response
-          ) {
-            return (response as { Initiate: Configuration }).Initiate;
-          }
+        if (!!response && response.type === "Configure") {
+          return response.data as Configuration;
+        } else if (!!response && response.type === "Continue") {
+          return value;
         }
-      },
-    );
+      } else {
+        let response = await invoke<NextStep>(
+          "module_insert_or_update_initiate",
+          {
+            module: props.module,
+          },
+        );
+        if (!!response && response.type === "Configure") {
+          return response.data as Configuration;
+        }
+      }
+    },
+  );
   const [moduleData, { mutate: _mm, refetch: refetchModuleData }] =
     createResource<ModuleDataRead>(async () => {
       return await invoke<ModuleDataRead>("read_module_item_by_pk", {
@@ -166,6 +155,14 @@ const Form: Component<IPropTypes> = (props) => {
     }));
 
     setDirty((state) => (state.includes(name) ? state : [...state, name]));
+
+    // Let's check if the form configuration has changes for this change in form data
+    refetchModuleConfiguration({
+      [props.module]: dirty().reduce(
+        (acc, name) => ({ ...acc, [name]: formData()[name] }),
+        {},
+      ),
+    });
   };
 
   const submitForm = async () => {
@@ -242,18 +239,9 @@ const Form: Component<IPropTypes> = (props) => {
       data,
     });
 
-    if (
-      !!response &&
-      typeof response === "object" &&
-      "AlterConfiguration" in response
-    ) {
+    if (!!response && response.type === "Configure") {
       // We have been asked to update the form with new configuration
-      refetchModuleConfiguration({
-        [props.module]: dirty().reduce(
-          (acc, name) => ({ ...acc, [name]: formData()[name] }),
-          {},
-        ),
-      });
+      mutateModuleConfiguration(response.data as Configuration);
     } else {
       await submitForm();
     }
@@ -293,10 +281,6 @@ const Form: Component<IPropTypes> = (props) => {
       </form>
     );
   };
-
-  createMemo(() => {
-    console.log("Configuration", config());
-  });
 
   if (props.showPrelude !== undefined && !props.showPrelude) {
     return <Inner />;

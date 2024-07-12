@@ -3,13 +3,14 @@ import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { useNavigate } from "@solidjs/router";
 import { EmailAccount } from "../../api_types/EmailAccount";
+import { Module } from "../../api_types/Module";
 
 const SettingsEmailAccountItem: Component<EmailAccount> = (props) => {
   const [_, { getColors }] = useUserInterface();
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/settings/ai-integration/edit/${props.id}`);
+    navigate(`/settings/email-account/edit/${props.id}`);
   };
 
   return (
@@ -34,10 +35,11 @@ const SettingsEmailAccountItem: Component<EmailAccount> = (props) => {
 
 const SettingsEmailAccountList: Component = () => {
   const [workspace] = useWorkspace();
+  const module: Module = "EmailAccount";
 
   const getItems = createMemo(() => {
-    if (!workspace.isFetching && !!workspace.isReady) {
-      return workspace.emailAccountList;
+    if (!workspace.isFetching[module] && !!workspace.isReady[module]) {
+      return workspace[module];
     }
     return [];
   });

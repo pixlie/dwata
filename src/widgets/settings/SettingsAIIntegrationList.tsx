@@ -3,6 +3,8 @@ import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { useNavigate } from "@solidjs/router";
 import { AIIntegration } from "../../api_types/AIIntegration";
+import { Module } from "../../api_types/Module";
+import { IWorkspace } from "../../utils/types";
 
 const SettingsAIIntegrationItem: Component<AIIntegration> = (props) => {
   const [_, { getColors }] = useUserInterface();
@@ -34,10 +36,11 @@ const SettingsAIIntegrationItem: Component<AIIntegration> = (props) => {
 
 const SettingsAIIntegrationList: Component = () => {
   const [workspace] = useWorkspace();
+  const module: Module = "AIIntegration";
 
   const aiIntegrations = createMemo(() => {
-    if (!workspace.isFetching && !!workspace.isReady) {
-      return workspace.aiIntegrationList;
+    if (!workspace.isFetching[module] && !!workspace.isReady[module]) {
+      return workspace[module];
     }
     return [];
   });

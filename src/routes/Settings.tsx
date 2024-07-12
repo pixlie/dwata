@@ -1,4 +1,4 @@
-import { Component, onMount } from "solid-js";
+import { Component, createResource, onMount } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
@@ -14,12 +14,15 @@ import SettingsOAuth2List from "../widgets/settings/SettingsOAuth2List";
 import SettingsEmailAccountList from "../widgets/settings/SettingsEmailAccountList";
 
 const SettingsIndex: Component = () => {
-  const [_w, { readAIIntegrationList }] = useWorkspace();
+  const [_w, { readModuleList }] = useWorkspace();
+  const [_data, { refetch }] = createResource(async () => {
+    await readModuleList("AIIntegration");
+    await readModuleList("OAuth2");
+    await readModuleList("EmailAccount");
+  });
 
-  onMount(async () => {
-    // await readDirectoryList();
-    // await readDatabaseList();
-    await readAIIntegrationList();
+  onMount(() => {
+    refetch();
   });
 
   return (
@@ -63,7 +66,7 @@ const SettingsIndex: Component = () => {
       ></Button>
       <div class="mb-6" />
 
-      <Heading size="xl">Oauth2 credentials</Heading>
+      <Heading size="xl">OAuth2 credentials</Heading>
       <SettingsOAuth2List />
       <div class="mb-2" />
       <Button

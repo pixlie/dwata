@@ -3,13 +3,14 @@ import { useWorkspace } from "../../stores/workspace";
 import { useUserInterface } from "../../stores/userInterface";
 import { useNavigate } from "@solidjs/router";
 import { OAuth2 } from "../../api_types/OAuth2";
+import { Module } from "../../api_types/Module";
 
 const SettingsOAuth2Item: Component<OAuth2> = (props) => {
   const [_, { getColors }] = useUserInterface();
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/settings/ai-integration/edit/${props.id}`);
+    navigate(`/settings/oauth2/edit/${props.id}`);
   };
 
   return (
@@ -22,7 +23,7 @@ const SettingsOAuth2Item: Component<OAuth2> = (props) => {
       onClick={handleClick}
     >
       <i class="fa-solid fa-database w-6 text-gray-500" />
-      {props.identifier}
+      {props.handle}
       <div>
         <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
           {props.provider}
@@ -34,10 +35,11 @@ const SettingsOAuth2Item: Component<OAuth2> = (props) => {
 
 const SettingsOAuth2List: Component = () => {
   const [workspace] = useWorkspace();
+  const module: Module = "OAuth2";
 
   const getItems = createMemo(() => {
-    if (!workspace.isFetching && !!workspace.isReady) {
-      return workspace.oAuth2List;
+    if (!workspace.isFetching[module] && !!workspace.isReady[module]) {
+      return workspace[module];
     }
     return [];
   });

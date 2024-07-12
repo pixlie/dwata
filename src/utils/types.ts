@@ -8,6 +8,7 @@ import { DatabaseSource } from "../api_types/DatabaseSource";
 import { AIIntegration } from "../api_types/AIIntegration";
 import { OAuth2 } from "../api_types/OAuth2";
 import { EmailAccount } from "../api_types/EmailAccount";
+import { Module } from "../api_types/Module";
 
 interface ILabel {
   id: number;
@@ -45,14 +46,14 @@ interface IFormField extends FormField {
 }
 
 interface IWorkspace {
-  directoryList: Array<DirectorySource>;
-  databaseList: Array<DatabaseSource>;
-  aiIntegrationList: Array<AIIntegration>;
-  oAuth2List: Array<OAuth2>;
-  emailAccountList: Array<EmailAccount>;
+  DirectorySource: Array<DirectorySource>;
+  DatabaseSource: Array<DatabaseSource>;
+  AIIntegration: Array<AIIntegration>;
+  OAuth2: Array<OAuth2>;
+  EmailAccount: Array<EmailAccount>;
 
-  isReady: boolean;
-  isFetching: boolean;
+  isReady: Partial<{ [key in Module]: boolean }>;
+  isFetching: Partial<{ [key in Module]: boolean }>;
 }
 
 interface INextTask {

@@ -24,8 +24,10 @@ const Button: Component<IPropTypes> = (props) => {
     }
   });
 
-  const buttonType =
-    !!props.buttonType && props.buttonType === "Submit" ? "submit" : undefined;
+  let buttonType = "button";
+  if (!!props.buttonType && props.buttonType === "Submit") {
+    buttonType = "submit";
+  }
 
   const buttonClasses =
     getSizeClass() +
