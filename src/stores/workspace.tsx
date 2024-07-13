@@ -4,99 +4,55 @@ import { IProviderPropTypes, IWorkspace } from "../utils/types";
 import { invoke } from "@tauri-apps/api/core";
 import { Module } from "../api_types/Module";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
-import { DirectorySource } from "../api_types/DirectorySource";
-import { DatabaseSource } from "../api_types/DatabaseSource";
-import { AIIntegration } from "../api_types/AIIntegration";
 
 const makeStore = () => {
   const [store, setStore] = createStore<IWorkspace>({
-    directoryList: [],
-    databaseList: [],
-    aiIntegrationList: [],
+    DirectorySource: [],
+    DatabaseSource: [],
+    AIIntegration: [],
+    OAuth2: [],
+    EmailAccount: [],
 
-    isReady: false,
-    isFetching: false,
+    isReady: {},
+    isFetching: {},
   });
 
   return [
     store,
     {
-      readDirectoryList: async () => {
-        if (store.isFetching) {
+      readModuleList: async (module: Module) => {
+        if (module in store.isFetching && !!store.isFetching[module]) {
           return;
         }
-        setStore({
-          ...store,
-          isFetching: true,
-        });
-        // We invoke the Tauri API to load workspace
-        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
-          "read_row_list_for_module",
-          {
-            module: "DirectorySource" as Module,
-          },
-        );
         setStore((state) => ({
           ...state,
-          directoryList:
-            "DirectorySource" in response
-              ? (response.DirectorySource as Array<DirectorySource>)
-              : [],
-          isReady: true,
-          isFetching: false,
+          isFetching: {
+            ...state.isFetching,
+            [module]: true,
+          },
         }));
-      },
 
-      readDatabaseList: async () => {
-        if (store.isFetching) {
-          return;
-        }
-        setStore({
-          ...store,
-          isFetching: true,
-        });
-        // We invoke the Tauri API to load workspace
+        // We invoke the Tauri API to load data
         const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
           "read_row_list_for_module",
           {
-            module: "DatabaseSource" as Module,
+            module,
           },
         );
-        setStore((state) => ({
-          ...state,
-          databaseList:
-            "DatabaseSource" in response
-              ? (response.DatabaseSource as Array<DatabaseSource>)
-              : [],
-          isReady: true,
-          isFetching: false,
-        }));
-      },
-
-      readAIIntegrationList: async () => {
-        if (store.isFetching) {
-          return;
+        if (response["type"] === module) {
+          setStore((state) => ({
+            ...state,
+            [module]: response["data"],
+            isReady: {
+              ...state.isReady,
+              [module]: true,
+            },
+            isFetching: {
+              ...state.isFetching,
+              [module]: false,
+            },
+          }));
         }
-        setStore({
-          ...store,
-          isFetching: true,
-        });
-        // We invoke the Tauri API to load workspace
-        const response: ModuleDataReadList = await invoke<ModuleDataReadList>(
-          "read_row_list_for_module",
-          {
-            module: "AIIntegration" as Module,
-          },
-        );
-        setStore((state) => ({
-          ...state,
-          aiIntegrationList:
-            "AIIntegration" in response
-              ? (response.AIIntegration as Array<AIIntegration>)
-              : [],
-          isReady: true,
-          isFetching: false,
-        }));
       },
     },
   ] as const; // `as const` forces tuple type inference

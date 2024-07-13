@@ -1,3 +1,5 @@
+use std::default;
+
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -34,9 +36,10 @@ pub enum TextType {
     FilePath,
 }
 
-#[derive(Deserialize, Serialize, TS)]
+#[derive(Default, Deserialize, Serialize, TS)]
 #[ts(export)]
 pub enum ContentType {
+    #[default]
     Text,
     ID,
     TextArray,
@@ -49,22 +52,29 @@ pub enum ContentType {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct ContentSpec {
+    #[ts(optional = nullable)]
     pub text_type: Option<TextType>,
+    #[ts(optional = nullable)]
     pub length_limits: Option<(usize, usize)>,
+    #[ts(optional = nullable)]
     pub choices: Option<Vec<(String, String)>>,
     // The frontend will call the provided function to get choices,
     // generally needed when choices come from a data source
+    #[ts(optional = nullable)]
     pub choices_from_function: Option<String>,
     // Text can be a prompt to AI model
+    #[ts(optional = nullable)]
     pub is_prompt: Option<bool>,
+    #[ts(optional = nullable)]
+    pub is_clickable: Option<bool>,
     // BulletPoints,
 }
 
-#[derive(Debug, Deserialize, Serialize, TS)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, Hash, TS)]
 #[ts(export)]
 pub enum Content {
     Text(String),
-    ID(i64),
+    ID(#[ts(type = "number")] i64),
     // Image(Image),
     // DateTime(DateTime<Utc>),
 }

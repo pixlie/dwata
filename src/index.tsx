@@ -10,6 +10,7 @@ import { SettingsWrapper, SettingsRoutes } from "./routes/Settings";
 import UserAccountForm from "./routes/UserAccountForm";
 import { ChatRoutes, ChatWrapper } from "./routes/Chat";
 import DirectoryBrowser from "./routes/DirectoryBrowser";
+import Search from "./routes/Search";
 
 render(
   () => (
@@ -20,10 +21,11 @@ render(
         <SettingsRoutes />
       </Route>
       <Route path={"/user"} component={UserAccountForm} />
-      <Route path={"/"} component={Home} />
       <Route path={"/chat"} component={ChatWrapper}>
         <ChatRoutes />
       </Route>
+      <Route path={"/search"} component={Search} />
+      <Route path={"/"} component={Home} />
     </Router>
   ),
   document.getElementById("root") as HTMLElement,

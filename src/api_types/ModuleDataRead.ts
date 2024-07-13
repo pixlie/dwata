@@ -3,6 +3,8 @@ import type { AIIntegration } from "./AIIntegration";
 import type { Chat } from "./Chat";
 import type { DatabaseSource } from "./DatabaseSource";
 import type { DirectorySource } from "./DirectorySource";
+import type { EmailAccount } from "./EmailAccount";
+import type { OAuth2 } from "./OAuth2";
 import type { UserAccount } from "./UserAccount";
 
 export type ModuleDataRead =
@@ -10,4 +12,6 @@ export type ModuleDataRead =
   | { DirectorySource: DirectorySource }
   | { DatabaseSource: DatabaseSource }
   | { AIIntegration: AIIntegration }
-  | { Chat: Chat };
+  | { Chat: Chat }
+  | { OAuth2: OAuth2 }
+  | { EmailAccount: EmailAccount };

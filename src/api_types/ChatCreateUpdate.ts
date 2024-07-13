@@ -3,6 +3,7 @@
 export type ChatCreateUpdate = {
   role: string | null;
   rootChatId: number;
+  comparedToRootChatId: number;
   message: string | null;
   requestedAiModel: string | null;
   processStatus: string | null;

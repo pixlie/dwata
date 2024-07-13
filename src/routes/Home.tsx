@@ -2,9 +2,20 @@ import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import { useUserInterface } from "../stores/userInterface";
 import Button from "../widgets/interactable/Button";
+import { invoke } from "@tauri-apps/api/core";
 
 const Home: Component = () => {
   const [_, { getColors }] = useUserInterface();
+
+  const handleRefetchGoogleAccessToken = async () => {
+    await invoke("refetch_google_access_token", { pk: 1 });
+  };
+
+  const handleFetchEmails = async () => {
+    await invoke("fetch_emails", {
+      pk: 1,
+    });
+  };
 
   return (
     <div class="max-w-screen-md">
@@ -23,8 +34,8 @@ const Home: Component = () => {
         class="mb-4 italic text-lg"
         style={{ color: getColors().colors["editor.foreground"] }}
       >
-        Note: Dwata is free to use, but you will be charged by AI provider for
-        the API usage.
+        Note: dwata is free to use (for single person usage), but you will be
+        charged by AI provider for AI usage in chats or other features.
       </p>
 
       <p style={{ color: getColors().colors["editor.foreground"] }}>
@@ -34,6 +45,19 @@ const Home: Component = () => {
           size="sm"
           label="add an AI provider"
         />
+      </p>
+
+      <p style={{ color: getColors().colors["editor.foreground"] }}>
+        <Button
+          onClick={handleRefetchGoogleAccessToken}
+          size="sm"
+          label="Refetch"
+        />{" "}
+        Google access tokens
+      </p>
+
+      <p style={{ color: getColors().colors["editor.foreground"] }}>
+        <Button onClick={handleFetchEmails} size="sm" label="Fetch emails" />
       </p>
     </div>
   );

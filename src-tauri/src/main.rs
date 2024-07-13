@@ -4,7 +4,10 @@
 use env_logger;
 use log::{error, info};
 use std::path::PathBuf;
-use tauri::{App, Manager};
+use tauri::{
+    path::{self, BaseDirectory},
+    App, Manager,
+};
 
 mod database_source;
 mod directory_source;
@@ -20,6 +23,9 @@ mod text_generation;
 // mod schema;
 mod user_account;
 // mod workflow;
+mod email;
+mod email_account;
+mod oauth2;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -32,8 +38,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         window.close_devtools();
     }
     let app_config_dir: PathBuf = app.path().app_config_dir().unwrap();
+    let migrations_dir: PathBuf = app
+        .path()
+        .resolve("migrations/", BaseDirectory::Resource)
+        .unwrap();
     match tauri::async_runtime::block_on(async {
-        workspace::helpers::get_database_connection(&app_config_dir).await
+        workspace::helpers::get_database_connection(&app_config_dir, migrations_dir).await
     }) {
         Ok(db_connection) => {
             app.manage(workspace::DwataDb::new(db_connection));
@@ -51,7 +61,9 @@ fn main() {
         .setup(setup)
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            workspace::commands::get_module_configuration,
+            workspace::commands::module_insert_or_update_initiate,
+            workspace::commands::module_insert_or_update_on_change,
+            workspace::commands::module_insert_or_update_next_step,
             workspace::commands::read_row_list_for_module,
             workspace::commands::read_row_list_for_module_with_filter,
             workspace::commands::read_module_item_by_pk,
@@ -63,6 +75,9 @@ fn main() {
             ai_integration::commands::get_ai_model_list,
             ai_integration::commands::get_ai_model_choice_list,
             text_generation::commands::chat_with_ai,
+            email_account::commands::fetch_emails,
+            oauth2::commands::get_oauth2_choice_list,
+            oauth2::commands::refetch_google_access_token,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

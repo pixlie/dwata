@@ -5,8 +5,8 @@ use tokio::sync::Mutex;
 use ts_rs::TS;
 
 // pub mod api_types;
+pub mod api;
 pub mod commands;
-pub mod configuration;
 pub mod crud;
 pub mod helpers;
 
@@ -20,6 +20,8 @@ pub enum Module {
     DatabaseSource,
     AIIntegration,
     Chat,
+    OAuth2,
+    EmailAccount,
 }
 
 #[derive(Deserialize, TS)]

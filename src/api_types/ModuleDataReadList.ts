@@ -3,11 +3,15 @@ import type { AIIntegration } from "./AIIntegration";
 import type { Chat } from "./Chat";
 import type { DatabaseSource } from "./DatabaseSource";
 import type { DirectorySource } from "./DirectorySource";
+import type { EmailAccount } from "./EmailAccount";
+import type { OAuth2 } from "./OAuth2";
 import type { UserAccount } from "./UserAccount";
 
 export type ModuleDataReadList =
-  | { UserAccount: Array<UserAccount> }
-  | { DirectorySource: Array<DirectorySource> }
-  | { DatabaseSource: Array<DatabaseSource> }
-  | { AIIntegration: Array<AIIntegration> }
-  | { Chat: Array<Chat> };
+  | { type: "UserAccount"; data: Array<UserAccount> }
+  | { type: "DirectorySource"; data: Array<DirectorySource> }
+  | { type: "DatabaseSource"; data: Array<DatabaseSource> }
+  | { type: "AIIntegration"; data: Array<AIIntegration> }
+  | { type: "Chat"; data: Array<Chat> }
+  | { type: "OAuth2"; data: Array<OAuth2> }
+  | { type: "EmailAccount"; data: Array<EmailAccount> };

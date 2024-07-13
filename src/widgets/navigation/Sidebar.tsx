@@ -25,11 +25,13 @@ const Sidebar: Component = () => {
       <div class="my-4 px-4">
         <Button label="Start a new chat" href="/chat/start" />
       </div>
-      {/* <SidebarHeading
-        label="Saved Queries"
-        icon="fa-solid fa-bookmark"
-        href="/saved"
-      /> */}
+
+      <SidebarHeading
+        label="Search"
+        icon="fa-solid fa-magnifying-glass"
+        href="/search"
+      />
+
       <div
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}

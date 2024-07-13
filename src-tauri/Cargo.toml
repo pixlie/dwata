@@ -50,6 +50,10 @@ uuid = "1.8.0"
 env_logger = "0.11.3"
 derive_builder = "0.20.0"
 strum = { version = "0.26.2", features = ["derive"] }
+oauth2 = "4.4.2"
+imap = "2.4.1"
+native-tls = "0.2.12"
+mail-parser = "0.9.3"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

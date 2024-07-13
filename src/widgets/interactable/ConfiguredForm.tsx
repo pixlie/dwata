@@ -3,6 +3,7 @@ import {
   For,
   JSX,
   createComputed,
+  createMemo,
   createResource,
   createSignal,
   onMount,
@@ -19,6 +20,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { ModuleDataRead } from "../../api_types/ModuleDataRead";
 import { InsertUpdateResponse } from "../../api_types/InsertUpdateResponse";
 import { nextTaskStore } from "../../stores/nextTask";
+import { NextStep } from "../../api_types/NextStep";
 
 interface IPropTypes {
   module: Module;
@@ -29,8 +31,6 @@ interface IPropTypes {
   postSaveNavigateTo?: string;
   initiateNextTask?: boolean;
   title?: string;
-  submitButtomLabel?: string;
-  submitButton?: JSX.Element;
   showPrelude?: boolean;
 }
 
@@ -42,12 +42,39 @@ const Form: Component<IPropTypes> = (props) => {
   const navigate = useNavigate();
   const [_, { getColors }] = useUserInterface();
 
-  const [config, { mutate: _m, refetch: refetchModuleConfiguration }] =
-    createResource<Configuration>(async () => {
-      return await invoke<Configuration>("get_module_configuration", {
-        module: props.module,
-      });
-    });
+  const [
+    config,
+    { mutate: mutateModuleConfiguration, refetch: refetchModuleConfiguration },
+  ] = createResource<Configuration | undefined>(
+    async (_source, { value, refetching }) => {
+      if (typeof refetching === "object") {
+        // We are refetching the configuration on change
+        let response = await invoke<NextStep>(
+          "module_insert_or_update_on_change",
+          {
+            module: props.module,
+            data: refetching,
+          },
+        );
+
+        if (!!response && response.type === "Configure") {
+          return response.data as Configuration;
+        } else if (!!response && response.type === "Continue") {
+          return value;
+        }
+      } else {
+        let response = await invoke<NextStep>(
+          "module_insert_or_update_initiate",
+          {
+            module: props.module,
+          },
+        );
+        if (!!response && response.type === "Configure") {
+          return response.data as Configuration;
+        }
+      }
+    },
+  );
   const [moduleData, { mutate: _mm, refetch: refetchModuleData }] =
     createResource<ModuleDataRead>(async () => {
       return await invoke<ModuleDataRead>("read_module_item_by_pk", {
@@ -58,14 +85,6 @@ const Form: Component<IPropTypes> = (props) => {
 
   onMount(() => {
     refetchModuleConfiguration();
-    if (props.initialData !== undefined) {
-      setFormData((state) => ({ ...state, ...props.initialData }));
-
-      setDirty((state) => [
-        ...state,
-        ...Object.keys(props.initialData!).filter((x) => !state.includes(x)),
-      ]);
-    }
 
     if (props.existingItemId) {
       refetchModuleData();
@@ -73,6 +92,7 @@ const Form: Component<IPropTypes> = (props) => {
   });
 
   createComputed((isSet) => {
+    // This function loads data when we are editing existing items
     if (!props.existingItemId) {
       return false;
     }
@@ -101,6 +121,33 @@ const Form: Component<IPropTypes> = (props) => {
     return false;
   });
 
+  createComputed(() => {
+    // This function set inidial values from form configuration
+    if (config.state === "ready" && !!config()) {
+      for (const field of config()!.fields) {
+        if (!!field.defaultValue) {
+          let value = undefined;
+          if ("Text" in field.defaultValue) {
+            value = field.defaultValue.Text;
+          } else if ("ID" in field.defaultValue) {
+            value = field.defaultValue.ID;
+          }
+
+          if (!!value) {
+            setFormData((state) => ({
+              ...state,
+              [field.name]: value,
+            }));
+
+            setDirty((state) =>
+              state.includes(field.name) ? state : [...state, field.name],
+            );
+          }
+        }
+      }
+    }
+  });
+
   const handleChange = (name: string, value: IFormFieldValue) => {
     setFormData((state) => ({
       ...state,
@@ -108,27 +155,35 @@ const Form: Component<IPropTypes> = (props) => {
     }));
 
     setDirty((state) => (state.includes(name) ? state : [...state, name]));
+
+    // Let's check if the form configuration has changes for this change in form data
+    refetchModuleConfiguration({
+      [props.module]: dirty().reduce(
+        (acc, name) => ({ ...acc, [name]: formData()[name] }),
+        {},
+      ),
+    });
   };
 
-  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = async (
-    event,
-  ) => {
-    event.preventDefault();
+  const submitForm = async () => {
+    const data = {
+      [props.module]: dirty().reduce(
+        (acc, name) => ({ ...acc, [name]: formData()[name] }),
+        {},
+      ),
+    };
+
     if (!!props.existingItemId) {
       console.info(
-        `Submitting form data to update module ${props.module}, item ID ${props.existingItemId}`,
+        `Submitting form data to update module ${props.module}, item ID ${props.existingItemId}, data, dirty:`,
         formData(),
+        dirty(),
       );
       const response = await invoke<InsertUpdateResponse>(
         "update_module_item",
         {
           pk: props.existingItemId,
-          data: {
-            [props.module]: dirty().reduce(
-              (acc, name) => ({ ...acc, [name]: formData()[name] }),
-              {},
-            ),
-          },
+          data,
         },
       );
       if (!!response && !!props.postSaveNavigateTo) {
@@ -136,20 +191,15 @@ const Form: Component<IPropTypes> = (props) => {
       }
     } else {
       console.info(
-        `Submitting form data to insert into module: ${props.module}`,
+        `Submitting form data to insert into module: ${props.module}, data, dirty:`,
         formData(),
+        dirty(),
       );
-      console.log("handleSubmit, Form data:", formData(), "Dirty:", dirty());
 
       const response = await invoke<InsertUpdateResponse>(
         "insert_module_item",
         {
-          data: {
-            [props.module]: dirty().reduce(
-              (acc, name) => ({ ...acc, [name]: formData()[name] }),
-              {},
-            ),
-          },
+          data,
         },
       );
       if (!!response) {
@@ -173,9 +223,45 @@ const Form: Component<IPropTypes> = (props) => {
     }
   };
 
-  const Inner = () => (
-    <form onSubmit={handleSubmit}>
-      {!!config() && (
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, Event> = async (
+    event,
+  ) => {
+    event.preventDefault();
+
+    const data = {
+      [props.module]: dirty().reduce(
+        (acc, name) => ({ ...acc, [name]: formData()[name] }),
+        {},
+      ),
+    };
+    let response = await invoke<NextStep>("module_insert_or_update_next_step", {
+      module: props.module,
+      data,
+    });
+
+    if (!!response && response.type === "Configure") {
+      // We have been asked to update the form with new configuration
+      mutateModuleConfiguration(response.data as Configuration);
+    } else {
+      await submitForm();
+    }
+  };
+
+  createComputed(async () => {
+    if (config.state === "ready" && !!config() && config()?.submitImplicitly) {
+      await submitForm();
+    }
+  });
+
+  const Inner = () => {
+    const Buttons: Component = () => {
+      return (
+        <For each={config()?.buttons}>{(button) => <Button {...button} />}</For>
+      );
+    };
+
+    return (
+      <form onSubmit={handleSubmit}>
         <For each={config()?.fields}>
           {(field) => (
             <>
@@ -183,24 +269,18 @@ const Form: Component<IPropTypes> = (props) => {
                 {...field}
                 onChange={handleChange}
                 value={
-                  !!formData() && field.name in formData()
-                    ? formData()[field.name]
-                    : undefined
+                  field.name in formData() ? formData()[field.name] : undefined
                 }
               />
               <div class="mt-4" />
             </>
           )}
         </For>
-      )}
 
-      {!!props.submitButton ? (
-        props.submitButton
-      ) : (
-        <Button label={props.submitButtomLabel || "Save"} />
-      )}
-    </form>
-  );
+        <Buttons />
+      </form>
+    );
+  };
 
   if (props.showPrelude !== undefined && !props.showPrelude) {
     return <Inner />;

@@ -4,7 +4,9 @@ use crate::chat::{Chat, ChatCreateUpdate};
 use crate::content::content::{Content, ContentType};
 use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
+use crate::email_account::{EmailAccount, EmailAccountCreateUpdate};
 use crate::error::DwataError;
+use crate::oauth2::{OAuth2, OAuth2CreateUpdate};
 use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use log::{error, info};
@@ -85,7 +87,7 @@ pub trait CRUDRead {
         match result {
             Ok(row) => {
                 info!(
-                    "Fetched one row from Dwata DBm, table{}, ID {}",
+                    "Fetched one row from Dwata DBm, table {}, ID {}",
                     Self::table_name(),
                     pk
                 );
@@ -198,9 +200,12 @@ pub enum ModuleDataRead {
     DatabaseSource(DatabaseSource),
     AIIntegration(AIIntegration),
     Chat(Chat),
+    OAuth2(OAuth2),
+    EmailAccount(EmailAccount),
 }
 
 #[derive(Serialize, TS)]
+#[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataReadList {
     UserAccount(Vec<UserAccount>),
@@ -208,8 +213,11 @@ pub enum ModuleDataReadList {
     DatabaseSource(Vec<DatabaseSource>),
     AIIntegration(Vec<AIIntegration>),
     Chat(Vec<Chat>),
+    OAuth2(Vec<OAuth2>),
+    EmailAccount(Vec<EmailAccount>),
 }
 
+#[derive(Clone)]
 pub enum InputValue {
     Text(String),
     ID(i64),
@@ -244,17 +252,22 @@ pub trait CRUDCreateUpdate {
 
     fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError>;
 
-    async fn pre_insert(&self, _db_connection: &mut SqliteConnection) -> Result<(), DwataError> {
-        Ok(())
+    async fn pre_insert(
+        &self,
+        _db_connection: &mut SqliteConnection,
+    ) -> Result<VecColumnNameValue, DwataError> {
+        Ok(VecColumnNameValue::default())
     }
 
     async fn insert_module_data(
         &self,
         db_connection: &mut SqliteConnection,
     ) -> Result<InsertUpdateResponse, DwataError> {
-        // Just calling this so if it fails the error will propagate up
-        self.pre_insert(db_connection).await?;
         let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
+        let other_column_names_values: VecColumnNameValue = self.pre_insert(db_connection).await?;
+        let column_names_values = VecColumnNameValue {
+            0: [column_names_values.0, other_column_names_values.0].concat(),
+        };
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "INSERT INTO {} ({}) VALUES (",
             Self::table_name(),
@@ -404,4 +417,6 @@ pub enum ModuleDataCreateUpdate {
     DatabaseSource(DatabaseSourceCreateUpdate),
     AIIntegration(AIIntegrationCreateUpdate),
     Chat(ChatCreateUpdate),
+    OAuth2(OAuth2CreateUpdate),
+    EmailAccount(EmailAccountCreateUpdate),
 }
