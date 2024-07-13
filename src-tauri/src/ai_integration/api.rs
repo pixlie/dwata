@@ -23,21 +23,21 @@ impl Writable for AIIntegration {
             You can have more than one integration to the same provider.",
             vec![
                 FormField::new(
-                    "label",
-                    "Label",
-                    Some("An easy to remember label for this AI integration"),
-                    ContentType::Text,
-                    ContentSpec::default(),
-                    Some(false),
-                    Some(true),
-                ),
-                FormField::new(
                     "aiProvider",
                     "Select AI provider",
                     None,
                     ContentType::SingleChoice,
                     ai_provider_spec,
                     Some(true),
+                    Some(true),
+                ),
+                FormField::new(
+                    "label",
+                    "Label",
+                    Some("An easy to remember label for this AI integration"),
+                    ContentType::Text,
+                    ContentSpec::default(),
+                    Some(false),
                     Some(true),
                 ),
                 FormField::new(

@@ -1,6 +1,5 @@
 // use crate::ai::{Tool, ToolParameterType};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 use crate::text_generation::TextGenerationRequest;
 

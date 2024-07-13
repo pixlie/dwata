@@ -71,6 +71,7 @@ pub enum DwataError {
     // Email related
     InvalidEmailProvider,
     CouldNotReadMailBody,
+    CouldNotCreateLocalFolder,
 }
 
 impl Error for DwataError {

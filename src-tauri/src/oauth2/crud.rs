@@ -28,6 +28,12 @@ impl CRUDCreateUpdate for OAuth2CreateUpdate {
         if let Some(x) = &self.client_secret {
             names_values.push_name_value("client_secret", InputValue::Text(x.clone()));
         }
+        if let Some(x) = &self.refresh_token {
+            names_values.push_name_value("refresh_token", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.access_token {
+            names_values.push_name_value("access_token", InputValue::Text(x.clone()));
+        }
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         Ok(names_values)
     }

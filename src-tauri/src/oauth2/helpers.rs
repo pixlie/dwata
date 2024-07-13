@@ -1,6 +1,6 @@
 use super::Oauth2APIResponse;
 use crate::error::DwataError;
-use log::{error, info};
+use log::error;
 use oauth2::reqwest::async_http_client;
 use oauth2::{basic::BasicClient, TokenResponse};
 use oauth2::{
@@ -71,9 +71,7 @@ pub async fn get_google_oauth2_authorize_url(
     let (authorize_url, _csrf_state) = client
         .authorize_url(CsrfToken::new_random)
         // This example is requesting access to the "calendar" features and the user's profile.
-        .add_scope(Scope::new(
-            "https://www.googleapis.com/auth/gmail.readonly".to_string(),
-        ))
+        .add_scope(Scope::new("https://mail.google.com/".to_string()))
         .add_scope(Scope::new(
             "https://www.googleapis.com/auth/userinfo.email".to_string(),
         ))
@@ -143,7 +141,7 @@ pub async fn get_google_oauth2_tokens(
     };
 
     let auth_code = format!("{}", code.secret());
-    // Exchange the code with a token.
+    // Exchange the authorization code with a token
     let token_response = match client
         .exchange_code(code)
         // .set_pkce_verifier(pkce_code_verifier)

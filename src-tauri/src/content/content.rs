@@ -52,14 +52,20 @@ pub enum ContentType {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct ContentSpec {
+    #[ts(optional = nullable)]
     pub text_type: Option<TextType>,
+    #[ts(optional = nullable)]
     pub length_limits: Option<(usize, usize)>,
+    #[ts(optional = nullable)]
     pub choices: Option<Vec<(String, String)>>,
     // The frontend will call the provided function to get choices,
     // generally needed when choices come from a data source
+    #[ts(optional = nullable)]
     pub choices_from_function: Option<String>,
     // Text can be a prompt to AI model
+    #[ts(optional = nullable)]
     pub is_prompt: Option<bool>,
+    #[ts(optional = nullable)]
     pub is_clickable: Option<bool>,
     // BulletPoints,
 }

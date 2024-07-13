@@ -1,12 +1,16 @@
-use crate::{error::DwataError, oauth2::OAuth2, workspace::crud::CRUDRead};
-use chrono::{DateTime, FixedOffset, Utc};
+use crate::{email::Email, error::DwataError, oauth2::OAuth2, workspace::crud::CRUDRead};
+use chrono::{DateTime, FixedOffset, TimeDelta, Utc};
 use imap::{self, Session};
 use log::{error, info};
 use mail_parser::MessageParser;
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, Type};
-use std::net::TcpStream;
+use std::{
+    fs::create_dir_all,
+    net::TcpStream,
+    path::{Path, PathBuf},
+};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
@@ -53,16 +57,6 @@ pub struct EmailAccountCreateUpdate {
     pub oauth2_id: Option<String>,
 }
 
-#[derive(Serialize, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct Email {
-    pub from: (String, String),
-    pub date: DateTime<FixedOffset>,
-    pub subject: String,
-    pub body_text: String,
-}
-
 pub struct GmailAccount {
     email_address: String,
     access_token: String,
@@ -79,61 +73,59 @@ impl imap::Authenticator for GmailAccount {
 }
 
 impl EmailAccount {
-    pub async fn read_inbox(
+    pub async fn fetch_emails(
         &self,
+        storage_dir: &PathBuf,
         db_connection: &mut SqliteConnection,
-    ) -> Result<Vec<Email>, DwataError> {
+    ) -> Result<(), DwataError> {
+        // We read emails using IMAP and store the raw messages in a local folder
         let mut imap_session = self.get_imap_session(db_connection).await?;
         match imap_session.examine("INBOX") {
             Ok(mailbox) => info!("{}", mailbox),
             Err(e) => error!("Error selecting INBOX: {}", e),
         };
 
-        let mut emails: Vec<Email> = vec![];
-        match imap_session.fetch("1", "BODY.PEEK[]") {
+        let since = Utc::now() - TimeDelta::weeks(1);
+        let email_uid_list = imap_session
+            .uid_search(format!("SINCE {}", since.format("%d-%b-%Y").to_string()))
+            .unwrap();
+        info!(
+            "Searching for emails since {}, found {} emails",
+            since.format("%d-%b-%Y"),
+            email_uid_list.len()
+        );
+        let mut storage_dir = storage_dir.clone();
+        storage_dir.push("emails");
+        storage_dir.push(self.email_address.clone());
+        storage_dir.push("INBOX");
+        if let Ok(false) = Path::try_exists(storage_dir.as_path()) {
+            match create_dir_all(storage_dir.as_path()) {
+                Ok(_) => {}
+                Err(err) => {
+                    error!("Could not create local folder\n Error: {}", err);
+                    return Err(DwataError::CouldNotCreateLocalFolder);
+                }
+            }
+        }
+
+        match imap_session.uid_fetch(
+            email_uid_list
+                .iter()
+                .map(|x| format!("{}", x))
+                .collect::<Vec<String>>()
+                .join(","),
+            "(BODY.PEEK[] UID)",
+        ) {
             Ok(messages) => {
                 for message in messages.iter() {
                     match message.body() {
-                        Some(body) => match MessageParser::default().parse(body) {
-                            Some(parsed) => {
-                                let from = match parsed.from() {
-                                    Some(from) => match from.first() {
-                                        Some(first) => (
-                                            first.name().unwrap().to_string(),
-                                            first.address().unwrap().to_string(),
-                                        ),
-                                        None => continue,
-                                    },
-                                    None => continue,
-                                };
-                                let date = match parsed.date() {
-                                    Some(dt) => {
-                                        match DateTime::parse_from_rfc3339(&dt.to_rfc3339()) {
-                                            Ok(dt) => dt,
-                                            Err(_) => continue,
-                                        }
-                                    }
-                                    None => {
-                                        continue;
-                                    }
-                                };
-                                let subject = match parsed.subject() {
-                                    Some(subject) => subject.to_string(),
-                                    None => continue,
-                                };
-                                let body_text = match parsed.body_text(0) {
-                                    Some(body_text) => body_text.to_string(),
-                                    None => continue,
-                                };
-                                emails.push(Email {
-                                    from,
-                                    date,
-                                    subject,
-                                    body_text,
-                                });
-                            }
-                            None => continue,
-                        },
+                        Some(body) => {
+                            // Store the email in a local folder
+                            let mut file_path = storage_dir.clone();
+                            file_path.push(format!("{}.email", message.uid.unwrap()));
+                            info!("File path: {}", file_path.to_str().unwrap());
+                            std::fs::write(file_path, body).unwrap();
+                        }
                         None => continue,
                     }
                 }
@@ -142,7 +134,7 @@ impl EmailAccount {
         };
 
         imap_session.logout().unwrap();
-        Ok(emails)
+        Ok(())
     }
 }
 
@@ -195,11 +187,10 @@ impl EmailAccount {
         db_connection: &mut SqliteConnection,
     ) -> Result<GmailAccount, DwataError> {
         if let Some(oauth2_config_id) = self.oauth2_id {
-            let oauth2_config: OAuth2 =
-                OAuth2::read_one_by_pk(oauth2_config_id, db_connection).await?;
+            let oauth2: OAuth2 = OAuth2::read_one_by_pk(oauth2_config_id, db_connection).await?;
             let gmail_account = GmailAccount {
                 email_address: self.email_address.clone(),
-                access_token: oauth2_config.access_token,
+                access_token: oauth2.access_token,
             };
             Ok(gmail_account)
         } else {

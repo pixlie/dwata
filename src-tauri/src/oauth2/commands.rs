@@ -19,3 +19,14 @@ pub async fn get_oauth2_choice_list(
         })
         .collect())
 }
+
+#[tauri::command]
+pub async fn refetch_google_access_token(
+    pk: i64,
+    store: State<'_, DwataDb>,
+) -> Result<(), DwataError> {
+    let mut db_guard = store.lock().await;
+    let oauth2: OAuth2 = OAuth2::read_one_by_pk(pk, &mut db_guard).await?;
+    oauth2.refetch_google_access_token(&mut db_guard).await?;
+    Ok(())
+}

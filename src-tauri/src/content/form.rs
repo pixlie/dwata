@@ -11,15 +11,21 @@ pub struct FormField {
     // A unique identifier within a form or schema
     pub name: String,
     pub label: String,
+    #[ts(optional = nullable)]
     pub description: Option<String>,
+    #[ts(optional = nullable)]
     pub placeholder: Option<String>,
     pub content_type: ContentType,
     pub content_spec: ContentSpec,
     // Not required by default
+    #[ts(optional = nullable)]
     pub is_required: Option<bool>,
     // Editable by default
+    #[ts(optional = nullable)]
     pub is_editable: Option<bool>,
+    #[ts(optional = nullable)]
     pub is_hidden: Option<bool>,
+    #[ts(optional = nullable)]
     pub default_value: Option<Content>,
 }
 
