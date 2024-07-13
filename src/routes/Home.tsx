@@ -7,12 +7,14 @@ import { invoke } from "@tauri-apps/api/core";
 const Home: Component = () => {
   const [_, { getColors }] = useUserInterface();
 
-  const handleGoogleAuth = async () => {
-    await invoke("google_oauth2");
+  const handleRefetchGoogleAccessToken = async () => {
+    await invoke("refetch_google_access_token", { pk: 1 });
   };
 
-  const handleReadEmail = async () => {
-    await invoke("read_inbox");
+  const handleFetchEmails = async () => {
+    await invoke("fetch_emails", {
+      pk: 1,
+    });
   };
 
   return (
@@ -32,8 +34,8 @@ const Home: Component = () => {
         class="mb-4 italic text-lg"
         style={{ color: getColors().colors["editor.foreground"] }}
       >
-        Note: Dwata is free to use, but you will be charged by AI provider for
-        the API usage.
+        Note: dwata is free to use (for single person usage), but you will be
+        charged by AI provider for AI usage in chats or other features.
       </p>
 
       <p style={{ color: getColors().colors["editor.foreground"] }}>
@@ -46,11 +48,16 @@ const Home: Component = () => {
       </p>
 
       <p style={{ color: getColors().colors["editor.foreground"] }}>
-        Text <Button onClick={handleGoogleAuth} size="sm" label="Google Auth" />
+        <Button
+          onClick={handleRefetchGoogleAccessToken}
+          size="sm"
+          label="Refetch"
+        />{" "}
+        Google access tokens
       </p>
 
       <p style={{ color: getColors().colors["editor.foreground"] }}>
-        <Button onClick={handleReadEmail} size="sm" label="Read email" />
+        <Button onClick={handleFetchEmails} size="sm" label="Fetch emails" />
       </p>
     </div>
   );

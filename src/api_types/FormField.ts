@@ -6,12 +6,12 @@ import type { ContentType } from "./ContentType";
 export type FormField = {
   name: string;
   label: string;
-  description: string | null;
-  placeholder: string | null;
+  description?: string | null;
+  placeholder?: string | null;
   contentType: ContentType;
   contentSpec: ContentSpec;
-  isRequired: boolean | null;
-  isEditable: boolean | null;
-  isHidden: boolean | null;
-  defaultValue: Content | null;
+  isRequired?: boolean | null;
+  isEditable?: boolean | null;
+  isHidden?: boolean | null;
+  defaultValue?: Content | null;
 };

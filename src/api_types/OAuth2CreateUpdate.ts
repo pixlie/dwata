@@ -4,4 +4,6 @@ export type OAuth2CreateUpdate = {
   provider: string | null;
   clientId: string | null;
   clientSecret: string | null;
+  refreshToken: string | null;
+  accessToken: string | null;
 };
