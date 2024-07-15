@@ -10,7 +10,8 @@ use ts_rs::TS;
 pub struct FormField {
     // A unique identifier within a form or schema
     pub name: String,
-    pub label: String,
+    #[ts(optional = nullable)]
+    pub label: Option<String>,
     #[ts(optional = nullable)]
     pub description: Option<String>,
     #[ts(optional = nullable)]
@@ -33,7 +34,7 @@ impl Default for FormField {
     fn default() -> Self {
         FormField {
             name: "field".to_string(),
-            label: "Field".to_string(),
+            label: None,
             description: None,
             placeholder: None,
             content_type: ContentType::Text,
@@ -49,7 +50,7 @@ impl Default for FormField {
 impl FormField {
     pub fn new(
         name: &str,
-        label: &str,
+        label: Option<&str>,
         description: Option<&str>,
         content_type: ContentType,
         content_spec: ContentSpec,
@@ -58,8 +59,8 @@ impl FormField {
     ) -> Self {
         FormField {
             name: name.to_string(),
-            label: label.to_string(),
-            description: description.and_then(|x| Some(x.to_string())),
+            label: label.map(|x| x.to_string()),
+            description: description.map(|x| x.to_string()),
             placeholder: None,
             content_type,
             content_spec,
@@ -73,7 +74,7 @@ impl FormField {
     pub fn text_field<T: Display>(name: T, label: T) -> Self {
         FormField {
             name: name.to_string(),
-            label: label.to_string(),
+            label: Some(label.to_string()),
             ..Default::default()
         }
     }
@@ -81,7 +82,6 @@ impl FormField {
     pub fn hidden_field<T: Display>(name: T) -> Self {
         FormField {
             name: name.to_string(),
-            label: name.to_string(),
             content_type: ContentType::Text,
             content_spec: ContentSpec::default(),
             is_editable: Some(false),

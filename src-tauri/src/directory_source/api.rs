@@ -12,7 +12,7 @@ impl Writable for DirectorySource {
             vec![
                 FormField::new(
                     "path",
-                    "Path to Directory",
+                    Some("Path to Directory"),
                     Some(
                         "The directory from which you want to read files matching specified types",
                     ),
@@ -23,7 +23,7 @@ impl Writable for DirectorySource {
                 ),
                 FormField::new(
                     "label",
-                    "Label",
+                    Some("Label"),
                     Some("An easy to remember label for this directory"),
                     ContentType::Text,
                     ContentSpec::default(),
@@ -32,7 +32,7 @@ impl Writable for DirectorySource {
                 ),
                 FormField::new(
                     "includePatterns",
-                    "Include patterns",
+                    Some("Include patterns"),
                     Some("File glob patterns to include (like in .gitignore file)"),
                     ContentType::TextArray,
                     ContentSpec::default(),

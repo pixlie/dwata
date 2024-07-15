@@ -24,7 +24,7 @@ impl Writable for AIIntegration {
             vec![
                 FormField::new(
                     "aiProvider",
-                    "Select AI provider",
+                    Some("Select AI provider"),
                     None,
                     ContentType::SingleChoice,
                     ai_provider_spec,
@@ -33,7 +33,7 @@ impl Writable for AIIntegration {
                 ),
                 FormField::new(
                     "label",
-                    "Label",
+                    Some("Label"),
                     Some("An easy to remember label for this AI integration"),
                     ContentType::Text,
                     ContentSpec::default(),
@@ -42,7 +42,7 @@ impl Writable for AIIntegration {
                 ),
                 FormField::new(
                     "apiKey",
-                    "API key",
+                    Some("API key"),
                     Some("You will find this in your AI providers account settings"),
                     ContentType::Text,
                     ContentSpec::default(),

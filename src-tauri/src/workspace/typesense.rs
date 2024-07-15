@@ -51,7 +51,6 @@ pub trait TypesenseSearchable {
     }
 
     async fn create_collection_in_typesense(&self) -> Result<(), DwataError> {
-        self.delete_collection().await?;
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -118,7 +117,6 @@ pub trait TypesenseSearchable {
     }
 
     async fn search_in_typesense(&self, query: String) -> Result<(), DwataError> {
-        self.retrieve_collection().await?;
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -132,7 +130,7 @@ pub trait TypesenseSearchable {
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
             .query(&[
                 ("q", query),
-                ("query_by", "subject,from,body_text".to_string()),
+                ("query_by", "subject,from_name,body_text".to_string()),
             ])
             .send()
             .await?;

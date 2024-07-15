@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider};
 use crate::{
     error::DwataError,
@@ -7,6 +5,7 @@ use crate::{
     workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
 };
 use chrono::Utc;
+use std::str::FromStr;
 
 impl CRUDRead for EmailAccount {
     fn table_name() -> String {

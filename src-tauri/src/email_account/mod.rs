@@ -207,9 +207,17 @@ impl EmailAccount {
                                 continue;
                             }
                         };
+                        // Extract the email UID from the file name, which has .email at the end
                         match Email::parse_email_from_file(
-                            entry.file_name().to_string_lossy().to_string(),
-                            path.file_name().unwrap().to_string_lossy().to_string(),
+                            path.file_name()
+                                .unwrap()
+                                .to_string_lossy()
+                                .split(".")
+                                .collect::<Vec<&str>>()
+                                .iter()
+                                .nth(0)
+                                .unwrap()
+                                .to_string(),
                             file_contents,
                         )
                         .await
@@ -315,40 +323,7 @@ impl TypesenseSearchable for EmailAccount {
     async fn get_collection_schema(&self) -> Result<TypesenseCollection, DwataError> {
         Ok(TypesenseCollection {
             name: self.get_collection_name().await,
-            fields: vec![
-                TypesenseField {
-                    name: "id".to_string(),
-                    field_type: "int32".to_string(),
-                    ..Default::default()
-                },
-                TypesenseField {
-                    name: "mailbox".to_string(),
-                    field_type: "string".to_string(),
-                    ..Default::default()
-                },
-                TypesenseField {
-                    name: "from".to_string(),
-                    field_type: "string".to_string(),
-                    ..Default::default()
-                },
-                TypesenseField {
-                    name: "date".to_string(),
-                    field_type: "int64".to_string(),
-                    facet: Some(true),
-                    ..Default::default()
-                },
-                TypesenseField {
-                    name: "subject".to_string(),
-                    field_type: "string".to_string(),
-                    ..Default::default()
-                },
-                TypesenseField {
-                    name: "body_text".to_string(),
-                    field_type: "string".to_string(),
-                    store: Some(false),
-                    ..Default::default()
-                },
-            ],
+            fields: Email::get_typesense_fields(),
             default_sorting_field: Some("date".to_string()),
         })
     }
