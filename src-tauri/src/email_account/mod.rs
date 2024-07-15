@@ -1,13 +1,19 @@
-use crate::{email::Email, error::DwataError, oauth2::OAuth2, workspace::crud::CRUDRead};
-use chrono::{DateTime, FixedOffset, TimeDelta, Utc};
+use crate::email::Email;
+use crate::error::DwataError;
+use crate::oauth2::OAuth2;
+use crate::workspace::{
+    crud::CRUDRead,
+    typesense::{TypesenseCollection, TypesenseField, TypesenseSearchable},
+};
+use chrono::{DateTime, TimeDelta, Utc};
 use imap::{self, Session};
 use log::{error, info};
-use mail_parser::MessageParser;
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, Type};
 use std::{
-    fs::create_dir_all,
+    fs::{create_dir_all, read_dir, File},
+    io::Read,
     net::TcpStream,
     path::{Path, PathBuf},
 };
@@ -45,6 +51,16 @@ pub struct EmailAccount {
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
+
+    // IMAP protocol and local storage related
+    #[serde(skip)]
+    #[ts(skip)]
+    #[sqlx(skip)]
+    pub mailbox: Option<String>,
+    #[serde(skip)]
+    #[ts(skip)]
+    #[sqlx(skip)]
+    pub storage_dir: Option<PathBuf>,
 }
 
 #[derive(Default, Deserialize, TS)]
@@ -75,12 +91,11 @@ impl imap::Authenticator for GmailAccount {
 impl EmailAccount {
     pub async fn fetch_emails(
         &self,
-        storage_dir: &PathBuf,
         db_connection: &mut SqliteConnection,
     ) -> Result<(), DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
         let mut imap_session = self.get_imap_session(db_connection).await?;
-        match imap_session.examine("INBOX") {
+        match imap_session.examine(self.mailbox.as_ref().unwrap()) {
             Ok(mailbox) => info!("{}", mailbox),
             Err(e) => error!("Error selecting INBOX: {}", e),
         };
@@ -94,7 +109,7 @@ impl EmailAccount {
             since.format("%d-%b-%Y"),
             email_uid_list.len()
         );
-        let mut storage_dir = storage_dir.clone();
+        let mut storage_dir = self.storage_dir.as_ref().unwrap().clone();
         storage_dir.push("emails");
         storage_dir.push(self.email_address.clone());
         storage_dir.push("INBOX");
@@ -103,7 +118,7 @@ impl EmailAccount {
                 Ok(_) => {}
                 Err(err) => {
                     error!("Could not create local folder\n Error: {}", err);
-                    return Err(DwataError::CouldNotCreateLocalFolder);
+                    return Err(DwataError::CouldNotCreateLocalEmailStorage);
                 }
             }
         }
@@ -135,6 +150,95 @@ impl EmailAccount {
 
         imap_session.logout().unwrap();
         Ok(())
+    }
+
+    pub async fn process_stored_emails(&self) -> Result<Vec<String>, DwataError> {
+        // We parse the files that are in the given email storage directory
+        // and extract our JSON structure.
+
+        // We read emails from the local folder and parse them to extract the Email struct
+        let mut emails: Vec<Email> = vec![];
+        let storage_dir = self.storage_dir.as_ref().unwrap();
+        info!(
+            "Reading emails from local storage directory: {}",
+            &storage_dir.to_str().unwrap()
+        );
+        if !std::path::Path::exists(&storage_dir) {
+            error!(
+                "Could not find email storage directory: {}",
+                &storage_dir.to_str().unwrap()
+            );
+            return Err(DwataError::CouldNotOpenLocalEmailStorage);
+        }
+        // Read all email files in the local folder
+        match read_dir(&storage_dir) {
+            Ok(entries) => {
+                for entry in entries {
+                    let entry = match entry {
+                        Ok(x) => x,
+                        Err(err) => {
+                            error!("Could not get email file entry.\n Error: {}", err);
+                            continue;
+                        }
+                    };
+                    let path = entry.path();
+                    if path.is_file() {
+                        // We read the file contents and parse it to extract the email
+                        let mut file = match File::open(&path) {
+                            Ok(x) => x,
+                            Err(err) => {
+                                error!(
+                                    "Could not open email file {}\n Error: {}",
+                                    path.to_str().unwrap(),
+                                    err
+                                );
+                                continue;
+                            }
+                        };
+                        let mut file_contents: Vec<u8> = Vec::new();
+                        match file.read_to_end(&mut file_contents) {
+                            Ok(_) => {}
+                            Err(err) => {
+                                error!(
+                                    "Could not read email file {}\n Error: {}",
+                                    path.to_str().unwrap(),
+                                    err
+                                );
+                                continue;
+                            }
+                        };
+                        match Email::parse_email_from_file(
+                            entry.file_name().to_string_lossy().to_string(),
+                            path.file_name().unwrap().to_string_lossy().to_string(),
+                            file_contents,
+                        )
+                        .await
+                        {
+                            Ok(email) => {
+                                emails.push(email);
+                            }
+                            Err(err) => {
+                                error!("Could not parse email file\n Error: {}", err);
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            Err(err) => {
+                error!(
+                    "Could not read email storage directory {}\n Error: {}",
+                    &storage_dir.to_string_lossy(),
+                    err
+                )
+            }
+        }
+
+        info!("Emails to index in Typesense: {}", emails.len());
+        Ok(emails
+            .iter()
+            .map(|x| serde_json::to_string(&x).unwrap())
+            .collect::<Vec<String>>())
     }
 }
 
@@ -196,5 +300,60 @@ impl EmailAccount {
         } else {
             Err(DwataError::CouldNotFindOAuth2Config)
         }
+    }
+}
+
+impl TypesenseSearchable for EmailAccount {
+    async fn get_collection_name(&self) -> String {
+        format!(
+            "dwata_emails_{}_{}",
+            self.id,
+            self.mailbox.as_ref().unwrap()
+        )
+    }
+
+    async fn get_collection_schema(&self) -> Result<TypesenseCollection, DwataError> {
+        Ok(TypesenseCollection {
+            name: self.get_collection_name().await,
+            fields: vec![
+                TypesenseField {
+                    name: "id".to_string(),
+                    field_type: "int32".to_string(),
+                    ..Default::default()
+                },
+                TypesenseField {
+                    name: "mailbox".to_string(),
+                    field_type: "string".to_string(),
+                    ..Default::default()
+                },
+                TypesenseField {
+                    name: "from".to_string(),
+                    field_type: "string".to_string(),
+                    ..Default::default()
+                },
+                TypesenseField {
+                    name: "date".to_string(),
+                    field_type: "int64".to_string(),
+                    facet: Some(true),
+                    ..Default::default()
+                },
+                TypesenseField {
+                    name: "subject".to_string(),
+                    field_type: "string".to_string(),
+                    ..Default::default()
+                },
+                TypesenseField {
+                    name: "body_text".to_string(),
+                    field_type: "string".to_string(),
+                    store: Some(false),
+                    ..Default::default()
+                },
+            ],
+            default_sorting_field: Some("date".to_string()),
+        })
+    }
+
+    async fn get_json_lines(&self) -> Result<Vec<String>, DwataError> {
+        self.process_stored_emails().await
     }
 }

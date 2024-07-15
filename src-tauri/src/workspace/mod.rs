@@ -4,11 +4,11 @@ use sqlx::SqliteConnection;
 use tokio::sync::Mutex;
 use ts_rs::TS;
 
-// pub mod api_types;
 pub mod api;
 pub mod commands;
 pub mod crud;
 pub mod helpers;
+pub mod typesense;
 
 pub type DwataDb = Mutex<SqliteConnection>;
 
