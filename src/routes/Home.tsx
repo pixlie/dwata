@@ -17,9 +17,21 @@ const Home: Component = () => {
     });
   };
 
+  const handleCreateCollection = async () => {
+    await invoke("create_collection_in_typesense", {
+      pk: 1,
+    });
+  };
+
+  const handleIndexEmails = async () => {
+    await invoke("index_emails", {
+      pk: 1,
+    });
+  };
+
   return (
     <div class="max-w-screen-md">
-      <Heading size="6xl">Welcome to dwata</Heading>
+      <Heading size="3xl">Welcome to dwata</Heading>
       <div class="mb-4" />
 
       <p
@@ -53,11 +65,19 @@ const Home: Component = () => {
           size="sm"
           label="Refetch"
         />{" "}
-        Google access tokens
-      </p>
-
-      <p style={{ color: getColors().colors["editor.foreground"] }}>
-        <Button onClick={handleFetchEmails} size="sm" label="Fetch emails" />
+        Google access tokens{" "}
+        <Button
+          onClick={handleCreateCollection}
+          size="sm"
+          label="Create Collection"
+        />
+        {"  for emails "}
+        <Button
+          onClick={handleFetchEmails}
+          size="sm"
+          label="Fetch emails"
+        />{" "}
+        <Button onClick={handleIndexEmails} size="sm" label="Index emails" />
       </p>
     </div>
   );

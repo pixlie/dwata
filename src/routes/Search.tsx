@@ -1,31 +1,48 @@
-import { Component } from "solid-js";
+import { Component, createResource, createSignal } from "solid-js";
 import Heading from "../widgets/typography/Heading";
-import { useUserInterface } from "../stores/userInterface";
-import Button from "../widgets/interactable/Button";
+// import { useUserInterface } from "../stores/userInterface";
+// import Button from "../widgets/interactable/Button";
 import TextInput from "../widgets/interactable/TextInput";
+import { invoke } from "@tauri-apps/api/core";
+import { IFormFieldValue } from "../utils/types";
 
 const Search: Component = () => {
-  const [_, { getColors }] = useUserInterface();
+  // const [_, { getColors }] = useUserInterface();
+  const [formData, setFormData] = createSignal<{
+    [key: string]: IFormFieldValue;
+  }>({});
+  const [results, { mutate: _m, refetch: search }] = createResource(
+    async () => {
+      if (!!formData().query && (formData()!.query! as string).length >= 1) {
+        await invoke("search_emails", {
+          pk: 1,
+          query: formData().query,
+        });
+      }
+    },
+  );
+
+  const handleChange = (name: string, value: IFormFieldValue) => {
+    setFormData((state) => ({
+      ...state,
+      [name]: value,
+    }));
+
+    search();
+  };
 
   return (
     <div class="max-w-screen-md">
-      <Heading size="6xl">Search anything</Heading>
+      <Heading size="3xl">Search</Heading>
       <div class="mb-4" />
       <TextInput
         name="query"
-        label="What are you looking for?"
         contentType="Text"
         contentSpec={{}}
+        isEditable
+        onChange={handleChange}
+        value={"query" in formData() ? formData().query : undefined}
       />
-
-      <p style={{ color: getColors().colors["editor.foreground"] }}>
-        To get started, please{" "}
-        <Button
-          href="/settings/ai-integration/add"
-          size="sm"
-          label="add an AI provider"
-        />
-      </p>
     </div>
   );
 };
