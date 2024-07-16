@@ -1,19 +1,20 @@
 use crate::{error::DwataError, workspace::typesense::TypesenseField};
 use chrono::DateTime;
 use mail_parser::MessageParser;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Serialize, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[ts(export, rename_all = "camelCase")]
 pub struct Email {
     // The UID of the email in the mailbox
     pub id: String,
 
     pub from_name: String,
-    // pub from_email: String,
+    pub from_email: String,
     pub date: i64,
     pub subject: String,
+    #[serde(skip_deserializing)]
     pub body_text: String,
 }
 
@@ -68,7 +69,7 @@ impl Email {
                 return Ok(Email {
                     id: mail_uid,
                     from_name: from.0,
-                    // from_email: from.1,
+                    from_email: from.1,
                     date,
                     subject,
                     body_text,
@@ -92,11 +93,11 @@ impl Email {
                 field_type: "string".to_string(),
                 ..Default::default()
             },
-            // TypesenseField {
-            //     name: "from_email".to_string(),
-            //     field_type: "string".to_string(),
-            //     ..Default::default()
-            // },
+            TypesenseField {
+                name: "from_email".to_string(),
+                field_type: "string".to_string(),
+                ..Default::default()
+            },
             TypesenseField {
                 name: "date".to_string(),
                 field_type: "int64".to_string(),

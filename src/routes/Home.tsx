@@ -2,32 +2,9 @@ import { Component } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import { useUserInterface } from "../stores/userInterface";
 import Button from "../widgets/interactable/Button";
-import { invoke } from "@tauri-apps/api/core";
 
 const Home: Component = () => {
   const [_, { getColors }] = useUserInterface();
-
-  const handleRefetchGoogleAccessToken = async () => {
-    await invoke("refetch_google_access_token", { pk: 1 });
-  };
-
-  const handleFetchEmails = async () => {
-    await invoke("fetch_emails", {
-      pk: 1,
-    });
-  };
-
-  const handleCreateCollection = async () => {
-    await invoke("create_collection_in_typesense", {
-      pk: 1,
-    });
-  };
-
-  const handleIndexEmails = async () => {
-    await invoke("index_emails", {
-      pk: 1,
-    });
-  };
 
   return (
     <div class="max-w-screen-md">
@@ -57,27 +34,6 @@ const Home: Component = () => {
           size="sm"
           label="add an AI provider"
         />
-      </p>
-
-      <p style={{ color: getColors().colors["editor.foreground"] }}>
-        <Button
-          onClick={handleRefetchGoogleAccessToken}
-          size="sm"
-          label="Refetch"
-        />{" "}
-        Google access tokens{" "}
-        <Button
-          onClick={handleCreateCollection}
-          size="sm"
-          label="Create Collection"
-        />
-        {"  for emails "}
-        <Button
-          onClick={handleFetchEmails}
-          size="sm"
-          label="Fetch emails"
-        />{" "}
-        <Button onClick={handleIndexEmails} size="sm" label="Index emails" />
       </p>
     </div>
   );

@@ -3,6 +3,7 @@
 export type Email = {
   id: string;
   fromName: string;
+  fromEmail: string;
   date: bigint;
   subject: string;
   bodyText: string;

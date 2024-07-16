@@ -1,8 +1,7 @@
 use super::EmailAccount;
 use crate::workspace::crud::CRUDRead;
-use crate::workspace::typesense::TypesenseSearchable;
+use crate::workspace::typesense::{TypesenseSearchResult, TypesenseSearchable};
 use crate::{error::DwataError, workspace::DwataDb};
-use log::info;
 use tauri::{AppHandle, Manager, State};
 
 #[tauri::command]
@@ -63,7 +62,7 @@ pub async fn search_emails(
     query: String,
     app: AppHandle,
     store: State<'_, DwataDb>,
-) -> Result<(), DwataError> {
+) -> Result<TypesenseSearchResult, DwataError> {
     let mut db_guard = store.lock().await;
     let mut email_account = EmailAccount::read_one_by_pk(pk, &mut db_guard).await?;
     let mut storage_dir = app.path().app_data_dir().unwrap();

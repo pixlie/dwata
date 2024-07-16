@@ -1,7 +1,8 @@
-use crate::error::DwataError;
+use crate::{email::Email, error::DwataError};
 use log::info;
 use reqwest;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 #[derive(Serialize, Default)]
 pub struct TypesenseField {
@@ -116,7 +117,10 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn search_in_typesense(&self, query: String) -> Result<(), DwataError> {
+    async fn search_in_typesense(
+        &self,
+        query: String,
+    ) -> Result<TypesenseSearchResult, DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -134,12 +138,27 @@ pub trait TypesenseSearchable {
             ])
             .send()
             .await?;
+        let status = &response.status();
+        let results = response.json::<TypesenseSearchResult>().await.unwrap();
 
         info!(
-            "Searched in Typesense, API response status: {}\n Results: {}",
-            response.status(),
-            response.text().await.unwrap()
+            "Searched in Typesense, API response status: {}\n {} results",
+            status, results.found
         );
-        Ok(())
+        Ok(results)
     }
+}
+
+#[derive(Deserialize, Serialize, TS)]
+#[ts(export)]
+pub struct TypesenseSearchResult {
+    #[ts(type = "number")]
+    pub found: u64,
+    pub hits: Vec<TypesenseSearchResultHit>,
+}
+
+#[derive(Deserialize, Serialize, TS)]
+#[ts(export)]
+pub struct TypesenseSearchResultHit {
+    pub document: Email,
 }

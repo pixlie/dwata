@@ -100,7 +100,7 @@ impl EmailAccount {
             Err(e) => error!("Error selecting INBOX: {}", e),
         };
 
-        let since = Utc::now() - TimeDelta::weeks(1);
+        let since = Utc::now() - TimeDelta::weeks(5);
         let email_uid_list = imap_session
             .uid_search(format!("SINCE {}", since.format("%d-%b-%Y").to_string()))
             .unwrap();
@@ -109,10 +109,7 @@ impl EmailAccount {
             since.format("%d-%b-%Y"),
             email_uid_list.len()
         );
-        let mut storage_dir = self.storage_dir.as_ref().unwrap().clone();
-        storage_dir.push("emails");
-        storage_dir.push(self.email_address.clone());
-        storage_dir.push("INBOX");
+        let storage_dir = self.storage_dir.as_ref().unwrap().clone();
         if let Ok(false) = Path::try_exists(storage_dir.as_path()) {
             match create_dir_all(storage_dir.as_path()) {
                 Ok(_) => {}
