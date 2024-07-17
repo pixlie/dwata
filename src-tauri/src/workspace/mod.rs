@@ -1,16 +1,14 @@
 use crate::{ai_integration::AIIntegrationFilters, chat::ChatFilters};
 use serde::Deserialize;
-use sqlx::SqliteConnection;
-use tokio::sync::Mutex;
 use ts_rs::TS;
 
 pub mod api;
+pub mod app_state;
 pub mod commands;
 pub mod crud;
-pub mod helpers;
 pub mod typesense;
 
-pub type DwataDb = Mutex<SqliteConnection>;
+pub use app_state::DwataDb;
 
 #[derive(Deserialize, TS)]
 #[ts(export)]

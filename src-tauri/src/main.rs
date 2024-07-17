@@ -1,13 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use email_account::app_state::EmailAccountsState;
 use env_logger;
 use log::{error, info};
 use std::path::PathBuf;
-use tauri::{
-    path::{self, BaseDirectory},
-    App, Manager,
-};
+use tauri::{path::BaseDirectory, App, Manager};
+use tokio::sync::Mutex;
+use workspace::app_state::get_database_connection;
 
 mod database_source;
 mod directory_source;
@@ -43,7 +43,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         .resolve("migrations/", BaseDirectory::Resource)
         .unwrap();
     match tauri::async_runtime::block_on(async {
-        workspace::helpers::get_database_connection(&app_config_dir, migrations_dir).await
+        get_database_connection(&app_config_dir, migrations_dir).await
     }) {
         Ok(db_connection) => {
             app.manage(workspace::DwataDb::new(db_connection));
@@ -53,6 +53,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             return Err(Box::new(err));
         }
     }
+    app.manage(EmailAccountsState::new(Mutex::new(vec![])));
     Ok(())
 }
 

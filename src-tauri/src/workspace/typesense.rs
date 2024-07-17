@@ -4,6 +4,17 @@ use reqwest;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+#[derive(Serialize)]
+pub struct TypesenseEmbeddingModelConfig {
+    pub model_name: String,
+}
+
+#[derive(Serialize)]
+pub struct TypesenseEmbedding {
+    pub from: Vec<String>,
+    pub model_config: TypesenseEmbeddingModelConfig,
+}
+
 #[derive(Serialize, Default)]
 pub struct TypesenseField {
     pub name: String,
@@ -13,6 +24,8 @@ pub struct TypesenseField {
     pub facet: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub store: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embed: Option<TypesenseEmbedding>,
 }
 
 #[derive(Serialize)]
@@ -134,7 +147,10 @@ pub trait TypesenseSearchable {
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
             .query(&[
                 ("q", query),
-                ("query_by", "subject,from_name,body_text".to_string()),
+                (
+                    "query_by",
+                    "subject,from_name,body_text,embedding".to_string(),
+                ),
             ])
             .send()
             .await?;
