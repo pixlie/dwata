@@ -11,7 +11,13 @@ import { TypesenseSearchResult } from "../api_types/TypesenseSearchResult";
 const SearchResultItem: Component<Email> = (props) => {
   const [_, { getColors }] = useUserInterface();
   return (
-    <div style={{ color: getColors().colors["editor.foreground"] }}>
+    <div
+      class="text-lg font-normal border border-b-0 p-1"
+      style={{
+        color: getColors().colors["editor.foreground"],
+        "border-color": getColors().colors["editorWidget.border"],
+      }}
+    >
       {props.subject}
     </div>
   );

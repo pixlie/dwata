@@ -15,7 +15,7 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
   const Tag = () =>
     !!props.infoTag ? (
       <div>
-        <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
+        <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2 font-normal">
           {props.infoTag}
         </span>
       </div>
