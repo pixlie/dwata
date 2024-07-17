@@ -1,4 +1,7 @@
-use crate::{error::DwataError, workspace::typesense::TypesenseField};
+use crate::{
+    error::DwataError,
+    workspace::typesense::{TypesenseEmbedding, TypesenseEmbeddingModelConfig, TypesenseField},
+};
 use chrono::DateTime;
 use mail_parser::MessageParser;
 use serde::{Deserialize, Serialize};
@@ -113,6 +116,17 @@ impl Email {
                 name: "body_text".to_string(),
                 field_type: "string".to_string(),
                 store: Some(false),
+                ..Default::default()
+            },
+            TypesenseField {
+                name: "embedding".to_string(),
+                field_type: "float[]".to_string(),
+                embed: Some(TypesenseEmbedding {
+                    from: vec!["subject".to_string(), "from_name".to_string()],
+                    model_config: TypesenseEmbeddingModelConfig {
+                        model_name: "ts/jina-embeddings-v2-base-en".to_string(),
+                    },
+                }),
                 ..Default::default()
             },
         ]

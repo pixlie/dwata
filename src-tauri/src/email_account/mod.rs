@@ -1,16 +1,22 @@
 use crate::email::Email;
 use crate::error::DwataError;
 use crate::oauth2::OAuth2;
+use crate::workspace::DwataDb;
 use crate::workspace::{
     crud::CRUDRead,
-    typesense::{TypesenseCollection, TypesenseField, TypesenseSearchable},
+    typesense::{TypesenseCollection, TypesenseSearchable},
 };
-use chrono::{DateTime, TimeDelta, Utc};
+use app_state::EmailAccountsState;
+use chrono::{DateTime, NaiveDate, TimeDelta, Utc};
+use helpers::{fetch_email_uid_list, fetch_emails};
+use imap::types::Mailbox;
 use imap::{self, Session};
 use log::{error, info};
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, SqliteConnection, Type};
+use std::collections::HashSet;
+use std::sync::Arc;
 use std::{
     fs::{create_dir_all, read_dir, File},
     io::Read,
@@ -18,11 +24,16 @@ use std::{
     path::{Path, PathBuf},
 };
 use strum::{Display, EnumString};
+use tauri::{AppHandle, Manager};
+use tokio::sync::Mutex;
+use tokio::task::JoinSet;
 use ts_rs::TS;
 
 pub mod api;
+pub mod app_state;
 pub mod commands;
 pub mod crud;
+pub mod helpers;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
 #[sqlx(rename_all = "lowercase")]
@@ -34,6 +45,23 @@ pub enum EmailProvider {
     ProtonMail,
     // Yahoo,
     // Outlook,
+}
+
+pub struct EmailAccountItemStatus {
+    pub id: i64,
+    // MESSAGES: The number of messages in the mailbox.
+    pub messages: u32,
+    // RECENT: The number of messages with Flag::Recent set.
+    pub recent: u32,
+    // UIDNEXT: The next Uid of the mailbox.
+    pub uid_next: Option<u32>,
+    // UIDVALIDITY: The unique identifier validity value of the mailbox (see Uid).
+    pub uid_validity: Option<u32>,
+    // UNSEEN: The number of messages which do not have Flag::Seen set.
+    pub unseen: Option<u32>,
+    // Related to IMAP processing in dwata
+    pub last_fetched_at: i64,
+    pub fetched_till_date: Option<NaiveDate>,
 }
 
 #[derive(Serialize, FromRow, TS)]
@@ -57,6 +85,7 @@ pub struct EmailAccount {
     #[ts(skip)]
     #[sqlx(skip)]
     pub mailbox: Option<String>,
+
     #[serde(skip)]
     #[ts(skip)]
     #[sqlx(skip)]
@@ -89,26 +118,62 @@ impl imap::Authenticator for GmailAccount {
 }
 
 impl EmailAccount {
-    pub async fn fetch_emails(
-        &self,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<(), DwataError> {
+    pub fn prep_for_access(&mut self, storage_dir: PathBuf) {
+        let mut storage_dir = storage_dir.clone();
+        storage_dir.push("emails");
+        storage_dir.push(self.email_address.clone());
+        storage_dir.push("INBOX");
+        self.mailbox = Some("INBOX".to_string());
+        self.storage_dir = Some(storage_dir);
+    }
+
+    pub async fn update_status(&self, app: AppHandle, mailbox: Mailbox) {
+        let email_accounts_state = app.state::<EmailAccountsState>();
+        let mut email_accounts_state_guard = email_accounts_state.lock().await;
+        let mut found = false;
+        // Check if we already have this email account in our state
+        for email_account_item_status in email_accounts_state_guard.iter_mut() {
+            if email_account_item_status.id == self.id {
+                email_account_item_status.messages = mailbox.exists;
+                email_account_item_status.recent = mailbox.recent;
+                email_account_item_status.uid_next = mailbox.uid_next;
+                email_account_item_status.uid_validity = mailbox.uid_validity;
+                email_account_item_status.unseen = mailbox.unseen;
+                email_account_item_status.last_fetched_at = Utc::now().timestamp();
+                found = true;
+                break;
+            }
+        }
+        if !found {
+            // If we don't have this email account in our state, then we add it
+            email_accounts_state_guard.push(EmailAccountItemStatus {
+                id: self.id,
+                messages: mailbox.exists,
+                recent: mailbox.recent,
+                uid_next: mailbox.uid_next,
+                uid_validity: mailbox.uid_validity,
+                unseen: mailbox.unseen,
+                last_fetched_at: Utc::now().timestamp(),
+                fetched_till_date: None,
+            });
+        }
+    }
+
+    pub async fn fetch_emails(&self, app: AppHandle) -> Result<(), DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
-        let mut imap_session = self.get_imap_session(db_connection).await?;
+        let db = app.state::<DwataDb>();
+        let mut imap_session = {
+            let mut db_guard = db.lock().await;
+            self.get_imap_session(&mut db_guard).await?
+        };
         match imap_session.examine(self.mailbox.as_ref().unwrap()) {
-            Ok(mailbox) => info!("{}", mailbox),
+            Ok(mailbox) => {
+                info!("Selected mailbox: {}", mailbox);
+                self.update_status(app.clone(), mailbox).await;
+            }
             Err(e) => error!("Error selecting INBOX: {}", e),
         };
 
-        let since = Utc::now() - TimeDelta::weeks(5);
-        let email_uid_list = imap_session
-            .uid_search(format!("SINCE {}", since.format("%d-%b-%Y").to_string()))
-            .unwrap();
-        info!(
-            "Searching for emails since {}, found {} emails",
-            since.format("%d-%b-%Y"),
-            email_uid_list.len()
-        );
         let storage_dir = self.storage_dir.as_ref().unwrap().clone();
         if let Ok(false) = Path::try_exists(storage_dir.as_path()) {
             match create_dir_all(storage_dir.as_path()) {
@@ -120,31 +185,72 @@ impl EmailAccount {
             }
         }
 
-        match imap_session.uid_fetch(
-            email_uid_list
-                .iter()
-                .map(|x| format!("{}", x))
-                .collect::<Vec<String>>()
-                .join(","),
-            "(BODY.PEEK[] UID)",
-        ) {
-            Ok(messages) => {
-                for message in messages.iter() {
-                    match message.body() {
-                        Some(body) => {
-                            // Store the email in a local folder
-                            let mut file_path = storage_dir.clone();
-                            file_path.push(format!("{}.email", message.uid.unwrap()));
-                            info!("File path: {}", file_path.to_str().unwrap());
-                            std::fs::write(file_path, body).unwrap();
-                        }
-                        None => continue,
-                    }
+        let shared_email_uid_list = Arc::new(Mutex::new(HashSet::<u32>::new()));
+        let shared_imap_session = Arc::new(Mutex::new(imap_session));
+        let shared_fetched_email_uid_count = Arc::new(Mutex::new(0));
+        let email_accounts_state = app.state::<EmailAccountsState>();
+        let email_accounts_state_guard = email_accounts_state.lock().await;
+        let email_account_status = email_accounts_state_guard
+            .iter()
+            .find(|x| x.id == self.id)
+            .unwrap();
+        let fetch_batch_limit = 25;
+        let mut month = 0;
+        let mut fetch_email_uid_set = JoinSet::new();
+        let mut fetch_email_set = JoinSet::new();
+        let mut before = Utc::now().date_naive();
+        loop {
+            month += 1;
+            let moved_imap_session = shared_imap_session.clone();
+            let moved_email_uid_list = shared_email_uid_list.clone();
+            let since = before - TimeDelta::weeks(4);
+            fetch_email_uid_set.spawn(async move {
+                fetch_email_uid_list(
+                    moved_email_uid_list,
+                    moved_imap_session,
+                    since.format("%d-%b-%Y").to_string(),
+                    before.format("%d-%b-%Y").to_string(),
+                )
+                .await;
+            });
+            before = since;
+            {
+                let email_uid_list = shared_email_uid_list.lock().await;
+                let mut fetched_email_uid_count = shared_fetched_email_uid_count.lock().await;
+                let moved_imap_session = shared_imap_session.clone();
+                let moved_storage_dir = storage_dir.clone();
+                // We select the next batch of email Uids to fetch
+                let mut next_email_uid_list: Vec<u32> = vec![];
+                for uid in email_uid_list
+                    .iter()
+                    .skip(*fetched_email_uid_count)
+                    .take(fetch_batch_limit)
+                {
+                    next_email_uid_list.push(*uid);
+                }
+                if next_email_uid_list.len() > 0 {
+                    *fetched_email_uid_count += next_email_uid_list.len();
+                    fetch_email_set.spawn(async move {
+                        fetch_emails(next_email_uid_list, moved_imap_session, moved_storage_dir)
+                            .await;
+                    });
                 }
             }
-            Err(e) => error!("Error Fetching email 1: {}", e),
-        };
 
+            // Let's check if we have already received the entire list of email Uids
+            let email_uid_list = shared_email_uid_list.lock().await;
+            if email_uid_list.len() >= email_account_status.messages.try_into().unwrap()
+                || month >= 18
+            {
+                while let Some(_) = fetch_email_uid_set.join_next().await {}
+                info!("Finished all tasks to fetch email uids");
+                while let Some(_) = fetch_email_set.join_next().await {}
+                info!("Finished all tasks to fetch emails");
+                break;
+            }
+        }
+
+        let mut imap_session = shared_imap_session.lock().await;
         imap_session.logout().unwrap();
         Ok(())
     }
@@ -206,15 +312,7 @@ impl EmailAccount {
                         };
                         // Extract the email UID from the file name, which has .email at the end
                         match Email::parse_email_from_file(
-                            path.file_name()
-                                .unwrap()
-                                .to_string_lossy()
-                                .split(".")
-                                .collect::<Vec<&str>>()
-                                .iter()
-                                .nth(0)
-                                .unwrap()
-                                .to_string(),
+                            path.file_name().unwrap().to_string_lossy().to_string(),
                             file_contents,
                         )
                         .await

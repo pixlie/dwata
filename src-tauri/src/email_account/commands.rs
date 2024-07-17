@@ -8,17 +8,14 @@ use tauri::{AppHandle, Manager, State};
 pub async fn fetch_emails(
     pk: i64,
     app: AppHandle,
-    store: State<'_, DwataDb>,
+    db: State<'_, DwataDb>,
 ) -> Result<(), DwataError> {
-    let mut db_guard = store.lock().await;
-    let mut email_account = EmailAccount::read_one_by_pk(pk, &mut db_guard).await?;
-    let mut storage_dir = app.path().app_data_dir().unwrap();
-    storage_dir.push("emails");
-    storage_dir.push(email_account.email_address.clone());
-    storage_dir.push("INBOX");
-    email_account.mailbox = Some("INBOX".to_string());
-    email_account.storage_dir = Some(storage_dir);
-    email_account.fetch_emails(&mut db_guard).await
+    let mut email_account = {
+        let mut db_guard = db.lock().await;
+        EmailAccount::read_one_by_pk(pk, &mut db_guard).await?
+    };
+    email_account.prep_for_access(app.path().app_data_dir().unwrap());
+    email_account.fetch_emails(app).await
 }
 
 #[tauri::command]
@@ -27,14 +24,11 @@ pub async fn create_collection_in_typesense(
     app: AppHandle,
     store: State<'_, DwataDb>,
 ) -> Result<(), DwataError> {
-    let mut db_guard = store.lock().await;
-    let mut email_account = EmailAccount::read_one_by_pk(pk, &mut db_guard).await?;
-    let mut storage_dir = app.path().app_data_dir().unwrap();
-    storage_dir.push("emails");
-    storage_dir.push(email_account.email_address.clone());
-    storage_dir.push("INBOX");
-    email_account.mailbox = Some("INBOX".to_string());
-    email_account.storage_dir = Some(storage_dir);
+    let mut email_account = {
+        let mut db_guard = store.lock().await;
+        EmailAccount::read_one_by_pk(pk, &mut db_guard).await?
+    };
+    email_account.prep_for_access(app.path().app_data_dir().unwrap());
     email_account.delete_collection().await?;
     email_account.create_collection_in_typesense().await
 }
@@ -45,14 +39,11 @@ pub async fn index_emails(
     app: AppHandle,
     store: State<'_, DwataDb>,
 ) -> Result<(), DwataError> {
-    let mut db_guard = store.lock().await;
-    let mut email_account = EmailAccount::read_one_by_pk(pk, &mut db_guard).await?;
-    let mut storage_dir = app.path().app_data_dir().unwrap();
-    storage_dir.push("emails");
-    storage_dir.push(email_account.email_address.clone());
-    storage_dir.push("INBOX");
-    email_account.mailbox = Some("INBOX".to_string());
-    email_account.storage_dir = Some(storage_dir);
+    let mut email_account = {
+        let mut db_guard = store.lock().await;
+        EmailAccount::read_one_by_pk(pk, &mut db_guard).await?
+    };
+    email_account.prep_for_access(app.path().app_data_dir().unwrap());
     email_account.index_in_typesense().await
 }
 
@@ -63,14 +54,11 @@ pub async fn search_emails(
     app: AppHandle,
     store: State<'_, DwataDb>,
 ) -> Result<TypesenseSearchResult, DwataError> {
-    let mut db_guard = store.lock().await;
-    let mut email_account = EmailAccount::read_one_by_pk(pk, &mut db_guard).await?;
-    let mut storage_dir = app.path().app_data_dir().unwrap();
-    storage_dir.push("emails");
-    storage_dir.push(email_account.email_address.clone());
-    storage_dir.push("INBOX");
-    email_account.mailbox = Some("INBOX".to_string());
-    email_account.storage_dir = Some(storage_dir);
+    let mut email_account = {
+        let mut db_guard = store.lock().await;
+        EmailAccount::read_one_by_pk(pk, &mut db_guard).await?
+    };
+    email_account.prep_for_access(app.path().app_data_dir().unwrap());
     email_account.retrieve_collection().await?;
     email_account.search_in_typesense(query).await
 }
