@@ -187,7 +187,6 @@ impl EmailAccount {
 
         let shared_email_uid_list = Arc::new(Mutex::new(HashSet::<u32>::new()));
         let shared_imap_session = Arc::new(Mutex::new(imap_session));
-        let shared_fetched_email_uid_count = Arc::new(Mutex::new(0));
         let email_accounts_state = app.state::<EmailAccountsState>();
         let email_accounts_state_guard = email_accounts_state.lock().await;
         let email_account_status = email_accounts_state_guard
@@ -197,13 +196,14 @@ impl EmailAccount {
         let fetch_batch_limit = 25;
         let mut month = 0;
         let mut fetch_email_uid_set = JoinSet::new();
-        let mut fetch_email_set = JoinSet::new();
         let mut before = Utc::now().date_naive();
-        loop {
+        // Let's retrieve all the email Uids
+        while month < 18 {
             month += 1;
             let moved_imap_session = shared_imap_session.clone();
             let moved_email_uid_list = shared_email_uid_list.clone();
             let since = before - TimeDelta::weeks(4);
+            info!("Fetching emails Uids SINCE {} BEFORE {}", since, before);
             fetch_email_uid_set.spawn(async move {
                 fetch_email_uid_list(
                     moved_email_uid_list,
@@ -214,41 +214,44 @@ impl EmailAccount {
                 .await;
             });
             before = since;
-            {
-                let email_uid_list = shared_email_uid_list.lock().await;
-                let mut fetched_email_uid_count = shared_fetched_email_uid_count.lock().await;
-                let moved_imap_session = shared_imap_session.clone();
-                let moved_storage_dir = storage_dir.clone();
-                // We select the next batch of email Uids to fetch
-                let mut next_email_uid_list: Vec<u32> = vec![];
-                for uid in email_uid_list
-                    .iter()
-                    .skip(*fetched_email_uid_count)
-                    .take(fetch_batch_limit)
-                {
-                    next_email_uid_list.push(*uid);
-                }
-                if next_email_uid_list.len() > 0 {
-                    *fetched_email_uid_count += next_email_uid_list.len();
-                    fetch_email_set.spawn(async move {
-                        fetch_emails(next_email_uid_list, moved_imap_session, moved_storage_dir)
-                            .await;
-                    });
-                }
-            }
-
-            // Let's check if we have already received the entire list of email Uids
             let email_uid_list = shared_email_uid_list.lock().await;
-            if email_uid_list.len() >= email_account_status.messages.try_into().unwrap()
-                || month >= 18
-            {
-                while let Some(_) = fetch_email_uid_set.join_next().await {}
-                info!("Finished all tasks to fetch email uids");
-                while let Some(_) = fetch_email_set.join_next().await {}
-                info!("Finished all tasks to fetch emails");
+            if email_uid_list.len() >= email_account_status.messages.try_into().unwrap() {
                 break;
             }
         }
+        if fetch_email_uid_set.len() > 0 {
+            while let Some(_) = fetch_email_uid_set.join_next().await {}
+        }
+        info!("Finished all tasks to fetch email uids");
+
+        // Let's fetch the actual emails, in batches
+        let email_uid_list = shared_email_uid_list.lock().await;
+        let mut fetch_email_set = JoinSet::new();
+        let mut fetched_email_uid_count = 0;
+        while fetched_email_uid_count < email_uid_list.len() {
+            let moved_imap_session = shared_imap_session.clone();
+            let moved_storage_dir = storage_dir.clone();
+            // We select the next batch of email Uids to fetch
+            let mut next_email_uid_list: Vec<u32> = vec![];
+            for uid in email_uid_list
+                .iter()
+                .skip(fetched_email_uid_count)
+                .take(fetch_batch_limit)
+            {
+                next_email_uid_list.push(*uid);
+            }
+            if next_email_uid_list.len() > 0 {
+                fetched_email_uid_count += next_email_uid_list.len();
+                info!("Fetching {} emails", next_email_uid_list.len());
+                fetch_email_set.spawn(async move {
+                    fetch_emails(next_email_uid_list, moved_imap_session, moved_storage_dir).await;
+                });
+            }
+        }
+        if fetch_email_set.len() > 0 {
+            while let Some(_) = fetch_email_set.join_next().await {}
+        }
+        info!("Finished all tasks to fetch emails");
 
         let mut imap_session = shared_imap_session.lock().await;
         imap_session.logout().unwrap();

@@ -14,7 +14,6 @@ pub async fn fetch_email_uid_list(
 ) {
     let mut imap_session = shared_imap_session.lock().await;
     let mut email_uid_list = shared_email_uid_list.lock().await;
-
     match imap_session.uid_search(format!("SINCE {} BEFORE {}", since_date, before_date)) {
         Ok(data) => {
             for uid in &data {
