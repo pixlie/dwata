@@ -1,4 +1,5 @@
-use crate::{email::Email, error::DwataError};
+use crate::email::SearchableEmail;
+use crate::error::DwataError;
 use log::info;
 use reqwest;
 use serde::{Deserialize, Serialize};
@@ -88,22 +89,27 @@ pub trait TypesenseSearchable {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
-        let response = client
-            .post(format!(
-                "{}/collections/{}/documents/import?action=upsert",
-                typesense_url,
-                self.get_collection_name().await
-            ))
-            .header("Content-Type", "application/json")
-            .header("X-TYPESENSE-API-KEY", typesense_api_key)
-            .body(self.get_json_lines().await?.join("\n"))
-            .send()
-            .await?;
 
-        info!(
-            "Indexed in Typesense, API response status: {}",
-            response.status()
-        );
+        // We index in batches of 25 at a time
+        for lines in self.get_json_lines().await?.chunks(25) {
+            let response = client
+                .post(format!(
+                    "{}/collections/{}/documents/import?action=upsert",
+                    typesense_url,
+                    self.get_collection_name().await
+                ))
+                .header("Content-Type", "application/json")
+                .header("X-TYPESENSE-API-KEY", typesense_api_key)
+                .body(lines.join("\n"))
+                .send()
+                .await?;
+
+            info!(
+                "Indexed in Typesense, API response status: {}",
+                response.status()
+            );
+        }
+
         Ok(())
     }
 
@@ -151,6 +157,8 @@ pub trait TypesenseSearchable {
                     "query_by",
                     "subject,from_name,body_text,embedding".to_string(),
                 ),
+                ("exclude_fields", "embedding".to_string()),
+                ("per_page", "100".to_string()),
             ])
             .send()
             .await?;
@@ -165,16 +173,22 @@ pub trait TypesenseSearchable {
     }
 }
 
+// #[derive(Deserialize, Serialize, TS)]
+// #[ts(export)]
+// pub struct TypesenseSearchResponse {
+//     pub results: Vec<TypesenseSearchResult>,
+// }
+
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export)]
+#[ts(export, rename_all = "camelCase")]
 pub struct TypesenseSearchResult {
     #[ts(type = "number")]
-    pub found: u64,
+    pub found: i64,
     pub hits: Vec<TypesenseSearchResultHit>,
 }
 
 #[derive(Deserialize, Serialize, TS)]
-#[ts(export)]
+#[ts(export, rename_all = "camelCase")]
 pub struct TypesenseSearchResultHit {
-    pub document: Email,
+    pub document: SearchableEmail,
 }

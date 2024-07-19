@@ -9,11 +9,11 @@ use tauri::{path::BaseDirectory, App, Manager};
 use tokio::sync::Mutex;
 use workspace::app_state::get_database_connection;
 
+mod chat;
 mod database_source;
 mod directory_source;
 mod error;
-// mod labels;
-mod chat;
+mod labels;
 mod relational_database;
 // mod saved_query;
 mod ai_integration;
@@ -23,6 +23,7 @@ mod text_generation;
 // mod schema;
 mod user_account;
 // mod workflow;
+mod contacts;
 mod email;
 mod email_account;
 mod oauth2;
@@ -79,6 +80,7 @@ fn main() {
             email_account::commands::fetch_emails,
             email_account::commands::create_collection_in_typesense,
             email_account::commands::index_emails,
+            email_account::commands::store_emails_in_db,
             email_account::commands::search_emails,
             oauth2::commands::get_oauth2_choice_list,
             oauth2::commands::refetch_google_access_token,

@@ -6,7 +6,7 @@ use ts_rs::TS;
 pub mod api;
 pub mod crud;
 
-#[derive(Debug, Serialize, FromRow, TS)]
+#[derive(Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct UserAccount {
@@ -22,7 +22,7 @@ pub struct UserAccount {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize, TS)]
+#[derive(Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct UserAccountCreateUpdate {

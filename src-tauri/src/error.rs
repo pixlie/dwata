@@ -74,6 +74,7 @@ pub enum DwataError {
     CouldNotCreateLocalEmailStorage,
     CouldNotOpenLocalEmailStorage,
     CouldNotParseEmailFile,
+    CouldNotSelectMailbox,
 }
 
 impl Error for DwataError {
