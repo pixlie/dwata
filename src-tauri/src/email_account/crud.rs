@@ -1,4 +1,4 @@
-use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider};
+use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox, MailboxCreateUpdate};
 use crate::{
     error::DwataError,
     oauth2::OAuth2,
@@ -71,5 +71,33 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
             }
         }
         Ok(name_values)
+    }
+}
+
+impl CRUDRead for Mailbox {
+    fn table_name() -> String {
+        "mailbox".to_string()
+    }
+}
+
+impl CRUDCreateUpdate for MailboxCreateUpdate {
+    fn table_name() -> String {
+        "mailbox".to_string()
+    }
+
+    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
+        let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
+        if let Some(x) = &self.email_account_id {
+            names_values.push_name_value("email_account_id", InputValue::ID(*x));
+        }
+        if let Some(x) = &self.name {
+            names_values.push_name_value("name", InputValue::Text(x.clone()));
+        }
+        if let Some(x) = &self.storage_path {
+            names_values.push_name_value("storage_path", InputValue::Text(x.clone()));
+        }
+
+        names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
+        Ok(names_values)
     }
 }

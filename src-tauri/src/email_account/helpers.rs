@@ -19,16 +19,22 @@ use crate::{email::Email, error::DwataError, workspace::DwataDb};
 pub async fn fetch_email_uid_list(
     shared_email_uid_list: Arc<Mutex<HashSet<u32>>>,
     shared_imap_session: Arc<Mutex<Session<TlsStream<TcpStream>>>>,
+    total_number_of_messages: u32,
     since_date: String,
     before_date: String,
 ) {
-    let mut imap_session = shared_imap_session.lock().await;
     let mut email_uid_list = shared_email_uid_list.lock().await;
+    if email_uid_list.len() >= usize::try_from(total_number_of_messages).unwrap() {
+        return;
+    }
+    if email_uid_list.len() > 1000 {
+        // Temporarily we are limiting the number of emails to fetch to 1000
+        return;
+    }
+    let mut imap_session = shared_imap_session.lock().await;
     match imap_session.uid_search(format!("SINCE {} BEFORE {}", since_date, before_date)) {
         Ok(data) => {
-            for uid in &data {
-                email_uid_list.insert(*uid);
-            }
+            email_uid_list.extend(&data);
             info!(
                 "Searched email Uids SINCE {} BEFORE {}, found {} email Uids",
                 since_date,
@@ -37,7 +43,7 @@ pub async fn fetch_email_uid_list(
             );
         }
         Err(err) => {
-            error!("Error searching for emails\n Error: {}", err);
+            error!("(fetch_email_uid_list) Error searching for emails: {}", err);
         }
     }
 }
@@ -104,7 +110,16 @@ pub async fn read_emails_from_local_storage(
                 .collect::<Result<Vec<_>, io::Error>>()
             {
                 Ok(mut entries) => {
-                    entries.sort();
+                    // We sort by the file name but parsed as integer
+                    entries.sort_by_key(|a| {
+                        a.file_name()
+                            .unwrap()
+                            .to_string_lossy()
+                            .to_string()
+                            .parse::<i64>()
+                            .unwrap_or(0)
+                    });
+                    entries.reverse();
 
                     for entry in entries.iter().take(limit) {
                         let path = entry.as_path();

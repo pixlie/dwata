@@ -4,6 +4,7 @@ CREATE TABLE email
 (
     id                          INTEGER PRIMARY KEY,
     uid                         INTEGER,
+    mailbox_id                  INTEGER,
 
     from_name                   VARCHAR(255),
     from_email                  VARCHAR(255),
@@ -14,7 +15,8 @@ CREATE TABLE email
     created_at                  DATETIME NOT NULL,
     modified_at                 DATETIME,
 
-    UNIQUE (uid) ON CONFLICT ABORT
+    UNIQUE (uid) ON CONFLICT ABORT,
+    FOREIGN KEY (mailbox_id) REFERENCES mailbox (id) ON DELETE CASCADE
 );
 
 -- This table stores email buckets

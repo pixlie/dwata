@@ -1,25 +1,20 @@
-use crate::email::{Email, EmailBucket, SearchableEmail};
+use crate::email::EmailBucket;
 use crate::error::DwataError;
-use crate::oauth2::OAuth2;
+use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
 use crate::workspace::DwataDb;
-use crate::workspace::{
-    crud::CRUDRead,
-    typesense::{TypesenseCollection, TypesenseSearchable},
-};
-use app_state::EmailAccountsState;
 use chrono::{DateTime, NaiveDate, TimeDelta, Utc};
 use helpers::{fetch_email_uid_list, fetch_emails, read_emails_from_local_storage};
-use imap::{self, Session};
+use imap::Session;
 use log::{error, info};
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, SqliteConnection, Type};
-use std::collections::HashSet;
+use slug::slugify;
+use sqlx::{FromRow, Type};
+use std::collections::{HashMap, HashSet};
+use std::net::TcpStream;
 use std::sync::Arc;
 use std::{
-    fs::{create_dir_all, read_dir, File},
-    io::Read,
-    net::TcpStream,
+    fs::create_dir_all,
     path::{Path, PathBuf},
 };
 use strum::{Display, EnumString};
@@ -33,6 +28,8 @@ pub mod app_state;
 pub mod commands;
 pub mod crud;
 pub mod helpers;
+pub mod providers;
+pub mod typesense;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
 #[sqlx(rename_all = "lowercase")]
@@ -59,16 +56,21 @@ pub struct EmailAccountIMAPStatus {
     pub uid_validity: Option<u32>,
     // UNSEEN: The number of messages which do not have Flag::Seen set.
     pub unseen: Option<u32>,
+}
+
+#[derive(Default)]
+pub struct EmailAccountStatus {
+    // IMAP protocol and local storage related
+    pub selected_mailbox_choice: MailboxChoice,
+    pub storage_dir: PathBuf,
     // Related to IMAP processing in dwata
     pub last_fetched_at: Option<i64>,
     // Which date range is being searched
     pub searching_date_range: Option<(NaiveDate, NaiveDate)>,
-}
+    // Information about logged in IMAP session
+    pub imap_status: Option<EmailAccountIMAPStatus>,
 
-pub struct EmailAccountStatus {
-    // IMAP protocol and local storage related
-    pub selected_mailbox: String,
-    pub storage_dir: PathBuf,
+    pub imap_session: Option<Arc<Mutex<Session<TlsStream<TcpStream>>>>>,
 }
 
 #[derive(Serialize, FromRow, TS)]
@@ -91,11 +93,6 @@ pub struct EmailAccount {
     #[sqlx(skip)]
     #[ts(skip)]
     pub status: Option<EmailAccountStatus>,
-
-    #[serde(skip)]
-    #[sqlx(skip)]
-    #[ts(skip)]
-    pub imap_status: Option<EmailAccountIMAPStatus>,
 }
 
 #[derive(Default, Deserialize, TS)]
@@ -108,72 +105,80 @@ pub struct EmailAccountCreateUpdate {
     pub oauth2_id: Option<String>,
 }
 
-pub struct GmailAccount {
-    email_address: String,
-    access_token: String,
+#[derive(Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase")]
+pub struct Mailbox {
+    #[ts(type = "number")]
+    pub id: i64,
+    pub email_account_id: i64,
+    pub name: String,
+    #[ts(skip)]
+    pub storage_path: String,
 }
 
-impl imap::Authenticator for GmailAccount {
-    type Response = String;
-    fn process(&self, _: &[u8]) -> Self::Response {
-        format!(
-            "user={}\x01auth=Bearer {}\x01\x01",
-            self.email_address, self.access_token
-        )
-    }
+pub struct MailboxCreateUpdate {
+    pub email_account_id: Option<i64>,
+    pub name: Option<String>,
+    pub storage_path: Option<String>,
+}
+
+#[derive(Default)]
+pub enum MailboxChoice {
+    #[default]
+    Inbox,
+    Sent,
 }
 
 impl EmailAccount {
-    pub fn get_storage_dir(&self) -> PathBuf {
-        self.status.as_ref().unwrap().storage_dir.clone()
-    }
-
-    pub fn get_selected_mailbox(&self) -> String {
-        self.status.as_ref().unwrap().selected_mailbox.clone()
+    pub async fn get_storage_dir(&self, app: AppHandle) -> Result<PathBuf, DwataError> {
+        Ok(self.status.as_ref().unwrap().storage_dir.join(slugify(
+            self.get_selected_mailbox(app).await?.storage_path.clone(),
+        )))
     }
 
     pub async fn prep_for_access(
         &mut self,
-        mailbox_name: String,
+        mailbox_choice: MailboxChoice,
         storage_dir: PathBuf,
-        needs_imap_status: bool,
+        needs_imap_session: bool,
         app: AppHandle,
     ) -> Result<(), DwataError> {
-        let db = app.state::<DwataDb>();
-
         // Set the path to local storage for emails
         let mut storage_dir = storage_dir.clone();
         storage_dir.push("emails");
         storage_dir.push(self.email_address.clone());
-        storage_dir.push(&mailbox_name);
 
         self.status = Some(EmailAccountStatus {
-            selected_mailbox: mailbox_name.clone(),
+            selected_mailbox_choice: mailbox_choice,
             storage_dir,
+            last_fetched_at: Some(Utc::now().timestamp()),
+            ..Default::default()
         });
 
-        if needs_imap_status {
-            let mut imap_session = {
-                let mut db_guard = db.lock().await;
-                self.get_imap_session(&mut db_guard).await?
-            };
-            match imap_session.examine(&mailbox_name) {
+        if needs_imap_session {
+            self.sync_mailboxes(app.clone()).await?;
+            let imap_session = self.get_imap_session(app.clone()).await?;
+            let mut imap_session = imap_session.lock().await;
+            let email_account_mailbox = self.get_selected_mailbox(app.clone()).await?;
+            match imap_session.examine(&email_account_mailbox.name) {
                 Ok(mailbox) => {
                     info!("Selected mailbox: {}", mailbox);
-                    // self.update_status(app.clone(), mailbox).await;
-                    self.imap_status = Some(EmailAccountIMAPStatus {
+                    self.status.as_mut().unwrap().imap_status = Some(EmailAccountIMAPStatus {
                         id: self.id,
                         messages: mailbox.exists,
                         recent: mailbox.recent,
                         uid_next: mailbox.uid_next,
                         uid_validity: mailbox.uid_validity,
                         unseen: mailbox.unseen,
-                        last_fetched_at: Some(Utc::now().timestamp()),
                         ..Default::default()
                     });
                 }
-                Err(e) => {
-                    error!("Error selecting INBOX: {}", e);
+                Err(err) => {
+                    error!(
+                        "Error selecting mailbox {}: {} - {}",
+                        email_account_mailbox.id, email_account_mailbox.name, err
+                    );
                     return Err(DwataError::CouldNotSelectMailbox);
                 }
             };
@@ -182,47 +187,41 @@ impl EmailAccount {
         Ok(())
     }
 
-    // pub async fn update_status(&self, app: AppHandle, mailbox: Mailbox) {
-    //     let email_accounts_state = app.state::<EmailAccountsState>();
-    //     let mut email_accounts_state_guard = email_accounts_state.lock().await;
-    //     let mut found = false;
-    //     // Check if we already have this email account in our state
-    //     for email_account_item_status in email_accounts_state_guard.iter_mut() {
-    //         if email_account_item_status.id == self.id {
-    //             email_account_item_status.messages = mailbox.exists;
-    //             email_account_item_status.recent = mailbox.recent;
-    //             email_account_item_status.uid_next = mailbox.uid_next;
-    //             email_account_item_status.uid_validity = mailbox.uid_validity;
-    //             email_account_item_status.unseen = mailbox.unseen;
-    //             email_account_item_status.last_fetched_at = Utc::now().timestamp();
-    //             found = true;
-    //             break;
-    //         }
-    //     }
-    //     if !found {
-    //         // If we don't have this email account in our state, then we add it
-    //         email_accounts_state_guard.push(EmailAccountStatus {
-    //             id: self.id,
-    //             messages: mailbox.exists,
-    //             recent: mailbox.recent,
-    //             uid_next: mailbox.uid_next,
-    //             uid_validity: mailbox.uid_validity,
-    //             unseen: mailbox.unseen,
-    //             last_fetched_at: Utc::now().timestamp(),
-    //             fetched_till_date: None,
-    //         });
-    //     }
-    // }
-
-    pub async fn fetch_emails(&self, app: AppHandle) -> Result<(), DwataError> {
+    pub async fn sync_mailboxes(&mut self, app: AppHandle) -> Result<(), DwataError> {
+        // Store all the mailboxes in Dwata DB
+        let imap_session = self.get_imap_session(app.clone()).await.unwrap();
+        let mut imap_session = imap_session.lock().await;
         let db = app.state::<DwataDb>();
-        let imap_session = {
+        let mailboxes_in_db = {
             let mut db_guard = db.lock().await;
-            self.get_imap_session(&mut db_guard).await?
+            Mailbox::read_all(&mut db_guard).await?
         };
+        for mailbox in imap_session.list(None, Some("*")).unwrap().iter() {
+            let mailbox_name = mailbox.name().trim().to_string();
+            if mailboxes_in_db.len() == 0
+                || mailboxes_in_db
+                    .iter()
+                    .find(|mb| mb.email_account_id == self.id && mb.name == mailbox_name)
+                    .is_none()
+            {
+                // We did not find this mailbox in Dwata DB, let's add it
+                info!("Saving mailbox: {}", mailbox.name());
+                let mut db_guard = db.lock().await;
+                MailboxCreateUpdate {
+                    email_account_id: Some(self.id),
+                    name: Some(mailbox_name.clone()),
+                    storage_path: Some(slugify(mailbox_name)),
+                }
+                .insert_module_data(&mut db_guard)
+                .await?;
+            }
+        }
+        Ok(())
+    }
 
+    pub async fn fetch_emails(&mut self, app: AppHandle) -> Result<(), DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
-        let storage_dir = self.get_storage_dir();
+        let storage_dir = self.get_storage_dir(app.clone()).await?;
         if let Ok(false) = Path::try_exists(storage_dir.as_path()) {
             match create_dir_all(storage_dir.as_path()) {
                 Ok(_) => {}
@@ -234,40 +233,32 @@ impl EmailAccount {
         }
 
         let shared_email_uid_list = Arc::new(Mutex::new(HashSet::<u32>::new()));
-        let shared_imap_session = Arc::new(Mutex::new(imap_session));
-        let email_accounts_state = app.state::<EmailAccountsState>();
-        let email_accounts_state_guard = email_accounts_state.lock().await;
-        let email_account_status = email_accounts_state_guard
-            .iter()
-            .find(|x| x.id == self.id)
-            .unwrap();
+        let number_of_messages = self
+            .status
+            .as_ref()
+            .unwrap()
+            .imap_status
+            .as_ref()
+            .unwrap()
+            .messages;
         let fetch_batch_limit = 25;
         let mut month = 0;
-        let mut fetch_email_uid_set = JoinSet::new();
         let mut before = Utc::now().date_naive();
         // Let's retrieve all the email Uids in the last 300 months (25 years)
         while month < 300 {
             month += 1;
-            let moved_imap_session = shared_imap_session.clone();
+            let moved_imap_session = self.get_imap_session(app.clone()).await?;
             let moved_email_uid_list = shared_email_uid_list.clone();
             let since = before - TimeDelta::weeks(4);
-            fetch_email_uid_set.spawn(async move {
-                fetch_email_uid_list(
-                    moved_email_uid_list,
-                    moved_imap_session,
-                    since.format("%d-%b-%Y").to_string(),
-                    before.format("%d-%b-%Y").to_string(),
-                )
-                .await;
-            });
+            fetch_email_uid_list(
+                moved_email_uid_list,
+                moved_imap_session,
+                number_of_messages,
+                since.format("%d-%b-%Y").to_string(),
+                before.format("%d-%b-%Y").to_string(),
+            )
+            .await;
             before = since;
-            let email_uid_list = shared_email_uid_list.lock().await;
-            if email_uid_list.len() >= email_account_status.messages.try_into().unwrap() {
-                break;
-            }
-        }
-        if fetch_email_uid_set.len() > 0 {
-            while let Some(_) = fetch_email_uid_set.join_next().await {}
         }
         info!("Finished all tasks to fetch email uids");
 
@@ -276,7 +267,7 @@ impl EmailAccount {
         let mut fetch_email_set = JoinSet::new();
         let mut fetched_email_count = 0;
         while fetched_email_count < email_uid_list.len() {
-            let moved_imap_session = shared_imap_session.clone();
+            let moved_imap_session = self.get_imap_session(app.clone()).await?;
             let moved_storage_dir = storage_dir.clone();
             // We select the next batch of email Uids to fetch
             let mut batch: Vec<u32> = vec![];
@@ -299,138 +290,124 @@ impl EmailAccount {
         }
         info!("Finished all tasks to fetch emails");
 
-        let mut imap_session = shared_imap_session.lock().await;
-        imap_session.logout().unwrap();
+        let imap_session = self.get_imap_session(app.clone()).await?;
+        let mut imap_session = imap_session.lock().await;
+        match imap_session.logout() {
+            Ok(_) => {}
+            Err(err) => {
+                error!("Could not logout IMAP session: {}", err);
+            }
+        }
         Ok(())
     }
 
-    pub async fn store_emails_in_db(&self) -> Result<usize, DwataError> {
+    pub async fn store_emails_in_db(&self, app: AppHandle) -> Result<usize, DwataError> {
         // Let's save the emails into Dwata DB, in batches of 100 at a time
-        let emails = read_emails_from_local_storage(self.get_storage_dir(), 1000).await?;
+        let emails = read_emails_from_local_storage(self.get_storage_dir(app).await?, 1000).await?;
         let mut buckets: Vec<EmailBucket> = vec![];
 
-        for email in &emails {
-            if let Some(in_reply_to) = email.in_reply_to.as_ref() {
-                // This email is a reply to another email, let's find the root email
-                if let Some(root_email) = &emails
-                    .iter()
-                    .filter(|item| item.message_id.is_some())
-                    .find(|x| *x.message_id.as_ref().unwrap() == *in_reply_to)
-                {
-                    // We found the root email, let's find the bucket
-                    if let Some(bucket) = buckets
-                        .iter_mut()
-                        .find(|x| x.root_email_id == Some(root_email.id))
-                    {
-                        // We found the bucket, let's add this email to it
-                        bucket.id_list_raw.push(email.id);
-                    } else {
-                        // We did not find the bucket, let's create a new one
-                        buckets.push(EmailBucket {
-                            root_email_id: Some(root_email.id),
-                            id_list_raw: vec![email.id],
-                            ..Default::default()
-                        });
-                    }
-                }
-            };
-        }
-        info!("Found {} buckets", buckets.len());
-        Ok(1000)
-    }
-}
-
-impl EmailAccount {
-    pub async fn get_imap_session(
-        &self,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<Session<TlsStream<TcpStream>>, DwataError> {
-        match self.provider {
-            EmailProvider::Gmail => {
-                let gmail_account = self.get_gmail_account(db_connection).await?;
-                let domain = "imap.gmail.com";
-                let tls = native_tls::TlsConnector::builder().build().unwrap();
-                let client = imap::connect((domain, 993), domain, &tls).unwrap();
-
-                match client.authenticate("XOAUTH2", &gmail_account) {
-                    Ok(session) => {
-                        info!("Logged into Gmail with Oauth2 credentials");
-                        Ok(session)
-                    }
-                    Err((error, _unauth_client)) => {
-                        error!("Error authenticating with Gmail:\n{}", error);
-                        return Err(DwataError::CouldNotAuthenticateToService);
-                    }
-                }
-            }
-            EmailProvider::ProtonMail => {
-                let domain = "localhost";
-                let tls = native_tls::TlsConnector::builder().build().unwrap();
-                let client = imap::connect_starttls((domain, 1143), domain, &tls).unwrap();
-
-                match client.login(&self.email_address, &self.password.as_ref().unwrap()) {
-                    Ok(session) => {
-                        info!("Logged into Protonmail with Oauth2 credentials");
-                        Ok(session)
-                    }
-                    Err((error, _unauth_client)) => {
-                        error!("Error authenticating with Protonmail:\n{}", error);
-                        return Err(DwataError::CouldNotAuthenticateToService);
-                    }
-                }
-            }
-        }
-    }
-}
-
-impl EmailAccount {
-    pub async fn get_gmail_account(
-        &self,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<GmailAccount, DwataError> {
-        if let Some(oauth2_config_id) = self.oauth2_id {
-            let oauth2: OAuth2 = OAuth2::read_one_by_pk(oauth2_config_id, db_connection).await?;
-            let gmail_account = GmailAccount {
-                email_address: self.email_address.clone(),
-                access_token: oauth2.access_token,
-            };
-            Ok(gmail_account)
-        } else {
-            Err(DwataError::CouldNotFindOAuth2Config)
-        }
-    }
-}
-
-impl TypesenseSearchable for EmailAccount {
-    async fn get_collection_name(&self) -> String {
-        format!("dwata_emails_{}_{}", self.id, self.get_selected_mailbox())
-    }
-
-    async fn get_collection_schema(&self) -> Result<TypesenseCollection, DwataError> {
-        Ok(TypesenseCollection {
-            name: self.get_collection_name().await,
-            fields: Email::get_typesense_fields(),
-            default_sorting_field: Some("date".to_string()),
-        })
-    }
-
-    async fn get_json_lines(&self) -> Result<Vec<String>, DwataError> {
-        let emails = read_emails_from_local_storage(self.get_storage_dir(), 1000).await?;
-
-        info!("Emails to index in Typesense: {}", emails.len());
-        Ok(emails
+        for email in emails
             .iter()
-            .map(|x| {
-                serde_json::to_string(&SearchableEmail {
-                    id: x.id.to_string(),
-                    from_name: x.from_name.clone(),
-                    from_email: x.from_email.clone(),
-                    date: x.date,
-                    subject: x.subject.clone(),
-                    body_text: x.body_text.clone(),
-                })
-                .unwrap()
-            })
-            .collect::<Vec<String>>())
+            .filter(|x| x.subject.contains("On Deck Early Stage Mastermind"))
+        {
+            // We are checking if this email is a reply to another email
+            // We need to do this recursively, so we keep checking the parent email until we find the root email
+            // which does not have an `in_reply_to` field
+            info!("Email: {}: {}", email.id, email.subject);
+            let mut root_email = email;
+            let mut found_in_reply_to = false;
+            while let Some(in_reply_to) = root_email.in_reply_to.as_ref() {
+                found_in_reply_to = true;
+                root_email = match emails
+                    .iter()
+                    .filter(|item| item.message_id.as_ref().is_some_and(|x| x == in_reply_to))
+                    .nth(0)
+                {
+                    Some(x) => x,
+                    None => break,
+                };
+            }
+            info!(
+                "Found root email: {}: {} - {}",
+                root_email.id,
+                root_email
+                    .in_reply_to
+                    .as_ref()
+                    .unwrap_or(&"None".to_string()),
+                root_email.subject
+            );
+
+            if found_in_reply_to {
+                // This email is a reply to another email, let's find the root email recursively
+                // Let's find the bucket for this email
+                if let Some(bucket) = buckets
+                    .iter_mut()
+                    .find(|x| x.root_email_id == Some(root_email.id))
+                {
+                    // We found the bucket, let's add this email to it
+                    bucket.id_list_raw.push(email.id);
+                } else {
+                    // We did not find the bucket, let's create a new one
+                    let mut clean_subject = root_email.subject.clone().trim().to_string();
+                    // Remove "Re: " from the beginning of the subject
+                    if clean_subject.starts_with("Re: ") {
+                        clean_subject = clean_subject.replace("Re: ", "");
+                    }
+                    if clean_subject.is_empty() {
+                        continue;
+                    }
+                    buckets.push(EmailBucket {
+                        root_email_id: Some(root_email.id),
+                        id_list_raw: vec![email.id],
+                        summary: Some(clean_subject),
+                        ..Default::default()
+                    });
+                }
+            };
+        }
+
+        // Let's group the emails by subject, keeping a vector of IDs for each email as value of the HashMap
+        let mut subject_buckets: HashMap<String, Vec<i64>> = HashMap::new();
+        for email in &emails {
+            let mut clean_subject = email.subject.clone().trim().to_string();
+            // Remove "Re: " from the beginning of the subject
+            if clean_subject.starts_with("Re: ") {
+                clean_subject = clean_subject.replace("Re: ", "");
+            }
+            if clean_subject.is_empty() {
+                continue;
+            }
+            subject_buckets
+                .entry(clean_subject)
+                .and_modify(|x| x.push(email.id))
+                .or_insert(vec![email.id]);
+        }
+
+        // If we have subject buckets with count > 1, then we create a new bucket for each subject
+        // for (subject, vector) in subject_buckets {
+        //     if vector.len() > 1 {
+        //         buckets.push(EmailBucket {
+        //             root_email_id: None,
+        //             id_list_raw: vector,
+        //             summary: Some(subject.clone()),
+        //             ..Default::default()
+        //         });
+        //     }
+        // }
+
+        info!(
+            "Found {} buckets\n Subjects: {}",
+            buckets.len(),
+            buckets
+                .iter()
+                .map(|x| format!(
+                    "{}: {}",
+                    x.root_email_id.as_ref().unwrap(),
+                    x.summary.clone().unwrap()
+                ))
+                .collect::<Vec<String>>()
+                .join("\n")
+        );
+        Ok(1000)
     }
 }

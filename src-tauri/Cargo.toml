@@ -55,6 +55,7 @@ imap = "2.4.1"
 native-tls = "0.2.12"
 mail-parser = "0.9.3"
 similar = "2.5.0"
+slug = "0.1.5"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

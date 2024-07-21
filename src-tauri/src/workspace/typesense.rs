@@ -3,6 +3,7 @@ use crate::error::DwataError;
 use log::info;
 use reqwest;
 use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 use ts_rs::TS;
 
 #[derive(Serialize)]
@@ -37,13 +38,16 @@ pub struct TypesenseCollection {
 }
 
 pub trait TypesenseSearchable {
-    async fn get_collection_name(&self) -> String;
+    async fn get_collection_name(&self, app: AppHandle) -> Result<String, DwataError>;
 
-    async fn get_collection_schema(&self) -> Result<TypesenseCollection, DwataError>;
+    async fn get_collection_schema(
+        &self,
+        app: AppHandle,
+    ) -> Result<TypesenseCollection, DwataError>;
 
-    async fn get_json_lines(&self) -> Result<Vec<String>, DwataError>;
+    async fn get_json_lines(&self, app: AppHandle) -> Result<Vec<String>, DwataError>;
 
-    async fn delete_collection(&self) -> Result<(), DwataError> {
+    async fn delete_collection(&self, app: AppHandle) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -51,7 +55,7 @@ pub trait TypesenseSearchable {
             .delete(format!(
                 "{}/collections/{}",
                 typesense_url,
-                self.get_collection_name().await
+                self.get_collection_name(app).await?
             ))
             .header("Content-Type", "application/json")
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
@@ -65,38 +69,39 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn create_collection_in_typesense(&self) -> Result<(), DwataError> {
+    async fn create_collection_in_typesense(&self, app: AppHandle) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
+        let collection_schema = self.get_collection_schema(app).await?;
         let response = client
             .post(format!("{}/collections", typesense_url,))
             .header("Content-Type", "application/json")
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
-            .json(&self.get_collection_schema().await?)
+            .json(&collection_schema)
             .send()
             .await?;
 
         info!(
             "Created collection in Typesense, API response status: {}, using schema: {}",
             response.status(),
-            serde_json::to_string_pretty(&self.get_collection_schema().await?).unwrap()
+            serde_json::to_string_pretty(&collection_schema).unwrap()
         );
         Ok(())
     }
 
-    async fn index_in_typesense(&self) -> Result<(), DwataError> {
+    async fn index_in_typesense(&self, app: AppHandle) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
 
         // We index in batches of 25 at a time
-        for lines in self.get_json_lines().await?.chunks(25) {
+        for lines in self.get_json_lines(app.clone()).await?.chunks(25) {
             let response = client
                 .post(format!(
                     "{}/collections/{}/documents/import?action=upsert",
                     typesense_url,
-                    self.get_collection_name().await
+                    self.get_collection_name(app.clone()).await?
                 ))
                 .header("Content-Type", "application/json")
                 .header("X-TYPESENSE-API-KEY", typesense_api_key)
@@ -113,7 +118,7 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn retrieve_collection(&self) -> Result<(), DwataError> {
+    async fn retrieve_collection(&self, app: AppHandle) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -121,7 +126,7 @@ pub trait TypesenseSearchable {
             .get(format!(
                 "{}/collections/{}",
                 typesense_url,
-                self.get_collection_name().await
+                self.get_collection_name(app).await?
             ))
             .header("Content-Type", "application/json")
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
@@ -139,6 +144,7 @@ pub trait TypesenseSearchable {
     async fn search_in_typesense(
         &self,
         query: String,
+        app: AppHandle,
     ) -> Result<TypesenseSearchResult, DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
@@ -147,16 +153,13 @@ pub trait TypesenseSearchable {
             .get(format!(
                 "{}/collections/{}/documents/search",
                 typesense_url,
-                self.get_collection_name().await
+                self.get_collection_name(app).await?
             ))
             .header("Content-Type", "application/json")
             .header("X-TYPESENSE-API-KEY", typesense_api_key)
             .query(&[
                 ("q", query),
-                (
-                    "query_by",
-                    "subject,from_name,body_text,embedding".to_string(),
-                ),
+                ("query_by", "subject".to_string()),
                 ("exclude_fields", "embedding".to_string()),
                 ("per_page", "100".to_string()),
             ])
@@ -179,10 +182,8 @@ pub trait TypesenseSearchable {
 //     pub results: Vec<TypesenseSearchResult>,
 // }
 
-#[derive(Deserialize, Serialize, TS)]
-#[ts(export, rename_all = "camelCase")]
+#[derive(Deserialize)]
 pub struct TypesenseSearchResult {
-    #[ts(type = "number")]
     pub found: i64,
     pub hits: Vec<TypesenseSearchResultHit>,
 }
@@ -191,4 +192,19 @@ pub struct TypesenseSearchResult {
 #[ts(export, rename_all = "camelCase")]
 pub struct TypesenseSearchResultHit {
     pub document: SearchableEmail,
+}
+
+#[derive(Serialize, TS)]
+#[ts(export, rename_all = "camelCase")]
+pub struct SearchResult {
+    #[ts(type = "number")]
+    pub found: i64,
+    pub hits: Vec<SearchCollection>,
+}
+
+#[derive(Serialize, TS)]
+#[ts(export, rename_all = "camelCase")]
+pub struct SearchCollection {
+    pub collection_name: String,
+    pub hits: Vec<TypesenseSearchResultHit>,
 }

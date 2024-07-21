@@ -72,7 +72,6 @@ impl Writable for OAuth2 {
                     x.client_secret.as_ref().unwrap().clone(),
                 )
                 .await?;
-                info!("Generated Google OAuth2 authorize URL: {}", authorize_url);
 
                 Ok(NextStep::Configure(
                     Configuration {
