@@ -3,17 +3,19 @@ use log::{error, info};
 use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::{Connection, Sqlite, SqliteConnection};
 use std::fs::create_dir_all;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use tokio::sync::Mutex;
 
 pub type DwataDb = Mutex<SqliteConnection>;
 
 pub async fn get_database_connection(
-    app_config_dir: &PathBuf,
+    app_data_dir: &PathBuf,
     migrations_dir: PathBuf,
 ) -> Result<SqliteConnection, DwataError> {
-    let mut path = app_config_dir.clone();
-    if let Ok(false) = Path::try_exists(app_config_dir) {
+    let mut path = app_data_dir.clone();
+    path.push("databases");
+    path.push("sqlite3");
+    if !path.as_path().exists() {
         create_dir_all(path.as_path()).unwrap_or_else(|_| {});
     }
     path.push("dwata.sqlite3");

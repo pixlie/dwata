@@ -13,17 +13,7 @@ CREATE TABLE chat_temp
     process_status              JSON,
 
     created_at                  DATETIME NOT NULL,
+
     FOREIGN KEY (root_chat_id) REFERENCES chat_temp (id) ON DELETE CASCADE
     FOREIGN KEY (compared_to_root_chat_id) REFERENCES chat_temp (id) ON DELETE CASCADE
 );
-
--- Copy the data from the old table to the new table
-INSERT INTO chat_temp (id, root_chat_id, role, message, requested_ai_model, process_status, created_at)
-SELECT id, root_chat_id, role, message, requested_ai_model, process_status, created_at
-FROM chat;
-
--- Drop the old table
-DROP TABLE chat;
-
--- Rename the new table to chat
-ALTER TABLE chat_temp RENAME TO chat;

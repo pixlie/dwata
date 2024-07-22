@@ -12,5 +12,6 @@ CREATE TABLE chat
     process_status              JSON,
 
     created_at                  DATETIME NOT NULL,
+
     FOREIGN KEY (root_chat_id) REFERENCES chat (id) ON DELETE CASCADE
 );

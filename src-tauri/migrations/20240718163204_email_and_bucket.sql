@@ -15,8 +15,8 @@ CREATE TABLE email
     created_at                  DATETIME NOT NULL,
     modified_at                 DATETIME,
 
-    UNIQUE (uid) ON CONFLICT ABORT,
-    FOREIGN KEY (mailbox_id) REFERENCES mailbox (id) ON DELETE CASCADE
+    FOREIGN KEY (mailbox_id) REFERENCES mailbox (id) ON DELETE CASCADE,
+    UNIQUE (uid) ON CONFLICT ABORT
 );
 
 -- This table stores email buckets
