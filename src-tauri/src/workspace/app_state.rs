@@ -4,8 +4,11 @@ use sqlx::migrate::{MigrateDatabase, Migrator};
 use sqlx::{Connection, Sqlite, SqliteConnection};
 use std::fs::create_dir_all;
 use std::path::{Path, PathBuf};
+use tokio::sync::Mutex;
 
-pub(crate) async fn get_database_connection(
+pub type DwataDb = Mutex<SqliteConnection>;
+
+pub async fn get_database_connection(
     app_config_dir: &PathBuf,
     migrations_dir: PathBuf,
 ) -> Result<SqliteConnection, DwataError> {

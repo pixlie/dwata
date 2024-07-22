@@ -12,7 +12,7 @@ impl Writable for UserAccount {
             vec![
                 FormField::new(
                     "firstName",
-                    "First Name",
+                    Some("First Name"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -21,7 +21,7 @@ impl Writable for UserAccount {
                 ),
                 FormField::new(
                     "lastName",
-                    "Last Name",
+                    Some("Last Name"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -30,7 +30,7 @@ impl Writable for UserAccount {
                 ),
                 FormField::new(
                     "email",
-                    "Email",
+                    Some("Email"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),

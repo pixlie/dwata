@@ -34,7 +34,7 @@ pub trait CRUDRead {
         {
             Ok(result) => {
                 info!(
-                    "Fetched {} rows from Dwata DBm, table {}",
+                    "Fetched {} rows from Dwata DB, table {}",
                     result.len(),
                     Self::table_name()
                 );
@@ -87,7 +87,7 @@ pub trait CRUDRead {
         match result {
             Ok(row) => {
                 info!(
-                    "Fetched one row from Dwata DBm, table {}, ID {}",
+                    "Fetched one row from Dwata DB, table {}, ID {}",
                     Self::table_name(),
                     pk
                 );

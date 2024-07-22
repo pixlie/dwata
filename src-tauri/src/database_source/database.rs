@@ -175,7 +175,7 @@ pub enum DatabasePool {
 }
 
 #[derive(Debug, Deserialize, Serialize, TS)]
-#[ts(export)]
+#[ts(export, rename_all = "camelCase")]
 pub struct DatabaseSource {
     id: String,
     pub label: Option<String>,

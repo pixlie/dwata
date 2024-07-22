@@ -12,7 +12,7 @@ impl Writable for Chat {
             vec![
                 FormField::new(
                     "message",
-                    "Message",
+                    Some("Message"),
                     Some("When asking an AI model, try to keep the message short.\
                     If you have a broad task then it is better to break it into tasks in your chat."),
                     ContentType::Text,
@@ -25,7 +25,7 @@ impl Writable for Chat {
                 ),
                 FormField::new(
                     "requestedAiModel",
-                    "AI Model",
+                    Some("AI Model"),
                     Some("What AI model would you like to use?"),
                     ContentType::SingleChoice,
                     ContentSpec {

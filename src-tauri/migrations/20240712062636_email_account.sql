@@ -15,3 +15,19 @@ CREATE TABLE email_account
     FOREIGN KEY (oauth2_id) REFERENCES oauth2 (id) ON DELETE SET NULL,
     UNIQUE(provider, email_address) ON CONFLICT ABORT
 );
+
+-- This table stores the mailboxes of the email account
+
+CREATE TABLE mailbox
+(
+    id                          INTEGER PRIMARY KEY,
+
+    email_account_id            INTEGER NOT NULL,
+    name                        VARCHAR(30) NOT NULL,
+    storage_path                VARCHAR(255),
+
+    created_at                  DATETIME NOT NULL,
+    modified_at                 DATETIME,
+
+    FOREIGN KEY (email_account_id) REFERENCES email_account (id) ON DELETE CASCADE
+);

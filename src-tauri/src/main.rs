@@ -1,19 +1,19 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use email_account::app_state::EmailAccountsState;
 use env_logger;
 use log::{error, info};
 use std::path::PathBuf;
-use tauri::{
-    path::{self, BaseDirectory},
-    App, Manager,
-};
+use tauri::{path::BaseDirectory, App, Manager};
+use tokio::sync::Mutex;
+use workspace::app_state::get_database_connection;
 
+mod chat;
 mod database_source;
 mod directory_source;
 mod error;
-// mod labels;
-mod chat;
+mod labels;
 mod relational_database;
 // mod saved_query;
 mod ai_integration;
@@ -23,6 +23,7 @@ mod text_generation;
 // mod schema;
 mod user_account;
 // mod workflow;
+mod contacts;
 mod email;
 mod email_account;
 mod oauth2;
@@ -43,7 +44,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         .resolve("migrations/", BaseDirectory::Resource)
         .unwrap();
     match tauri::async_runtime::block_on(async {
-        workspace::helpers::get_database_connection(&app_config_dir, migrations_dir).await
+        get_database_connection(&app_config_dir, migrations_dir).await
     }) {
         Ok(db_connection) => {
             app.manage(workspace::DwataDb::new(db_connection));
@@ -53,6 +54,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
             return Err(Box::new(err));
         }
     }
+    app.manage(EmailAccountsState::new(Mutex::new(vec![])));
     Ok(())
 }
 
@@ -76,6 +78,10 @@ fn main() {
             ai_integration::commands::get_ai_model_choice_list,
             text_generation::commands::chat_with_ai,
             email_account::commands::fetch_emails,
+            email_account::commands::create_collection_in_typesense,
+            email_account::commands::index_emails,
+            email_account::commands::store_emails_in_db,
+            email_account::commands::search_emails,
             oauth2::commands::get_oauth2_choice_list,
             oauth2::commands::refetch_google_access_token,
             // schema::commands::read_schema,

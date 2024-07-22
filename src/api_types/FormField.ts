@@ -5,7 +5,7 @@ import type { ContentType } from "./ContentType";
 
 export type FormField = {
   name: string;
-  label: string;
+  label?: string | null;
   description?: string | null;
   placeholder?: string | null;
   contentType: ContentType;

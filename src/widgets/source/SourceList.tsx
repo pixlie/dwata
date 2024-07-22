@@ -9,20 +9,32 @@ const SourceList: Component = () => {
   const [searchParams] = useSearchParams();
   const [_, { getColors }] = useUserInterface();
 
-  const dataSources = createMemo(() => {
-    if (!workspace.isFetching && !!workspace.isReady) {
-      return [...workspace.directoryList, ...workspace.databaseList];
+  const databaseSources = createMemo(() => {
+    if (
+      !workspace.isFetching["DatabaseSource"] &&
+      !!workspace.isReady["DatabaseSource"]
+    ) {
+      return workspace.DatabaseSource;
     }
     return [];
   });
 
   const directorySources = createMemo(() => {
     if (
-      !workspace.isFetching &&
-      !!workspace.isReady &&
-      !!workspace.directoryList
+      !workspace.isFetching["DirectorySource"] &&
+      !!workspace.isReady["DirectorySource"]
     ) {
-      return workspace.directoryList;
+      return workspace.DirectorySource;
+    }
+    return [];
+  });
+
+  const emailAccounts = createMemo(() => {
+    if (
+      !workspace.isFetching["EmailAccount"] &&
+      !!workspace.isReady["EmailAccount"]
+    ) {
+      return workspace.EmailAccount;
     }
     return [];
   });
@@ -36,9 +48,9 @@ const SourceList: Component = () => {
         Data sources
       </span>
 
-      <For each={dataSources()}>
+      {/* <For each={databaseSources()}>
         {(dataSource) => {
-          const label = dataSource.label || dataSource.sourceName;
+          const label = dataSource.label || dataSource.databaseName;
 
           return (
             <SidebarHeading
@@ -53,8 +65,8 @@ const SourceList: Component = () => {
             />
           );
         }}
-      </For>
-      <For each={directorySources()}>
+      </For> */}
+      {/* <For each={directorySources()}>
         {(dataSource) => {
           const label = dataSource.label || dataSource.path;
 
@@ -68,6 +80,21 @@ const SourceList: Component = () => {
                 dataSource.id == searchParams.dataSouceId
               }
               infoTag="Markdown files"
+            />
+          );
+        }}
+      </For> */}
+
+      <For each={emailAccounts()}>
+        {(emailAccount) => {
+          const label = emailAccount.emailAddress;
+
+          return (
+            <SidebarHeading
+              label={label}
+              icon="fa-solid fa-envelope"
+              href={`/search/?emailAccountId=${emailAccount.id}`}
+              infoTag="Email account"
             />
           );
         }}

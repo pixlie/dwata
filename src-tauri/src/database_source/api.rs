@@ -21,7 +21,7 @@ impl Writable for DatabaseSource {
             vec![
                 FormField::new(
                     "label",
-                    "Label",
+                    Some("Label"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -30,7 +30,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databaseType",
-                    "Database type",
+                    Some("Database type"),
                     None,
                     ContentType::SingleChoice,
                     database_type_content_spec,
@@ -39,7 +39,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databaseName",
-                    "Database name",
+                    Some("Database name"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -48,7 +48,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databaseHost",
-                    "Database host",
+                    Some("Database host"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -57,7 +57,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databasePort",
-                    "Database port",
+                    Some("Database port"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -66,7 +66,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databaseUsername",
-                    "Database username",
+                    Some("Database username"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),
@@ -75,7 +75,7 @@ impl Writable for DatabaseSource {
                 ),
                 FormField::new(
                     "databasePassword",
-                    "Database password",
+                    Some("Database password"),
                     None,
                     ContentType::Text,
                     ContentSpec::default(),

@@ -4,6 +4,7 @@ use crate::{
     workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
 };
 use chrono::Utc;
+use log::info;
 use sqlx::SqliteConnection;
 
 impl CRUDRead for OAuth2 {

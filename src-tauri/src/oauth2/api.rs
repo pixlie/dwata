@@ -25,7 +25,7 @@ impl OAuth2 {
         vec![
             FormField {
                 name: "provider".to_string(),
-                label: "Provider".to_string(),
+                label: Some("Provider".to_string()),
                 content_type: ContentType::SingleChoice,
                 content_spec: provider_spec,
                 default_value: Some(Content::Text("google".to_string())),
@@ -72,7 +72,6 @@ impl Writable for OAuth2 {
                     x.client_secret.as_ref().unwrap().clone(),
                 )
                 .await?;
-                info!("Generated Google OAuth2 authorize URL: {}", authorize_url);
 
                 Ok(NextStep::Configure(
                     Configuration {
@@ -80,7 +79,7 @@ impl Writable for OAuth2 {
                         description: "Waiting for your authorization at the URL".to_string(),
                         fields: vec![FormField {
                             name: "googleAuthLink".to_string(),
-                            label: "Link to authorize".to_string(),
+                            label: Some("Link to authorize".to_string()),
                             description: Some("Please copy this link to your browser and authorize data access with Google".to_string()),
                             content_spec: ContentSpec {
                                 text_type: Some(TextType::Link),

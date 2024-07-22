@@ -93,7 +93,7 @@ const Form: Component<IPropTypes> = (props) => {
 
   createComputed((isSet) => {
     // This function loads data when we are editing existing items
-    if (!props.existingItemId) {
+    if (!props.existingItemId || isSet) {
       return false;
     }
 
@@ -104,10 +104,11 @@ const Form: Component<IPropTypes> = (props) => {
       props.module in moduleData()!
     ) {
       let _data: { [key: string]: IFormFieldValue } = {};
+      let fieldNames = config()!.fields.map((f) => f.name);
       for (const [key, value] of Object.entries(
         moduleData()![props.module as keyof ModuleDataRead],
       )) {
-        if (key in formData()) {
+        if (fieldNames.includes(key)) {
           _data[key] = value as IFormFieldValue;
         }
       }

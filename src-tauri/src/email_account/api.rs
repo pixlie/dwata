@@ -22,7 +22,7 @@ impl EmailAccount {
 
         vec![FormField {
             name: "provider".to_string(),
-            label: "Provider".to_string(),
+            label: Some("Provider".to_string()),
             content_type: ContentType::SingleChoice,
             content_spec: provider_spec,
             ..Default::default()
@@ -61,7 +61,7 @@ impl Writable for EmailAccount {
                         // If provider is Gmail, then show OAuth2 choice list
                         fields.push(FormField {
                             name: "oauth2Id".to_string(),
-                            label: "Select OAuth2 credentials".to_string(),
+                            label: Some("Select OAuth2 credentials".to_string()),
                             content_type: ContentType::SingleChoice,
                             content_spec: ContentSpec {
                                 choices_from_function: Some("get_oauth2_choice_list".to_string()),
@@ -73,7 +73,7 @@ impl Writable for EmailAccount {
                     EmailProvider::ProtonMail => {
                         fields.push(FormField {
                             name: "emailAddress".to_string(),
-                            label: "Email address".to_string(),
+                            label: Some("Email address".to_string()),
                             content_spec: ContentSpec {
                                 text_type: Some(TextType::Email),
                                 ..ContentSpec::default()
@@ -82,7 +82,7 @@ impl Writable for EmailAccount {
                         });
                         fields.push(FormField {
                             name: "password".to_string(),
-                            label: "Password".to_string(),
+                            label: Some("Password".to_string()),
                             content_spec: ContentSpec {
                                 text_type: Some(TextType::Password),
                                 ..ContentSpec::default()
