@@ -4,7 +4,7 @@ import type { ContentSpec } from "./ContentSpec";
 import type { ContentType } from "./ContentType";
 
 export type HomogeneousContentArray = {
-  content_type: ContentType;
-  content_type_spec: ContentSpec;
+  contentType: ContentType;
+  contentTypeSpec: ContentSpec;
   contents: Array<Content>;
 };

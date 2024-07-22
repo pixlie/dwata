@@ -86,6 +86,18 @@ pub async fn index_emails(
         let mut db_guard = db.lock().await;
         EmailAccount::read_one_by_pk(pk, &mut db_guard).await?
     };
+    // Let's work with the Sent folder
+    email_account
+        .prep_for_access(
+            MailboxChoice::Sent,
+            app.path().app_data_dir().unwrap(),
+            true,
+            app.clone(),
+        )
+        .await?;
+    email_account.index_in_typesense(app.clone()).await?;
+
+    // Let's work with the Inbox folder
     email_account
         .prep_for_access(
             MailboxChoice::Inbox,

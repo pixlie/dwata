@@ -93,7 +93,7 @@ const SourceList: Component = () => {
             <SidebarHeading
               label={label}
               icon="fa-solid fa-envelope"
-              href={`/search/?email-account=${emailAccount.id}`}
+              href={`/search/?emailAccountId=${emailAccount.id}`}
               infoTag="Email account"
             />
           );

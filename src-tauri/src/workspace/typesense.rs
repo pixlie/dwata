@@ -165,13 +165,9 @@ pub trait TypesenseSearchable {
             ])
             .send()
             .await?;
-        let status = &response.status();
         let results = response.json::<TypesenseSearchResult>().await.unwrap();
 
-        info!(
-            "Searched in Typesense, API response status: {}\n {} results",
-            status, results.found
-        );
+        info!("Searched in Typesense; found {} results", results.found);
         Ok(results)
     }
 }

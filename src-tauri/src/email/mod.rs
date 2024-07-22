@@ -18,6 +18,7 @@ pub struct Email {
     pub id: i64,
     #[ts(type = "number")]
     pub uid: i64,
+    pub mailbox_id: i64,
 
     #[serde(skip)]
     pub message_id: Option<String>,
@@ -28,7 +29,7 @@ pub struct Email {
     pub from_email: String,
     pub date: i64,
     pub subject: String,
-    #[serde(skip_deserializing)]
+
     pub body_text: String,
 }
 
