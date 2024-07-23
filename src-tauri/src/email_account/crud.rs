@@ -1,10 +1,11 @@
 use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox, MailboxCreateUpdate};
 use crate::{
     error::DwataError,
-    oauth2::OAuth2,
+    oauth2::OAuth2Token,
     workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
 };
 use chrono::Utc;
+use sqlx::{Pool, Sqlite};
 use std::str::FromStr;
 
 impl CRUDRead for EmailAccount {
@@ -45,23 +46,21 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
         Ok(names_values)
     }
 
-    async fn pre_insert(
-        &self,
-        db_connection: &mut sqlx::SqliteConnection,
-    ) -> Result<VecColumnNameValue, DwataError> {
+    async fn pre_insert(&self, db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
         let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
         if self.provider == Some("gmail".to_string()) {
-            if self.oauth2_id.is_none() {
+            if self.oauth2_token_id.is_none() {
                 return Err(DwataError::CouldNotFindOAuth2Config);
             }
-            match self.oauth2_id.as_ref().unwrap().parse::<i64>() {
+            match self.oauth2_token_id.as_ref().unwrap().parse::<i64>() {
                 Ok(id) => {
-                    match OAuth2::read_one_by_pk(id, db_connection).await {
-                        Ok(oauth) => {
-                            name_values.push_name_value("oauth2_id", InputValue::ID(oauth.id));
+                    match OAuth2Token::read_one_by_pk(id, db).await {
+                        Ok(oauth2_token) => {
+                            name_values
+                                .push_name_value("oauth2_id", InputValue::ID(oauth2_token.id));
                             name_values.push_name_value(
                                 "email_address",
-                                InputValue::Text(oauth.handle.unwrap()),
+                                InputValue::Text(oauth2_token.handle.unwrap()),
                             );
                         }
                         Err(_) => return Err(DwataError::CouldNotFindOAuth2Config),

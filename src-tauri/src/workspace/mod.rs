@@ -1,14 +1,16 @@
 use crate::{ai_integration::AIIntegrationFilters, chat::ChatFilters};
-use serde::Deserialize;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use sqlx::{types::Json, FromRow, Type};
+use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
 pub mod app_state;
 pub mod commands;
 pub mod crud;
+pub mod process_log;
 pub mod typesense;
-
-pub use app_state::DwataDb;
 
 #[derive(Deserialize, TS)]
 #[ts(export)]
@@ -27,6 +29,53 @@ pub enum Module {
 pub enum ModuleFilters {
     AIIntegration(AIIntegrationFilters),
     Chat(ChatFilters),
+}
+
+#[derive(Clone, Serialize, Type, TS, EnumString, Display)]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
+#[ts(export)]
+pub enum ProcessInLog {
+    CheckEmails,
+    FetchEmails,
+    ParseEmails,
+    CreateSearchIndex,
+    IndexEmails,
+}
+
+#[derive(Clone, Serialize, Type, TS, EnumString, Display)]
+#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+#[strum(serialize_all = "lowercase")]
+#[ts(export)]
+pub enum ProcessingStatusInLog {
+    Pending,
+    InProgress,
+    Completed,
+}
+
+#[derive(Clone, Serialize, FromRow, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase")]
+pub struct ProcessLog {
+    #[ts(type = "number")]
+    pub id: i64,
+    pub process: ProcessInLog,
+    #[ts(type = "Array<(string, string)>")]
+    pub arguments: Json<Vec<(String, String)>>,
+    pub status: ProcessingStatusInLog,
+    pub is_sent_to_frontend: bool,
+
+    pub created_at: DateTime<Utc>,
+    pub modified_at: Option<DateTime<Utc>>,
+}
+
+pub struct AppUpdatesCreateUpdate {
+    pub process: Option<ProcessInLog>,
+    pub arguments: Option<Vec<(String, String)>>,
+    pub status: Option<ProcessingStatusInLog>,
+    pub is_sent_to_frontend: Option<bool>,
 }
 
 // impl ChatContextNode for Config {

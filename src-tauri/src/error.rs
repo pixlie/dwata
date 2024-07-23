@@ -27,6 +27,7 @@ pub enum DwataError {
     // Workspace and configuration
     ModuleNotFound,
     NextStepNotAvailable,
+    CouldNotReadAppUpdates,
 
     // AI providers/models/features
     InvalidAIModel,

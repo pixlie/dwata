@@ -46,7 +46,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         get_database_connection(&app.path().app_data_dir().unwrap(), migrations_dir).await
     }) {
         Ok(db_connection) => {
-            app.manage(workspace::DwataDb::new(db_connection));
+            app.manage(db_connection);
         }
         Err(err) => {
             error!("Could not connect to Dwata DB\n Error: {:?}", err);
@@ -71,6 +71,7 @@ fn main() {
             workspace::commands::insert_module_item,
             workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
+            workspace::app_updates::get_app_updates,
             directory_source::commands::fetch_file_list_in_directory,
             directory_source::commands::fetch_file_content_list,
             ai_integration::commands::get_ai_model_list,

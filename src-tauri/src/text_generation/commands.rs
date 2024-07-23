@@ -19,7 +19,7 @@ use tauri::State;
 #[tauri::command]
 pub async fn chat_with_ai(
     chat_id: i64,
-    db: State<'_, DwataDb>,
+    db: &Pool<Sqlite>,
 ) -> Result<InsertUpdateResponse, DwataError> {
     generate_text_for_chat(chat_id, db).await
 }

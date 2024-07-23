@@ -3,7 +3,7 @@ use crate::error::DwataError;
 use log::info;
 use reqwest;
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
+use sqlx::{Pool, Sqlite};
 use ts_rs::TS;
 
 #[derive(Serialize)]
@@ -38,16 +38,16 @@ pub struct TypesenseCollection {
 }
 
 pub trait TypesenseSearchable {
-    async fn get_collection_name(&self, app: AppHandle) -> Result<String, DwataError>;
+    async fn get_collection_name(&self, db: &Pool<Sqlite>) -> Result<String, DwataError>;
 
     async fn get_collection_schema(
         &self,
-        app: AppHandle,
+        db: &Pool<Sqlite>,
     ) -> Result<TypesenseCollection, DwataError>;
 
-    async fn get_json_lines(&self, app: AppHandle) -> Result<Vec<String>, DwataError>;
+    async fn get_json_lines(&self, db: &Pool<Sqlite>) -> Result<Vec<String>, DwataError>;
 
-    async fn delete_collection(&self, app: AppHandle) -> Result<(), DwataError> {
+    async fn delete_collection(&self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -69,7 +69,7 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn create_collection_in_typesense(&self, app: AppHandle) -> Result<(), DwataError> {
+    async fn create_collection_in_typesense(&self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -90,18 +90,18 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn index_in_typesense(&self, app: AppHandle) -> Result<(), DwataError> {
+    async fn index_in_typesense(&self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
 
         // We index in batches of 25 at a time
-        for lines in self.get_json_lines(app.clone()).await?.chunks(25) {
+        for lines in self.get_json_lines(db).await?.chunks(25) {
             let response = client
                 .post(format!(
                     "{}/collections/{}/documents/import?action=upsert",
                     typesense_url,
-                    self.get_collection_name(app.clone()).await?
+                    self.get_collection_name(db).await?
                 ))
                 .header("Content-Type", "application/json")
                 .header("X-TYPESENSE-API-KEY", typesense_api_key)
@@ -118,7 +118,7 @@ pub trait TypesenseSearchable {
         Ok(())
     }
 
-    async fn retrieve_collection(&self, app: AppHandle) -> Result<(), DwataError> {
+    async fn retrieve_collection(&self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";
         let typesense_api_key = "TYPESENSE_LOCAL";
@@ -144,7 +144,7 @@ pub trait TypesenseSearchable {
     async fn search_in_typesense(
         &self,
         query: String,
-        app: AppHandle,
+        db: &Pool<Sqlite>,
     ) -> Result<TypesenseSearchResult, DwataError> {
         let client = reqwest::Client::new();
         let typesense_url = "http://localhost:8108";

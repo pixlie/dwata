@@ -22,7 +22,7 @@ use tauri::State;
 /// * `Result<InsertUpdateResponse, DwataError>` - The response from the AI model.
 pub async fn generate_text_for_chat(
     chat_id: i64,
-    db: State<'_, DwataDb>,
+    db: &Pool<Sqlite>,
 ) -> Result<InsertUpdateResponse, DwataError> {
     let chat: Chat;
     let root_chat: Chat;

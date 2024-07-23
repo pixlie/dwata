@@ -14,7 +14,7 @@ pub async fn get_ai_model_list(_usable_only: Option<bool>) -> Result<Vec<AIModel
 #[tauri::command]
 pub async fn get_ai_model_choice_list(
     usable_only: Option<bool>,
-    db: State<'_, DwataDb>,
+    db: &Pool<Sqlite>,
 ) -> Result<Vec<(String, String)>, DwataError> {
     let mut result: Vec<AIModel> = vec![];
     if let Some(false) = usable_only {

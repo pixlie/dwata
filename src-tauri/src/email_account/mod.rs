@@ -1,7 +1,7 @@
 use crate::email::EmailBucket;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
-use crate::workspace::DwataDb;
+use crate::workspace::{AppUpdatesCreateUpdate, DwataDb, ProcessInLog, ProcessingStatusInLog};
 use chrono::{DateTime, NaiveDate, TimeDelta, Utc};
 use helpers::{fetch_email_uid_list, fetch_emails, read_emails_from_local_storage};
 use imap::Session;
@@ -9,7 +9,7 @@ use log::{error, info};
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
 use slug::slugify;
-use sqlx::{FromRow, Type};
+use sqlx::{FromRow, Pool, Sqlite, Type};
 use std::collections::{HashMap, HashSet};
 use std::net::TcpStream;
 use std::sync::Arc;
@@ -84,7 +84,7 @@ pub struct EmailAccount {
 
     pub email_address: String,
     pub password: Option<String>,
-    pub oauth2_id: Option<i64>,
+    pub oauth2_token_id: Option<i64>,
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
@@ -102,7 +102,7 @@ pub struct EmailAccountCreateUpdate {
     pub provider: Option<String>,
     pub email_address: Option<String>,
     pub password: Option<String>,
-    pub oauth2_id: Option<String>,
+    pub oauth2_token_id: Option<String>,
 }
 
 #[derive(Serialize, FromRow, TS)]
@@ -131,9 +131,9 @@ pub enum MailboxChoice {
 }
 
 impl EmailAccount {
-    pub async fn get_storage_dir(&self, app: AppHandle) -> Result<PathBuf, DwataError> {
+    pub async fn get_storage_dir(&self, db: &Pool<Sqlite>) -> Result<PathBuf, DwataError> {
         Ok(self.status.as_ref().unwrap().storage_dir.join(slugify(
-            self.get_selected_mailbox(app).await?.storage_path.clone(),
+            self.get_selected_mailbox(db).await?.storage_path.clone(),
         )))
     }
 
@@ -142,7 +142,7 @@ impl EmailAccount {
         mailbox_choice: MailboxChoice,
         storage_dir: PathBuf,
         needs_imap_session: bool,
-        app: AppHandle,
+        db: &Pool<Sqlite>,
     ) -> Result<(), DwataError> {
         // Set the path to local storage for emails
         let mut storage_dir = storage_dir.clone();
@@ -157,10 +157,10 @@ impl EmailAccount {
         });
 
         if needs_imap_session {
-            self.sync_mailboxes(app.clone()).await?;
-            let imap_session = self.get_imap_session(app.clone()).await?;
+            self.sync_mailboxes(db).await?;
+            let imap_session = self.get_imap_session(db).await?;
             let mut imap_session = imap_session.lock().await;
-            let email_account_mailbox = self.get_selected_mailbox(app.clone()).await?;
+            let email_account_mailbox = self.get_selected_mailbox(db).await?;
             match imap_session.examine(&email_account_mailbox.name) {
                 Ok(mailbox) => {
                     info!("Selected mailbox: {}", mailbox);
@@ -187,9 +187,9 @@ impl EmailAccount {
         Ok(())
     }
 
-    pub async fn sync_mailboxes(&mut self, app: AppHandle) -> Result<(), DwataError> {
+    pub async fn sync_mailboxes(&mut self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         // Store all the mailboxes in Dwata DB
-        let imap_session = self.get_imap_session(app.clone()).await.unwrap();
+        let imap_session = self.get_imap_session(db).await.unwrap();
         let mut imap_session = imap_session.lock().await;
         let db = app.state::<DwataDb>();
         let mailboxes_in_db = {
@@ -219,9 +219,9 @@ impl EmailAccount {
         Ok(())
     }
 
-    pub async fn fetch_emails(&mut self, app: AppHandle) -> Result<(), DwataError> {
+    pub async fn fetch_emails(&mut self, db: &Pool<Sqlite>) -> Result<(), DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
-        let storage_dir = self.get_storage_dir(app.clone()).await?;
+        let storage_dir = self.get_storage_dir(db).await?;
         if let Ok(false) = Path::try_exists(storage_dir.as_path()) {
             match create_dir_all(storage_dir.as_path()) {
                 Ok(_) => {}
@@ -245,9 +245,17 @@ impl EmailAccount {
         let mut month = 0;
         let mut before = Utc::now().date_naive();
         // Let's retrieve all the email Uids in the last 300 months (25 years)
+        AppUpdatesCreateUpdate {
+            process: Some(ProcessInLog::CheckEmails),
+            arguments: Some(vec![("id".to_string(), self.id.to_string())]),
+            status: Some(ProcessingStatusInLog::InProgress),
+            is_sent_to_frontend: Some(false),
+        }
+        .insert_module_data(db)
+        .await?;
         while month < 300 {
             month += 1;
-            let moved_imap_session = self.get_imap_session(app.clone()).await?;
+            let moved_imap_session = self.get_imap_session(db).await?;
             let moved_email_uid_list = shared_email_uid_list.clone();
             let since = before - TimeDelta::weeks(4);
             fetch_email_uid_list(
@@ -261,13 +269,21 @@ impl EmailAccount {
             before = since;
         }
         info!("Finished all tasks to fetch email uids");
+        AppUpdatesCreateUpdate {
+            process: Some(ProcessInLog::CheckEmails),
+            arguments: Some(vec![("id".to_string(), self.id.to_string())]),
+            status: Some(ProcessingStatusInLog::Completed),
+            is_sent_to_frontend: Some(false),
+        }
+        .insert_module_data(db)
+        .await?;
 
         // Let's fetch the actual emails, in batches
         let email_uid_list = shared_email_uid_list.lock().await;
         let mut fetch_email_set = JoinSet::new();
         let mut fetched_email_count = 0;
         while fetched_email_count < email_uid_list.len() {
-            let moved_imap_session = self.get_imap_session(app.clone()).await?;
+            let moved_imap_session = self.get_imap_session(db).await?;
             let moved_storage_dir = storage_dir.clone();
             // We select the next batch of email Uids to fetch
             let mut batch: Vec<u32> = vec![];
@@ -290,7 +306,7 @@ impl EmailAccount {
         }
         info!("Finished all tasks to fetch emails");
 
-        let imap_session = self.get_imap_session(app.clone()).await?;
+        let imap_session = self.get_imap_session(db).await?;
         let mut imap_session = imap_session.lock().await;
         match imap_session.logout() {
             Ok(_) => {}
@@ -301,9 +317,9 @@ impl EmailAccount {
         Ok(())
     }
 
-    pub async fn store_emails_in_db(&self, app: AppHandle) -> Result<usize, DwataError> {
+    pub async fn store_emails_in_db(&self, db: &Pool<Sqlite>) -> Result<usize, DwataError> {
         // Let's save the emails into Dwata DB, in batches of 100 at a time
-        let emails = read_emails_from_local_storage(self.get_storage_dir(app).await?, 1000).await?;
+        let emails = read_emails_from_local_storage(self.get_storage_dir(db).await?, 1000).await?;
         let mut buckets: Vec<EmailBucket> = vec![];
 
         for email in emails

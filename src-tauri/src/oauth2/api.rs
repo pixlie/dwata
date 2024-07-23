@@ -1,7 +1,7 @@
 use log::info;
 
 use super::helpers::get_google_oauth2_authorize_url;
-use super::{OAuth2, OAuth2Provider};
+use super::{OAuth2App, OAuth2Provider};
 use crate::content::content::{Content, TextType};
 use crate::content::form::{FormButton, FormButtonType};
 use crate::content::{
@@ -12,7 +12,7 @@ use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
 use crate::workspace::crud::ModuleDataCreateUpdate;
 
-impl OAuth2 {
+impl OAuth2App {
     fn get_initial_form_fields() -> Vec<FormField> {
         let provider_spec: ContentSpec = ContentSpec {
             choices: Some(vec![(
@@ -50,7 +50,7 @@ impl OAuth2 {
     }
 }
 
-impl Writable for OAuth2 {
+impl Writable for OAuth2App {
     fn initiate() -> Result<NextStep, DwataError> {
         Ok(NextStep::Configure(Self::get_initial_configuration()))
     }

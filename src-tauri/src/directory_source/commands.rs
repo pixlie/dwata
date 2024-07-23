@@ -9,7 +9,7 @@ use tauri::State;
 #[tauri::command]
 pub(crate) async fn fetch_file_list_in_directory(
     directory_id: i64,
-    db: State<'_, DwataDb>,
+    db: &Pool<Sqlite>,
 ) -> Result<Vec<File>, DwataError> {
     let mut db_guard = db.lock().await;
     // Find the Directory matching the given folder_id
@@ -23,7 +23,7 @@ pub(crate) async fn fetch_file_list_in_directory(
 pub(crate) async fn fetch_file_content_list(
     directory_id: i64,
     relative_file_path: &str,
-    db: State<'_, DwataDb>,
+    db: &Pool<Sqlite>,
 ) -> Result<HeterogeneousContentArray, DwataError> {
     let mut db_guard = db.lock().await;
     // Find the Directory matching the given folder_id
