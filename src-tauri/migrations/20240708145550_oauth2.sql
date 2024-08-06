@@ -9,7 +9,7 @@ CREATE TABLE oauth2_app
     client_secret               VARCHAR(255),
 
     created_at                  DATETIME NOT NULL,
-    modified_at                 DATETIME,
+    modified_at                 DATETIME
 );
 
 -- This table stores the OAuth2 tokens for any OAuth2 app

@@ -10,7 +10,6 @@ use oauth2::{
 use serde::{Deserialize, Serialize};
 use sqlx::{query_as, FromRow, Pool, Sqlite, Type};
 use strum::{Display, EnumString};
-use tauri::State;
 use ts_rs::TS;
 
 pub mod api;
@@ -76,6 +75,7 @@ pub struct OAuth2AppCreateUpdate {
     pub client_secret: Option<String>,
 }
 
+#[derive(Default)]
 pub struct OAuth2TokenCreateUpdate {
     pub oauth2_app_id: Option<i64>,
     pub refresh_token: Option<String>,
@@ -95,12 +95,9 @@ impl OAuth2Token {
         if let Some(oauth2_app) = &self.oauth2_app {
             Ok(oauth2_app.clone())
         } else {
-            let mut db = db.lock().await;
             let sql = "SELECT * FROM oauth2_app WHERE id = ?";
-            let oauth2_app: OAuth2App = query_as(sql)
-                .bind(self.oauth2_app_id)
-                .fetch_one(db.deref_mut())
-                .await?;
+            let oauth2_app: OAuth2App =
+                query_as(sql).bind(self.oauth2_app_id).fetch_one(db).await?;
             self.oauth2_app = Some(oauth2_app);
             Ok(self.oauth2_app.as_ref().unwrap().clone())
         }

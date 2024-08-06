@@ -11,13 +11,13 @@ use sqlx::{query_as, Pool, Sqlite};
 
 impl CRUDRead for OAuth2App {
     fn table_name() -> String {
-        "oauth2".to_string()
+        "oauth2_app".to_string()
     }
 }
 
 impl CRUDCreateUpdate for OAuth2AppCreateUpdate {
     fn table_name() -> String {
-        "oauth2".to_string()
+        "oauth2_app".to_string()
     }
 
     fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
@@ -49,6 +49,9 @@ impl CRUDCreateUpdate for OAuth2TokenCreateUpdate {
 
     fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
+        if let Some(x) = &self.oauth2_app_id {
+            names_values.push_name_value("oauth2_app_id", InputValue::ID(*x));
+        }
         if let Some(x) = &self.refresh_token {
             names_values.push_name_value("refresh_token", InputValue::Text(x.clone()));
         }
@@ -60,6 +63,8 @@ impl CRUDCreateUpdate for OAuth2TokenCreateUpdate {
     }
 
     async fn pre_insert(&self, db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
+        // We call the OAuth2 server and get the authorization code,
+        // refresh token, access token, identifier etc.
         if self.oauth2_app_id.is_none() {
             return Err(DwataError::CouldNotFindOAuth2Config);
         }

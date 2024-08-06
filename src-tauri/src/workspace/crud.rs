@@ -1,16 +1,9 @@
 use super::ModuleFilters;
-use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate};
-use crate::chat::{Chat, ChatCreateUpdate};
 use crate::content::content::{Content, ContentType};
-use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
-use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::email_account::{EmailAccount, EmailAccountCreateUpdate};
 use crate::error::DwataError;
-use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
-use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use log::{error, info};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::Value;
 use sqlx::sqlite::SqliteRow;
 use sqlx::{query_as, Execute, FromRow, Pool, QueryBuilder, Sqlite};
@@ -62,6 +55,10 @@ pub trait CRUDRead {
             Some(filters) => match filters {
                 ModuleFilters::AIIntegration(x) => Self::read_with_filter_helper(x, db).await,
                 ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, db).await,
+                _ => {
+                    error!("Invalid module {}", filters.to_string());
+                    Err(DwataError::ModuleNotFound)
+                }
             },
             None => Self::read_all_helper(db).await,
         }
@@ -184,31 +181,6 @@ pub trait CRUDReadFilter {
     }
 }
 
-#[derive(Serialize, TS)]
-#[ts(export)]
-pub enum ModuleDataRead {
-    UserAccount(UserAccount),
-    DirectorySource(DirectorySource),
-    DatabaseSource(DatabaseSource),
-    AIIntegration(AIIntegration),
-    Chat(Chat),
-    OAuth2(OAuth2App),
-    EmailAccount(EmailAccount),
-}
-
-#[derive(Serialize, TS)]
-#[serde(tag = "type", content = "data")]
-#[ts(export)]
-pub enum ModuleDataReadList {
-    UserAccount(Vec<UserAccount>),
-    DirectorySource(Vec<DirectorySource>),
-    DatabaseSource(Vec<DatabaseSource>),
-    AIIntegration(Vec<AIIntegration>),
-    Chat(Vec<Chat>),
-    OAuth2(Vec<OAuth2App>),
-    EmailAccount(Vec<EmailAccount>),
-}
-
 #[derive(Clone)]
 pub enum InputValue {
     Text(String),
@@ -220,11 +192,17 @@ pub enum InputValue {
 }
 
 #[derive(Default)]
-pub struct VecColumnNameValue(Vec<(String, InputValue)>);
+pub struct VecColumnNameValue(pub Vec<(String, InputValue)>);
 
 impl VecColumnNameValue {
     pub fn push_name_value(&mut self, name: &str, value: InputValue) {
         self.0.push((name.to_string(), value));
+    }
+
+    pub fn find_by_name(&self, name: &str) -> Option<InputValue> {
+        self.0
+            .iter()
+            .find_map(|(x, y)| if x == name { Some(y.clone()) } else { None })
     }
 }
 
@@ -396,16 +374,4 @@ pub trait CRUDCreateUpdate {
             }
         }
     }
-}
-
-#[derive(Deserialize, TS)]
-#[ts(export)]
-pub enum ModuleDataCreateUpdate {
-    UserAccount(UserAccountCreateUpdate),
-    DirectorySource(DirectorySourceCreateUpdate),
-    DatabaseSource(DatabaseSourceCreateUpdate),
-    AIIntegration(AIIntegrationCreateUpdate),
-    Chat(ChatCreateUpdate),
-    OAuth2(OAuth2AppCreateUpdate),
-    EmailAccount(EmailAccountCreateUpdate),
 }

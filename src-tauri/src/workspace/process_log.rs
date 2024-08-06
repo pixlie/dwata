@@ -1,24 +1,24 @@
-use crate::error::DwataError;
-
 use super::{
     crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
-    AppUpdatesCreateUpdate, DwataDb, ProcessLog,
+    ProcessLog, ProcessLogCreateUpdate,
 };
+use crate::error::DwataError;
+use chrono::Utc;
 use log::error;
-use sqlx::{query, query_as};
-use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use sqlx::{query, query_as, Pool, Sqlite};
+use std::{ops::Deref, time::Duration};
+use tauri::{AppHandle, Emitter, State};
 use tokio::time::interval;
 
 impl CRUDRead for ProcessLog {
     fn table_name() -> String {
-        "app_updates".to_string()
+        "process_log".to_string()
     }
 }
 
-impl CRUDCreateUpdate for AppUpdatesCreateUpdate {
+impl CRUDCreateUpdate for ProcessLogCreateUpdate {
     fn table_name() -> String {
-        "app_updates".to_string()
+        "process_log".to_string()
     }
 
     fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
@@ -35,42 +35,38 @@ impl CRUDCreateUpdate for AppUpdatesCreateUpdate {
         if let Some(x) = &self.is_sent_to_frontend {
             names_values.push_name_value("is_sent_to_frontend", InputValue::Bool(*x));
         }
+        names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));
         Ok(names_values)
     }
 }
 
 #[tauri::command]
-pub async fn get_app_updates(app: AppHandle) {
-    let mut interval = interval(Duration::from_secs(1));
+pub async fn get_process_log(
+    db: State<'_, Pool<Sqlite>>,
+    app: AppHandle,
+) -> Result<(), DwataError> {
+    let mut interval = interval(Duration::from_secs(2));
+    let db = db.deref();
     loop {
         interval.tick().await;
-        // Let's read the app_updates table and send any pending updates to the frontend
+        // Let's read the process_log table and send any pending updates to the frontend
         let updates = {
-            let db = app.state::<DwataDb>();
-            let mut db_guard = db.lock().await;
-            let sql = "SELECT * FROM app_updates WHERE is_sent_to_frontend = 0";
-            query_as::<_, ProcessLog>(sql)
-                .fetch_all(&mut *db_guard)
-                .await
+            let sql = "SELECT * FROM process_log WHERE is_sent_to_frontend = 0";
+            query_as::<_, ProcessLog>(sql).fetch_all(db).await
         };
         match updates {
             Ok(updates) => {
-                let db = app.state::<DwataDb>();
-                let mut db_guard = db.lock().await;
                 for update in updates.iter() {
                     // We send the update to the frontend
-                    app.emit("app_updates", update).unwrap();
-                    // Update the is_sent_to_frontend column
-                    let sql = "UPDATE app_updates SET is_sent_to_frontend = 1 WHERE id = ?";
-                    query(sql)
-                        .bind(update.id)
-                        .execute(&mut *db_guard)
-                        .await
+                    app.emit("process_log", serde_json::to_string(&update).unwrap())
                         .unwrap();
+                    // Update the is_sent_to_frontend column
+                    let sql = "UPDATE process_log SET is_sent_to_frontend = 1 WHERE id = ?";
+                    query(sql).bind(update.id).execute(db).await.unwrap();
                 }
             }
             Err(err) => {
-                error!("Could not read app updates\n Error: {}", err);
+                error!("Could not read process log\n Error: {}", err);
             }
         }
     }

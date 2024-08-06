@@ -6,19 +6,14 @@ use std::ops::Deref;
 use tauri::State;
 
 #[tauri::command]
-pub async fn get_oauth2_choice_list(
+pub async fn get_oauth2_app_choice_list(
     db: State<'_, Pool<Sqlite>>,
 ) -> Result<Vec<(String, String)>, DwataError> {
     let db = db.deref();
-    let all_oauth2_configs: Vec<OAuth2App> = OAuth2App::read_all(db).await?;
-    Ok(all_oauth2_configs
+    let all_oauth2_apps = OAuth2App::read_all(db).await?;
+    Ok(all_oauth2_apps
         .iter()
-        .map(|x| {
-            (
-                format!("{}", x.id),
-                format!("{}", x.handle.as_ref().unwrap_or(&x.identifier.clone())),
-            )
-        })
+        .map(|x| (format!("{}", x.id), format!("{}", x.provider.to_string())))
         .collect())
 }
 
