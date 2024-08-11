@@ -8,37 +8,23 @@ import {
   onMount,
 } from "solid-js";
 import Heading from "../widgets/typography/Heading";
-import { useUserInterface } from "../stores/userInterface";
 import TextInput from "../widgets/interactable/TextInput";
 import { IFormFieldValue } from "../utils/types";
-import { useSearchParams } from "@solidjs/router";
+import { useLocation, useParams, useSearchParams } from "@solidjs/router";
 import { EmailAccount } from "../api_types/EmailAccount";
-import { EmailProvider, useEmail } from "../stores/email";
+import { useSearchableData } from "../stores/searchableData";
 import { Mailbox } from "../api_types/Mailbox";
-import { Email } from "../api_types/Email";
 import { invoke } from "@tauri-apps/api/core";
-
-const SearchResultItem: Component<Email> = (props) => {
-  const [_, { getColors }] = useUserInterface();
-  return (
-    <div
-      class="text-lg font-normal border border-b-0 p-1"
-      style={{
-        color: getColors().colors["editor.foreground"],
-        "border-color": getColors().colors["editorWidget.border"],
-      }}
-    >
-      {props.uid}: {props.subject}
-    </div>
-  );
-};
+import { searchRoutes } from "./routeList";
+import SearchResultEmailItem from "../widgets/search/SearchResultEmailItem";
+import SearchResultFileItem from "../widgets/search/SearchResultFileItem";
 
 const MailboxLabel: Component<Mailbox> = (props) => {
   return <div>{props.name}</div>;
 };
 
 const EmailAccountBox: Component = () => {
-  const [emailAccounts, mailboxes] = useEmail();
+  const [emailAccounts, mailboxes] = useSearchableData();
   const [searchParams] = useSearchParams();
 
   const getEmailAccount = createMemo<EmailAccount | undefined>(() => {
@@ -76,68 +62,56 @@ const EmailAccountBox: Component = () => {
 };
 
 const Search: Component = () => {
-  const [_, { getColors }] = useUserInterface();
   const [searchParams] = useSearchParams();
-  const [
-    _emailAccounts,
-    mailboxes,
-    emails,
-    { fetchAllEmailAccounts, fetchAllMailboxes, fetchEmailsForMailbox },
-  ] = useEmail();
+  const location = useLocation();
+  const params = useParams();
+  const [emailAccounts, mailboxes, emails, { fetchEmailsForMailbox }] =
+    useSearchableData();
   const [formData, setFormData] = createSignal<{
     [key: string]: IFormFieldValue;
   }>({});
-  const [_r, { mutate: _m, refetch: _refetchEmails }] = createResource(
+  const [_r, { mutate: _m, refetch: refetchEmails }] = createResource(
     async () => {
-      if (!!searchParams.emailAccountId) {
+      if (emailAccounts.state !== "ready") {
+        return;
+      }
+      for (const emailAccount of emailAccounts()?.data) {
         await invoke("fetch_emails", {
-          pk: parseInt(searchParams.emailAccountId),
+          pk: emailAccount.id,
         });
       }
     },
   );
 
-  // const [results, { mutate: _m, refetch: refetchSearch }] =
-  //   createResource<SearchResult>(async () => {
-  //     let results: SearchResult = {
-  //       found: 0,
-  //       hits: [],
-  //     };
-  //     if (!!formData().query && (formData()!.query! as string).length >= 1) {
-  //       const pkList = !!searchParams.emailAccountId
-  //         ? [parseInt(searchParams.emailAccountId)]
-  //         : workspace.EmailAccount.map((x) => x.id);
-  //       results = await invoke<SearchResult>("search_emails", {
-  //         pkList,
-  //         query: formData().query,
-  //       });
-  //     }
-  //     return results;
-  //   });
-
-  onMount(() => {
-    // refetchEmails();
-  });
-
-  createComputed(() => {
-    if (!!searchParams.emailAccountId) {
-      // refetchEmails();
+  createComputed((isFetched) => {
+    if (!isFetched && emailAccounts.state === "ready") {
+      refetchEmails();
+      return true;
     }
-  });
+  }, false);
 
   createComputed(() => {
+    const searchQuery =
+      !!formData().query && (formData()!.query! as string).length >= 1
+        ? `${formData().query}`.trim()
+        : undefined;
     if (!!searchParams.emailAccountId) {
-      // Load recent emails
+      // Load emails (recent or for search query) from this email account
       if (mailboxes.state === "ready" && mailboxes().data.length > 0) {
         const mailbox = mailboxes().data.find(
-          (x) => x.name.toLowerCase() === "sent",
+          (x) =>
+            x.name.toLowerCase() === "sent" &&
+            x.emailAccountId === parseInt(searchParams.emailAccountId!),
         );
-        const searchQuery =
-          !!formData().query && (formData()!.query! as string).length >= 1
-            ? `${formData().query}`.trim()
-            : undefined;
         if (mailbox) {
           fetchEmailsForMailbox(mailbox.id, searchQuery);
+        }
+      }
+    } else {
+      // Load emails (recent or for search query) from all email accounts
+      if (mailboxes.state === "ready" && mailboxes().data.length > 0) {
+        for (const mb of mailboxes().data) {
+          fetchEmailsForMailbox(mb.id, searchQuery);
         }
       }
     }
@@ -164,43 +138,57 @@ const Search: Component = () => {
     }
   };
 
+  const getSearchTypeDisplay = createMemo(() => {
+    if (!!location.pathname) {
+      const matchedRoute = searchRoutes.find(
+        (x) => x.href === location.pathname,
+      );
+      if (matchedRoute) {
+        return " " + matchedRoute.label.toLowerCase();
+      }
+    }
+    return " all emails";
+  });
+
   return (
-    <div class="flex flex-row gap-4">
-      <div
+    <div class="flex flex-col h-full">
+      {/* <div
         class="max-w-96"
         style={{ color: getColors().colors["editor.foreground"] }}
       >
         <EmailAccountBox />
-      </div>
+      </div> */}
 
-      <div class="grow max-w-screen-md">
-        <Heading size="2xl">Search</Heading>
-        <div class="mb-4" />
-        <TextInput
-          name="query"
-          contentType="Text"
-          contentSpec={{}}
-          isEditable
-          onChange={handleChange}
-          value={"query" in formData() ? formData().query : undefined}
-        />
+      <TextInput
+        name="query"
+        contentType="Text"
+        contentSpec={{}}
+        isEditable
+        onChange={handleChange}
+        value={"query" in formData() ? formData().query : undefined}
+        placeholder={`Search${getSearchTypeDisplay()}`}
+      />
 
-        <div class="mt-8">
+      <div class="mt-2 overflow-y-auto">
+        {!!params.searchType && params.searchType === "files" ? (
+          <div class="grid grid-cols-5 gap-4">
+            <For each={emails()?.data}>
+              {(result) => <SearchResultFileItem {...result} />}
+            </For>
+          </div>
+        ) : null}
+        {!!params.searchType && params.searchType === "emails" ? (
           <For each={emails()?.data}>
-            {(result) => <SearchResultItem {...result} />}
+            {(result) => <SearchResultEmailItem {...result} />}
           </For>
-        </div>
+        ) : null}
       </div>
     </div>
   );
 };
 
 const SearchWrapper: Component = () => {
-  return (
-    <EmailProvider>
-      <Search />
-    </EmailProvider>
-  );
+  return <Search />;
 };
 
 export default SearchWrapper;

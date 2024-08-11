@@ -24,7 +24,7 @@ render(
       <Route path={"/chat"} component={ChatWrapper}>
         <ChatRoutes />
       </Route>
-      <Route path={"/search"} component={SearchWrapper} />
+      <Route path={"/search/:searchType"} component={SearchWrapper} />
       <Route path={"/"} component={Home} />
     </Router>
   ),

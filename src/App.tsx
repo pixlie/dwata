@@ -11,6 +11,7 @@ import {
 } from "./stores/userInterface";
 import { NextTaskProvider } from "./stores/nextTask";
 import { ProcessLogLoader, ProcessLogProvider } from "./stores/processLog";
+import { SearchableDataProvider } from "./stores/searchableData";
 
 const MainContent: Component<RouteSectionProps> = (props) => {
   const [_, { getColors }] = useUserInterface();
@@ -33,20 +34,22 @@ const App: Component<RouteSectionProps> = (props) => {
       <UserProvider>
         <UserInterfaceProvider>
           <WorkspaceProvider>
-            <SchemaProvider>
-              <NextTaskProvider>
-                <div class="flex flex-col w-full h-full">
-                  <ProcessLogLoader />
-                  <NavigationBar />
+            <SearchableDataProvider>
+              <SchemaProvider>
+                <NextTaskProvider>
+                  <div class="flex flex-col w-full h-full">
+                    <ProcessLogLoader />
+                    <NavigationBar />
 
-                  <div class="flex bg-gray-300 grow h-full overflow-hidden">
-                    <Sidebar />
+                    <div class="flex bg-gray-300 grow h-full overflow-hidden">
+                      <Sidebar />
 
-                    <MainContent {...props} />
+                      <MainContent {...props} />
+                    </div>
                   </div>
-                </div>
-              </NextTaskProvider>
-            </SchemaProvider>
+                </NextTaskProvider>
+              </SchemaProvider>
+            </SearchableDataProvider>
           </WorkspaceProvider>
         </UserInterfaceProvider>
       </UserProvider>

@@ -1,8 +1,7 @@
-import { Component } from "solid-js";
-import SidebarHeading from "./SidebarHeading";
-import SourceList from "../source/SourceList";
+import { Component, For } from "solid-js";
+import NavigationLink from "./NavigationLink";
 import { useUserInterface } from "../../stores/userInterface";
-import Button from "../interactable/Button";
+import { searchRoutes } from "../../routes/routeList";
 
 const Sidebar: Component = () => {
   const [_, { getColors }] = useUserInterface();
@@ -15,34 +14,24 @@ const Sidebar: Component = () => {
         "border-color": getColors().colors["sideBar.border"],
       }}
     >
-      <SidebarHeading label="Home" icon="fa-solid fa-home" href="/" />
-      {/* <SidebarHeading
-        label="Notes"
-        icon="fa-solid fa-sticky-note"
-        href="/notes"
-      /> */}
-      <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" />
-      <div class="my-4 px-4">
-        <Button label="Start a new chat" href="/chat/start" />
-      </div>
+      <For each={searchRoutes}>{(item) => <NavigationLink {...item} />}</For>
 
-      <SidebarHeading
+      {/* <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" /> */}
+      {/* <div class="my-4 px-4">
+        <Button label="Start a new chat" href="/chat/start" />
+      </div> */}
+      {/* <SidebarHeading
         label="Search"
         icon="fa-solid fa-magnifying-glass"
         href="/search"
-      />
+      /> */}
 
-      <div
-        class="border-b"
-        style={{ "border-color": getColors().colors["sideBar.border"] }}
-      />
-      <SourceList />
       <div class="flex-grow" />
       {/* <div
         class="mt-4 border-b"
         style={{ "border-color": getColors().colors["sideBar.border"] }}
       /> */}
-      <SidebarHeading
+      <NavigationLink
         label="Settings"
         icon="fa-solid fa-cog"
         href="/settings"

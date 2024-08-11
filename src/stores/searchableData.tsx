@@ -4,9 +4,9 @@ import { IProviderPropTypes } from "../utils/types";
 import { ModuleDataReadList } from "../api_types/ModuleDataReadList";
 import { Module } from "../api_types/Module";
 import { Email } from "../api_types/Email";
-import { ModuleFilters } from "../api_types/ModuleFilters";
 import { EmailAccount } from "../api_types/EmailAccount";
 import { Mailbox } from "../api_types/Mailbox";
+import { ModuleFilters } from "../api_types/ModuleFilters";
 
 const makeStore = () => {
   const [emails, { mutate: _mutateEmails, refetch: refetchEmails }] =
@@ -19,7 +19,6 @@ const makeStore = () => {
         "mailboxId" in refetching
       ) {
         // We are fetching emails from a specific mailbox
-        console.info("invoke search_emails {}", refetching);
         const result = await invoke<ModuleDataReadList>("search_emails", {
           module: "Email" as Module,
           filters: {
@@ -31,8 +30,6 @@ const makeStore = () => {
           } as ModuleFilters,
         });
         if (!!result && "type" in result && result["type"] === "Email") {
-          console.log(result["data"]);
-
           return { ...value, data: result["data"] as Array<Email> };
         }
       } else {
@@ -108,16 +105,19 @@ const makeStore = () => {
 };
 
 type TStoreAndFunctions = ReturnType<typeof makeStore>;
-const emailStore = makeStore();
+const searchableDataStore = makeStore();
 
-const EmailContext = createContext<TStoreAndFunctions>(emailStore);
+const SearchableDataContext =
+  createContext<TStoreAndFunctions>(searchableDataStore);
 
-export const EmailProvider: Component<IProviderPropTypes> = (props) => {
+export const SearchableDataProvider: Component<IProviderPropTypes> = (
+  props,
+) => {
   return (
-    <EmailContext.Provider value={emailStore}>
+    <SearchableDataContext.Provider value={searchableDataStore}>
       {props.children}
-    </EmailContext.Provider>
+    </SearchableDataContext.Provider>
   );
 };
 
-export const useEmail = () => useContext(EmailContext);
+export const useSearchableData = () => useContext(SearchableDataContext);

@@ -7,10 +7,17 @@ interface IPropTypes {
   href?: string;
   isActive?: boolean;
   infoTag?: string;
+  size?: "sm" | "md" | "lg";
 }
 
-const SidebarHeading: Component<IPropTypes> = (props) => {
+const NavigationLink: Component<IPropTypes> = (props) => {
   const [_, { getColors }] = useUserInterface();
+  let sizeClasses = "mx-2 my-1 px-2 py-1.5";
+  if (props.size === "sm") {
+    sizeClasses = "mx-2 my-0.5 px-2 py-0.5 font-thin";
+  } else if (props.size === "lg") {
+    sizeClasses = "mx-2 my-1.5 px-3 py-2";
+  }
 
   const Tag = () =>
     !!props.infoTag ? (
@@ -25,7 +32,8 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
     return (
       <a
         class={
-          "mx-2 my-2 px-2 py-1 block select-none rounded-md hover:bg-zinc-700 " +
+          sizeClasses +
+          " block select-none rounded hover:bg-zinc-700 " +
           (!!props.isActive ? "font-bold" : "")
         }
         style={{
@@ -43,7 +51,7 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
     );
   } else {
     return (
-      <div class="mx-2 my-2 px-2 py-1 select-none rounded-md">
+      <div class={sizeClasses + " select-none rounded"}>
         <i class={`${props.icon} w-6 text-gray-500`} />
         {props.label}
         <Tag />
@@ -52,4 +60,4 @@ const SidebarHeading: Component<IPropTypes> = (props) => {
   }
 };
 
-export default SidebarHeading;
+export default NavigationLink;
