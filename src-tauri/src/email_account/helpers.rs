@@ -6,7 +6,6 @@ use crate::email_account::MailboxCreateUpdate;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
 use crate::workspace::{ProcessInLog, ProcessLogCreateUpdate, ProcessingStatusInLog};
-use chrono::{TimeDelta, Utc};
 use imap::Session;
 use log::{error, info};
 use native_tls::TlsStream;
@@ -16,207 +15,133 @@ use std::collections::HashSet;
 use std::fs::{create_dir_all, read_dir, File};
 use std::io::{self, Read};
 use std::net::TcpStream;
+use std::ops::DerefMut;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::{sync::Mutex, task::JoinSet};
 
-// pub async fn check_date_of_emails_in_storage(storage_dir: PathBuf) -> Result<bool, DwataError> {}
-
 impl EmailAccount {
-    pub async fn prep_mailbox_for_access(
+    pub async fn prep_for_access(
         &mut self,
-        mailbox: Mailbox,
-        storage_dir: &PathBuf,
-        needs_imap_session: bool,
         db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
-    ) -> Result<usize, DwataError> {
-        let mut num_messages: usize = 0;
+    ) -> Result<Vec<String>, DwataError> {
+        let imap_session = self.create_imap_session(db).await?;
         {
-            // We ckeck if we have already fetched emails within last 60 seconds
             let mut locked_state = email_account_state.lock().await;
             // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
-            match locked_state
-                .iter_mut()
-                .find(|x| x.id == self.id && x.mailbox.id == mailbox.id)
-            {
-                Some(x) => {
-                    if let Some(last_fetched_at) = x.last_fetched_at {
-                        if last_fetched_at > Utc::now().timestamp() - 60 {
-                            error!("Task EmailAccount::prep_for_access has run recently for {}, mailbox {}", self.email_address, mailbox.id);
-                            return Err(DwataError::TaskHasRunRecently);
-                        }
-                    }
-                }
-                None => {
-                    let mut storage_dir = storage_dir.clone();
-                    storage_dir.push("emails");
-                    storage_dir.push(self.email_address.clone());
-                    locked_state.push(EmailAccountStatus {
-                        id: self.id,
-                        mailbox,
-                        storage_dir: storage_dir.clone(),
-                        last_fetched_at: Some(Utc::now().timestamp()),
-                        imap_session: None,
-                    });
-                }
+            let found = locked_state.iter_mut().find(|x| x.id == self.id);
+            if let Some(x) = found {
+                x.imap_session = Some(Arc::new(Mutex::new(imap_session)));
+                info!("Stored IMAP session for {}", self.email_address);
+            } else {
+                locked_state.push(EmailAccountStatus {
+                    id: self.id,
+                    mailbox_names: vec![],
+                    imap_session: Some(Arc::new(Mutex::new(imap_session))),
+                });
             }
         }
 
-        if needs_imap_session {
-            self.sync_mailboxes(db, email_account_state).await?;
-            let imap_session = self.create_imap_session(db, email_account_state).await?;
-            let mut imap_session = imap_session.lock().await;
-            let selected_mailbox = self.get_selected_mailbox(db, email_account_state).await?;
-            match imap_session.examine(&selected_mailbox.name) {
-                Ok(mailbox) => {
-                    info!(
-                        "Selected mailbox: {}, has {} messages, uid_next: {:?}, uid_validity: {:?}",
-                        selected_mailbox.name,
-                        mailbox.exists,
-                        mailbox.uid_next,
-                        mailbox.uid_validity
-                    );
-                    // TODO: If uid_validity changes then we need to (perhaps delete and) refetch all the emails
-                    // We check if we there are any new emails as per IMAP UID_NEXT
-                    let existing = Mailbox::read_one_by_pk(selected_mailbox.id, db).await?;
-                    if mailbox.uid_validity == existing.uid_validity
-                        && mailbox.uid_next == existing.uid_next
-                    {
-                        // We have no new emails
-                        info!(
-                            "Mailbox {} of email account {} has no new emails",
-                            selected_mailbox.name, self.email_address
-                        );
-                        return Err(DwataError::MailboxHasNoNewEmails);
-                    }
-                    MailboxCreateUpdate {
-                        messages: Some(mailbox.exists),
-                        uid_next: mailbox.uid_next,
-                        uid_validity: mailbox.uid_validity,
-                        ..Default::default()
-                    }
-                    .update_module_data(selected_mailbox.id, db)
-                    .await?;
-                    num_messages = mailbox.exists as usize;
-                }
-                Err(err) => {
-                    error!(
-                        "Error selecting mailbox {} (ID: {}) of email account {} - {}",
-                        selected_mailbox.name, selected_mailbox.id, self.email_address, err
-                    );
-                    return Err(DwataError::CouldNotSelectMailbox);
-                }
-            };
+        let mailbox_names = self.get_all_mailboxes(db, email_account_state).await?;
+        {
+            let mut locked_state = email_account_state.lock().await;
+            // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
+            let found = locked_state.iter_mut().find(|x| x.id == self.id);
+            if let Some(x) = found {
+                x.mailbox_names = mailbox_names.clone();
+            } else {
+                return Err(DwataError::AppStateNotFound);
+            }
         }
-
-        Ok(num_messages)
+        Ok(mailbox_names)
     }
 
-    pub async fn sync_mailboxes(
+    pub async fn get_all_mailboxes(
         &mut self,
-        db: &Pool<Sqlite>,
+        _db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
-    ) -> Result<(), DwataError> {
-        // Store all the mailboxes in Dwata DB
-        let imap_session = self.get_imap_session(db, email_account_state, true).await?;
+    ) -> Result<Vec<String>, DwataError> {
+        let imap_session = get_imap_session(self.id, email_account_state).await?;
         let mut imap_session = imap_session.lock().await;
-        let mailboxes_in_db = Mailbox::read_all(db).await?;
         match imap_session.list(None, Some("*")) {
-            Ok(mailboxes) => {
-                for mailbox in mailboxes.iter() {
-                    let mailbox_name = mailbox.name().trim().to_string();
-                    if mailboxes_in_db.len() == 0
-                        || mailboxes_in_db
-                            .iter()
-                            .find(|mb| mb.email_account_id == self.id && mb.name == mailbox_name)
-                            .is_none()
-                    {
-                        // We did not find this mailbox in Dwata DB, let's add it
-                        info!("Saving mailbox: {}", mailbox.name());
-                        MailboxCreateUpdate {
-                            email_account_id: Some(self.id),
-                            name: Some(mailbox_name.clone()),
-                            storage_path: Some(slugify(mailbox_name)),
-                            ..Default::default()
-                        }
-                        .insert_module_data(db)
-                        .await?;
-                    }
-                }
-                Ok(())
-            }
+            Ok(mailboxes) => Ok(mailboxes.iter().map(|x| x.name().to_string()).collect()),
             Err(err) => {
                 error!("Could not list mailboxes - {}", err);
                 Err(DwataError::CouldNotListMailboxes)
             }
         }
     }
+}
 
+impl Mailbox {
     pub async fn fetch_emails(
-        &mut self,
-        num_messages: usize,
+        email_account_id: i64,
+        mailbox_name: &str,
+        storage_dir: &PathBuf,
         db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
-    ) -> Result<(), DwataError> {
+    ) -> Result<Self, DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
-        info!("Fetching emails for {}", self.email_address);
-        let shared_email_uid_list = Arc::new(Mutex::new(HashSet::<u32>::new()));
-        let fetch_batch_limit = 25;
-        let mut month = 0;
-        let mut before = Utc::now().date_naive();
-
         ProcessLogCreateUpdate {
-            process: Some(ProcessInLog::CheckEmails),
-            arguments: Some(vec![("id".to_string(), self.id.to_string())]),
+            process: Some(ProcessInLog::FetchEmails),
+            arguments: Some(vec![("name".to_string(), mailbox_name.to_string())]),
             status: Some(ProcessingStatusInLog::InProgress),
             is_sent_to_frontend: Some(false),
         }
         .insert_module_data(db)
         .await?;
-        // Let's retrieve all the email Uids in the last 300 months (25 years)
-        while month < 300 {
-            month += 1;
-            let moved_imap_session = self
-                .get_imap_session(db, email_account_state, false)
-                .await?;
-            let moved_email_uid_list = shared_email_uid_list.clone();
-            let since = before - TimeDelta::weeks(4);
-            fetch_uid_list_of_emails(
-                moved_email_uid_list,
-                moved_imap_session,
-                since.format("%d-%b-%Y").to_string(),
-                before.format("%d-%b-%Y").to_string(),
-            )
-            .await;
-            before = since;
-            if num_messages > shared_email_uid_list.lock().await.len() {
-                break;
+        let mut storage_dir = storage_dir.clone();
+        storage_dir.push(slugify(mailbox_name));
+        if !storage_dir.as_path().exists() {
+            create_dir_all(storage_dir.as_path()).unwrap();
+        }
+        // Let's examine the email mailbox to check the uid_validity value below
+        let shared_imap_session = get_imap_session(email_account_id, email_account_state).await?;
+        let mailbox = {
+            let mut imap_session = shared_imap_session.lock().await;
+            match imap_session.examine(mailbox_name) {
+                Ok(mailbox) => mailbox,
+                Err(err) => {
+                    error!("Could not examine mailbox {}; Error: {}", mailbox_name, err);
+                    return Err(DwataError::CouldNotFetchEmails);
+                }
+            }
+        };
+        let all_mailboxes_in_db = Mailbox::read_all(db).await?;
+        let mailbox_in_db_opt = all_mailboxes_in_db
+            .iter()
+            .find(|x| x.email_account_id == email_account_id && x.name == mailbox_name);
+        // By default we fetch all UIDs from 0
+        let mut uid_from = 1;
+        if let Some(mailbox_in_db) = mailbox_in_db_opt {
+            if let Some(x) = mailbox_in_db.uid_next {
+                if mailbox.uid_validity == mailbox_in_db.uid_validity {
+                    // We have the same uid_validity as before, we fetch from our last uid_next
+                    uid_from = x;
+                }
             }
         }
-        info!("Finished all tasks to fetch email uids");
-        ProcessLogCreateUpdate {
-            process: Some(ProcessInLog::CheckEmails),
-            arguments: Some(vec![("id".to_string(), self.id.to_string())]),
-            status: Some(ProcessingStatusInLog::Completed),
-            is_sent_to_frontend: Some(false),
-        }
-        .insert_module_data(db)
-        .await?;
 
-        // Let's fetch the actual emails, in batches
-        let email_uid_list = shared_email_uid_list.lock().await;
+        let email_uid_list = {
+            let mut imap_session = shared_imap_session.lock().await;
+            fetch_uid_list_of_emails(
+                imap_session.deref_mut(),
+                format!("{}", uid_from),
+                "*".to_string(),
+            )
+            .await?
+        };
+        let email_uid_len = email_uid_list.len();
+
+        // Let's fetch the actual emails, in batches        let fetch_batch_limit = 25;
+        let fetch_batch_limit = 25;
         let mut fetch_email_set = JoinSet::new();
         let mut fetched_email_count = 0;
-        while fetched_email_count < email_uid_list.len() {
-            let moved_imap_session = self
-                .get_imap_session(db, email_account_state, false)
-                .await?;
-            let moved_storage_dir = self
-                .get_selected_mailbox(db, email_account_state)
-                .await?
-                .get_storage_dir(email_account_state)
-                .await?;
+
+        while fetched_email_count < email_uid_len {
+            let cloned_imap_session = shared_imap_session.clone();
+            let cloned_storage_dir = storage_dir.clone();
             // We select the next batch of email Uids to fetch
             let mut batch: Vec<u32> = vec![];
             for uid in email_uid_list
@@ -229,100 +154,67 @@ impl EmailAccount {
             if batch.len() > 0 {
                 fetched_email_count += batch.len();
                 fetch_email_set.spawn(async move {
-                    fetch_emails_for_uid_list(batch, moved_imap_session, moved_storage_dir).await;
+                    fetch_emails_for_uid_list(batch, cloned_imap_session, cloned_storage_dir).await;
                 });
             }
         }
         if fetch_email_set.len() > 0 {
             while let Some(_) = fetch_email_set.join_next().await {}
         }
+        ProcessLogCreateUpdate {
+            process: Some(ProcessInLog::FetchEmails),
+            arguments: Some(vec![("name".to_string(), mailbox_name.to_string())]),
+            status: Some(ProcessingStatusInLog::Completed),
+            is_sent_to_frontend: Some(false),
+        }
+        .insert_module_data(db)
+        .await?;
         info!("Finished all tasks to fetch emails");
 
-        let imap_session = self
-            .get_imap_session(db, email_account_state, false)
-            .await?;
-        let mut imap_session = imap_session.lock().await;
+        let mut imap_session = shared_imap_session.lock().await;
         match imap_session.logout() {
             Ok(_) => {}
             Err(err) => {
                 error!("Could not logout IMAP session - {}", err);
             }
         }
-        Ok(())
-    }
-
-    pub async fn index_emails_for_search(
-        &self,
-        storage_dir: &PathBuf,
-        db: &Pool<Sqlite>,
-        email_account_state: &EmailAccountsState,
-    ) -> Result<(), DwataError> {
-        // We index emails in Tantivy search engine
-        let mailbox = self.get_selected_mailbox(db, email_account_state).await?;
-        let emails = mailbox
-            .read_emails_from_local_storage(1000, email_account_state)
-            .await?;
-        store_emails_to_tantity(&self, &mailbox, &emails, storage_dir)?;
-
-        Ok(())
-    }
-}
-
-impl Mailbox {
-    pub async fn get_by_name(
-        email_account_id: i64,
-        name: &str,
-        db: &Pool<Sqlite>,
-    ) -> Result<Self, DwataError> {
-        let mailboxes = Mailbox::read_all(db).await?;
-        let name = name.to_lowercase();
-        mailboxes
-            .into_iter()
-            .find(|x| {
-                x.email_account_id == email_account_id && x.name.trim().to_lowercase() == name
-            })
-            .ok_or(DwataError::InvalidMailbox)
-    }
-
-    pub async fn get_storage_dir(
-        &self,
-        email_account_state: &EmailAccountsState,
-    ) -> Result<PathBuf, DwataError> {
-        // We find the storage directory for this mailbox, which is inside the EmailAccount storage directory
-        let locked_state = email_account_state.lock().await;
-        // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
-        match locked_state.iter().find(|x| x.id == self.email_account_id) {
-            Some(x) => {
-                // Create all the directories in the storage path
-                let mut storage_path = x.storage_dir.clone();
-                storage_path.push(slugify(&self.storage_path));
-                match create_dir_all(storage_path.as_path()) {
-                    Ok(_) => Ok(x.storage_dir.join(slugify(&self.storage_path))),
-                    Err(_) => Err(DwataError::CouldNotCreateLocalEmailStorage),
-                }
+        let mailbox_in_db = match mailbox_in_db_opt {
+            Some(mailbox_in_db) => {
+                let updates = MailboxCreateUpdate {
+                    uid_next: mailbox.uid_next,
+                    uid_validity: mailbox.uid_validity,
+                    ..Default::default()
+                };
+                updates.update_module_data(mailbox_in_db.id, db).await?;
+                Mailbox::read_one_by_pk(mailbox_in_db.id, db).await?
             }
-            None => Err(DwataError::AppStateNotFound),
-        }
+            None => {
+                // We store this mailbox that is not in the DB yet
+                let new_mailbox_in_db = MailboxCreateUpdate {
+                    email_account_id: Some(email_account_id),
+                    name: Some(mailbox_name.to_string()),
+                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
+                    messages: Some(mailbox.exists),
+                    uid_next: mailbox.uid_next,
+                    uid_validity: mailbox.uid_validity,
+                };
+                let response = new_mailbox_in_db.insert_module_data(db).await?;
+                Mailbox::read_one_by_pk(response.pk, db).await?
+            }
+        };
+        Ok(mailbox_in_db)
     }
 
     pub async fn read_emails_from_local_storage(
         &self,
+        skip: usize,
         limit: usize,
-        email_account_state: &EmailAccountsState,
     ) -> Result<Vec<EmailFull>, DwataError> {
         // We parse the files that are in the given email storage directory
-        // and extract Email structs.
+        // and extract EmailFull structs.
         let mut emails: Vec<EmailFull> = vec![];
-        let storage_dir = self.get_storage_dir(email_account_state).await?;
-        info!(
-            "Reading emails from local storage directory: {}",
-            self.get_storage_dir(email_account_state)
-                .await?
-                .to_str()
-                .unwrap()
-        );
         // Read all email files in the local folder
-        match read_dir(&storage_dir) {
+        match read_dir(&self.storage_path) {
             Ok(entries) => {
                 match entries
                     .map(|res| res.map(|e| e.path()))
@@ -340,7 +232,7 @@ impl Mailbox {
                         });
                         entries.reverse();
 
-                        for entry in entries.iter().take(limit) {
+                        for entry in entries.iter().skip(skip).take(limit) {
                             let path = entry.as_path();
                             if path.is_file() {
                                 // We read the file contents and parse it to extract the email
@@ -389,8 +281,7 @@ impl Mailbox {
                     Err(err) => {
                         error!(
                             "Could not read email storage directory {}\n Error: {}",
-                            storage_dir.to_string_lossy(),
-                            err
+                            self.storage_path, err
                         )
                     }
                 }
@@ -398,13 +289,31 @@ impl Mailbox {
             Err(err) => {
                 error!(
                     "Could not read email storage directory {}\n Error: {}",
-                    storage_dir.to_string_lossy(),
-                    err
+                    self.storage_path, err
                 )
             }
         }
 
         Ok(emails)
+    }
+}
+
+pub async fn get_imap_session(
+    email_account_id: i64,
+    email_account_state: &EmailAccountsState,
+) -> Result<Arc<Mutex<Session<TlsStream<TcpStream>>>>, DwataError> {
+    let session = {
+        let locked_state = email_account_state.lock().await;
+        // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
+        match locked_state.iter().find(|x| x.id == email_account_id) {
+            Some(x) => x.imap_session.clone(),
+            None => None,
+        }
+    };
+    if let Some(session) = session {
+        Ok(session.clone())
+    } else {
+        Err(DwataError::AppStateNotFound)
     }
 }
 
@@ -415,66 +324,71 @@ pub async fn fetch_and_save_emails_for_email_account(
     email_account_state: &EmailAccountsState,
 ) -> Result<(), DwataError> {
     let mut email_account = EmailAccount::read_one_by_pk(pk, db).await?;
-    // Let's work with the Sent folder
-    let num_messages = email_account
-        .prep_mailbox_for_access(
-            Mailbox::get_by_name(pk, "sent", db).await?,
-            storage_dir,
-            true,
-            db,
-            email_account_state,
-        )
-        .await?;
-    email_account
-        .fetch_emails(num_messages, db, email_account_state)
-        .await?;
-    email_account
-        .index_emails_for_search(storage_dir, db, email_account_state)
+    let mut emails_storage_dir = storage_dir.clone();
+    emails_storage_dir.push("emails");
+    emails_storage_dir.push(email_account.email_address.clone());
+
+    info!("Preparing Email account {}", email_account.email_address);
+    let mailbox_names = email_account
+        .prep_for_access(db, email_account_state)
         .await?;
 
-    // Let's work with the Inbox folder
-    let num_messages = email_account
-        .prep_mailbox_for_access(
-            Mailbox::get_by_name(pk, "inbox", db).await?,
-            storage_dir,
-            true,
+    for mailbox_name in mailbox_names {
+        let mailbox = Mailbox::fetch_emails(
+            email_account.id,
+            &mailbox_name,
+            &emails_storage_dir,
             db,
             email_account_state,
         )
         .await?;
-    email_account
-        .fetch_emails(num_messages, db, email_account_state)
-        .await?;
-    email_account
-        .index_emails_for_search(storage_dir, db, email_account_state)
-        .await?;
+        info!("Fetche emails");
+
+        let mut read_emails_count = 0;
+        loop {
+            let emails = mailbox
+                .read_emails_from_local_storage(read_emails_count as usize, 1000)
+                .await?;
+            if emails.len() > 0 {
+                store_emails_to_tantity(
+                    &email_account.email_address,
+                    &mailbox.name,
+                    &emails,
+                    storage_dir,
+                )?;
+            } else {
+                break;
+            }
+            read_emails_count += 1000;
+        }
+    }
+
     Ok(())
 }
 
 pub async fn fetch_uid_list_of_emails(
-    shared_email_uid_list: Arc<Mutex<HashSet<u32>>>,
-    shared_imap_session: Arc<Mutex<Session<TlsStream<TcpStream>>>>,
-    since_date: String,
-    before_date: String,
-) {
-    let mut email_uid_list = shared_email_uid_list.lock().await;
-    if email_uid_list.len() > 1000 {
-        // Temporarily we are limiting the number of emails to fetch to 1000
-        return;
-    }
-    let mut imap_session = shared_imap_session.lock().await;
-    match imap_session.uid_search(format!("SINCE {} BEFORE {}", since_date, before_date)) {
+    imap_session: &mut Session<TlsStream<TcpStream>>,
+    from_uid: String,
+    to_uid: String,
+) -> Result<HashSet<u32>, DwataError> {
+    match imap_session.uid_search(format!("UID {}:{}", from_uid, to_uid)) {
         Ok(data) => {
-            email_uid_list.extend(&data);
             info!(
-                "Searched email Uids SINCE {} BEFORE {}, found {} email Uids",
-                since_date,
-                before_date,
+                "Searched email UIDs from {} to {}, found {} Uids",
+                from_uid,
+                to_uid,
                 &data.len()
             );
+            Ok(data)
         }
         Err(err) => {
-            error!("(fetch_email_uid_list) Error searching for emails: {}", err);
+            error!(
+                "(fetch_uid_list_of_emails) Error searching for emails; Searched UIDs from {} to {}; Error: {}",
+                from_uid,
+                to_uid,
+                err
+            );
+            Err(DwataError::CouldNotFetchEmails)
         }
     }
 }

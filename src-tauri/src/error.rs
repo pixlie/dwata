@@ -82,7 +82,7 @@ pub enum DwataError {
     CouldNotParseEmailFile,
     CouldNotSelectMailbox,
     CouldNotListMailboxes,
-    MailboxHasNoNewEmails,
+    CouldNotFetchEmails,
 
     // Search related
     CouldNotCreateSearchIndex,

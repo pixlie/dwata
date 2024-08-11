@@ -87,7 +87,6 @@ pub enum ModuleFilters {
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum ProcessInLog {
-    CheckEmails,
     FetchEmails,
     ParseEmails,
     IndexEmails,

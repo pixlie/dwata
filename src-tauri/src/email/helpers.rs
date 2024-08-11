@@ -62,8 +62,8 @@ pub async fn parse_email_from_file(
 }
 
 pub fn store_emails_to_tantity(
-    email_account: &EmailAccount,
-    mailbox: &Mailbox,
+    email_address: &str,
+    mailbox_name: &str,
     emails: &Vec<EmailFull>,
     storage_dir: &PathBuf,
 ) -> Result<(), DwataError> {
@@ -116,7 +116,7 @@ pub fn store_emails_to_tantity(
     for email_full in emails {
         index_writer
             .add_document(doc!(
-                mailbox_facet => Facet::from(&format!("/{}/{}", email_account.email_address, mailbox.name)),
+                mailbox_facet => Facet::from(&format!("/{}/{}", email_address, mailbox_name)),
                 uid => u64::from(email_full.email.uid),
                 subject => email_full.email.subject.clone(),
                 body => email_full.body_text.clone(),

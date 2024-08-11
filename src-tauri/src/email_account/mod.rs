@@ -31,13 +31,7 @@ pub enum EmailProvider {
 
 pub struct EmailAccountStatus {
     pub id: i64,
-    // IMAP protocol and local storage related
-    pub mailbox: Mailbox,
-    pub storage_dir: PathBuf,
-    // Related to IMAP processing in dwata
-    pub last_fetched_at: Option<i64>,
-    // Which date range is being searched
-    // pub searching_date_range: Option<(NaiveDate, NaiveDate)>,
+    pub mailbox_names: Vec<String>,
     pub imap_session: Option<Arc<Mutex<Session<TlsStream<TcpStream>>>>>,
 }
 

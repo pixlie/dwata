@@ -30,8 +30,7 @@ impl EmailAccount {
     pub async fn create_imap_session(
         &mut self,
         db: &Pool<Sqlite>,
-        email_account_state: &EmailAccountsState,
-    ) -> Result<Arc<Mutex<Session<TlsStream<TcpStream>>>>, DwataError> {
+    ) -> Result<Session<TlsStream<TcpStream>>, DwataError> {
         let mut session: Option<Session<TlsStream<TcpStream>>> = None;
         match self.provider {
             EmailProvider::Gmail => {
@@ -86,45 +85,11 @@ impl EmailAccount {
         };
 
         match session {
-            Some(s) => {
-                let session = Arc::new(Mutex::new(s));
-                let mut locked_state = email_account_state.lock().await;
-                // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
-                match locked_state.iter_mut().find(|x| x.id == self.id) {
-                    Some(x) => {
-                        x.imap_session = Some(session.clone());
-                        Ok(session)
-                    }
-                    None => Err(DwataError::AppStateNotFound),
-                }
-            }
+            Some(s) => Ok(s),
             None => {
                 error!("Could not authenticate to IMAP server");
                 Err(DwataError::CouldNotAuthenticateToService)
             }
-        }
-    }
-
-    pub async fn get_imap_session(
-        &mut self,
-        db: &Pool<Sqlite>,
-        email_account_state: &EmailAccountsState,
-        create_if_not_found: bool,
-    ) -> Result<Arc<Mutex<Session<TlsStream<TcpStream>>>>, DwataError> {
-        let session = {
-            let locked_state = email_account_state.lock().await;
-            // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
-            match locked_state.iter().find(|x| x.id == self.id) {
-                Some(x) => x.imap_session.clone(),
-                None => None,
-            }
-        };
-        if let Some(session) = session {
-            Ok(session.clone())
-        } else if create_if_not_found {
-            self.create_imap_session(db, email_account_state).await
-        } else {
-            Err(DwataError::AppStateNotFound)
         }
     }
 
@@ -139,16 +104,16 @@ impl EmailAccount {
         }
     }
 
-    pub async fn get_selected_mailbox(
-        &self,
-        _db: &Pool<Sqlite>,
-        email_account_state: &EmailAccountsState,
-    ) -> Result<Mailbox, DwataError> {
-        let email_account_state = email_account_state.lock().await;
-        // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
-        match email_account_state.iter().find(|x| x.id == self.id) {
-            Some(x) => Ok(x.mailbox.clone()),
-            None => Err(DwataError::AppStateNotFound),
-        }
-    }
+    // pub async fn get_selected_mailbox(
+    //     &self,
+    //     _db: &Pool<Sqlite>,
+    //     email_account_state: &EmailAccountsState,
+    // ) -> Result<Mailbox, DwataError> {
+    //     let email_account_state = email_account_state.lock().await;
+    //     // Filter the vec of EmailAccountStatus to find the one that matches this EmailAccount
+    //     match email_account_state.iter().find(|x| x.id == self.id) {
+    //         Some(x) => Ok(x.mailbox.clone()),
+    //         None => Err(DwataError::AppStateNotFound),
+    //     }
+    // }
 }
