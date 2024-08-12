@@ -108,6 +108,7 @@ impl Mailbox {
                 }
             }
         };
+        // TODO: Change to using read_with_filter
         let all_mailboxes_in_db = Mailbox::read_all(db).await?;
         let mailbox_in_db_opt = all_mailboxes_in_db
             .iter()
@@ -171,18 +172,19 @@ impl Mailbox {
         .await?;
         info!("Finished all tasks to fetch emails");
 
-        let mut imap_session = shared_imap_session.lock().await;
-        match imap_session.logout() {
-            Ok(_) => {}
-            Err(err) => {
-                error!("Could not logout IMAP session - {}", err);
-            }
-        }
+        // let mut imap_session = shared_imap_session.lock().await;
+        // match imap_session.logout() {
+        //     Ok(_) => {}
+        //     Err(err) => {
+        //         error!("Could not logout IMAP session - {}", err);
+        //     }
+        // }
         let mailbox_in_db = match mailbox_in_db_opt {
             Some(mailbox_in_db) => {
                 let updates = MailboxCreateUpdate {
                     uid_next: mailbox.uid_next,
                     uid_validity: mailbox.uid_validity,
+                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
                     ..Default::default()
                 };
                 updates.update_module_data(mailbox_in_db.id, db).await?;
@@ -334,15 +336,26 @@ pub async fn fetch_and_save_emails_for_email_account(
         .await?;
 
     for mailbox_name in mailbox_names {
-        let mailbox = Mailbox::fetch_emails(
+        info!("Fetching emails for mailbox {}", mailbox_name);
+        let mailbox = match Mailbox::fetch_emails(
             email_account.id,
             &mailbox_name,
             &emails_storage_dir,
             db,
             email_account_state,
         )
-        .await?;
-        info!("Fetche emails");
+        .await
+        {
+            Ok(m) => m,
+            Err(err) => {
+                error!(
+                    "Could not fetch emails for mailbox {} - Error: {}",
+                    mailbox_name, err
+                );
+                continue;
+            }
+        };
+        info!("Fetched emails for mailbox {}", mailbox_name);
 
         let mut read_emails_count = 0;
         loop {
@@ -361,6 +374,7 @@ pub async fn fetch_and_save_emails_for_email_account(
             }
             read_emails_count += 1000;
         }
+        info!("Stored emails for mailbox {} to tantivy", mailbox_name);
     }
 
     Ok(())

@@ -1,5 +1,4 @@
-use super::app_state::EmailAccountsState;
-use super::{EmailAccount, EmailProvider, Mailbox};
+use super::{EmailAccount, EmailProvider};
 use crate::error::DwataError;
 use crate::oauth2::OAuth2Token;
 use crate::workspace::crud::CRUDRead;
@@ -8,8 +7,6 @@ use log::{error, info};
 use native_tls::{TlsConnector, TlsStream};
 use sqlx::{Pool, Sqlite};
 use std::net::TcpStream;
-use std::sync::Arc;
-use tokio::sync::Mutex;
 
 pub struct GmailAccount {
     email_address: String,
