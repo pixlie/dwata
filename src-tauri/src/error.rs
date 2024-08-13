@@ -83,6 +83,7 @@ pub enum DwataError {
     CouldNotSelectMailbox,
     CouldNotListMailboxes,
     CouldNotFetchEmails,
+    NoNewEmailsToFetch,
 
     // Search related
     CouldNotCreateSearchIndex,

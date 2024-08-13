@@ -113,30 +113,61 @@ impl Mailbox {
         let mailbox_in_db_opt = all_mailboxes_in_db
             .iter()
             .find(|x| x.email_account_id == email_account_id && x.name == mailbox_name);
-        // By default we fetch all UIDs from 0
-        let mut uid_from = 1;
+        let mut uid_from: i32 = 1;
         if let Some(mailbox_in_db) = mailbox_in_db_opt {
             if let Some(x) = mailbox_in_db.uid_next {
                 if mailbox.uid_validity == mailbox_in_db.uid_validity {
                     // We have the same uid_validity as before, we fetch from our last uid_next
-                    uid_from = x;
+                    uid_from = x as i32;
+                    if uid_from != 1
+                        && mailbox.uid_next.is_some()
+                        && mailbox.uid_next.unwrap() == uid_from as u32
+                    {
+                        // There are no new emails to fetch
+                        info!("No new emails to fetch");
+                        return Err(DwataError::NoNewEmailsToFetch);
+                    }
                 }
             }
         }
 
-        let email_uid_list = {
+        let email_uid_list: HashSet<u32> = {
             let mut imap_session = shared_imap_session.lock().await;
-            fetch_uid_list_of_emails(
-                imap_session.deref_mut(),
-                format!("{}", uid_from),
-                "*".to_string(),
-            )
-            .await?
+            if uid_from == 1 && mailbox.uid_next.is_some() && mailbox.uid_next.unwrap() > 1000 {
+                // We have a large uid_next, let's fetch the emails for the last 1000 Uids
+                uid_from = mailbox.uid_next.unwrap() as i32 - 1000;
+                let mut batch = 1000;
+                let mut temp: HashSet<u32> = HashSet::new();
+                while uid_from > 0 {
+                    temp.extend(
+                        fetch_uid_list_of_emails(
+                            imap_session.deref_mut(),
+                            format!("{}", uid_from + 1),
+                            format!("{}", uid_from + 1000),
+                        )
+                        .await?
+                        .iter(),
+                    );
+                    uid_from -= 1000;
+                    if uid_from < 1 && batch == 1000 {
+                        batch = uid_from + 1000 - 1;
+                        uid_from = 1;
+                    }
+                }
+                temp
+            } else {
+                fetch_uid_list_of_emails(
+                    imap_session.deref_mut(),
+                    format!("{}", uid_from),
+                    "*".to_string(),
+                )
+                .await?
+            }
         };
         let email_uid_len = email_uid_list.len();
 
-        // Let's fetch the actual emails, in batches        let fetch_batch_limit = 25;
-        let fetch_batch_limit = 25;
+        // Let's fetch the actual emails, in batches of fetch_batch_limit
+        let fetch_batch_limit = 50;
         let mut fetch_email_set = JoinSet::new();
         let mut fetched_email_count = 0;
 
@@ -170,21 +201,14 @@ impl Mailbox {
         }
         .insert_module_data(db)
         .await?;
-        info!("Finished all tasks to fetch emails");
 
-        // let mut imap_session = shared_imap_session.lock().await;
-        // match imap_session.logout() {
-        //     Ok(_) => {}
-        //     Err(err) => {
-        //         error!("Could not logout IMAP session - {}", err);
-        //     }
-        // }
         let mailbox_in_db = match mailbox_in_db_opt {
             Some(mailbox_in_db) => {
                 let updates = MailboxCreateUpdate {
+                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
+                    messages: Some(mailbox.exists),
                     uid_next: mailbox.uid_next,
                     uid_validity: mailbox.uid_validity,
-                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
                     ..Default::default()
                 };
                 updates.update_module_data(mailbox_in_db.id, db).await?;
@@ -319,7 +343,7 @@ pub async fn get_imap_session(
     }
 }
 
-pub async fn fetch_and_save_emails_for_email_account(
+pub async fn fetch_and_index_emails_for_email_account(
     pk: i64,
     storage_dir: &PathBuf,
     db: &Pool<Sqlite>,
@@ -348,10 +372,12 @@ pub async fn fetch_and_save_emails_for_email_account(
         {
             Ok(m) => m,
             Err(err) => {
-                error!(
-                    "Could not fetch emails for mailbox {} - Error: {}",
-                    mailbox_name, err
-                );
+                if !matches!(err, DwataError::NoNewEmailsToFetch) {
+                    error!(
+                        "Could not fetch emails for mailbox {} - Error: {}",
+                        mailbox_name, err
+                    );
+                }
                 continue;
             }
         };
