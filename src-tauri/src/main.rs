@@ -80,7 +80,6 @@ fn main() {
             email_account::commands::fetch_emails,
             email::commands::search_emails,
             oauth2::commands::get_oauth2_app_choice_list,
-            oauth2::commands::refetch_google_access_token,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

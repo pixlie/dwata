@@ -1,18 +1,18 @@
-use super::{Email, EmailBucket, EmailFull};
-use crate::{
-    email_account::{EmailAccount, Mailbox},
-    error::DwataError,
-};
-use chrono::DateTime;
+use super::{Email, EmailFilters, ParsedEmail, SearchedEmail};
+use crate::email_account::{EmailAccount, Mailbox};
+use crate::error::DwataError;
+use crate::workspace::crud::{CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue};
+use chrono::{DateTime, Utc};
 use log::{error, info};
 use mail_parser::MessageParser;
-use std::{collections::HashMap, fs::create_dir_all, path::PathBuf};
+use sqlx::{query_as, Execute, Pool, QueryBuilder, Sqlite};
+use std::{fs::create_dir_all, path::PathBuf};
 use tantivy::{
     collector::TopDocs,
     directory::MmapDirectory,
     doc,
     query::{AllQuery, QueryParser},
-    schema::{Facet, FacetOptions, Schema, Value, FAST, STORED, TEXT},
+    schema::{Schema, Value, FAST, STORED, TEXT},
     Index, ReloadPolicy, TantivyDocument, TantivyError,
 };
 
@@ -20,7 +20,7 @@ pub async fn parse_email_from_file(
     mailbox: &Mailbox,
     mail_uid: String,
     email_file: &[u8],
-) -> Result<EmailFull, DwataError> {
+) -> Result<ParsedEmail, DwataError> {
     match MessageParser::default().parse(email_file) {
         Some(parsed) => {
             let from = parsed.from().ok_or(DwataError::CouldNotParseEmailFile)?;
@@ -42,18 +42,17 @@ pub async fn parse_email_from_file(
                 .body_text(0)
                 .ok_or(DwataError::CouldNotParseEmailFile)?;
 
-            return Ok(EmailFull {
-                email: Email {
-                    uid: mail_uid.parse::<u32>().unwrap(),
-                    mailbox_id: mailbox.id,
-                    message_id: parsed.message_id().map(|x| x.to_string()),
-                    in_reply_to: parsed.in_reply_to().as_text().map(|x| x.to_string()),
-                    from_name: from.0,
-                    from_email: from.1,
-                    date,
-                    subject: subject.to_string(),
-                    ..Default::default()
-                },
+            return Ok(ParsedEmail {
+                uid: mail_uid.parse::<u32>().unwrap(),
+                mailbox_id: mailbox.id,
+                message_id: parsed.message_id().map(|x| x.to_string()),
+                in_reply_to: parsed.in_reply_to().as_text_list().map_or(vec![], |items| {
+                    items.iter().map(|x| x.to_string()).collect()
+                }),
+                from_name: from.0,
+                from_email: from.1,
+                date,
+                subject: subject.to_string(),
                 body_text: body_text.to_string(),
             });
         }
@@ -61,19 +60,66 @@ pub async fn parse_email_from_file(
     }
 }
 
-pub fn store_emails_to_tantity(
-    email_address: &str,
-    mailbox_name: &str,
-    emails: &Vec<EmailFull>,
+pub async fn save_emails_to_dwata_db(
+    mailbox: &Mailbox,
+    emails: &Vec<ParsedEmail>,
+    db: &Pool<Sqlite>,
+) -> Result<(), DwataError> {
+    // We store each parsed email in Dwata DB
+    let batch_size = 100;
+    let mut inserted_count = 0;
+    for email in emails.iter().skip(inserted_count).take(batch_size) {
+        let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(
+            "INSERT INTO email (uid, mailbox_id, from_email_address, date, subject, body_text, message_id, in_reply_to, created_at) VALUES "
+        );
+        query_builder.push("(");
+        query_builder.push_bind(email.uid);
+        query_builder.push(", ");
+        query_builder.push_bind(mailbox.id);
+        query_builder.push(", ");
+        query_builder.push_bind(format!("{} <{}>", email.from_name, email.from_email));
+        query_builder.push(", ");
+        query_builder.push_bind(email.date);
+        query_builder.push(", ");
+        query_builder.push_bind(email.subject.clone());
+        query_builder.push(", ");
+        query_builder.push_bind(email.body_text.clone());
+        query_builder.push(", ");
+        query_builder.push_bind(email.message_id.as_ref().map(|x| x.clone()));
+        query_builder.push(", ");
+        query_builder.push_bind(serde_json::to_string(&email.in_reply_to).unwrap());
+        query_builder.push(", ");
+        query_builder.push_bind(Utc::now());
+        // query_builder.push(", ");
+        // query_builder.push_bind(email.flag.as_ref().map(|x| x.to_string()));
+        query_builder.push(")");
+        inserted_count += 1;
+        let executable = query_builder.build();
+        let sql = &executable.sql();
+        match executable.execute(db).await {
+            Ok(_) => {}
+            Err(err) => {
+                error!(
+                    "Could not insert emails into Dwata DB - SQL: {}; error: {}",
+                    sql, err
+                );
+                return Err(DwataError::CouldNotInsertToDwataDB);
+            }
+        };
+    }
+    Ok(())
+}
+
+pub fn index_emails_in_tantity(
+    mailbox: &Mailbox,
+    emails: &Vec<Email>,
     storage_dir: &PathBuf,
 ) -> Result<(), DwataError> {
+    // We create a schema for the search index in Tantivy and then we index the emails
     let mut schema_builder = Schema::builder();
-    let mailbox_facet = schema_builder.add_facet_field("mailbox", FacetOptions::default());
-    let uid = schema_builder.add_u64_field("uid", FAST | STORED);
-    let subject = schema_builder.add_text_field("subject", TEXT | STORED);
-    let body = schema_builder.add_text_field("body", TEXT);
-    let from_name = schema_builder.add_text_field("from_name", TEXT | STORED);
-    let from_email = schema_builder.add_text_field("from_email", TEXT | STORED);
+    let email_id = schema_builder.add_i64_field("email_id", FAST | STORED);
+    let subject = schema_builder.add_text_field("subject", TEXT);
+    let body_text = schema_builder.add_text_field("body_text", TEXT);
     let schema = schema_builder.build();
 
     let mut storage_dir = storage_dir.clone();
@@ -113,28 +159,27 @@ pub fn store_emails_to_tantity(
         }
     };
     let mut index_writer = index.writer(100_000_000).unwrap();
-    for email_full in emails {
-        index_writer
-            .add_document(doc!(
-                mailbox_facet => Facet::from(&format!("/{}/{}", email_address, mailbox_name)),
-                uid => u64::from(email_full.email.uid),
-                subject => email_full.email.subject.clone(),
-                body => email_full.body_text.clone(),
-                from_name => email_full.email.from_name.clone(),
-                from_email => email_full.email.from_email.clone()
-            ))
-            .unwrap();
+    for email in emails {
+        if let Some(body) = &email.body_text {
+            index_writer
+                .add_document(doc!(
+                    email_id => mailbox.id,
+                    subject => email.subject.clone(),
+                    body_text => body.clone(),
+                ))
+                .unwrap();
+        }
     }
     index_writer.commit().unwrap();
     Ok(())
 }
 
-pub async fn search_emails_from_tantivy(
+pub async fn search_emails_in_tantivy(
     search_query: Option<String>,
     _email_account: &EmailAccount,
     _mailbox: &Mailbox,
     storage_dir: &PathBuf,
-) -> Result<Vec<Email>, DwataError> {
+) -> Result<Vec<SearchedEmail>, DwataError> {
     let mut storage_dir = storage_dir.clone();
     storage_dir.push("search_index");
     if !storage_dir.as_path().exists() {
@@ -168,17 +213,14 @@ pub async fn search_emails_from_tantivy(
     };
     let searcher = reader.searcher();
     let mut schema_builder = Schema::builder();
-    let mailbox_facet = schema_builder.add_facet_field("mailbox", FacetOptions::default());
-    let uid = schema_builder.add_u64_field("uid", FAST | STORED);
-    let subject = schema_builder.add_text_field("subject", TEXT | STORED);
-    let body = schema_builder.add_text_field("body", TEXT);
-    let from_name = schema_builder.add_text_field("from_name", TEXT | STORED);
-    let from_email = schema_builder.add_text_field("from_email", TEXT | STORED);
-    let schema = schema_builder.build();
+    let email_id = schema_builder.add_i64_field("email_id", FAST | STORED);
+    let subject = schema_builder.add_text_field("subject", TEXT);
+    let body_text = schema_builder.add_text_field("body_text", TEXT);
+    // let _schema = schema_builder.build();
 
     let query = match search_query {
         Some(query) => {
-            let query_parser = QueryParser::for_index(&index, vec![subject, body]);
+            let query_parser = QueryParser::for_index(&index, vec![subject, body_text]);
             info!("Search query {}", query);
             match query_parser.parse_query(&query) {
                 Ok(query) => query,
@@ -197,33 +239,12 @@ pub async fn search_emails_from_tantivy(
             return Err(DwataError::CouldNotSearchTheIndex);
         }
     };
-    let mut emails: Vec<Email> = vec![];
+    let mut emails: Vec<SearchedEmail> = vec![];
     for (_score, doc_address) in top_docs {
         match searcher.doc::<TantivyDocument>(doc_address) {
             Ok(doc) => {
-                emails.push(Email {
-                    uid: doc.get_first(uid).unwrap().as_u64().unwrap() as u32,
-                    mailbox_id: doc.get_first(uid).unwrap().as_u64().unwrap() as i64,
-                    from_name: doc
-                        .get_first(from_name)
-                        .unwrap()
-                        .as_str()
-                        .unwrap()
-                        .to_string(),
-                    from_email: doc
-                        .get_first(from_email)
-                        .unwrap()
-                        .as_str()
-                        .unwrap()
-                        .to_string(),
-                    // date: doc.get_first("date").unwrap().as_i64().unwrap(),
-                    subject: doc
-                        .get_first(subject)
-                        .unwrap()
-                        .as_str()
-                        .unwrap()
-                        .to_string(),
-                    ..Default::default()
+                emails.push(SearchedEmail {
+                    email_id: doc.get_first(email_id).unwrap().as_i64().unwrap(),
                 });
             }
             Err(err) => {
@@ -235,108 +256,155 @@ pub async fn search_emails_from_tantivy(
     Ok(emails)
 }
 
-async fn find_and_index_email_buckets(emails: &Vec<Email>) -> Vec<EmailBucket> {
-    // We create buckets of emails that are similar or are in a thread or belong to same sender, etc.
-    let mut buckets: Vec<EmailBucket> = vec![];
-
-    for email in emails.iter() {
-        // We are checking if this email is a reply to another email
-        // We need to do this recursively, so we keep checking the parent email until we find the root email
-        // which does not have an `in_reply_to` field
-        info!("Email: {}: {}", email.uid, email.subject);
-        let mut root_email = email;
-        let mut found_in_reply_to = false;
-        while let Some(in_reply_to) = root_email.in_reply_to.as_ref() {
-            found_in_reply_to = true;
-            root_email = match emails
-                .iter()
-                .filter(|item| item.message_id.as_ref().is_some_and(|x| x == in_reply_to))
-                .nth(0)
-            {
-                Some(x) => x,
-                None => break,
-            };
+pub async fn search_emails_in_tantity_and_dwata_db(
+    filters: EmailFilters,
+    storage_dir: &PathBuf,
+    db: &Pool<Sqlite>,
+) -> Result<Vec<Email>, DwataError> {
+    let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
+    let search_query: Option<String> = match column_names_values.find_by_name("search_query") {
+        Some(InputValue::Text(x)) => Some(x),
+        _ => None,
+    };
+    // let email_account: Option<EmailAccount>;
+    // let mailbox: Option<Mailbox> = match column_names_values.find_by_name("mailbox_id") {
+    //     Some(InputValue::ID(x)) => match Mailbox::read_one_by_pk(x, db).await {
+    //         Ok(mailbox) => {
+    //             email_account =
+    //                 match EmailAccount::read_one_by_pk(mailbox.email_account_id, db).await {
+    //                     Ok(email_account) => Some(email_account),
+    //                     Err(_) => None,
+    //                 };
+    //             Some(mailbox)
+    //         }
+    //         Err(_) => None,
+    //     },
+    //     _ => None,
+    // };
+    //     match search_emails_in_tantivy(search_query, &email_account, &mailbox, storage_dir).await {
+    //         Ok(emails) => emails,
+    //         Err(err) => return Err(err),
+    //     };
+    // let result: Vec<Email> = match query_as("SELECT * FROM email WHERE id IN (?)")
+    let result: Vec<Email> = match query_as("SELECT * FROM email ORDER BY date DESC LIMIT 100")
+        // .bind(
+        //     emails
+        //         .iter()
+        //         .map(|x| format!("{}", x.email_id))
+        //         .collect::<Vec<String>>()
+        //         .join(","),
+        // )
+        .fetch_all(db)
+        .await
+    {
+        Ok(result) => result,
+        Err(err) => {
+            error!("Could not fetch emails from Dwata DB - {}", err);
+            return Err(DwataError::CouldNotFetchEmails);
         }
-        info!(
-            "Found root email: {}: {} - {}",
-            root_email.uid,
-            root_email
-                .in_reply_to
-                .as_ref()
-                .unwrap_or(&"None".to_string()),
-            root_email.subject
-        );
-
-        if found_in_reply_to {
-            // This email is a reply to another email, let's find the root email recursively
-            // Let's find the bucket for this email
-            if let Some(bucket) = buckets
-                .iter_mut()
-                .find(|x| x.root_email_uid == Some(root_email.uid))
-            {
-                // We found the bucket, let's add this email to it
-                bucket.uid_list.push(email.uid);
-            } else {
-                // We did not find the bucket, let's create a new one
-                let mut clean_subject = root_email.subject.clone().trim().to_string();
-                // Remove "Re: " from the beginning of the subject
-                if clean_subject.starts_with("Re: ") {
-                    clean_subject = clean_subject.replace("Re: ", "");
-                }
-                if clean_subject.is_empty() {
-                    continue;
-                }
-                buckets.push(EmailBucket {
-                    root_email_uid: Some(root_email.uid),
-                    uid_list: vec![email.uid],
-                    summary: Some(clean_subject),
-                    ..Default::default()
-                });
-            }
-        };
-    }
-
-    // Let's group the emails by subject, keeping a vector of IDs for each email as value of the HashMap
-    let mut subject_buckets: HashMap<String, Vec<u32>> = HashMap::new();
-    for email in emails {
-        let mut clean_subject = email.subject.clone().trim().to_string();
-        // Remove "Re: " from the beginning of the subject
-        if clean_subject.starts_with("Re: ") {
-            clean_subject = clean_subject.replace("Re: ", "");
-        }
-        if clean_subject.is_empty() {
-            continue;
-        }
-        subject_buckets
-            .entry(clean_subject)
-            .and_modify(|x| x.push(email.uid))
-            .or_insert(vec![email.uid]);
-    }
-
-    // If we have subject buckets with count > 1, then we create a new bucket for each subject
-    // for (subject, vector) in subject_buckets {
-    //     if vector.len() > 1 {
-    //         buckets.push(EmailBucket {
-    //             root_email_id: None,
-    //             id_list_raw: vector,
-    //             summary: Some(subject.clone()),
-    //             ..Default::default()
-    //         });
-    //     }
-    // }
-
-    info!(
-        "Found {} buckets\n Subjects: {}",
-        buckets.len(),
-        buckets
-            .iter()
-            .map(|x| format!(
-                "{}: {}",
-                x.root_email_uid.as_ref().unwrap(),
-                x.summary.clone().unwrap()
-            ))
-            .collect::<Vec<String>>()
-            .join("\n")
-    );
-    buckets
+    };
+    Ok(result)
 }
+
+// async fn find_and_save_email_buckets(emails: &Vec<Email>) {
+//     // We create buckets of emails that are similar or are in a thread or belong to same sender, etc.
+//     for email in emails.iter() {
+//         // We are checking if this email is a reply to another email
+//         // We need to do this recursively, so we keep checking the parent email until we find the root email
+//         // which does not have an `in_reply_to` field
+//         info!("Email: {}: {}", email.uid, email.subject);
+//         let mut root_email = email;
+//         let mut found_in_reply_to = false;
+//         while let Some(in_reply_to) = root_email.in_reply_to.as_ref() {
+//             found_in_reply_to = true;
+//             root_email = match emails
+//                 .iter()
+//                 .filter(|item| item.message_id.as_ref().is_some_and(|x| x == in_reply_to))
+//                 .nth(0)
+//             {
+//                 Some(x) => x,
+//                 None => break,
+//             };
+//         }
+//         info!(
+//             "Found root email: {}: {} - {}",
+//             root_email.id,
+//             root_email
+//                 .in_reply_to
+//                 .as_ref()
+//                 .unwrap_or(&"None".to_string()),
+//             root_email.subject
+//         );
+
+//         if found_in_reply_to {
+//             // This email is a reply to another email, let's find the root email recursively
+//             // Let's find the bucket for this email
+//             if let Some(bucket) = buckets
+//                 .iter_mut()
+//                 .find(|x| x.root_email_uid == Some(root_email.uid))
+//             {
+//                 // We found the bucket, let's add this email to it
+//                 bucket.uid_list.push(email.uid);
+//             } else {
+//                 // We did not find the bucket, let's create a new one
+//                 let mut clean_subject = root_email.subject.clone().trim().to_string();
+//                 // Remove "Re: " from the beginning of the subject
+//                 if clean_subject.starts_with("Re: ") {
+//                     clean_subject = clean_subject.replace("Re: ", "");
+//                 }
+//                 if clean_subject.is_empty() {
+//                     continue;
+//                 }
+//                 buckets.push(EmailBucket {
+//                     root_email_uid: Some(root_email.uid),
+//                     uid_list: vec![email.uid],
+//                     summary: Some(clean_subject),
+//                     ..Default::default()
+//                 });
+//             }
+//         };
+//     }
+
+//     // Let's group the emails by subject, keeping a vector of IDs for each email as value of the HashMap
+//     let mut subject_buckets: HashMap<String, Vec<u32>> = HashMap::new();
+//     for email in emails {
+//         let mut clean_subject = email.subject.clone().trim().to_string();
+//         // Remove "Re: " from the beginning of the subject
+//         if clean_subject.starts_with("Re: ") {
+//             clean_subject = clean_subject.replace("Re: ", "");
+//         }
+//         if clean_subject.is_empty() {
+//             continue;
+//         }
+//         subject_buckets
+//             .entry(clean_subject)
+//             .and_modify(|x| x.push(email.uid))
+//             .or_insert(vec![email.uid]);
+//     }
+
+//     If we have subject buckets with count > 1, then we create a new bucket for each subject
+//     for (subject, vector) in subject_buckets {
+//         if vector.len() > 1 {
+//             buckets.push(EmailBucket {
+//                 root_email_id: None,
+//                 id_list_raw: vector,
+//                 summary: Some(subject.clone()),
+//                 ..Default::default()
+//             });
+//         }
+//     }
+
+//     info!(
+//         "Found {} buckets\n Subjects: {}",
+//         buckets.len(),
+//         buckets
+//             .iter()
+//             .map(|x| format!(
+//                 "{}: {}",
+//                 x.root_email_uid.as_ref().unwrap(),
+//                 x.summary.clone().unwrap()
+//             ))
+//             .collect::<Vec<String>>()
+//             .join("\n")
+//     );
+// }

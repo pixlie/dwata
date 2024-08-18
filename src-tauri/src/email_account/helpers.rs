@@ -1,7 +1,9 @@
 use super::{app_state::EmailAccountsState, EmailAccount};
 use super::{EmailAccountStatus, Mailbox};
-use crate::email::helpers::{parse_email_from_file, store_emails_to_tantity};
-use crate::email::EmailFull;
+use crate::email::helpers::{
+    index_emails_in_tantity, parse_email_from_file, save_emails_to_dwata_db,
+};
+use crate::email::{Email, ParsedEmail};
 use crate::email_account::MailboxCreateUpdate;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
@@ -10,9 +12,9 @@ use imap::Session;
 use log::{error, info};
 use native_tls::TlsStream;
 use slug::slugify;
-use sqlx::{Pool, Sqlite};
+use sqlx::{query_as, Pool, Sqlite};
 use std::collections::HashSet;
-use std::fs::{create_dir_all, read_dir, File};
+use std::fs::{create_dir_all, read_dir, remove_dir_all, File};
 use std::io::{self, Read};
 use std::net::TcpStream;
 use std::ops::DerefMut;
@@ -81,7 +83,7 @@ impl Mailbox {
         storage_dir: &PathBuf,
         db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
-    ) -> Result<Self, DwataError> {
+    ) -> Result<i64, DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
         ProcessLogCreateUpdate {
             process: Some(ProcessInLog::FetchEmails),
@@ -125,7 +127,7 @@ impl Mailbox {
                     {
                         // There are no new emails to fetch
                         info!("No new emails to fetch");
-                        return Err(DwataError::NoNewEmailsToFetch);
+                        return Ok(mailbox_in_db.id);
                     }
                 }
             }
@@ -202,43 +204,44 @@ impl Mailbox {
         .insert_module_data(db)
         .await?;
 
-        let mailbox_in_db = match mailbox_in_db_opt {
+        let mailbox_id = match mailbox_in_db_opt {
             Some(mailbox_in_db) => {
                 let updates = MailboxCreateUpdate {
-                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
+                    storage_path: Some(storage_dir.to_string_lossy().to_string()),
                     messages: Some(mailbox.exists),
                     uid_next: mailbox.uid_next,
                     uid_validity: mailbox.uid_validity,
                     ..Default::default()
                 };
                 updates.update_module_data(mailbox_in_db.id, db).await?;
-                Mailbox::read_one_by_pk(mailbox_in_db.id, db).await?
+                mailbox_in_db.id
             }
             None => {
                 // We store this mailbox that is not in the DB yet
                 let new_mailbox_in_db = MailboxCreateUpdate {
                     email_account_id: Some(email_account_id),
                     name: Some(mailbox_name.to_string()),
-                    storage_path: Some(format!("{}", storage_dir.to_string_lossy())),
+                    storage_path: Some(storage_dir.to_string_lossy().to_string()),
                     messages: Some(mailbox.exists),
                     uid_next: mailbox.uid_next,
                     uid_validity: mailbox.uid_validity,
+                    ..Default::default()
                 };
                 let response = new_mailbox_in_db.insert_module_data(db).await?;
-                Mailbox::read_one_by_pk(response.pk, db).await?
+                response.pk
             }
         };
-        Ok(mailbox_in_db)
+        Ok(mailbox_id)
     }
 
     pub async fn read_emails_from_local_storage(
         &self,
         skip: usize,
         limit: usize,
-    ) -> Result<Vec<EmailFull>, DwataError> {
+    ) -> Result<Vec<ParsedEmail>, DwataError> {
         // We parse the files that are in the given email storage directory
-        // and extract EmailFull structs.
-        let mut emails: Vec<EmailFull> = vec![];
+        // and extract ParsedEmail structs.
+        let mut emails = vec![];
         // Read all email files in the local folder
         match read_dir(&self.storage_path) {
             Ok(entries) => {
@@ -360,8 +363,14 @@ pub async fn fetch_and_index_emails_for_email_account(
         .await?;
 
     for mailbox_name in mailbox_names {
+        if mailbox_name.to_lowercase().contains("all mail")
+            || mailbox_name.to_lowercase().contains("all email")
+        {
+            // We skip the "All Mail" or "All Email" mailboxes
+            continue;
+        }
         info!("Fetching emails for mailbox {}", mailbox_name);
-        let mailbox = match Mailbox::fetch_emails(
+        let mailbox_id = match Mailbox::fetch_emails(
             email_account.id,
             &mailbox_name,
             &emails_storage_dir,
@@ -370,31 +379,61 @@ pub async fn fetch_and_index_emails_for_email_account(
         )
         .await
         {
-            Ok(m) => m,
+            Ok(x) => x,
             Err(err) => {
-                if !matches!(err, DwataError::NoNewEmailsToFetch) {
-                    error!(
-                        "Could not fetch emails for mailbox {} - Error: {}",
-                        mailbox_name, err
-                    );
-                }
+                error!(
+                    "Could not fetch emails for mailbox {} - error: {}",
+                    mailbox_name, err
+                );
                 continue;
             }
         };
-        info!("Fetched emails for mailbox {}", mailbox_name);
 
         let mut read_emails_count = 0;
         loop {
+            let mailbox = Mailbox::read_one_by_pk(mailbox_id, db).await?;
             let emails = mailbox
                 .read_emails_from_local_storage(read_emails_count as usize, 1000)
                 .await?;
+            let last_email_uid = match emails.last() {
+                Some(x) => x.uid,
+                None => 0,
+            };
+            let first_email_uid = match emails.first() {
+                Some(x) => x.uid,
+                None => 0,
+            };
             if emails.len() > 0 {
-                store_emails_to_tantity(
-                    &email_account.email_address,
-                    &mailbox.name,
-                    &emails,
-                    storage_dir,
-                )?;
+                if mailbox.last_saved_email_uid.is_none()
+                    || mailbox.last_saved_email_uid < mailbox.uid_next
+                {
+                    save_emails_to_dwata_db(&mailbox, &emails, db).await?;
+                    let update_last_saved_email_id = MailboxCreateUpdate {
+                        last_saved_email_uid: Some(last_email_uid),
+                        ..Default::default()
+                    };
+                    update_last_saved_email_id
+                        .update_module_data(mailbox_id, db)
+                        .await?;
+                    // Fetch all the email objects from Dwata DB that we saved in the previous step
+                    let newly_saved_emails: Vec<Email> = query_as(
+                        "SELECT * FROM email WHERE mailbox_id = ? AND uid >= ? AND uid <= ?",
+                    )
+                    .bind(mailbox.id)
+                    .bind(first_email_uid)
+                    .bind(last_email_uid)
+                    .fetch_all(db)
+                    .await?;
+                    delete_emails_index_in_tantivy(storage_dir).unwrap();
+                    index_emails_in_tantity(&mailbox, &newly_saved_emails, storage_dir)?;
+                    let update_last_indexed_email_id = MailboxCreateUpdate {
+                        last_indexed_email_uid: Some(last_email_uid),
+                        ..Default::default()
+                    };
+                    update_last_indexed_email_id
+                        .update_module_data(mailbox_id, db)
+                        .await?;
+                }
             } else {
                 break;
             }
@@ -403,6 +442,15 @@ pub async fn fetch_and_index_emails_for_email_account(
         info!("Stored emails for mailbox {} to tantivy", mailbox_name);
     }
 
+    Ok(())
+}
+
+pub fn delete_emails_index_in_tantivy(storage_dir: &PathBuf) -> Result<(), DwataError> {
+    let mut storage_dir = storage_dir.clone();
+    storage_dir.push("search_index");
+    if storage_dir.as_path().exists() {
+        remove_dir_all(storage_dir.as_path()).unwrap();
+    }
     Ok(())
 }
 
@@ -475,7 +523,3 @@ pub async fn fetch_emails_for_uid_list(
         Err(e) => error!("Error Fetching email 1: {}", e),
     };
 }
-
-// pub async fn save_emails_to_db(email_batch: Vec<u32>, app: AppHandle) {
-//     let mut db_guard = db.lock().await;
-// }

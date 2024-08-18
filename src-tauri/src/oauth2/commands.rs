@@ -16,14 +16,3 @@ pub async fn get_oauth2_app_choice_list(
         .map(|x| (format!("{}", x.id), format!("{}", x.provider.to_string())))
         .collect())
 }
-
-#[tauri::command]
-pub async fn refetch_google_access_token(
-    pk: i64,
-    db: State<'_, Pool<Sqlite>>,
-) -> Result<(), DwataError> {
-    let db = db.deref();
-    let mut oauth2_token: OAuth2Token = OAuth2Token::read_one_by_pk(pk, db).await?;
-    oauth2_token.refetch_google_access_token(db).await?;
-    Ok(())
-}

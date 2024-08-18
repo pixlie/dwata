@@ -1,12 +1,13 @@
 use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox, MailboxCreateUpdate};
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
-use crate::oauth2::{OAuth2Token, OAuth2TokenCreateUpdate};
+use crate::oauth2::helpers::get_google_oauth2_tokens;
+use crate::oauth2::{OAuth2App, OAuth2Token, OAuth2TokenCreateUpdate};
 use crate::workspace::crud::{
     CRUDCreateUpdate, CRUDRead, InputValue, InsertUpdateResponse, VecColumnNameValue,
 };
 use chrono::Utc;
-use sqlx::{Pool, Sqlite};
+use sqlx::{query_as, Pool, Sqlite};
 use std::str::FromStr;
 
 impl CRUDRead for EmailAccount {
@@ -56,13 +57,46 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
             if self.oauth2_app_id.is_none() {
                 return Err(DwataError::CouldNotFindOAuth2Config);
             }
-            let oauth2_token_id = OAuth2TokenCreateUpdate {
-                oauth2_app_id: Some(self.oauth2_app_id.unwrap()),
-                ..Default::default()
-            }
-            .insert_module_data(db)
-            .await?
-            .pk;
+            let oauth2_app_id = self.oauth2_app_id.unwrap();
+            let sql = "SELECT * FROM oauth2_app WHERE id = ?";
+            let oauth2_app: OAuth2App = query_as(sql).bind(oauth2_app_id).fetch_one(db).await?;
+            let oauth2_response = get_google_oauth2_tokens(
+                oauth2_app.client_id.clone(),
+                oauth2_app.client_secret.as_ref().unwrap().clone(),
+            )
+            .await?;
+            // We check if there is an existing OAuth2 token for this OAuth2 app and identifier combination
+            let oauth2_token_id = match OAuth2Token::read_all(db).await?.iter().find(|token| {
+                token.oauth2_app_id == oauth2_app_id
+                    && token.identifier == oauth2_response.identifier
+                    && token.handle == oauth2_response.handle
+            }) {
+                Some(oauth2_token) => {
+                    // We already have an OAuth2 token for this combination, let's update it
+                    let updated = OAuth2TokenCreateUpdate {
+                        refresh_token: oauth2_response.refresh_token.clone(),
+                        access_token: Some(oauth2_response.access_token.clone()),
+                        ..Default::default()
+                    };
+                    updated.update_module_data(oauth2_token.id, db).await?;
+                    oauth2_token.id
+                }
+                None => {
+                    // We did not find an existing OAuth2 token for this combination, let's create a new one
+                    let oauth2_token_id = OAuth2TokenCreateUpdate {
+                        authorization_code: Some(oauth2_response.authorization_code.clone()),
+                        oauth2_app_id: Some(oauth2_app_id),
+                        refresh_token: oauth2_response.refresh_token.clone(),
+                        access_token: Some(oauth2_response.access_token.clone()),
+                        identifier: Some(oauth2_response.identifier.clone()),
+                        handle: oauth2_response.handle.clone(),
+                    }
+                    .insert_module_data(db)
+                    .await?
+                    .pk;
+                    oauth2_token_id
+                }
+            };
             match OAuth2Token::read_one_by_pk(oauth2_token_id, db).await {
                 Ok(oauth2_token) => {
                     name_values.push_name_value("oauth2_token_id", InputValue::ID(oauth2_token.id));
@@ -126,6 +160,12 @@ impl CRUDCreateUpdate for MailboxCreateUpdate {
         }
         if let Some(x) = &self.uid_validity {
             names_values.push_name_value("uid_validity", InputValue::ID(i64::from(*x)));
+        }
+        if let Some(x) = &self.last_saved_email_uid {
+            names_values.push_name_value("last_saved_email_uid", InputValue::ID(i64::from(*x)));
+        }
+        if let Some(x) = &self.last_indexed_email_uid {
+            names_values.push_name_value("last_indexed_email_uid", InputValue::ID(i64::from(*x)));
         }
 
         names_values.push_name_value("created_at", InputValue::DateTime(Utc::now()));

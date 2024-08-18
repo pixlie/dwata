@@ -1,11 +1,7 @@
-use super::helpers::search_emails_from_tantivy;
+use super::helpers::search_emails_in_tantity_and_dwata_db;
 use crate::{
-    email_account::{EmailAccount, Mailbox},
     error::DwataError,
-    workspace::{
-        crud::{CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue},
-        ModuleDataReadList, ModuleFilters,
-    },
+    workspace::{ModuleDataReadList, ModuleFilters},
 };
 use log::error;
 use sqlx::{Pool, Sqlite};
@@ -19,32 +15,14 @@ pub async fn search_emails(
     db: State<'_, Pool<Sqlite>>,
 ) -> Result<ModuleDataReadList, DwataError> {
     match filters {
-        ModuleFilters::Email(x) => {
-            let column_names_values: VecColumnNameValue = x.get_column_names_values_to_filter();
-            let mailbox_id = match column_names_values.find_by_name("mailbox_id") {
-                Some(InputValue::ID(x)) => x,
-                _ => return Err(DwataError::InvalidMailbox),
-            };
-            let db = db.deref();
-            let mailbox: Mailbox = Mailbox::read_one_by_pk(mailbox_id, db).await?;
-            let search_query: Option<String> =
-                match column_names_values.find_by_name("search_query") {
-                    Some(InputValue::Text(x)) => Some(x),
-                    _ => None,
-                };
-            let email_account: EmailAccount =
-                EmailAccount::read_one_by_pk(mailbox.email_account_id, db).await?;
-            match search_emails_from_tantivy(
-                search_query,
-                &email_account,
-                &mailbox,
+        ModuleFilters::Email(filters) => {
+            let result = search_emails_in_tantity_and_dwata_db(
+                filters,
                 &app.path().app_data_dir().unwrap(),
+                db.deref(),
             )
-            .await
-            {
-                Ok(emails) => Ok(ModuleDataReadList::Email(emails)),
-                Err(err) => Err(err),
-            }
+            .await?;
+            Ok(ModuleDataReadList::Email(result))
         }
         _ => {
             error!("Invalid module {}", filters.to_string());

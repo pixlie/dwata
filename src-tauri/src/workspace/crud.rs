@@ -276,11 +276,13 @@ pub trait CRUDCreateUpdate {
         let sql = &executable.sql();
         match executable.execute(db).await {
             Ok(result) => {
-                info!(
-                    "Inserted into Dwata DB, table {}:\nSQL: {}",
-                    Self::table_name(),
-                    sql
-                );
+                if Self::table_name() != "process_log" {
+                    info!(
+                        "Inserted into Dwata DB, table {}:\nSQL: {}",
+                        Self::table_name(),
+                        sql
+                    );
+                }
                 self.post_insert(
                     InsertUpdateResponse {
                         pk: result.last_insert_rowid(),

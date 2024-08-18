@@ -72,12 +72,32 @@ pub struct Mailbox {
     #[ts(type = "number")]
     pub email_account_id: i64,
     pub name: String,
+
     #[ts(skip)]
+    #[serde(skip)]
     pub storage_path: String,
 
+    // Total number of messages in this mailbox as per IMAP server
+    #[ts(skip)]
+    #[serde(skip)]
     messages: Option<u32>,
+    // The stored uid_next value is the last email we have fetched from this mailbox
+    #[ts(skip)]
+    #[serde(skip)]
     uid_next: Option<u32>,
+    #[ts(skip)]
+    #[serde(skip)]
     uid_validity: Option<u32>,
+
+    // We have saved emails till this id in Dwata DB
+    #[ts(skip)]
+    #[serde(skip)]
+    last_saved_email_uid: Option<u32>,
+
+    // We have indexed emails till this id in our search index
+    #[ts(skip)]
+    #[serde(skip)]
+    last_indexed_email_uid: Option<u32>,
 }
 
 #[derive(Default)]
@@ -88,4 +108,6 @@ pub struct MailboxCreateUpdate {
     pub messages: Option<u32>,
     pub uid_next: Option<u32>,
     pub uid_validity: Option<u32>,
+    pub last_saved_email_uid: Option<u32>,
+    pub last_indexed_email_uid: Option<u32>,
 }

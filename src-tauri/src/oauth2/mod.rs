@@ -77,9 +77,12 @@ pub struct OAuth2AppCreateUpdate {
 
 #[derive(Default)]
 pub struct OAuth2TokenCreateUpdate {
+    pub authorization_code: Option<String>,
     pub oauth2_app_id: Option<i64>,
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,
+    pub identifier: Option<String>,
+    pub handle: Option<String>,
 }
 
 pub struct Oauth2APIResponse {
@@ -147,6 +150,7 @@ impl OAuth2Token {
                     oauth2_app_id: Some(self.id),
                     refresh_token: x.refresh_token().map(|x| x.secret().clone()),
                     access_token: Some(x.access_token().secret().to_string()),
+                    ..Default::default()
                 };
                 updated.update_module_data(oauth2_token.id, db).await?;
             }
@@ -172,6 +176,7 @@ impl OAuth2Token {
                             oauth2_app_id: Some(self.id),
                             refresh_token: x.refresh_token().map(|x| x.secret().clone()),
                             access_token: Some(x.access_token().secret().to_string()),
+                            ..Default::default()
                         };
                         updated.update_module_data(self.id, db).await?;
                     }
