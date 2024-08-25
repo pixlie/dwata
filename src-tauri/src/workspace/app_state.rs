@@ -17,7 +17,6 @@ pub async fn get_database_connection(
     }
     path.push("dwata.sqlite3");
     let db_path = path.to_str().unwrap();
-    info!("Path to Dwata DB: {}", db_path);
     if !Sqlite::database_exists(db_path).await? {
         info!("Could not find existing Dwata DB, creating");
         Sqlite::create_database(db_path).await?;

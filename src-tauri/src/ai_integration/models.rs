@@ -87,8 +87,8 @@ impl AIModel {
             ai_provider: Some(self.ai_provider.to_string()),
             ..Default::default()
         };
-        match AIIntegration::read_with_filter(filters, db).await {
-            Ok(results) => match results.into_iter().nth(0) {
+        match AIIntegration::read_with_filter(filters, 25, 0, db).await {
+            Ok((results, _total_items)) => match results.into_iter().nth(0) {
                 Some(x) => Ok(x),
                 None => {
                     error!("Could not find AI Integration");

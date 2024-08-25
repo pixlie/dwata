@@ -66,37 +66,42 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
             )
             .await?;
             // We check if there is an existing OAuth2 token for this OAuth2 app and identifier combination
-            let oauth2_token_id = match OAuth2Token::read_all(db).await?.iter().find(|token| {
-                token.oauth2_app_id == oauth2_app_id
-                    && token.identifier == oauth2_response.identifier
-                    && token.handle == oauth2_response.handle
-            }) {
-                Some(oauth2_token) => {
-                    // We already have an OAuth2 token for this combination, let's update it
-                    let updated = OAuth2TokenCreateUpdate {
-                        refresh_token: oauth2_response.refresh_token.clone(),
-                        access_token: Some(oauth2_response.access_token.clone()),
-                        ..Default::default()
-                    };
-                    updated.update_module_data(oauth2_token.id, db).await?;
-                    oauth2_token.id
-                }
-                None => {
-                    // We did not find an existing OAuth2 token for this combination, let's create a new one
-                    let oauth2_token_id = OAuth2TokenCreateUpdate {
-                        authorization_code: Some(oauth2_response.authorization_code.clone()),
-                        oauth2_app_id: Some(oauth2_app_id),
-                        refresh_token: oauth2_response.refresh_token.clone(),
-                        access_token: Some(oauth2_response.access_token.clone()),
-                        identifier: Some(oauth2_response.identifier.clone()),
-                        handle: oauth2_response.handle.clone(),
-                    }
-                    .insert_module_data(db)
+            let oauth2_token_id =
+                match OAuth2Token::read_all(25, 0, db)
                     .await?
-                    .pk;
-                    oauth2_token_id
-                }
-            };
+                    .0
+                    .iter()
+                    .find(|token| {
+                        token.oauth2_app_id == oauth2_app_id
+                            && token.identifier == oauth2_response.identifier
+                            && token.handle == oauth2_response.handle
+                    }) {
+                    Some(oauth2_token) => {
+                        // We already have an OAuth2 token for this combination, let's update it
+                        let updated = OAuth2TokenCreateUpdate {
+                            refresh_token: oauth2_response.refresh_token.clone(),
+                            access_token: Some(oauth2_response.access_token.clone()),
+                            ..Default::default()
+                        };
+                        updated.update_module_data(oauth2_token.id, db).await?;
+                        oauth2_token.id
+                    }
+                    None => {
+                        // We did not find an existing OAuth2 token for this combination, let's create a new one
+                        let oauth2_token_id = OAuth2TokenCreateUpdate {
+                            authorization_code: Some(oauth2_response.authorization_code.clone()),
+                            oauth2_app_id: Some(oauth2_app_id),
+                            refresh_token: oauth2_response.refresh_token.clone(),
+                            access_token: Some(oauth2_response.access_token.clone()),
+                            identifier: Some(oauth2_response.identifier.clone()),
+                            handle: oauth2_response.handle.clone(),
+                        }
+                        .insert_module_data(db)
+                        .await?
+                        .pk;
+                        oauth2_token_id
+                    }
+                };
             match OAuth2Token::read_one_by_pk(oauth2_token_id, db).await {
                 Ok(oauth2_token) => {
                     name_values.push_name_value("oauth2_token_id", InputValue::ID(oauth2_token.id));

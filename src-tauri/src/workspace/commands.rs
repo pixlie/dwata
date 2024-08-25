@@ -1,7 +1,8 @@
 use super::{
     api::{NextStep, Writable},
     crud::{CRUDCreateUpdate, InsertUpdateResponse},
-    {Module, ModuleDataCreateUpdate, ModuleDataRead, ModuleDataReadList, ModuleFilters},
+    Module, ModuleDataCreateUpdate, ModuleDataList, ModuleDataRead, ModuleDataReadList,
+    ModuleFilters,
 };
 use crate::ai_integration::AIIntegration;
 use crate::database_source::DatabaseSource;
@@ -13,7 +14,7 @@ use crate::user_account::UserAccount;
 use crate::workspace::crud::CRUDRead;
 use crate::{chat::Chat, email_account::Mailbox};
 use log::error;
-use sqlx::{Pool, Sqlite};
+use sqlx::{FromRow, Pool, Sqlite};
 use std::ops::Deref;
 use tauri::State;
 
@@ -79,59 +80,89 @@ pub async fn module_insert_or_update_next_step(
 #[tauri::command]
 pub async fn read_row_list_for_module(
     module: Module,
+    limit: Option<usize>,
+    offset: Option<usize>,
     db: State<'_, Pool<Sqlite>>,
 ) -> Result<ModuleDataReadList, DwataError> {
     let db = db.deref();
-    match module {
-        Module::UserAccount => UserAccount::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::UserAccount(result))),
-        Module::DirectorySource => DirectorySource::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::DirectorySource(result))),
-        Module::DatabaseSource => DatabaseSource::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::DatabaseSource(result))),
-        Module::AIIntegration => AIIntegration::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
-        Module::Chat => Chat::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
-        Module::OAuth2App => OAuth2App::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::OAuth2App(result))),
-        Module::EmailAccount => EmailAccount::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::EmailAccount(result))),
-        Module::Mailbox => Mailbox::read_all(db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::Mailbox(result))),
+    let limit = limit.unwrap_or(25);
+    let offset = offset.unwrap_or(0);
+    let (data, total_items) = match module {
+        Module::UserAccount => {
+            let (rows, total_items) = UserAccount::read_all(limit, offset, db).await?;
+            (ModuleDataList::UserAccount(rows), total_items)
+        }
+        Module::DirectorySource => {
+            let (rows, total_items) = DirectorySource::read_all(limit, offset, db).await?;
+            (ModuleDataList::DirectorySource(rows), total_items)
+        }
+        Module::DatabaseSource => {
+            let (rows, total_items) = DatabaseSource::read_all(limit, offset, db).await?;
+            (ModuleDataList::DatabaseSource(rows), total_items)
+        }
+        Module::AIIntegration => {
+            let (rows, total_items) = AIIntegration::read_all(limit, offset, db).await?;
+            (ModuleDataList::AIIntegration(rows), total_items)
+        }
+        Module::Chat => {
+            let (rows, total_items) = Chat::read_all(limit, offset, db).await?;
+            (ModuleDataList::Chat(rows), total_items)
+        }
+        Module::OAuth2App => {
+            let (rows, total_items) = OAuth2App::read_all(limit, offset, db).await?;
+            (ModuleDataList::OAuth2App(rows), total_items)
+        }
+        Module::EmailAccount => {
+            let (rows, total_items) = EmailAccount::read_all(limit, offset, db).await?;
+            (ModuleDataList::EmailAccount(rows), total_items)
+        }
+        Module::Mailbox => {
+            let (rows, total_items) = Mailbox::read_all(limit, offset, db).await?;
+            (ModuleDataList::Mailbox(rows), total_items)
+        }
         _ => {
             error!("Invalid module {}", module.to_string());
-            Err(DwataError::ModuleNotFound)
+            return Err(DwataError::ModuleNotFound);
         }
-    }
+    };
+    Ok(ModuleDataReadList {
+        total_items,
+        limit,
+        offset,
+        data,
+    })
 }
 
 #[tauri::command]
 pub async fn read_row_list_for_module_with_filter(
     filters: ModuleFilters,
+    limit: Option<usize>,
+    offset: Option<usize>,
     db: State<'_, Pool<Sqlite>>,
 ) -> Result<ModuleDataReadList, DwataError> {
     let db = db.deref();
-    match filters {
-        ModuleFilters::AIIntegration(x) => AIIntegration::read_with_filter(x, db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::AIIntegration(result))),
-        ModuleFilters::Chat(x) => Chat::read_with_filter(x, db)
-            .await
-            .and_then(|result| Ok(ModuleDataReadList::Chat(result))),
+    let limit = limit.unwrap_or(25);
+    let offset = offset.unwrap_or(0);
+    let (data, total_items) = match filters {
+        ModuleFilters::AIIntegration(x) => {
+            let (rows, total_items) = AIIntegration::read_with_filter(x, limit, offset, db).await?;
+            (ModuleDataList::AIIntegration(rows), total_items)
+        }
+        ModuleFilters::Chat(x) => {
+            let (rows, total_items) = Chat::read_with_filter(x, limit, offset, db).await?;
+            (ModuleDataList::Chat(rows), total_items)
+        }
         _ => {
             error!("Invalid module {}", filters.to_string());
-            Err(DwataError::ModuleNotFound)
+            return Err(DwataError::ModuleNotFound);
         }
-    }
+    };
+    Ok(ModuleDataReadList {
+        total_items,
+        limit,
+        offset,
+        data,
+    })
 }
 
 #[tauri::command]

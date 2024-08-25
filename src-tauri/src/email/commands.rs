@@ -1,7 +1,7 @@
 use super::helpers::search_emails_in_tantity_and_dwata_db;
 use crate::{
     error::DwataError,
-    workspace::{ModuleDataReadList, ModuleFilters},
+    workspace::{ModuleDataList, ModuleDataReadList, ModuleFilters},
 };
 use log::error;
 use sqlx::{Pool, Sqlite};
@@ -11,18 +11,29 @@ use tauri::{AppHandle, Manager, State};
 #[tauri::command]
 pub async fn search_emails(
     filters: ModuleFilters,
+    limit: Option<usize>,
+    offset: Option<usize>,
     app: AppHandle,
     db: State<'_, Pool<Sqlite>>,
 ) -> Result<ModuleDataReadList, DwataError> {
+    let limit = limit.unwrap_or(25);
+    let offset = offset.unwrap_or(0);
     match filters {
         ModuleFilters::Email(filters) => {
-            let result = search_emails_in_tantity_and_dwata_db(
+            let (result, total_items) = search_emails_in_tantity_and_dwata_db(
                 filters,
+                limit,
+                offset,
                 &app.path().app_data_dir().unwrap(),
                 db.deref(),
             )
             .await?;
-            Ok(ModuleDataReadList::Email(result))
+            Ok(ModuleDataReadList {
+                total_items,
+                limit,
+                offset,
+                data: ModuleDataList::Email(result),
+            })
         }
         _ => {
             error!("Invalid module {}", filters.to_string());

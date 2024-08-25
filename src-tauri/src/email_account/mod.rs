@@ -4,7 +4,6 @@ use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, Type};
 use std::net::TcpStream;
-use std::path::PathBuf;
 use std::sync::Arc;
 use strum::{Display, EnumString};
 use tokio::sync::Mutex;
@@ -98,6 +97,9 @@ pub struct Mailbox {
     #[ts(skip)]
     #[serde(skip)]
     last_indexed_email_uid: Option<u32>,
+    // #[ts(skip)]
+    // #[serde(skip)]
+    // last_contact_processed_email_uid: Option<u32>,
 }
 
 #[derive(Default)]

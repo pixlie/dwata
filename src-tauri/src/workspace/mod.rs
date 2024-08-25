@@ -47,9 +47,19 @@ pub enum ModuleDataRead {
 }
 
 #[derive(Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase")]
+pub struct ModuleDataReadList {
+    pub total_items: usize,
+    pub limit: usize,
+    pub offset: usize,
+    pub data: ModuleDataList,
+}
+
+#[derive(Serialize, TS)]
 #[serde(tag = "type", content = "data")]
 #[ts(export)]
-pub enum ModuleDataReadList {
+pub enum ModuleDataList {
     UserAccount(Vec<UserAccount>),
     DirectorySource(Vec<DirectorySource>),
     DatabaseSource(Vec<DatabaseSource>),

@@ -1,6 +1,6 @@
 use super::Oauth2APIResponse;
 use crate::error::DwataError;
-use log::error;
+use log::{error, info};
 use oauth2::reqwest::async_http_client;
 use oauth2::{basic::BasicClient, TokenResponse};
 use oauth2::{
@@ -103,7 +103,10 @@ pub async fn get_google_oauth2_tokens(
     let (code, _state) = {
         // A very naive implementation of the redirect server.
         let listener = match TcpListener::bind("127.0.0.1:8080") {
-            Ok(listener) => listener,
+            Ok(listener) => {
+                info!("get_google_oauth2_tokens: Listening for OAuth2 redirect");
+                listener
+            }
             Err(err) => {
                 error!("Could not bind to localhost:8080 - error: {}", err);
                 return Err(DwataError::CouldNotStartAuthResponseServer);

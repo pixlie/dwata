@@ -111,7 +111,7 @@ impl Mailbox {
             }
         };
         // TODO: Change to using read_with_filter
-        let all_mailboxes_in_db = Mailbox::read_all(db).await?;
+        let (all_mailboxes_in_db, _) = Mailbox::read_all(200, 0, db).await?;
         let mailbox_in_db_opt = all_mailboxes_in_db
             .iter()
             .find(|x| x.email_account_id == email_account_id && x.name == mailbox_name);
@@ -134,8 +134,17 @@ impl Mailbox {
         }
 
         let email_uid_list: HashSet<u32> = {
-            let mut imap_session = shared_imap_session.lock().await;
-            if uid_from == 1 && mailbox.uid_next.is_some() && mailbox.uid_next.unwrap() > 1000 {
+            if mailbox.exists == 0 {
+                HashSet::new()
+            } else if uid_from == 1
+                && mailbox.uid_next.is_some()
+                && mailbox.uid_next.unwrap() > 1000
+            {
+                info!(
+                    "Fetching emails for large uid_next {}",
+                    mailbox.uid_next.unwrap()
+                );
+                let mut imap_session = shared_imap_session.lock().await;
                 // We have a large uid_next, let's fetch the emails for the last 1000 Uids
                 uid_from = mailbox.uid_next.unwrap() as i32 - 1000;
                 let mut batch = 1000;
@@ -158,6 +167,7 @@ impl Mailbox {
                 }
                 temp
             } else {
+                let mut imap_session = shared_imap_session.lock().await;
                 fetch_uid_list_of_emails(
                     imap_session.deref_mut(),
                     format!("{}", uid_from),
@@ -185,8 +195,14 @@ impl Mailbox {
             {
                 batch.push(*uid);
             }
+            fetched_email_count += batch.len();
+            // For the batch of email UIDs, we check if the file exists locally
+            // We filter out these existing emails from the batch
+            batch = batch
+                .into_iter()
+                .filter(|uid| !storage_dir.clone().join(uid.to_string()).as_path().exists())
+                .collect();
             if batch.len() > 0 {
-                fetched_email_count += batch.len();
                 fetch_email_set.spawn(async move {
                     fetch_emails_for_uid_list(batch, cloned_imap_session, cloned_storage_dir).await;
                 });
@@ -365,8 +381,10 @@ pub async fn fetch_and_index_emails_for_email_account(
     for mailbox_name in mailbox_names {
         if mailbox_name.to_lowercase().contains("all mail")
             || mailbox_name.to_lowercase().contains("all email")
+            || mailbox_name.to_lowercase().contains("spam")
+            || mailbox_name.to_lowercase().contains("trash")
         {
-            // We skip the "All Mail" or "All Email" mailboxes
+            // We skip mailboxes that are named "All Mail", "All Email", "Spam", "Trash" etc.
             continue;
         }
         info!("Fetching emails for mailbox {}", mailbox_name);

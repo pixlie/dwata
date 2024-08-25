@@ -42,8 +42,13 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         .path()
         .resolve("migrations/", BaseDirectory::Resource)
         .unwrap();
+    let app_data_dir = app.path().app_data_dir().unwrap();
+    info!(
+        "Storage directory for dwata: {}",
+        app_data_dir.to_str().unwrap()
+    );
     match tauri::async_runtime::block_on(async {
-        get_database_connection(&app.path().app_data_dir().unwrap(), migrations_dir).await
+        get_database_connection(&app_data_dir, migrations_dir).await
     }) {
         Ok(db_connection) => {
             app.manage(db_connection);

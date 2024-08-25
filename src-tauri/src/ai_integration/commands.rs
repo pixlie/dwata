@@ -21,7 +21,7 @@ pub async fn get_ai_model_choice_list(
         result.extend(AIModel::get_all_models().await);
     } else {
         // We load all the AI providers that are usable
-        let ai_integrations: Vec<AIIntegration> = AIIntegration::read_all(db.deref()).await?;
+        let (ai_integrations, _total_items) = AIIntegration::read_all(25, 0, db.deref()).await?;
         for ai_integration in ai_integrations {
             match ai_integration.ai_provider {
                 AIProvider::OpenAI => result.extend(AIModel::get_models_for_openai()),

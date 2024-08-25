@@ -67,11 +67,13 @@ pub async fn generate_text_for_chat(
     }
 
     // Get all the chats in this thread
-    chats = Chat::read_with_filter(
+    (chats, _) = Chat::read_with_filter(
         ChatFilters {
             root_chat_id: Some(root_chat.id),
             ..Default::default()
         },
+        25,
+        0,
         db,
     )
     .await?;

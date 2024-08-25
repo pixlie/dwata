@@ -1,4 +1,4 @@
-use super::ModuleFilters;
+use super::{ModuleDataReadList, ModuleFilters};
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use chrono::{DateTime, Utc};
@@ -6,7 +6,7 @@ use log::{error, info};
 use serde::Serialize;
 use serde_json::Value;
 use sqlx::sqlite::SqliteRow;
-use sqlx::{query_as, Execute, FromRow, Pool, QueryBuilder, Sqlite};
+use sqlx::{query_as, query_scalar, Execute, FromRow, Pool, QueryBuilder, Sqlite};
 use ts_rs::TS;
 
 pub trait CRUDRead {
@@ -16,14 +16,23 @@ pub trait CRUDRead {
         None
     }
 
-    async fn read_all_helper(db: &Pool<Sqlite>) -> Result<Vec<Self>, DwataError>
+    async fn read_all_helper(
+        limit: usize,
+        offset: usize,
+        db: &Pool<Sqlite>,
+    ) -> Result<(Vec<Self>, usize), DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
     {
-        match query_as(&format!("SELECT * FROM {}", Self::table_name()))
-            .fetch_all(db)
-            .await
+        match query_as(&format!(
+            "SELECT * FROM {} LIMIT {} OFFSET {}",
+            Self::table_name(),
+            limit,
+            offset
+        ))
+        .fetch_all(db)
+        .await
         {
             Ok(result) => {
                 info!(
@@ -31,7 +40,23 @@ pub trait CRUDRead {
                     result.len(),
                     Self::table_name()
                 );
-                Ok(result)
+                // Let's find the total number of rows
+                let count: i64 =
+                    match query_scalar(&format!("SELECT COUNT(*) FROM {}", Self::table_name()))
+                        .fetch_one(db)
+                        .await
+                    {
+                        Ok(x) => x,
+                        Err(err) => {
+                            error!(
+                                "Could not fetch count from Dwata DB, table {} - Error: {}",
+                                Self::table_name(),
+                                err
+                            );
+                            return Err(DwataError::CouldNotFetchRowsFromDwataDB);
+                        }
+                    };
+                Ok((result, count as usize))
             }
             Err(err) => {
                 error!(
@@ -44,7 +69,11 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_all(db: &Pool<Sqlite>) -> Result<Vec<Self>, DwataError>
+    async fn read_all(
+        limit: usize,
+        offset: usize,
+        db: &Pool<Sqlite>,
+    ) -> Result<(Vec<Self>, usize), DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
@@ -53,14 +82,16 @@ pub trait CRUDRead {
         let default_filters = Self::set_default_filters();
         match default_filters {
             Some(filters) => match filters {
-                ModuleFilters::AIIntegration(x) => Self::read_with_filter_helper(x, db).await,
-                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, db).await,
+                ModuleFilters::AIIntegration(x) => {
+                    Self::read_with_filter_helper(x, limit, offset, db).await
+                }
+                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, limit, offset, db).await,
                 _ => {
                     error!("Invalid module {}", filters.to_string());
                     Err(DwataError::ModuleNotFound)
                 }
             },
-            None => Self::read_all_helper(db).await,
+            None => Self::read_all_helper(limit, offset, db).await,
         }
     }
 
@@ -98,8 +129,10 @@ pub trait CRUDRead {
 
     async fn read_with_filter_helper<T>(
         filters: T,
+        limit: usize,
+        offset: usize,
         db: &Pool<Sqlite>,
-    ) -> Result<Vec<Self>, DwataError>
+    ) -> Result<(Vec<Self>, usize), DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
@@ -107,41 +140,58 @@ pub trait CRUDRead {
     {
         let mut builder: QueryBuilder<Sqlite> =
             QueryBuilder::new(format!("SELECT * FROM {} WHERE ", Self::table_name()));
+        // This QueryBuilder is used to count the number of rows, without using LIMIT and OFFSET in the same query
+        let mut count_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+            "SELECT COUNT(*) FROM {} WHERE ",
+            Self::table_name()
+        ));
         let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
-        let mut count = 0;
-        let limit = column_names_values.0.len();
+        let mut pushed_names_values = 0;
+        let len_names_values = column_names_values.0.len();
         for (name, data) in column_names_values.0 {
             match data {
                 InputValue::Null => {
                     builder.push(format!("{} IS null", name));
+                    count_builder.push(format!("{} IS null", name));
                 }
                 _ => {
                     builder.push(format!("{} = ", name));
+                    count_builder.push(format!("{} = ", name));
                     match data {
                         InputValue::Text(x) => {
                             builder.push_bind(x.clone());
+                            count_builder.push_bind(x.clone());
                         }
                         InputValue::ID(x) => {
                             builder.push_bind(x);
+                            count_builder.push_bind(x);
                         }
                         InputValue::Bool(x) => {
                             builder.push_bind(x);
+                            count_builder.push_bind(x);
                         }
                         InputValue::Json(x) => {
-                            builder.push_bind(x);
+                            builder.push_bind(x.clone());
+                            count_builder.push_bind(x);
                         }
                         InputValue::DateTime(x) => {
                             builder.push_bind(x);
+                            count_builder.push_bind(x);
                         }
                         _ => {}
                     }
                 }
             }
-            count += 1;
-            if count < limit {
+            pushed_names_values += 1;
+            if pushed_names_values < len_names_values {
                 builder.push(" AND ");
+                count_builder.push(" AND ");
             }
         }
+        builder.push(" LIMIT ");
+        builder.push_bind(limit as i64);
+        builder.push(" OFFSET ");
+        builder.push_bind(offset as i64);
         let executable = builder.build_query_as();
         let sql = &executable.sql();
         match executable.fetch_all(db).await {
@@ -151,11 +201,22 @@ pub trait CRUDRead {
                     rows.len(),
                     Self::table_name(),
                 );
-                Ok(rows)
+                let count: i64 = match count_builder.build_query_scalar().fetch_one(db).await {
+                    Ok(x) => x,
+                    Err(err) => {
+                        error!(
+                            "Could not fetch count from Dwata DB, table {} - Error: {}",
+                            Self::table_name(),
+                            err
+                        );
+                        return Err(DwataError::CouldNotFetchRowsFromDwataDB);
+                    }
+                };
+                Ok((rows, count as usize))
             }
             Err(err) => {
                 error!(
-                    "Could not fetch rows from Dwata DB, table {}.\nSQL: {}\nError: {}",
+                    "Could not fetch rows from Dwata DB, table {} - SQL: {}\nError: {}",
                     Self::table_name(),
                     sql,
                     err
@@ -165,13 +226,18 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_with_filter<T>(filters: T, db: &Pool<Sqlite>) -> Result<Vec<Self>, DwataError>
+    async fn read_with_filter<T>(
+        filters: T,
+        limit: usize,
+        offset: usize,
+        db: &Pool<Sqlite>,
+    ) -> Result<(Vec<Self>, usize), DwataError>
     where
         Self: Sized + Send + Unpin,
         for<'r> Self: FromRow<'r, SqliteRow>,
         T: CRUDReadFilter,
     {
-        Self::read_with_filter_helper(filters, db).await
+        Self::read_with_filter_helper(filters, limit, offset, db).await
     }
 }
 

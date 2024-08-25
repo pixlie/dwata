@@ -5,13 +5,13 @@ use crate::workspace::crud::{CRUDRead, CRUDReadFilter, InputValue, VecColumnName
 use chrono::{DateTime, Utc};
 use log::{error, info};
 use mail_parser::MessageParser;
-use sqlx::{query_as, Execute, Pool, QueryBuilder, Sqlite};
+use sqlx::{Execute, Pool, QueryBuilder, Sqlite};
 use std::{fs::create_dir_all, path::PathBuf};
 use tantivy::{
     collector::TopDocs,
     directory::MmapDirectory,
     doc,
-    query::{AllQuery, QueryParser},
+    query::QueryParser,
     schema::{Schema, Value, FAST, STORED, TEXT},
     Index, ReloadPolicy, TantivyDocument, TantivyError,
 };
@@ -99,6 +99,10 @@ pub async fn save_emails_to_dwata_db(
         match executable.execute(db).await {
             Ok(_) => {}
             Err(err) => {
+                // If the error is due to email already in the DB, then we ignore it
+                if err.to_string().contains("UNIQUE constraint failed") {
+                    continue;
+                }
                 error!(
                     "Could not insert emails into Dwata DB - SQL: {}; error: {}",
                     sql, err
@@ -175,9 +179,8 @@ pub fn index_emails_in_tantity(
 }
 
 pub async fn search_emails_in_tantivy(
-    search_query: Option<String>,
-    _email_account: &EmailAccount,
-    _mailbox: &Mailbox,
+    search_query: String,
+    _email_account_id: Option<i64>,
     storage_dir: &PathBuf,
 ) -> Result<Vec<SearchedEmail>, DwataError> {
     let mut storage_dir = storage_dir.clone();
@@ -218,19 +221,14 @@ pub async fn search_emails_in_tantivy(
     let body_text = schema_builder.add_text_field("body_text", TEXT);
     // let _schema = schema_builder.build();
 
-    let query = match search_query {
-        Some(query) => {
-            let query_parser = QueryParser::for_index(&index, vec![subject, body_text]);
-            info!("Search query {}", query);
-            match query_parser.parse_query(&query) {
-                Ok(query) => query,
-                Err(err) => {
-                    error!("Could not parse query\nError: {}", err);
-                    return Err(DwataError::CouldNotParseSearchQuery);
-                }
-            }
+    let query_parser = QueryParser::for_index(&index, vec![subject, body_text]);
+    info!("Search query {}", search_query);
+    let query = match query_parser.parse_query(&search_query) {
+        Ok(query) => query,
+        Err(err) => {
+            error!("Could not parse query\nError: {}", err);
+            return Err(DwataError::CouldNotParseSearchQuery);
         }
-        None => Box::new(AllQuery),
     };
     let top_docs = match searcher.search(&query, &TopDocs::with_limit(100)) {
         Ok(top_docs) => top_docs,
@@ -258,53 +256,92 @@ pub async fn search_emails_in_tantivy(
 
 pub async fn search_emails_in_tantity_and_dwata_db(
     filters: EmailFilters,
+    limit: usize,
+    offset: usize,
     storage_dir: &PathBuf,
     db: &Pool<Sqlite>,
-) -> Result<Vec<Email>, DwataError> {
+) -> Result<(Vec<Email>, usize), DwataError> {
     let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
-    let search_query: Option<String> = match column_names_values.find_by_name("search_query") {
-        Some(InputValue::Text(x)) => Some(x),
+    let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT * FROM email");
+    let mut count_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT COUNT(*) FROM email");
+    let mut where_clause = false;
+    let email_account_id = match column_names_values.find_by_name("email_account_id") {
+        Some(InputValue::ID(x)) => {
+            where_clause = true;
+            query_builder
+                .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
+            count_builder
+                .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
+            query_builder.push_bind(x);
+            count_builder.push_bind(x);
+            Some(x)
+        }
         _ => None,
     };
-    // let email_account: Option<EmailAccount>;
-    // let mailbox: Option<Mailbox> = match column_names_values.find_by_name("mailbox_id") {
-    //     Some(InputValue::ID(x)) => match Mailbox::read_one_by_pk(x, db).await {
-    //         Ok(mailbox) => {
-    //             email_account =
-    //                 match EmailAccount::read_one_by_pk(mailbox.email_account_id, db).await {
-    //                     Ok(email_account) => Some(email_account),
-    //                     Err(_) => None,
-    //                 };
-    //             Some(mailbox)
-    //         }
-    //         Err(_) => None,
-    //     },
-    //     _ => None,
-    // };
-    //     match search_emails_in_tantivy(search_query, &email_account, &mailbox, storage_dir).await {
-    //         Ok(emails) => emails,
-    //         Err(err) => return Err(err),
-    //     };
-    // let result: Vec<Email> = match query_as("SELECT * FROM email WHERE id IN (?)")
-    let result: Vec<Email> = match query_as("SELECT * FROM email ORDER BY date DESC LIMIT 100")
-        // .bind(
-        //     emails
-        //         .iter()
-        //         .map(|x| format!("{}", x.email_id))
-        //         .collect::<Vec<String>>()
-        //         .join(","),
-        // )
-        .fetch_all(db)
-        .await
-    {
-        Ok(result) => result,
+    match column_names_values.find_by_name("search_query") {
+        Some(InputValue::Text(x)) => {
+            match search_emails_in_tantivy(x, email_account_id, storage_dir).await {
+                Ok(emails) => {
+                    if where_clause {
+                        query_builder.push(" AND id IN (?)");
+                        count_builder.push(" AND id IN (?)");
+                    } else {
+                        where_clause = true;
+                        query_builder.push(" WHERE id IN (?)");
+                        count_builder.push(" WHERE id IN (?)");
+                    }
+                    query_builder.push_bind(
+                        emails
+                            .iter()
+                            .map(|x| x.email_id.to_string())
+                            .collect::<Vec<_>>()
+                            .join(","),
+                    );
+                }
+                Err(err) => return Err(err),
+            };
+        }
+        _ => {}
+    };
+    query_builder.push(format!(
+        " ORDER BY date DESC LIMIT {} OFFSET {}",
+        limit, offset
+    ));
+    count_builder.push(" ORDER BY date DESC");
+    match query_builder.build_query_as().fetch_all(db).await {
+        Ok(mut result) => {
+            // We select first 200 characters of the body text for each email
+            result.iter_mut().for_each(|x: &mut Email| {
+                if let Some(body) = &x.body_text {
+                    x.body_text = Some(body.clone().chars().take(400).collect::<String>());
+                }
+            });
+            let count = match count_builder
+                .build_query_scalar::<i64>()
+                .fetch_one(db)
+                .await
+            {
+                Ok(x) => x as usize,
+                Err(err) => {
+                    error!("Could not fetch count of emails from Dwata DB - {}", err);
+                    return Err(DwataError::CouldNotFetchRowsFromDwataDB);
+                }
+            };
+            Ok((result, count))
+        }
         Err(err) => {
             error!("Could not fetch emails from Dwata DB - {}", err);
-            return Err(DwataError::CouldNotFetchEmails);
+            Err(DwataError::CouldNotFetchEmails)
         }
-    };
-    Ok(result)
+    }
 }
+
+// async fn find_and_save_contacts(email_account_id: i64, db: &Pool<Sqlite>) {
+//     let sql = "SELECT DISTINCT from_email_address FROM email WHERE
+//        mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?) AND
+//        from_contact_id IS NULL";
+
+// }
 
 // async fn find_and_save_email_buckets(emails: &Vec<Email>) {
 //     // We create buckets of emails that are similar or are in a thread or belong to same sender, etc.

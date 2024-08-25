@@ -63,8 +63,8 @@ impl EmailAccount {
         // else we add a hidden field with the OAuth2 app ID
         match email_provider {
             EmailProvider::Gmail => {
-                match OAuth2App::read_all(db).await {
-                    Ok(oauth2_apps) => {
+                match OAuth2App::read_all(25, 0, db).await {
+                    Ok((oauth2_apps, _)) => {
                         // Check if we have only one OAuth2 app for this provider
                         let mut apps_iter = oauth2_apps
                             .iter()

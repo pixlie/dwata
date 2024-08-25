@@ -80,7 +80,7 @@ pub struct SearchedEmail {
 #[ts(export, rename_all = "camelCase")]
 pub struct EmailFilters {
     #[ts(type = "number")]
-    pub mailbox_id: Option<i64>,
+    pub email_account_id: Option<i64>,
     // pub from_name: Option<String>,
     // pub from_email: Option<String>,
     // #[ts(type = "number")]
