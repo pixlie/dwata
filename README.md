@@ -1,6 +1,9 @@
 # dwata
 
-## AI assisted app for our private data
+## Your personal assistant
+One app for your emails, calendars, files, Slack, LinkedIn and much more. Blazing fast search, offline access for unlimited email accounts.
+
+Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
 
 > [!WARNING]
 >
@@ -8,9 +11,9 @@
 
 ## Living with emails, calendars, files, Slack, LinkedIn...?
 
-Getting everything in one place, searching across all emails/documents, keeping track of new updates, delegating information... can take up a lot of our daily time.
+Getting everything in one place, searching across mutliple accounts, keeping track of todos, delegating information with others can all take up a lot of our daily time. Some days we are on top of our digital life, while on other days they drag us down.
 
-Some days we are on top of our digital footprint, while on other days they seem to drag us down. If you relate to these:
+If you relate to these:
 
 - Do you keep multiple open browser tabs for your digital life?
 - Do you struggle to search across all private data in one place?
