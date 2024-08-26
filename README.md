@@ -1,7 +1,7 @@
 # dwata
 
-## Your personal assistant
-One app for your emails, calendars, files, Slack, LinkedIn and much more. Blazing fast search, offline access for unlimited email accounts.
+## Communications: managed
+One app for your emails, calendars, files, Slack, LinkedIn and much more. Blazing fast search, offline access for unlimited accounts.
 
 Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
 
@@ -9,7 +9,7 @@ Open source and runs on your laptop for complete privacy. dwata **does not** sen
 >
 > dwata is in a very early stage of development.
 
-## Living with emails, calendars, files, Slack, LinkedIn...?
+## Emails, files, Slack... a thousand paper cuts
 
 Getting everything in one place, searching across mutliple accounts, keeping track of todos, delegating information with others can all take up a lot of our daily time. Some days we are on top of our digital life, while on other days they drag us down.
 

@@ -6,12 +6,12 @@ import { Astronav, MenuItems, MenuIcon } from "astro-navbar";
 
 const menuitems = [
   {
-    title: "Features",
-    path: "#",
+    title: "Download",
+    path: "/download",
     children: [
-      { title: "Multi AI chat", path: "#chat" },
-      { title: "Comparison", path: "#compare" },
-      { title: "Tasks and Calendar (coming soon)", path: "#tasks" },
+      // { title: "Multi AI chat", path: "#chat" },
+      // { title: "Comparison", path: "#compare" },
+      // { title: "Tasks and Calendar (coming soon)", path: "#tasks" },
     ],
   },
   {
@@ -20,7 +20,7 @@ const menuitems = [
   },
   {
     title: "Source",
-    path: "https://github.com/brainless/dwata",
+    path: "https://github.com/pixlie/dwata",
   },
 ];
 ---
@@ -41,21 +41,19 @@ const menuitems = [
           {
             menuitems.map((item, index) => (
               <>
-                {item.children && (
+                {!!item.children && item.children.length ? (
                   <Dropdown
                     title={item.title}
                     children={item.children}
                     lastItem={index === menuitems.length - 1}
                   />
-                )}
-
-                {!item.children && (
+                ) : (
                   <li>
                     <a
                       href={item.path}
                       class="flex lg:px-3 py-2 items-center text-gray-600 hover:text-gray-900">
                       <span> {item.title}</span>
-                      {item.badge && (
+                      {"badge" in item && (
                         <span class="ml-1 px-2 py-0.5 text-[10px] animate-pulse font-semibold uppercase text-white bg-indigo-600 rounded-full">
                           New
                         </span>
