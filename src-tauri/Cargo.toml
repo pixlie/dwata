@@ -20,7 +20,7 @@ tauri = { version = "2.0.0-beta.20", features = [] }
 tauri-plugin-shell = "2.0.0-alpha"
 csv = "1.3.0"
 serde = { version = "1.0.196", features = ["derive"] }
-sqlx = { version = "0.7.3", features = [
+sqlx = { version = "0.8.1", features = [
     "runtime-tokio",
     "tls-native-tls",
     "postgres",
