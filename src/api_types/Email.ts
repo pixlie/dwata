@@ -3,9 +3,13 @@
 export type Email = {
   id: number;
   uid: number;
-  fromName: string;
-  fromEmail: string;
-  date: bigint;
+  mailboxId: number;
+  fromEmailAddress: string;
+  fromContactId: number;
+  date: number;
   subject: string;
-  bodyText: string;
+  bodyText: string | null;
+  messageId: string | null;
+  inReplyTo: Array<string>;
+  parentEmailId: number;
 };

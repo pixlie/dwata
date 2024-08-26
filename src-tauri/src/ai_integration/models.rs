@@ -1,11 +1,10 @@
-use std::collections::HashSet;
-use std::default::Default;
-
 use chrono::{DateTime, Utc};
 use log::error;
 use reqwest;
 use serde::{Deserialize, Serialize};
-use sqlx::SqliteConnection;
+use sqlx::{Pool, Sqlite};
+use std::collections::HashSet;
+use std::default::Default;
 use ts_rs::TS;
 use url::Url;
 
@@ -83,16 +82,13 @@ impl AIModel {
         Ok(model)
     }
 
-    pub async fn get_integration(
-        &self,
-        db_connection: &mut SqliteConnection,
-    ) -> Result<AIIntegration, DwataError> {
+    pub async fn get_integration(&self, db: &Pool<Sqlite>) -> Result<AIIntegration, DwataError> {
         let filters = AIIntegrationFilters {
             ai_provider: Some(self.ai_provider.to_string()),
             ..Default::default()
         };
-        match AIIntegration::read_with_filter(filters, db_connection).await {
-            Ok(results) => match results.into_iter().nth(0) {
+        match AIIntegration::read_with_filter(filters, 25, 0, db).await {
+            Ok((results, _total_items)) => match results.into_iter().nth(0) {
                 Some(x) => Ok(x),
                 None => {
                     error!("Could not find AI Integration");

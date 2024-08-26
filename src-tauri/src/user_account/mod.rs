@@ -11,6 +11,7 @@ pub mod crud;
 #[ts(export, rename_all = "camelCase")]
 pub struct UserAccount {
     // First user, with ID one is used as default user
+    #[ts(type = "number")]
     pub id: i64,
     pub first_name: String,
     pub last_name: Option<String>,

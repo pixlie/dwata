@@ -1,72 +1,80 @@
 # dwata
 
-#### A general purpose, multi-model and multi-modal AI studio
+## AI assisted app for our private data
 
 > [!WARNING]
 >
 > dwata is in a very early stage of development.
-> At this moment only basic chat with large language models is available.
-> Please feel free to check Projects or Issues on GitHub for this project to get an idea of the status of development.
 
-## What does dwata solve?
+## Living with emails, calendars, files, Slack, LinkedIn...?
 
-Let us imagine regular tasks or problems in our daily lives. How to market our website, manage our finances better or even coming up with gift suggestions. Really it could be any daily topic where we need a sounding board or an organiser.
+Getting everything in one place, searching across all emails/documents, keeping track of new updates, delegating information... can take up a lot of our daily time.
 
-![Recent chats with AI models](docs/assets/List_chat_with_response_0.1.0.png?raw=true "Recent chats with AI models")
+Some days we are on top of our digital footprint, while on other days they seem to drag us down. If you relate to these:
 
-In dwata, we can have a chat with AI (Artificial Intelligence), mainly Large Language Models. We break the problem into small chunks. The AI model(s) can ask for further information (access to website, emails, financial details, business database...). We try to come to some insight, actional item(s), a reminder or set of future tasks to tackle the original problem. That's it. It is your personal assistant.
+- Do you keep multiple open browser tabs for your digital life?
+- Do you struggle to search across all private data in one place?
+- Do you travel often and need offline access to your data?
+- Do you share multiple inboxes with partner or colleagues?
+- Would you like some help in organising emails, files - like auto labelling folders?
+- Would you like someone to check what emails need to be shared with your partner or co-founder so they are updated?
+- And many more on these lines...
 
-![Start a chat with any AI model](docs/assets/Start_chat_0.1.0.png?raw=true "Start a chat with any AI model")
+Then dwata is for you.
 
-## Want to try out dwata?
+## How does dwata work?
 
-> [!NOTICE]
+dwata is an open source desktop app that gathers all your private data on to your laptop, manages them for you according to your workflow:
+
+- Offline access to all stored data
+- Blazing fast search on all documents (email, attachments, files, calendar...)
+- Shows up contacts, events, tasks and much more from your data
+- Will soon connect to Slack, Shopify, Stripe, LinkedIn and many others
+- Can read from databases like MySQL, PostgreSQL...
+- Uses AI to label documents, get summary of documents (email threads)
+
+## Why should I trust dwata?
+
+Good question. I am Sumit, founder of dwata and I am building dwata with my best intentions to make sure our daily lives have less cognitive overhead.
+
+In order to make sure that you can trust dwata, it is completely open source. dwata does not have any hidden telemetry - sends no data to my company (Pixlie, in India) without your explicit permission. All product analytics is stored inside dwata and is sent only after you see and confirm.
+
+I take your privacy very seriously. I do not even have OAuth2 apps for Google to access your data - you have to create those yourself (there is documentation in the app).
+
+AI providers can be run locally if you want to avoid hosted providers like OpenAI, Anthropic, etc.
+
+## How do I install dwata?
+
+> [!WARNING]
 >
-> Since dwata is being updated almost daily, I am not releasing binary versions of the desktop app.
-> If you are comfortable setting up Node.js and Rust on your computer, then you can easily setup and run dwata.
+> Please keep in mind that dwata is in a very early stage of development and there may be bugs.
 
-[Setup dwata from sources](./docs/SETUP.md)
+- [Install dwata on your computer](./docs/INSTALL.md)
+- [Compile dwata from sources](./docs/SETUP.md)
 
-## What does general purpose mean?
+## What AI providers can I use?
 
-dwata is not geared toward any specific type of problem. It it built around the fact that recent AI models have become really good at comprehending human language. It is a new interface to the computer.
+If you want to use hosted AI providers with your own API keys you can use these:
 
-In dwata, we start chats on any daily topic that needs our attention. Then we (explicitly) give access to our data to be shared with AI. dwata helps in reading data from many different sources and making it easy to be shared with AI. dwata helps in figuring out the steps that an AI may want us to take, say access further data, set a calendar reminder or run a piece of code.
+- [OpenAI](https://platform.openai.com/docs/models)
+- [Groq](https://console.groq.com/docs/models)
+- [Anthropic](https://www.anthropic.com/product) - coming soon
 
-Therefore, dwata does not focus on a type of problem and should be able to behave as an assistant to our day to day issues.
+If you want to run AI models on your computer (support for cloud run coming soon) you can use these:
 
-## What AI models can I connect to?
-
-dwata is a multi-model app, which means it supports (or will support) connecting to AI models from these providers:
-
-- [OpenAI](https://platform.openai.com/docs/models) - GPT-40, GPT-4, GPT-4 Turbo, GPT-3.5 Turbo, ...
-- [Groq](https://console.groq.com/docs/models) - Llama 3, LlaMA2-70b, Mixtral-8x7b, ...
-- [Ollama](https://ollama.com/library) - Llama 3, Llama 2, Mistral, Phi-2 Gemma, ...
-- [Anthropic](https://www.anthropic.com/product) - Claude 3, ...
-
-## What is multi-modal?
-
-dwata is being built to have chats that include any type of "content", like text, code (like JavaScript/Python), image (photo of a product for example), audio (speech to text for example) or even video (detect objects or even video creation). These content can be both input to AI or output from AI.
-
-## What is an AI studio?
-
-A studio here means that dwata is a general purpose software that allows mixing different questions, data and AI to accomplish our daily goals. We can save these as workflows and share with others. Thereby we can enable others to make AI based assistants easily.
+- [Ollama](https://ollama.com/library)
+- [Llamafile](https://github.com/Mozilla-Ocho/llamafile)
 
 ## What data sources can (will) dwata connect to?
 
 dwata will be able to read data from:
 
+- Receive emails with IMAP (tested with Gmail, Proton Mail)
 - Databases like PostgreSQL, MySQL or MongoDB
 - SaaS products like Stripe or Shopify (API or CSV)
 - Your own custom software (CSV or API)
 - CSV files/folders
 - Email (IMAP)
-
-## Can I compare chat from different models?
-
-Yes! In dwata, you start a chat thread with an AI model. Then you can go into the thread and select to `compare` to any number of other models.
-
-dwata will have a side by side view mode for this where your interactions are sent directly to all selected models in compare mode.
 
 ## Does dwata send any of my private/business data to your company?
 
@@ -76,8 +84,10 @@ dwata will send basic product usage analytics and error reports to our company s
 
 ## How will dwata make money?
 
-Private collaboration: the desktop app is and will remain free (both in source code and price).
+dwata is completely free to use. You may add as much data as your computer can handle.
 
-If you want to collaborate and work privately with your team, then you will have to take a subscription (pricing should start at USD 60 per user per year).
+_Please remember that you pay for your AI model usage costs yourself (OpenAI, Anthropic, Groq, etc)_
 
-Please remember that you pay for your AI model usage costs yourself (OpenAI, Anthropic, Groq, etc).
+**Pro version**: I will create a pro version of dwata that will have features which will need a license (pricing will come after this is available). License check will be made once a day with an API request (with your permission). Source code of the app will remain under an open source license.
+
+**Team collaboration**: If you want to collaborate and share data privately with others, then you will have to purchase a subscription (pricing will come after this is available). Data shared will use encryption while in transmission.

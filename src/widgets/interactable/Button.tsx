@@ -31,7 +31,7 @@ const Button: Component<IPropTypes> = (props) => {
 
   const buttonClasses =
     getSizeClass() +
-    " rounded-md select-none cursor-pointer hover:shadow-lg " +
+    " rounded-md select-none cursor-pointer hover:shadow " +
     `${props.isBlock ? "w-full" : ""}`;
   const styles = {
     color: getColors().colors["button.foreground"],
