@@ -1,6 +1,6 @@
 # dwata
 
-#### AI enabled app for all our data
+## AI assisted app for our private data
 
 > [!WARNING]
 >
@@ -8,12 +8,12 @@
 
 ## Living with emails, calendars, files, Slack, LinkedIn...?
 
-Getting everything in one place, searching across all emails/documents, keeping track of new updates to emails/documents can take up a lot of our daily time.
+Getting everything in one place, searching across all emails/documents, keeping track of new updates, delegating information... can take up a lot of our daily time.
 
-Sometimes we are on top of our digital footprint, while at other times they seem to be a burden. If you relate to questions like:
+Some days we are on top of our digital footprint, while on other days they seem to drag us down. If you relate to these:
 
 - Do you keep multiple open browser tabs for your digital life?
-- Do you struggle to search across all private data in one app?
+- Do you struggle to search across all private data in one place?
 - Do you travel often and need offline access to your data?
 - Do you share multiple inboxes with partner or colleagues?
 - Would you like some help in organising emails, files - like auto labelling folders?
@@ -21,16 +21,6 @@ Sometimes we are on top of our digital footprint, while at other times they seem
 - And many more on these lines...
 
 Then dwata is for you.
-
-## Why should I trust dwata?
-
-Good question. I am Sumit, founder of dwata and I am building dwata with my best intentions to make sure our daily lives have less cognitive overhead.
-
-In order to make sure that you can trust dwata, it is completely open source. dwata does not have any hidden telemetry - sends no data to my company (Pixlie, in India) without your explicit permission. All product analytics is stored inside dwata and is sent only after you see and confirm.
-
-I take your privacy very seriously. I do not even have OAuth2 apps for Google to access your data - you have to create those yourself (there is documentation in the app).
-
-AI providers can be run locally if you want to avoid hosted providers like OpenAI, Anthropic, etc.
 
 ## How does dwata work?
 
@@ -42,6 +32,16 @@ dwata is an open source desktop app that gathers all your private data on to you
 - Will soon connect to Slack, Shopify, Stripe, LinkedIn and many others
 - Can read from databases like MySQL, PostgreSQL...
 - Uses AI to label documents, get summary of documents (email threads)
+
+## Why should I trust dwata?
+
+Good question. I am Sumit, founder of dwata and I am building dwata with my best intentions to make sure our daily lives have less cognitive overhead.
+
+In order to make sure that you can trust dwata, it is completely open source. dwata does not have any hidden telemetry - sends no data to my company (Pixlie, in India) without your explicit permission. All product analytics is stored inside dwata and is sent only after you see and confirm.
+
+I take your privacy very seriously. I do not even have OAuth2 apps for Google to access your data - you have to create those yourself (there is documentation in the app).
+
+AI providers can be run locally if you want to avoid hosted providers like OpenAI, Anthropic, etc.
 
 ## How do I install dwata?
 

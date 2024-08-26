@@ -2,6 +2,7 @@ import { Component, createContext, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import { IProviderPropTypes, uiThemes } from "../utils/types";
 import getGitHubDarkColors from "../utils/colors/gitHubDark";
+import getDefaultLightModernColors from "../utils/colors/defaultLightModern";
 
 interface IStore {
   currentTheme: uiThemes;
@@ -9,7 +10,7 @@ interface IStore {
 
 const makeStore = () => {
   const [store, setStore] = createStore<IStore>({
-    currentTheme: "gitHubDark" as uiThemes,
+    currentTheme: "defaultLightModern",
   });
 
   return [
@@ -19,6 +20,9 @@ const makeStore = () => {
         setStore("currentTheme", theme);
       },
       getColors() {
+        if (store.currentTheme === "defaultLightModern") {
+          return getDefaultLightModernColors();
+        }
         return getGitHubDarkColors();
       },
     },

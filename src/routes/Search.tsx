@@ -5,7 +5,6 @@ import {
   createMemo,
   createResource,
   createSignal,
-  onMount,
 } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import TextInput from "../widgets/interactable/TextInput";
@@ -18,6 +17,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { searchRoutes } from "./routeList";
 import SearchResultEmailItem from "../widgets/search/SearchResultEmailItem";
 import SearchResultFileItem from "../widgets/search/SearchResultFileItem";
+import Pagination from "../widgets/navigation/Pagination";
 
 const MailboxLabel: Component<Mailbox> = (props) => {
   return <div>{props.name}</div>;
@@ -183,6 +183,8 @@ const Search: Component = () => {
           </For>
         ) : null}
       </div>
+
+      <Pagination />
     </div>
   );
 };

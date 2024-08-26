@@ -13,17 +13,16 @@ const makeStore = () => {
     createResource<{
       data: Array<Email>;
     }>(async (_, { value, refetching }) => {
-      if (
-        !!refetching &&
-        typeof refetching === "object" &&
-        "mailboxId" in refetching
-      ) {
+      if (!!refetching && typeof refetching === "object") {
         // We are fetching emails from a specific mailbox
         const result = await invoke<ModuleDataReadList>("search_emails", {
           module: "Email" as Module,
           filters: {
             Email: {
-              mailboxId: refetching.mailboxId,
+              emailAccountId:
+                "emailAccountId" in refetching
+                  ? refetching.emailAccountId
+                  : null,
               searchQuery:
                 "searchQuery" in refetching ? refetching.searchQuery : null,
             },
@@ -35,6 +34,15 @@ const makeStore = () => {
       } else {
         // We are fetching emails from all mailboxes
         console.log("Fetching emails from all mailboxes");
+        const result = await invoke<ModuleDataReadList>("search_emails", {
+          module: "Email" as Module,
+          filters: {
+            Email: {},
+          } as ModuleFilters,
+        });
+        if (!!result && "type" in result && result["type"] === "Email") {
+          return { ...value, data: result["data"] as Array<Email> };
+        }
       }
       return { data: [] };
     });
@@ -96,8 +104,6 @@ const makeStore = () => {
         searchQuery: string | undefined,
       ) => {
         if (!mailboxId) return;
-        console.log("Fetching search results for: ", searchQuery);
-
         refetchEmails({ mailboxId, searchQuery });
       },
     },

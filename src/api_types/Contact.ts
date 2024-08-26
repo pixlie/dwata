@@ -2,11 +2,9 @@
 
 export type Contact = {
   id: bigint;
-  firstName: string;
+  firstName: string | null;
   lastName: string | null;
-  emails: Array<string>;
-  phoneNumbers: Array<string>;
-  organizationId: bigint | null;
+  emailAddressList: Array<string>;
   createdAt: string;
   modifiedAt: string | null;
 };

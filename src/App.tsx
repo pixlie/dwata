@@ -41,7 +41,7 @@ const App: Component<RouteSectionProps> = (props) => {
                     <ProcessLogLoader />
                     <NavigationBar />
 
-                    <div class="flex bg-gray-300 grow h-full overflow-hidden">
+                    <div class="flex grow h-full overflow-hidden">
                       <Sidebar />
 
                       <MainContent {...props} />

@@ -1,63 +1,28 @@
 import { Component } from "solid-js";
 import { Email } from "../../api_types/Email";
 import { useUserInterface } from "../../stores/userInterface";
+import SecondsToDate from "../display/secondsToDate";
 
 const SearchResultEmailItem: Component<Email> = (props) => {
   const [_, { getColors }] = useUserInterface();
   return (
     <div
-      class="border rounded-md my-2"
+      class="border-b py-3"
       style={{
         "border-color": getColors().colors["editorWidget.border"],
+        color: getColors().colors["editor.foreground"],
       }}
     >
-      <div
-        class="flex gap-8 py-2 pr-3"
-        style={{
-          color: getColors().colors["editor.foreground"],
-        }}
-      >
-        <div
-          class="border rounded px-1 self-center"
-          style={{
-            "border-color": getColors().colors["editorWidget.border"],
-            "background-color": getColors().colors["editorWidget.background"],
-          }}
-        >
-          Mitesh Ashar
-        </div>
-        <div class="text-lg font-semibold">{props.subject}</div>
-      </div>
+      <div class="py-1 px-8">{props.fromEmailAddress}</div>
+      <div class="text-lg font-semibold px-8">{props.subject}</div>
 
-      <div
-        class="font-thin pl-8 pr-4"
-        style={{
-          color: getColors().colors["editor.foreground"],
-        }}
-      >
-        Eum corporis placeat aspernatur. Cupiditate minus blanditiis unde neque
-        aut sequi. Necessitatibus molestiae rerum aliquid quia. Vero enim
-        laudantium nihil est quia. Possimus possimus iste quis qui ex aut quo.
-        Sit facere dolor a quis. Aliquid quidem totam esse. Ipsum voluptatibus
-        quia consequatur accusantium. Rerum vitae adipisci minima ullam.
-        Assumenda tenetur maxime veritatis et fugiat doloribus sequi. Illo ut ad
-        a sapiente voluptatem accusamus itaque non. Sint qui omnis et
-        consequatur quas illo quo. Non aut aut quis. Laudantium laboriosam amet
-        architecto dolores nulla nesciunt. Quia incidunt temporibus consequatur.
-        Culpa laudantium omnis quo impedit rerum voluptas voluptatem. Qui
-        laboriosam nihil corrupti odio. In consequatur quis sapiente enim sed
-        magnam ut.
-      </div>
+      <div class="font-thin px-8">{props.bodyText}</div>
 
-      <div
-        class="mt-1 border-t font-thin text-sm px-4 py-1 flex gap-4"
-        style={{
-          "border-color": getColors().colors["editorWidget.border"],
-          color: getColors().colors["editor.foreground"],
-        }}
-      >
+      <div class="mt-1 font-thin text-sm px-4 py-1 flex gap-4">
         <span class="grow" />
-        <span class="py-0.5">Date: 6 Aug 2024</span>
+        <span class="py-0.5">
+          Date: <SecondsToDate seconds={props.date} />
+        </span>
       </div>
     </div>
   );

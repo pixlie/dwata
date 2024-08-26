@@ -26,6 +26,11 @@ const searchRoutes = [
     href: "/search/direct-messages",
   },
   {
+    label: "Contacts",
+    icon: "fa-solid fa-address-book",
+    href: "/search/contacts",
+  },
+  {
     label: "Notifications",
     icon: "fa-solid fa-bell",
     href: "/search/notifications",

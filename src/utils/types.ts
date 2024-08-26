@@ -63,7 +63,7 @@ interface INextTask {
 
 type IHeterogenousContent = [ContentType, ContentSpec, Content];
 
-type uiThemes = "gitHubDark" | "gitHubLight";
+type uiThemes = "gitHubDark" | "solarizedLight" | "defaultLightModern";
 
 export type {
   ILabel as IChatRoom,
