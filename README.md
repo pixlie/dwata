@@ -1,7 +1,8 @@
 # dwata
 
 ## Communications: managed
-One app for your emails, calendars, files, Slack, LinkedIn and much more. Blazing fast search, offline access for unlimited accounts.
+
+One app for your emails, calendars, files, Slack and much more. Blazing fast search, offline access for unlimited accounts.
 
 Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
 
@@ -32,8 +33,7 @@ dwata is an open source desktop app that gathers all your private data on to you
 - Offline access to all stored data
 - Blazing fast search on all documents (email, attachments, files, calendar...)
 - Shows up contacts, events, tasks and much more from your data
-- Will soon connect to Slack, Shopify, Stripe, LinkedIn and many others
-- Can read from databases like MySQL, PostgreSQL...
+- Will soon connect to Slack, Discord and many others
 - Uses AI to label documents, get summary of documents (email threads)
 
 ## Why should I trust dwata?
@@ -63,34 +63,21 @@ If you want to use hosted AI providers with your own API keys you can use these:
 - [Groq](https://console.groq.com/docs/models)
 - [Anthropic](https://www.anthropic.com/product) - coming soon
 
-If you want to run AI models on your computer (support for cloud run coming soon) you can use these:
+If you want to run AI models on your computer (support for own cloud server coming soon) you can use these:
 
 - [Ollama](https://ollama.com/library)
 - [Llamafile](https://github.com/Mozilla-Ocho/llamafile)
 
-## What data sources can (will) dwata connect to?
-
-dwata will be able to read data from:
-
-- Receive emails with IMAP (tested with Gmail, Proton Mail)
-- Databases like PostgreSQL, MySQL or MongoDB
-- SaaS products like Stripe or Shopify (API or CSV)
-- Your own custom software (CSV or API)
-- CSV files/folders
-- Email (IMAP)
-
 ## Does dwata send any of my private/business data to your company?
 
-No, dwata does not send me, Sumit, or my company, any of your private data. Your data will be sent to AI as per your choice in the chats.
+dwata does not send any private data to Pixlie, the parent company in India. Your data will be sent to AI as per your explicit choice.
 
-dwata will send basic product usage analytics and error reports to our company servers if you choose to send these. You will be asked explicitly.
+dwata will send product usage analytics and error reports to Pixlie only if you explicitly allow this.
 
 ## How will dwata make money?
 
-dwata is completely free to use. You may add as much data as your computer can handle.
+The Personal edition of dwata is completely free to use. Professional and Power plans are available with simple one time payment.
 
 _Please remember that you pay for your AI model usage costs yourself (OpenAI, Anthropic, Groq, etc)_
 
-**Pro version**: I will create a pro version of dwata that will have features which will need a license (pricing will come after this is available). License check will be made once a day with an API request (with your permission). Source code of the app will remain under an open source license.
-
-**Team collaboration**: If you want to collaborate and share data privately with others, then you will have to purchase a subscription (pricing will come after this is available). Data shared will use encryption while in transmission.
+Please check the [website](https://dwata.com/pricing) for pricing details.
