@@ -4,57 +4,108 @@ import { Icon } from "astro-icon/components";
 
 const features = [
   {
-    title: "Bring Your Own Framework",
+    title: "All your data",
     description:
-      "Build your site using React, Svelte, Vue, Preact, web components, or just plain ol' HTML + JavaScript.",
+      "dwata can manage all your emails, calendars, Slack, LinkedIn, and more. All on your computer.",
     icon: "bx:bxs-briefcase",
   },
   {
-    title: "100% Static HTML, No JS",
+    title: "Fully offline",
     description:
-      "Astro renders your entire page to static HTML, removing all JavaScript from your final build by default.",
-    icon: "bx:bxs-window-alt",
-  },
-  {
-    title: "On-Demand Components",
-    description:
-      "Need some JS? Astro can automatically hydrate interactive components when they become visible on the page.  ",
+      "Your entire digital footprint available offline, Internet not needed. Go on flight mode!",
     icon: "bx:bxs-data",
   },
   {
-    title: "Broad Integration",
+    title: "Complete privacy",
     description:
-      "Astro supports TypeScript, Scoped CSS, CSS Modules, Sass, Tailwind, Markdown, MDX, and any other npm packages.",
+      "dwata runs on your laptop and no data, not even product analytics, leaves your laptop without your permission!",
     icon: "bx:bxs-bot",
   },
   {
-    title: "SEO Enabled",
+    title: "Search everything",
     description:
-      "Automatic sitemaps, RSS feeds, pagination and collections take the pain out of SEO and syndication. It just works!",
-    icon: "bx:bxs-file-find",
+      "Blazing fast search across all your emails, attachments, messages, contacts, files.",
+    icon: "bx:bxs-bot",
   },
   {
-    title: "Community",
+    title: "Attachments and files",
     description:
-      "Astro is an open source project powered by hundreds of contributors making thousands of individual contributions.",
-    icon: "bx:bxs-user",
+      "Browse attachments (from emails) and files (from online or local drives), grouped by sender, month, year.",
+    icon: "bx:bxs-bot",
+  },
+  {
+    title: "Please remind me...",
+    description:
+      "dwata can remind you about pending conversations, todos like bills, flights and more.",
+    icon: "bx:bxs-bot",
+  },
+];
+
+const upcoming_features = [
+  {
+    title: "Organize with AI",
+    description:
+      "Label your emails; organize into folders; rename files with context... let AI do the hard work daily.",
+    icon: "bx:bxs-window-alt",
+  },
+  // {
+  //   title: "What needs to be done?",
+  //   description:
+  //     "Let AI find out tasks that are waiting for you, constantly filtering them out from new emails, messages, notes...",
+  //   icon: "bx:bxs-user",
+  // },
+  {
+    title: "Web in a box",
+    description:
+      "Built in web crawler which can fetch all your web research, blogs and more.",
+    icon: "bx:bxs-file-find",
   },
 ];
 ---
 
 <div class="mt-16 md:mt-0">
   <h2 class="text-4xl lg:text-5xl font-bold lg:tracking-tight">
-    Everything you need to start a website
+    Emails, files, Slack... a thousand paper cuts
   </h2>
   <p class="text-lg mt-4 text-slate-600">
-    Astro comes batteries included. It takes the best parts of state-of-the-art
-    tools and adds its own innovations.
+    Getting everything in one place, searching across mutliple accounts, keeping
+    track of todos, delegating information with others can all take up a lot of
+    our daily time. Some days we are on top of our digital life, while on other
+    days they drag us down.
   </p>
 </div>
 
-<div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16">
+<div class="grid sm:grid-cols-2 my-16 gap-16">
   {
     features.map((item) => (
+      <div class="flex gap-4 items-start">
+        <div class="mt-1 bg-black rounded-full  p-2 w-8 h-8 shrink-0">
+          <Icon class="text-white" name={item.icon} />
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg">{item.title}</h3>{" "}
+          <p class="text-slate-500 mt-2 leading-relaxed">{item.description}</p>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<div>
+  <h3 class="text-2xl lg:text-3xl font-bold lg:tracking-tight">
+    Coming soon...
+  </h3>
+  <p class="text-lg mt-4 text-slate-600">
+    dwata is in a very early stage of development and there is a lot that is
+    coming your way. AI integration, web crawler and more. And the best part -
+    dwata can use open source AI models on your laptop or on the cloud for full
+    privacy.
+  </p>
+</div>
+
+<div class="grid sm:grid-cols-2 mt-16 gap-16">
+  {
+    upcoming_features.map((item) => (
       <div class="flex gap-4 items-start">
         <div class="mt-1 bg-black rounded-full  p-2 w-8 h-8 shrink-0">
           <Icon class="text-white" name={item.icon} />
