@@ -7,14 +7,17 @@ import PricingCard from "@components/pricing.astro";
 const pricing = [
   {
     name: "Personal",
-    price: "Free",
+    price: {
+      isFree: true,
+    },
     popular: false,
     features: [
-      "Lifetime free",
-      "Up to 3 users",
-      "Unlimited Pages",
-      "Astro Sub domain",
-      "Basic Integrations",
+      "Email - unlimited accounts",
+      "Works offline",
+      "Complete privacy",
+      "Blazing fast search",
+      "Attachments manager",
+      "Contacts manager",
       "Community Support",
     ],
     button: {
@@ -23,21 +26,18 @@ const pricing = [
     },
   },
   {
-    name: "Startup",
+    name: "Professional",
     price: {
-      monthly: "$19",
-      annual: "$16",
-      discount: "10%",
-      original: "$24",
+      oneTime: "$29",
     },
     popular: true,
     features: [
-      "All Free Features",
-      "Up to 20 users",
-      "20 Custom domains",
-      "Unlimited Collaborators",
-      "Advanced Integrations",
-      "Priority Support",
+      "All Personal Features +",
+      "Mobile app",
+      "Slack, Google Calendar - unlimited accounts",
+      "Managed inbox with AI",
+      "Open Source AI on your own cloud server for full privacy",
+      "72 hour email support from real human",
     ],
     button: {
       text: "Get Started",
@@ -45,16 +45,18 @@ const pricing = [
     },
   },
   {
-    name: "Enterprise",
-    price: "Custom",
+    name: "Power",
+    price: {
+      oneTime: "$69",
+    },
     popular: false,
     features: [
-      "All Pro Features",
-      "Unlimited Custom domains",
-      "99.99% Uptime SLA",
-      "SAML & SSO Integration",
-      "Dedicated Account Manager",
-      "24/7 Phone Support",
+      "All Professional Features +",
+      "Collaborate with others",
+      "Web in a box - blogs, websites downloaded and stored offline",
+      "Search all online files: Google Drive, Dropbox, OneDrive, etc",
+      "Search all local files: unlimited hard disks and USB drives",
+      "24 hour email support from real human",
     ],
     button: {
       text: "Contact us",
@@ -69,8 +71,9 @@ const pricing = [
     <Sectionhead>
       <Fragment slot="title">Pricing</Fragment>
       <Fragment slot="desc">
-        Simple & Predictable pricing. No Surprises.
-      </Fragment>
+        Start for free.<br />Upgrade when you want, pay once and use forever.
+        Free updates for a year.</Fragment
+      >
     </Sectionhead>
 
     <div class="grid md:grid-cols-3 gap-10 mx-auto max-w-screen-lg mt-12">

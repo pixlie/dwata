@@ -28,9 +28,9 @@ const features = [
     icon: "bx:bxs-bot",
   },
   {
-    title: "Attachments within reach",
+    title: "Attachments and files",
     description:
-      "Browse attachments just like files, automatically grouped by sender, month, year.",
+      "Browse attachments (from emails) and files (from online or local drives), grouped by sender, month, year.",
     icon: "bx:bxs-bot",
   },
   {
@@ -48,12 +48,12 @@ const upcoming_features = [
       "Label your emails; organize into folders; rename files with context... let AI do the hard work daily.",
     icon: "bx:bxs-window-alt",
   },
-  {
-    title: "What needs to be done?",
-    description:
-      "Let AI find out tasks that are waiting for you, constantly filtering them out from new emails, messages, notes...",
-    icon: "bx:bxs-user",
-  },
+  // {
+  //   title: "What needs to be done?",
+  //   description:
+  //     "Let AI find out tasks that are waiting for you, constantly filtering them out from new emails, messages, notes...",
+  //   icon: "bx:bxs-user",
+  // },
   {
     title: "Web in a box",
     description:
@@ -75,7 +75,7 @@ const upcoming_features = [
   </p>
 </div>
 
-<div class="grid sm:grid-cols-2 md:grid-cols-3 my-16 gap-16">
+<div class="grid sm:grid-cols-2 my-16 gap-16">
   {
     features.map((item) => (
       <div class="flex gap-4 items-start">
@@ -103,7 +103,7 @@ const upcoming_features = [
   </p>
 </div>
 
-<div class="grid sm:grid-cols-2 md:grid-cols-3 mt-16 gap-16">
+<div class="grid sm:grid-cols-2 mt-16 gap-16">
   {
     upcoming_features.map((item) => (
       <div class="flex gap-4 items-start">
