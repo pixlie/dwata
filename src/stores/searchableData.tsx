@@ -28,8 +28,13 @@ const makeStore = () => {
             },
           } as ModuleFilters,
         });
-        if (!!result && "type" in result && result["type"] === "Email") {
-          return { ...value, data: result["data"] as Array<Email> };
+        if (
+          !!result &&
+          "data" in result &&
+          "type" in result["data"] &&
+          result["data"]["type"] === "Email"
+        ) {
+          return { ...value, data: result["data"]["data"] as Array<Email> };
         }
       } else {
         // We are fetching emails from all mailboxes
@@ -40,8 +45,13 @@ const makeStore = () => {
             Email: {},
           } as ModuleFilters,
         });
-        if (!!result && "type" in result && result["type"] === "Email") {
-          return { ...value, data: result["data"] as Array<Email> };
+        if (
+          !!result &&
+          "data" in result &&
+          "type" in result["data"] &&
+          result["data"]["type"] === "Email"
+        ) {
+          return { ...value, data: result["data"]["data"] as Array<Email> };
         }
       }
       return { data: [] };
@@ -59,9 +69,14 @@ const makeStore = () => {
         },
       );
 
-      if (!!result && "type" in result && result["type"] === "EmailAccount") {
+      if (
+        !!result &&
+        "data" in result &&
+        "type" in result["data"] &&
+        result["data"]["type"] === "EmailAccount"
+      ) {
         return {
-          data: result["data"] as Array<EmailAccount>,
+          data: result["data"]["data"] as Array<EmailAccount>,
         };
       }
       return { data: [] };
@@ -77,9 +92,14 @@ const makeStore = () => {
             module: "Mailbox" as Module,
           },
         );
-        if (!!result && "type" in result && result["type"] === "Mailbox") {
+        if (
+          !!result &&
+          "data" in result &&
+          "type" in result["data"] &&
+          result["data"]["type"] === "Mailbox"
+        ) {
           return {
-            data: result["data"] as Array<Mailbox>,
+            data: result["data"]["data"] as Array<Mailbox>,
           };
         }
         return { data: [] };

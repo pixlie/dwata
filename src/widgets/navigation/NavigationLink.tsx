@@ -5,6 +5,7 @@ interface IPropTypes {
   label: string;
   icon: string;
   href?: string;
+  status?: "enabled" | "disabled";
   isActive?: boolean;
   infoTag?: string;
   size?: "sm" | "md" | "lg";

@@ -55,7 +55,7 @@ const EmailAccountBox: Component = () => {
 
   return (
     <>
-      <Heading size="xl">{getEmailAccount()?.emailAddress}</Heading>
+      <Heading size={5}>{getEmailAccount()?.emailAddress}</Heading>
       <For each={getMailboxes()}>{(item) => <MailboxLabel {...item} />}</For>
     </>
   );

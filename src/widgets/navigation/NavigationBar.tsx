@@ -1,17 +1,24 @@
 import { Component } from "solid-js";
+import Logo from "../../assets/logo_32x32.png";
 
 // import NavigationButtom from "./NavigationButton";
 import { useUserInterface } from "../../stores/userInterface";
+import { useNavigate } from "@solidjs/router";
 // import DropdownItem from "../interactable/DropdownItem";
 
 const NavigationBar: Component = () => {
   // const [isUserDropdownOpen, setIsUserDropdownOpen] =
   //   createSignal<boolean>(false);
   const [_, { getColors }] = useUserInterface();
+  const navigate = useNavigate();
 
   // const handleUserDropdownClick = () => {
   //   setIsUserDropdownOpen(!isUserDropdownOpen());
   // };
+
+  const handleClickLogo = () => {
+    navigate("/");
+  };
 
   return (
     <nav
@@ -23,7 +30,12 @@ const NavigationBar: Component = () => {
     >
       <div class="relative flex h-12 items-center justify-between">
         <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex flex-shrink-0 items-center text-xl text-white font-bold cursor-default select-none">
+          <div
+            class="flex flex-shrink-0 items-center text-xl font-bold cursor-default select-none"
+            style={{ color: getColors().colors["editor.foreground"] }}
+            onClick={handleClickLogo}
+          >
+            <img src={Logo} alt="Logo" class="mr-2 w-6" />
             dwata
           </div>
           <div class="hidden sm:ml-6 sm:block">
