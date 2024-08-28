@@ -3,7 +3,7 @@ members = ["openai"]
 
 [package]
 name = "dwata"
-version = "0.1.4"
+version = "0.1.5"
 description = "AI assisted app for our private data"
 authors = ["Sumit Datta <sumitdatta@gmail.com>"]
 license = "Apache-2.0 license"
@@ -55,6 +55,7 @@ similar = "2.5.0"
 slug = "0.1.5"
 openai = { version = "2.0.0", path = "openai" }
 tantivy = "0.22.0"
+tauri-plugin-shell = "2.0.0-rc.2"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

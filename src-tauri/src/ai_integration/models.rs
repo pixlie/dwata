@@ -1,3 +1,5 @@
+use super::{AIIntegration, AIIntegrationFilters, AIProvider};
+use crate::{error::DwataError, workspace::crud::CRUDRead};
 use chrono::{DateTime, Utc};
 use log::error;
 use reqwest;
@@ -7,10 +9,6 @@ use std::collections::HashSet;
 use std::default::Default;
 use ts_rs::TS;
 use url::Url;
-
-use crate::{error::DwataError, workspace::crud::CRUDRead};
-
-use super::{AIIntegration, AIIntegrationFilters, AIProvider};
 
 #[derive(Debug, Eq, Hash, PartialEq, Serialize, TS)]
 #[ts(export)]
