@@ -2,7 +2,8 @@
 
 ## Communications: managed
 
-One app for your emails, calendars, files, Slack and much more. Blazing fast search, offline access for unlimited accounts.
+One app for your emails, calendars, contacts, files, Slack, blogs and much more.
+Blazing fast search, offline access for unlimited accounts.
 
 Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
 
