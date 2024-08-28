@@ -1,18 +1,18 @@
-import { Component, createResource, createSignal, onMount } from "solid-js";
+import { Component, createResource, onMount } from "solid-js";
 import Heading from "../widgets/typography/Heading";
 import DatabaseSourceForm from "../widgets/settings/DatabaseSourceForm";
 import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 // import SettingsSourceList from "../widgets/settings/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
-import SettingsAIIntegrationList from "../widgets/settings/SettingsAIIntegrationList";
+// import SettingsAIIntegrationList from "../widgets/settings/SettingsAIIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useWorkspace } from "../stores/workspace";
 import Oauth2AppForm from "../widgets/settings/OAuth2AppForm";
 import EmailAccountForm from "../widgets/settings/EmailAccountForm";
 import SettingsOAuth2AppList from "../widgets/settings/SettingsOAuth2AppList";
 import SettingsEmailAccountList from "../widgets/settings/SettingsEmailAccountList";
-import { useUserInterface } from "../stores/userInterface";
+import SetupEmail from "../widgets/informative/SetupEmail";
 
 const SettingsIndex: Component = () => {
   const [_w, { readModuleList }] = useWorkspace();
@@ -75,7 +75,7 @@ const SettingsIndex: Component = () => {
         href="/settings/oauth2-app/add"
         size="sm"
       ></Button>
-      <div class="mb-6" />
+      <div class="mb-16" />
 
       <Heading size={5}>Email accounts</Heading>
       <SettingsEmailAccountList />
@@ -90,20 +90,7 @@ const SettingsIndex: Component = () => {
   );
 };
 
-interface IHelpState {
-  openSection?: "gmail" | "protonMail" | "yahooMail";
-}
-
 const SettingsWrapper: Component<RouteSectionProps> = (props) => {
-  const [_, { getColors }] = useUserInterface();
-  const [helpState, setHelpState] = createSignal<IHelpState>({});
-
-  const handleOpenHelpSection = (
-    sectionName: "gmail" | "protonMail" | "yahooMail",
-  ) => {
-    setHelpState({ openSection: sectionName });
-  };
-
   return (
     <>
       <Heading size={3}>Settings</Heading>
@@ -112,72 +99,8 @@ const SettingsWrapper: Component<RouteSectionProps> = (props) => {
       <div class="flex">
         <div class="grow">{props.children}</div>
 
-        <div class="max-w-screen-sm">
-          <div
-            class="rounded-md p-4 mx-auto shadow-md"
-            style={{
-              "background-color": getColors().colors["editorWidget.background"],
-              color: getColors().colors["editor.foreground"],
-            }}
-          >
-            <Heading size={3}>Instructions</Heading>
-            <div class="font-thin">
-              Click any of the following to see how you can connect to that
-              email provider.
-            </div>
-
-            <div class="flex flex-col gap-y-4">
-              <div class="flex flex-col">
-                <div
-                  class="text-xl cursor-pointer"
-                  onClick={() => handleOpenHelpSection("gmail")}
-                >
-                  Gmail account
-                </div>
-                <span class="text-sm font-thin">
-                  Personal and Workspace accounts supported
-                </span>
-
-                {helpState().openSection === "gmail" && (
-                  <div class="list-decimal flex flex-col font-thin">
-                    <li>
-                      Create a Google OAuth2 app if you do not have one (can
-                      reuse for multiple Google accounts)
-                    </li>
-                  </div>
-                )}
-              </div>
-
-              <div class="flex flex-col">
-                <div class="text-xl cursor-pointer">Proton Mail account</div>
-                <span class="text-sm font-thin">
-                  Uses{" "}
-                  <a
-                    href="https://proton.me/mail/bridge"
-                    rel="noopener"
-                    target="_blank"
-                    class="underline"
-                  >
-                    Proton Mail Bridge
-                  </a>
-                  , needs{" "}
-                  <a
-                    href="https://proton.me/support/imap-smtp-and-pop3-setup"
-                    rel="noopener"
-                    target="_blank"
-                    class="underline"
-                  >
-                    paid Proton Mail
-                  </a>{" "}
-                  account
-                </span>
-              </div>
-
-              <div class="flex flex-col">
-                <div class="text-xl cursor-pointer">Yahoo! Mail account</div>
-              </div>
-            </div>
-          </div>
+        <div class="max-w-screen-md">
+          <SetupEmail />
         </div>
       </div>
     </>

@@ -15,17 +15,18 @@ const SettingsEmailAccountItem: Component<EmailAccount> = (props) => {
 
   return (
     <div
-      class="p-4 text-white rounded-md border cursor-pointer"
+      class="px-4 py-2 rounded-md border cursor-pointer font-thin"
       style={{
         "background-color": getColors().colors["panel.background"],
         "border-color": getColors().colors["panel.border"],
+        color: getColors().colors["editor.foreground"],
       }}
       onClick={handleClick}
     >
-      <i class="fa-solid fa-database w-6 text-gray-500" />
+      <i class="fa-solid fa-envelope w-6 text-gray-500" />
       {props.emailAddress}
       <div>
-        <span class="text-xs bg-gray-500 text-gray-900 rounded-sm px-2">
+        <span class="bg-gray-500 text-gray-100 rounded-sm px-2">
           {props.provider}
         </span>
       </div>
@@ -45,7 +46,7 @@ const SettingsEmailAccountList: Component = () => {
   });
 
   return (
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="flex gap-x-4">
       <For each={getItems()}>
         {(item) => <SettingsEmailAccountItem {...item} />}
       </For>
