@@ -92,18 +92,17 @@ const SettingsIndex: Component = () => {
 
 const SettingsWrapper: Component<RouteSectionProps> = (props) => {
   return (
-    <>
-      <Heading size={3}>Settings</Heading>
-      <div class="mb-4" />
-
-      <div class="flex gap-x-8">
-        <div class="grow">{props.children}</div>
-
-        <div class="max-w-screen-sm">
-          <SetupEmail />
-        </div>
+    <div class="flex gap-x-8 h-full">
+      <div class="grow">
+        <Heading size={3}>Settings</Heading>
+        <div class="mb-4" />
+        {props.children}
       </div>
-    </>
+
+      <div class="max-w-screen-sm px-4 border-l overflow-y-auto">
+        <SetupEmail />
+      </div>
+    </div>
   );
 };
 

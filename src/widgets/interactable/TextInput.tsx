@@ -27,6 +27,27 @@ const TextInput: Component<IFormField> = (props) => {
     }
   };
 
+  const LinkOptions: Component = () => {
+    return (
+      <>
+        {props.value !== undefined && typeof props.value === "string" ? (
+          <div class="font-thin">
+            Click to{" "}
+            <a
+              href={props.value}
+              class="font-medium text-blue-500 underline"
+              rel="noreferrer"
+              target="_blank"
+            >
+              open URL in default browser
+            </a>{" "}
+            or right click link to copy
+          </div>
+        ) : null}
+      </>
+    );
+  };
+
   return (
     <>
       {!!props.label && (
@@ -53,6 +74,12 @@ const TextInput: Component<IFormField> = (props) => {
         onFocus={props.onFocus}
         disabled={!props.isEditable}
       />
+
+      {props.contentType === "Text" &&
+      "textType" in props.contentSpec &&
+      props.contentSpec.textType === "Link" ? (
+        <LinkOptions />
+      ) : null}
     </>
   );
 };
