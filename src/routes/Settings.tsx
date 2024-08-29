@@ -67,7 +67,7 @@ const SettingsIndex: Component = () => {
       ></Button>
       <div class="mb-6" /> */}
 
-      <Heading size={5}>OAuth2 apps</Heading>
+      <Heading size={5}>OAuth apps</Heading>
       <SettingsOAuth2AppList />
       <div class="mb-2" />
       <Button
@@ -96,10 +96,10 @@ const SettingsWrapper: Component<RouteSectionProps> = (props) => {
       <Heading size={3}>Settings</Heading>
       <div class="mb-4" />
 
-      <div class="flex">
+      <div class="flex gap-x-8">
         <div class="grow">{props.children}</div>
 
-        <div class="max-w-screen-md">
+        <div class="max-w-screen-sm">
           <SetupEmail />
         </div>
       </div>

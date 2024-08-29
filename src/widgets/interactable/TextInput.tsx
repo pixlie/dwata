@@ -30,28 +30,29 @@ const TextInput: Component<IFormField> = (props) => {
   return (
     <>
       {!!props.label && (
-        <label class="block text-sm font-medium leading-6 text-gray-100">
+        <label
+          class="block text-sm font-medium leading-6 mb-1"
+          style={{ color: getColors().colors["input.foreground"] }}
+        >
           {props.label}
         </label>
       )}
-      <div class="mt-2">
-        <input
-          name={props.name}
-          type={inputType}
-          required={props.isRequired || undefined}
-          class="block w-full rounded-md px-2 py-1.5 border font-content"
-          style={{
-            "background-color": getColors().colors["input.background"],
-            "border-color": getColors().colors["input.border"],
-            color: getColors().colors["input.foreground"],
-          }}
-          placeholder={props.placeholder || undefined}
-          value={props.value !== undefined ? props.value : ""}
-          onChange={handleChange}
-          onFocus={props.onFocus}
-          disabled={!props.isEditable}
-        />
-      </div>
+      <input
+        name={props.name}
+        type={inputType}
+        required={props.isRequired || undefined}
+        class="block w-full rounded-md px-2 py-1.5 border font-content"
+        style={{
+          "background-color": getColors().colors["input.background"],
+          "border-color": getColors().colors["input.border"],
+          color: getColors().colors["input.foreground"],
+        }}
+        placeholder={props.placeholder || undefined}
+        value={props.value !== undefined ? props.value : ""}
+        onChange={handleChange}
+        onFocus={props.onFocus}
+        disabled={!props.isEditable}
+      />
     </>
   );
 };

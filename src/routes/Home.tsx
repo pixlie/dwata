@@ -13,11 +13,14 @@ const Home: Component = () => {
       </Heading>
 
       <div
-        class="mb-4 text-xl font-thin"
-        style={{ color: getColors().colors["editor.foreground"] }}
+        class="mb-4 text-md font-thin p-4 rounded-md opacity-70"
+        style={{
+          color: getColors().colors["banner.foreground"],
+          "background-color": getColors().colors["banner.background"],
+        }}
       >
-        dwata is in beta and many features are on the way. Right now you can add
-        your email accounts. To get started:
+        dwata is in beta! Ready-only access to email accounts and search are
+        available.
       </div>
 
       <div class="grow">
@@ -25,8 +28,8 @@ const Home: Component = () => {
           class="mb-4 text-xl font-thin"
           style={{ color: getColors().colors["editor.foreground"] }}
         >
-          Add your email accounts (dwata needs IMAP access) by going to
-          Settings.
+          Add your email accounts in app{" "}
+          <Button href="/settings" label="Settings" size="sm" />.
         </div>
       </div>
 
