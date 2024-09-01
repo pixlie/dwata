@@ -1,6 +1,6 @@
 {
   "productName": "dwata",
-  "version": "0.1.3",
+  "version": "0.1.6",
   "identifier": "com.dwata.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
