@@ -76,7 +76,10 @@ const Dropdown: Component<IFormField> = (props) => {
   return (
     <>
       {!!props.label && (
-        <label class="block text-sm font-medium leading-6 text-gray-100 mb-2">
+        <label
+          class="block text-sm font-medium leading-6 mb-1"
+          style={{ color: getColors().colors["input.foreground"] }}
+        >
           {props.label}
         </label>
       )}
@@ -85,7 +88,8 @@ const Dropdown: Component<IFormField> = (props) => {
         class={classes}
         style={{
           "border-color": getColors().colors["input.border"],
-          color: getColors().colors["input.background"],
+          color: getColors().colors["input.foreground"],
+          "background-color": getColors().colors["input.background"],
         }}
       >
         <For each={getChoices()}>
@@ -94,6 +98,7 @@ const Dropdown: Component<IFormField> = (props) => {
               class="bg-white"
               value={choice[0]}
               selected={choice[0] === props.value}
+              style={{ color: getColors().colors["input.foreground"] }}
             >
               {choice[1]}
             </option>

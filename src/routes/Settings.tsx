@@ -5,13 +5,14 @@ import { Route, RouteSectionProps } from "@solidjs/router";
 import Button from "../widgets/interactable/Button";
 // import SettingsSourceList from "../widgets/settings/SettingsSourceList";
 import AIIntegrationForm from "../widgets/settings/AIIntegrationForm";
-import SettingsAIIntegrationList from "../widgets/settings/SettingsAIIntegrationList";
+// import SettingsAIIntegrationList from "../widgets/settings/SettingsAIIntegrationList";
 import DirectorySourceForm from "../widgets/settings/DirectorySourceForm";
 import { useWorkspace } from "../stores/workspace";
 import Oauth2AppForm from "../widgets/settings/OAuth2AppForm";
 import EmailAccountForm from "../widgets/settings/EmailAccountForm";
 import SettingsOAuth2AppList from "../widgets/settings/SettingsOAuth2AppList";
 import SettingsEmailAccountList from "../widgets/settings/SettingsEmailAccountList";
+import SetupEmail from "../widgets/informative/SetupEmail";
 
 const SettingsIndex: Component = () => {
   const [_w, { readModuleList }] = useWorkspace();
@@ -56,7 +57,7 @@ const SettingsIndex: Component = () => {
       </div>
       <div class="mb-6" /> */}
 
-      <Heading size="xl">AI integrations</Heading>
+      {/* <Heading size="xl">AI integrations</Heading>
       <SettingsAIIntegrationList />
       <div class="mb-2" />
       <Button
@@ -64,24 +65,25 @@ const SettingsIndex: Component = () => {
         href="/settings/ai-integration/add"
         size="sm"
       ></Button>
-      <div class="mb-6" />
+      <div class="mb-6" /> */}
 
-      <Heading size="xl">OAuth2 apps</Heading>
-      <SettingsOAuth2AppList />
-      <div class="mb-2" />
-      <Button
-        label="Add Oauth2 app"
-        href="/settings/oauth2-app/add"
-        size="sm"
-      ></Button>
-      <div class="mb-6" />
-
-      <Heading size="xl">Email accounts</Heading>
+      <Heading size={5}>Email accounts</Heading>
       <SettingsEmailAccountList />
       <div class="mb-2" />
       <Button
         label="Add Email account"
         href="/settings/email-account/add"
+        size="sm"
+      ></Button>
+
+      <div class="mb-16" />
+
+      <Heading size={5}>OAuth apps</Heading>
+      <SettingsOAuth2AppList />
+      <div class="mb-2" />
+      <Button
+        label="Add Oauth2 app"
+        href="/settings/oauth2-app/add"
         size="sm"
       ></Button>
       <div class="mb-6" />
@@ -91,12 +93,17 @@ const SettingsIndex: Component = () => {
 
 const SettingsWrapper: Component<RouteSectionProps> = (props) => {
   return (
-    <>
-      <Heading size="3xl">Settings</Heading>
-      <div class="mb-4" />
+    <div class="flex gap-x-8 h-full">
+      <div class="grow">
+        <Heading size={3}>Settings</Heading>
+        <div class="mb-4" />
+        {props.children}
+      </div>
 
-      {props.children}
-    </>
+      <div class="max-w-screen-sm px-4 border-l overflow-y-auto">
+        <SetupEmail />
+      </div>
+    </div>
   );
 };
 

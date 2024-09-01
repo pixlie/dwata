@@ -6,7 +6,7 @@ import { Icon } from "astro-icon/components";
 ---
 
 <main
-  class="grid lg:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
+  class="grid md:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
   <div class="py-6 md:order-1 hidden md:block">
     <Picture
       src={heroImage}
@@ -22,11 +22,23 @@ import { Icon } from "astro-icon/components";
       class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
       Communications: managed
     </h1>
-    <div class="text-lg mt-4 text-slate-600 max-w-xl">
-      One app for your emails, calendars, files, Slack, LinkedIn and much more. <strong
-        >Blazing fast</strong
-      > search, <strong>offline</strong> access for unlimited email accounts.
-      <div class="my-6 flex flex-col sm:flex-row gap-3">
+    <div class="mt-4 text-slate-600 max-w-xl">
+      <div class="text-xl">
+        One app for your emails, calendars, contacts, files, Slack, blogs and
+        much more.
+      </div>
+
+      <div class="flex flex-col text-lg gap-y-1 mt-3">
+        <div><strong>Blazing fast</strong> search</div>
+        <div>
+          <strong>Offline</strong> access for unlimited accounts
+        </div>
+        <div>
+          <strong>Open source</strong> desktop app for complete privacy
+        </div>
+      </div>
+
+      <div class="mt-3 flex flex-col sm:flex-row gap-3">
         <Link
           size="md"
           href="https://github.com/pixlie/dwata/releases/latest"
@@ -48,11 +60,6 @@ import { Icon } from "astro-icon/components";
           GitHub Repo
         </Link>
       </div>
-      Open source and runs on your laptop for complete privacy. dwata <strong
-        >does not</strong
-      >
-      send any data (even product analytics) outside your computer without your explicit
-      permission.
     </div>
   </div>
 </main>

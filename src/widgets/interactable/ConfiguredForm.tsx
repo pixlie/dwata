@@ -281,17 +281,17 @@ const Form: Component<IPropTypes> = (props) => {
       <div
         class="w-full rounded-md border"
         style={{
-          "background-color": getColors().colors["inlineChat.background"],
-          "border-color": getColors().colors["inlineChat.border"],
+          "background-color": getColors().colors["sideBar.background"],
+          "border-color": getColors().colors["sideBar.border"],
         }}
       >
         <div
           class="px-2 py-2 rounded-md rounded-b-none border-b"
           style={{
-            "border-color": getColors().colors["editorWidget.border"],
+            "border-color": getColors().colors["sideBar.border"],
           }}
         >
-          <Heading size="xl">{config()?.title || props.title}</Heading>
+          <Heading size={4}>{config()?.title || props.title}</Heading>
 
           <p style={{ color: getColors().colors["editor.foreground"] }}>
             {config()?.description}

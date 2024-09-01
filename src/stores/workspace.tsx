@@ -39,10 +39,16 @@ const makeStore = () => {
             module,
           },
         );
-        if (response["type"] === module) {
+
+        if (
+          !!response &&
+          "data" in response &&
+          "type" in response["data"] &&
+          response["data"]["type"] === module
+        ) {
           setStore((state) => ({
             ...state,
-            [module]: response["data"],
+            [module]: response["data"]["data"],
             isReady: {
               ...state.isReady,
               [module]: true,

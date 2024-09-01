@@ -155,30 +155,49 @@ pub trait CRUDRead {
                     count_builder.push(format!("{} IS null", name));
                 }
                 _ => {
-                    builder.push(format!("{} = ", name));
-                    count_builder.push(format!("{} = ", name));
-                    match data {
-                        InputValue::Text(x) => {
-                            builder.push_bind(x.clone());
-                            count_builder.push_bind(x.clone());
+                    if let InputValue::IDList(x) = data {
+                        builder.push(format!("{} IN (", name));
+                        count_builder.push(format!("{} IN (", name));
+                        builder.push_bind(
+                            x.iter()
+                                .map(|x| x.to_string())
+                                .collect::<Vec<String>>()
+                                .join(","),
+                        );
+                        count_builder.push_bind(
+                            x.iter()
+                                .map(|x| x.to_string())
+                                .collect::<Vec<String>>()
+                                .join(","),
+                        );
+                        builder.push(")");
+                        count_builder.push(")");
+                    } else {
+                        builder.push(format!("{} = ", name));
+                        count_builder.push(format!("{} = ", name));
+                        match data {
+                            InputValue::Text(x) => {
+                                builder.push_bind(x.clone());
+                                count_builder.push_bind(x.clone());
+                            }
+                            InputValue::ID(x) => {
+                                builder.push_bind(x);
+                                count_builder.push_bind(x);
+                            }
+                            InputValue::Bool(x) => {
+                                builder.push_bind(x);
+                                count_builder.push_bind(x);
+                            }
+                            InputValue::Json(x) => {
+                                builder.push_bind(x.clone());
+                                count_builder.push_bind(x);
+                            }
+                            InputValue::DateTime(x) => {
+                                builder.push_bind(x);
+                                count_builder.push_bind(x);
+                            }
+                            _ => {}
                         }
-                        InputValue::ID(x) => {
-                            builder.push_bind(x);
-                            count_builder.push_bind(x);
-                        }
-                        InputValue::Bool(x) => {
-                            builder.push_bind(x);
-                            count_builder.push_bind(x);
-                        }
-                        InputValue::Json(x) => {
-                            builder.push_bind(x.clone());
-                            count_builder.push_bind(x);
-                        }
-                        InputValue::DateTime(x) => {
-                            builder.push_bind(x);
-                            count_builder.push_bind(x);
-                        }
-                        _ => {}
                     }
                 }
             }
@@ -251,6 +270,7 @@ pub trait CRUDReadFilter {
 pub enum InputValue {
     Text(String),
     ID(i64),
+    IDList(Vec<i64>),
     Bool(bool),
     Json(Value),
     DateTime(DateTime<Utc>),

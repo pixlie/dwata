@@ -1,42 +1,45 @@
 import { Component, JSX } from "solid-js";
+import { useUserInterface } from "../../stores/userInterface";
 
 interface IPropTypes {
-  size: "sm" | "base" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl";
+  size: 1 | 2 | 3 | 4 | 5 | 6;
   children: JSX.Element | string;
 }
 
 const Heading: Component<IPropTypes> = (props): JSX.Element => {
   // We need this function in order to tell Tailwind CSS exact and full size classes, so it will include all of these.
   // Otherwise, Tailwind will not include them in the final CSS file.
-  const getSizeClass = (size: string) => {
+  const [_, { getColors }] = useUserInterface();
+
+  const getSizeClass = (size: number) => {
     switch (size) {
-      case "sm":
-        return "text-sm";
-      case "base":
-        return "text-base";
-      case "lg":
-        return "text-lg";
-      case "xl":
-        return "text-xl";
-      case "2xl":
-        return "text-2xl";
-      case "3xl":
-        return "text-3xl";
-      case "4xl":
-        return "text-4xl";
-      case "5xl":
-        return "text-5xl";
-      case "6xl":
-        return "text-6xl";
+      case 5:
+        return "text-2xl font-semibold leading-tight";
+      case 4:
+        return "text-3xl font-normal leading-tight";
+      case 3:
+        return "text-4xl font-thin leading-snug mb-3";
+      case 2:
+        return "text-5xl font-thin leading-snug";
+      case 1:
+        return "text-6xl font-thin leading-snug";
+      case 6:
       default:
-        return "text-base";
+        return "text-xl font-semibold leading-tight";
     }
   };
   const headingClasses = `${getSizeClass(
-    props.size
-  )} block font-bold text-zinc-300 select-none cursor-default`;
+    props.size,
+  )} block font-bold select-none cursor-default`;
 
-  return <span class={headingClasses}>{props.children}</span>;
+  return (
+    <span
+      class={headingClasses}
+      style={{ color: getColors().colors["editor.foreground"] }}
+    >
+      {props.children}
+    </span>
+  );
 };
 
 export default Heading;

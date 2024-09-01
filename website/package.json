@@ -1,7 +1,7 @@
 {
-  "name": "astroship",
+  "name": "dwata-website",
   "type": "module",
-  "version": "2.2.0",
+  "version": "0.1.6",
   "private": true,
   "scripts": {
     "dev": "astro dev",

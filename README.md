@@ -2,7 +2,8 @@
 
 ## Communications: managed
 
-One app for your emails, calendars, files, Slack and much more. Blazing fast search, offline access for unlimited accounts.
+One app for your emails, calendars, contacts, files, Slack, blogs and much more.
+Blazing fast search, offline access for unlimited accounts.
 
 Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
 
@@ -81,3 +82,7 @@ The Personal edition of dwata is completely free to use. Professional and Power 
 _Please remember that you pay for your AI model usage costs yourself (OpenAI, Anthropic, Groq, etc)_
 
 Please check the [website](https://dwata.com/pricing) for pricing details.
+
+## Credits
+
+- [Logo of dwata](https://www.iconfinder.com/iconsets/business-and-finance-colorful-free-hand-drawn-set) by [Denis Sazhin](https://iconka.com/)
