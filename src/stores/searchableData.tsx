@@ -13,46 +13,33 @@ const makeStore = () => {
     createResource<{
       data: Array<Email>;
     }>(async (_, { value, refetching }) => {
+      let filters = {
+        Email: {},
+      } as ModuleFilters;
+
       if (!!refetching && typeof refetching === "object") {
-        // We are fetching emails from a specific mailbox
-        const result = await invoke<ModuleDataReadList>("search_emails", {
-          module: "Email" as Module,
-          filters: {
-            Email: {
-              emailAccountId:
-                "emailAccountId" in refetching
-                  ? refetching.emailAccountId
-                  : null,
-              searchQuery:
-                "searchQuery" in refetching ? refetching.searchQuery : null,
-            },
-          } as ModuleFilters,
-        });
-        if (
-          !!result &&
-          "data" in result &&
-          "type" in result["data"] &&
-          result["data"]["type"] === "Email"
-        ) {
-          return { ...value, data: result["data"]["data"] as Array<Email> };
-        }
-      } else {
-        // We are fetching emails from all mailboxes
-        console.log("Fetching emails from all mailboxes");
-        const result = await invoke<ModuleDataReadList>("search_emails", {
-          module: "Email" as Module,
-          filters: {
-            Email: {},
-          } as ModuleFilters,
-        });
-        if (
-          !!result &&
-          "data" in result &&
-          "type" in result["data"] &&
-          result["data"]["type"] === "Email"
-        ) {
-          return { ...value, data: result["data"]["data"] as Array<Email> };
-        }
+        filters = {
+          Email: {
+            // We are fetching emails from a specific mailbox
+            emailAccountIdList:
+              "emailAccountIdList" in refetching
+                ? refetching.emailAccountIdList
+                : [],
+            searchQuery:
+              "searchQuery" in refetching ? refetching.searchQuery : undefined,
+          },
+        } as ModuleFilters;
+      }
+      const result = await invoke<ModuleDataReadList>("search_emails", {
+        filters,
+      });
+      if (
+        !!result &&
+        "data" in result &&
+        "type" in result["data"] &&
+        result["data"]["type"] === "Email"
+      ) {
+        return { ...value, data: result["data"]["data"] as Array<Email> };
       }
       return { data: [] };
     });
@@ -119,12 +106,12 @@ const makeStore = () => {
         refetchMailboxes();
       },
 
-      fetchEmailsForMailbox: (
-        mailboxId: number,
+      fetchEmailsForAccounts: (
+        emailAccountIdList: number[],
         searchQuery: string | undefined,
       ) => {
-        if (!mailboxId) return;
-        refetchEmails({ mailboxId, searchQuery });
+        if (!emailAccountIdList) return;
+        refetchEmails({ emailAccountIdList, searchQuery });
       },
     },
   ] as const; // `as const` forces tuple type inference

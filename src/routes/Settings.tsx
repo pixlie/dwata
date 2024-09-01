@@ -67,22 +67,23 @@ const SettingsIndex: Component = () => {
       ></Button>
       <div class="mb-6" /> */}
 
-      <Heading size={5}>OAuth apps</Heading>
-      <SettingsOAuth2AppList />
-      <div class="mb-2" />
-      <Button
-        label="Add Oauth2 app"
-        href="/settings/oauth2-app/add"
-        size="sm"
-      ></Button>
-      <div class="mb-16" />
-
       <Heading size={5}>Email accounts</Heading>
       <SettingsEmailAccountList />
       <div class="mb-2" />
       <Button
         label="Add Email account"
         href="/settings/email-account/add"
+        size="sm"
+      ></Button>
+
+      <div class="mb-16" />
+
+      <Heading size={5}>OAuth apps</Heading>
+      <SettingsOAuth2AppList />
+      <div class="mb-2" />
+      <Button
+        label="Add Oauth2 app"
+        href="/settings/oauth2-app/add"
         size="sm"
       ></Button>
       <div class="mb-6" />

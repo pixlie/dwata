@@ -61,58 +61,59 @@ const EmailAccountBox: Component = () => {
   );
 };
 
+interface ISearchFormData {
+  query: string;
+}
+
 const Search: Component = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
-  const [emailAccounts, mailboxes, emails, { fetchEmailsForMailbox }] =
+  const [emailAccounts, _mailboxes, emails, { fetchEmailsForAccounts }] =
     useSearchableData();
-  const [formData, setFormData] = createSignal<{
-    [key: string]: IFormFieldValue;
-  }>({});
-  const [_r, { mutate: _m, refetch: refetchEmails }] = createResource(
-    async () => {
-      if (emailAccounts.state !== "ready") {
-        return;
-      }
-      for (const emailAccount of emailAccounts()?.data) {
-        await invoke("fetch_emails", {
-          pk: emailAccount.id,
-        });
-      }
-    },
-  );
+  const [formData, setFormData] = createSignal<ISearchFormData>({
+    query: "",
+  });
+  // const [_r, { mutate: _m, refetch: refetchEmails }] = createResource(
+  //   async () => {
+  //     if (emailAccounts.state !== "ready") {
+  //       return;
+  //     }
+  //     for (const emailAccount of emailAccounts()?.data) {
+  //       await invoke("fetch_emails", {
+  //         pk: emailAccount.id,
+  //       });
+  //     }
+  //   },
+  // );
 
   createComputed((isFetched) => {
     if (!isFetched && emailAccounts.state === "ready") {
-      refetchEmails();
+      // refetchEmails();
+      if (emailAccounts.state === "ready" && emailAccounts().data.length > 0) {
+        let emailAccountIdList = emailAccounts().data.map((x) => x.id);
+        fetchEmailsForAccounts(emailAccountIdList, undefined);
+      }
       return true;
     }
   }, false);
 
   createComputed(() => {
-    const searchQuery =
-      !!formData().query && (formData()!.query! as string).length >= 1
-        ? `${formData().query}`.trim()
-        : undefined;
+    if (!formData() || !formData().query || !formData().query.length) {
+      return;
+    }
+    const searchQuery = formData().query.trim();
     if (!!searchParams.emailAccountId) {
       // Load emails (recent or for search query) from this email account
-      if (mailboxes.state === "ready" && mailboxes().data.length > 0) {
-        const mailbox = mailboxes().data.find(
-          (x) =>
-            x.name.toLowerCase() === "sent" &&
-            x.emailAccountId === parseInt(searchParams.emailAccountId!),
-        );
-        if (mailbox) {
-          fetchEmailsForMailbox(mailbox.id, searchQuery);
-        }
-      }
+      fetchEmailsForAccounts(
+        [parseInt(searchParams.emailAccountId)],
+        searchQuery,
+      );
     } else {
       // Load emails (recent or for search query) from all email accounts
-      if (mailboxes.state === "ready" && mailboxes().data.length > 0) {
-        for (const mb of mailboxes().data) {
-          fetchEmailsForMailbox(mb.id, searchQuery);
-        }
+      if (emailAccounts.state === "ready" && emailAccounts().data.length > 0) {
+        let emailAccountIdList = emailAccounts().data.map((x) => x.id);
+        fetchEmailsForAccounts(emailAccountIdList, searchQuery);
       }
     }
   });
@@ -122,20 +123,6 @@ const Search: Component = () => {
       ...state,
       [name]: value,
     }));
-
-    // Load search results
-    if (mailboxes.state === "ready" && mailboxes().data.length > 0) {
-      const mailbox = mailboxes().data.find(
-        (x) => x.name.toLowerCase() === "sent",
-      );
-      const searchQuery =
-        !!formData().query && (formData()!.query! as string).length >= 1
-          ? `${formData().query}`.trim()
-          : undefined;
-      if (mailbox) {
-        fetchEmailsForMailbox(mailbox.id, searchQuery);
-      }
-    }
   };
 
   const getSearchTypeDisplay = createMemo(() => {
@@ -169,22 +156,26 @@ const Search: Component = () => {
         placeholder={`Search${getSearchTypeDisplay()}`}
       />
 
-      <div class="mt-2 overflow-y-auto">
-        {!!params.searchType && params.searchType === "files" ? (
-          <div class="grid grid-cols-5 gap-4">
+      <div class="flex mt-2 h-full gap-x-4">
+        <div class="h-full overflow-y-auto max-w-screen-sm pr-4">
+          {!!params.searchType && params.searchType === "files" ? (
+            <div class="grid grid-cols-5 gap-4">
+              <For each={emails()?.data}>
+                {(result) => <SearchResultFileItem {...result} />}
+              </For>
+            </div>
+          ) : null}
+          {!!params.searchType && params.searchType === "emails" ? (
             <For each={emails()?.data}>
-              {(result) => <SearchResultFileItem {...result} />}
+              {(result) => <SearchResultEmailItem {...result} />}
             </For>
-          </div>
-        ) : null}
-        {!!params.searchType && params.searchType === "emails" ? (
-          <For each={emails()?.data}>
-            {(result) => <SearchResultEmailItem {...result} />}
-          </For>
-        ) : null}
-      </div>
+          ) : null}
 
-      <Pagination />
+          <Pagination />
+        </div>
+
+        <div class="h-full overflow-y-auto grow"></div>
+      </div>
     </div>
   );
 };

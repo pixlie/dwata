@@ -5,7 +5,6 @@ interface IPropTypes {
   label: string;
   icon: string;
   href?: string;
-  status?: "enabled" | "disabled";
   isActive?: boolean;
   infoTag?: string;
   size?: "sm" | "md" | "lg";
@@ -34,8 +33,8 @@ const NavigationLink: Component<IPropTypes> = (props) => {
       <a
         class={
           sizeClasses +
-          " block select-none rounded hover:bg-zinc-700 " +
-          (!!props.isActive ? "font-bold" : "")
+          " block select-none rounded hover:bg-slate-200 " +
+          (!!props.isActive ? "bg-slate-300" : "")
         }
         style={{
           color: getColors().colors["sideBar.foreground"],

@@ -79,8 +79,8 @@ pub struct SearchedEmail {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct EmailFilters {
-    #[ts(type = "number")]
-    pub email_account_id: Option<i64>,
+    #[ts(type = "Array<number>")]
+    pub email_account_id_list: Option<Vec<i64>>,
     // pub from_name: Option<String>,
     // pub from_email: Option<String>,
     // #[ts(type = "number")]

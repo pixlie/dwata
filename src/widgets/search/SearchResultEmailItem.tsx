@@ -1,29 +1,33 @@
 import { Component } from "solid-js";
 import { Email } from "../../api_types/Email";
 import { useUserInterface } from "../../stores/userInterface";
-import SecondsToDate from "../display/secondsToDate";
+import { SecondsToRelativeDateTime } from "../display/DateTime";
 
 const SearchResultEmailItem: Component<Email> = (props) => {
   const [_, { getColors }] = useUserInterface();
+
+  let fromAddress = props.fromEmailAddress;
+  // We remove the actual email address from the format "Name <email>"
+  fromAddress = fromAddress?.replace(/<(.*?)>/, "");
+
   return (
     <div
-      class="border-b py-3"
+      class="border-b py-3 px-4"
       style={{
-        "border-color": getColors().colors["editorWidget.border"],
+        "border-color": getColors().colors["sideBar.border"],
         color: getColors().colors["editor.foreground"],
       }}
     >
-      <div class="py-1 px-8">{props.fromEmailAddress}</div>
-      <div class="text-lg font-semibold px-8">{props.subject}</div>
-
-      <div class="font-thin px-8">{props.bodyText}</div>
-
-      <div class="mt-1 font-thin text-sm px-4 py-1 flex gap-4">
-        <span class="grow" />
-        <span class="py-0.5">
-          Date: <SecondsToDate seconds={props.date} />
-        </span>
+      <div class="flex py-1">
+        <div class="grow font-normal">{fromAddress}</div>
+        <div class="font-normal">
+          <SecondsToRelativeDateTime seconds={props.date} />
+        </div>
       </div>
+
+      <div class="text-xl font-semibold line-clamp-1">{props.subject}</div>
+
+      <div class="font-thin line-clamp-3">{props.bodyText}</div>
     </div>
   );
 };

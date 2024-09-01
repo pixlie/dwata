@@ -5,8 +5,8 @@ use crate::workspace::crud::{CRUDCreateUpdate, CRUDReadFilter, InputValue, VecCo
 impl CRUDReadFilter for EmailFilters {
     fn get_column_names_values_to_filter(&self) -> VecColumnNameValue {
         let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
-        if let Some(x) = &self.email_account_id {
-            name_values.push_name_value("email_account_id", InputValue::ID(*x));
+        if let Some(x) = &self.email_account_id_list {
+            name_values.push_name_value("email_account_id_list", InputValue::IDList(x.clone()));
         }
         if let Some(x) = &self.search_query {
             name_values.push_name_value("search_query", InputValue::Text(x.clone()));

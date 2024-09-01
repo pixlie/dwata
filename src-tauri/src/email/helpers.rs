@@ -282,13 +282,14 @@ pub async fn search_emails_in_tantity_and_dwata_db(
         Some(InputValue::Text(x)) => {
             match search_emails_in_tantivy(x, email_account_id, storage_dir).await {
                 Ok(emails) => {
+                    info!("Found {} emails", emails.len());
                     if where_clause {
-                        query_builder.push(" AND id IN (?)");
-                        count_builder.push(" AND id IN (?)");
+                        query_builder.push(" AND id IN (");
+                        count_builder.push(" AND id IN (");
                     } else {
                         where_clause = true;
-                        query_builder.push(" WHERE id IN (?)");
-                        count_builder.push(" WHERE id IN (?)");
+                        query_builder.push(" WHERE id IN (");
+                        count_builder.push(" WHERE id IN (");
                     }
                     query_builder.push_bind(
                         emails
@@ -297,6 +298,8 @@ pub async fn search_emails_in_tantity_and_dwata_db(
                             .collect::<Vec<_>>()
                             .join(","),
                     );
+                    query_builder.push(")");
+                    count_builder.push(")");
                 }
                 Err(err) => return Err(err),
             };
@@ -313,7 +316,16 @@ pub async fn search_emails_in_tantity_and_dwata_db(
             // We select first 200 characters of the body text for each email
             result.iter_mut().for_each(|x: &mut Email| {
                 if let Some(body) = &x.body_text {
-                    x.body_text = Some(body.clone().chars().take(400).collect::<String>());
+                    let mut body_text = Some(body.clone().chars().take(400).collect::<String>());
+                    // We remove consecutive new lines from the body text
+                    body_text = body_text.map(|x| x.replace("\n\n", "\n"));
+                    // We remove consecutive spaces from the body text
+                    body_text = body_text.map(|x| x.replace("  ", " "));
+                    // We remove consecutive tabs from the body text
+                    body_text = body_text.map(|x| x.replace("\t", " "));
+                    // We remove consecutive dashes (2 or more) from the body text using a regex
+                    body_text = body_text.map(|x| x.replace(r"-{2,}", "-"));
+                    x.body_text = body_text;
                 }
             });
             let count = match count_builder

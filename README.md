@@ -82,3 +82,7 @@ The Personal edition of dwata is completely free to use. Professional and Power 
 _Please remember that you pay for your AI model usage costs yourself (OpenAI, Anthropic, Groq, etc)_
 
 Please check the [website](https://dwata.com/pricing) for pricing details.
+
+## Credits
+
+- [Logo of dwata](https://www.iconfinder.com/iconsets/business-and-finance-colorful-free-hand-drawn-set) by [Denis Sazhin](https://iconka.com/)
