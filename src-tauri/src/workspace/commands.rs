@@ -4,7 +4,6 @@ use super::{
     Module, ModuleDataCreateUpdate, ModuleDataList, ModuleDataRead, ModuleDataReadList,
     ModuleFilters,
 };
-use crate::ai_integration::AIIntegration;
 use crate::database_source::DatabaseSource;
 use crate::directory_source::DirectorySource;
 use crate::email_account::EmailAccount;
@@ -12,6 +11,7 @@ use crate::error::DwataError;
 use crate::oauth2::OAuth2App;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::CRUDRead;
+use crate::{ai_integration::AIIntegration, email::Email};
 use crate::{chat::Chat, email_account::Mailbox};
 use log::error;
 use sqlx::{FromRow, Pool, Sqlite};
@@ -197,6 +197,9 @@ pub async fn read_module_item_by_pk(
         Module::Mailbox => Mailbox::read_one_by_pk(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::Mailbox(x))),
+        Module::Email => Email::read_one_by_pk(pk, db)
+            .await
+            .and_then(|x| Ok(ModuleDataRead::Email(x))),
         _ => {
             error!("Invalid module {}", module.to_string());
             Err(DwataError::ModuleNotFound)

@@ -33,6 +33,7 @@ pub enum Module {
 }
 
 #[derive(Serialize, TS)]
+#[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataRead {
     UserAccount(UserAccount),

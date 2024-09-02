@@ -59,10 +59,10 @@ pub struct EmailAccountCreateUpdate {
     pub email_address: Option<String>,
     pub password: Option<String>,
     pub oauth2_app_id: Option<i64>,
-    pub oauth2_token_id: Option<i64>,
+    // pub oauth2_token_id: Option<i64>,
 }
 
-#[derive(Clone, Serialize, FromRow, TS)]
+#[derive(Serialize, FromRow, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Mailbox {

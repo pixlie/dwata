@@ -1,6 +1,8 @@
-use super::{EmailCreateUpdate, EmailFilters};
+use super::{Email, EmailCreateUpdate, EmailFilters};
 use crate::error::DwataError;
-use crate::workspace::crud::{CRUDCreateUpdate, CRUDReadFilter, InputValue, VecColumnNameValue};
+use crate::workspace::crud::{
+    CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue,
+};
 
 impl CRUDReadFilter for EmailFilters {
     fn get_column_names_values_to_filter(&self) -> VecColumnNameValue {
@@ -27,5 +29,11 @@ impl CRUDCreateUpdate for EmailCreateUpdate {
         }
 
         Ok(names_values)
+    }
+}
+
+impl CRUDRead for Email {
+    fn table_name() -> String {
+        "email".to_string()
     }
 }

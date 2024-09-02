@@ -18,13 +18,14 @@ import { searchRoutes } from "./routeList";
 import SearchResultEmailItem from "../widgets/search/SearchResultEmailItem";
 import SearchResultFileItem from "../widgets/search/SearchResultFileItem";
 import Pagination from "../widgets/navigation/Pagination";
+import SelectedEmail from "../widgets/search/SelectedEmail";
 
 const MailboxLabel: Component<Mailbox> = (props) => {
   return <div>{props.name}</div>;
 };
 
 const EmailAccountBox: Component = () => {
-  const [emailAccounts, mailboxes] = useSearchableData();
+  const [{ emailAccounts, mailboxes }] = useSearchableData();
   const [searchParams] = useSearchParams();
 
   const getEmailAccount = createMemo<EmailAccount | undefined>(() => {
@@ -69,7 +70,7 @@ const Search: Component = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
-  const [emailAccounts, _mailboxes, emails, { fetchEmailsForAccounts }] =
+  const [{ emailAccounts, emails }, { fetchEmailsForAccounts }] =
     useSearchableData();
   const [formData, setFormData] = createSignal<ISearchFormData>({
     query: "",
@@ -156,25 +157,29 @@ const Search: Component = () => {
         placeholder={`Search${getSearchTypeDisplay()}`}
       />
 
-      <div class="flex mt-2 h-full gap-x-4">
-        <div class="h-full overflow-y-auto max-w-screen-sm pr-4">
+      <div class="grid grid-cols-12 mt-2 h-full gap-4">
+        <div class="col-span-5 h-full overflow-y-hidden relative">
           {!!params.searchType && params.searchType === "files" ? (
-            <div class="grid grid-cols-5 gap-4">
+            <div class="grid grid-cols-5 gap-4 h-full overflow-y-auto pb-32">
               <For each={emails()?.data}>
                 {(result) => <SearchResultFileItem {...result} />}
               </For>
             </div>
           ) : null}
           {!!params.searchType && params.searchType === "emails" ? (
-            <For each={emails()?.data}>
-              {(result) => <SearchResultEmailItem {...result} />}
-            </For>
+            <div class="h-full overflow-y-auto pb-32">
+              <For each={emails()?.data}>
+                {(result) => <SearchResultEmailItem {...result} />}
+              </For>
+            </div>
           ) : null}
 
           <Pagination />
         </div>
 
-        <div class="h-full overflow-y-auto grow"></div>
+        <div class="overflow-y-auto col-span-7">
+          <SelectedEmail />
+        </div>
       </div>
     </div>
   );
