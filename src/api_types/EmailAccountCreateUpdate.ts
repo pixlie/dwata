@@ -5,5 +5,4 @@ export type EmailAccountCreateUpdate = {
   emailAddress: string | null;
   password: string | null;
   oauth2AppId: bigint | null;
-  oauth2TokenId: bigint | null;
 };

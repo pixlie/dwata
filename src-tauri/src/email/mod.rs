@@ -6,6 +6,7 @@ use ts_rs::TS;
 pub mod commands;
 pub mod crud;
 pub mod helpers;
+pub mod tests;
 
 #[derive(Deserialize, Serialize, TS, Type, EnumString, Display)]
 #[sqlx(rename_all = "lowercase")]

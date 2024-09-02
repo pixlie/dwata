@@ -7,6 +7,7 @@ import { Email } from "../api_types/Email";
 import { EmailAccount } from "../api_types/EmailAccount";
 import { Mailbox } from "../api_types/Mailbox";
 import { ModuleFilters } from "../api_types/ModuleFilters";
+import { ModuleDataRead } from "../api_types/ModuleDataRead";
 
 const makeStore = () => {
   const [emails, { mutate: _mutateEmails, refetch: refetchEmails }] =
@@ -93,10 +94,31 @@ const makeStore = () => {
       },
     );
 
+  const [
+    selectedEmail,
+    { mutate: _mutateSelectedEmail, refetch: refetchSelectedEmail },
+  ] = createResource<Email | undefined>(
+    async (_, { value: _value, refetching }) => {
+      if (
+        !refetching ||
+        typeof refetching !== "object" ||
+        !("emailId" in refetching)
+      ) {
+        return undefined;
+      }
+      const result = await invoke<ModuleDataRead>("read_module_item_by_pk", {
+        module: "Email" as Module,
+        pk: refetching.emailId,
+      });
+      if (!!result && "type" in result && result["type"] === "Email") {
+        return result["data"];
+      }
+      return undefined;
+    },
+  );
+
   return [
-    emailAccounts,
-    mailboxes,
-    emails,
+    { emailAccounts, mailboxes, emails, selectedEmail },
     {
       fetchAllEmailAccounts: () => {
         refetchEmailAccounts();
@@ -112,6 +134,10 @@ const makeStore = () => {
       ) => {
         if (!emailAccountIdList) return;
         refetchEmails({ emailAccountIdList, searchQuery });
+      },
+
+      fetchFullEmailByPk: (emailId: number) => {
+        refetchSelectedEmail({ emailId });
       },
     },
   ] as const; // `as const` forces tuple type inference

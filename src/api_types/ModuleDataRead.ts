@@ -10,12 +10,12 @@ import type { OAuth2App } from "./OAuth2App";
 import type { UserAccount } from "./UserAccount";
 
 export type ModuleDataRead =
-  | { UserAccount: UserAccount }
-  | { DirectorySource: DirectorySource }
-  | { DatabaseSource: DatabaseSource }
-  | { AIIntegration: AIIntegration }
-  | { Chat: Chat }
-  | { OAuth2App: OAuth2App }
-  | { EmailAccount: EmailAccount }
-  | { Mailbox: Mailbox }
-  | { Email: Email };
+  | { type: "UserAccount"; data: UserAccount }
+  | { type: "DirectorySource"; data: DirectorySource }
+  | { type: "DatabaseSource"; data: DatabaseSource }
+  | { type: "AIIntegration"; data: AIIntegration }
+  | { type: "Chat"; data: Chat }
+  | { type: "OAuth2App"; data: OAuth2App }
+  | { type: "EmailAccount"; data: EmailAccount }
+  | { type: "Mailbox"; data: Mailbox }
+  | { type: "Email"; data: Email };

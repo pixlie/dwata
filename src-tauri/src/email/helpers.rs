@@ -5,6 +5,7 @@ use crate::workspace::crud::{CRUDRead, CRUDReadFilter, InputValue, VecColumnName
 use chrono::{DateTime, Utc};
 use log::{error, info};
 use mail_parser::MessageParser;
+use regex::Regex;
 use sqlx::{Execute, Pool, QueryBuilder, Sqlite};
 use std::{fs::create_dir_all, path::PathBuf};
 use tantivy::{
@@ -254,6 +255,41 @@ pub async fn search_emails_in_tantivy(
     Ok(emails)
 }
 
+pub fn clean_email_body_text(body_text: &String) -> String {
+    let mut body_text = body_text.clone().chars().take(400).collect::<String>();
+    // We remove consecutive new lines from the body text
+    match Regex::new(r"\n{2,}") {
+        Ok(re) => {
+            body_text = re.replace(&body_text, "\n").to_string();
+        }
+        Err(_) => {}
+    };
+    // We remove consecutive spaces from the body text
+    match Regex::new(r" {2,}") {
+        Ok(re) => {
+            body_text = re.replace(&body_text, " ").to_string();
+        }
+        Err(_) => {}
+    };
+    // We remove consecutive tabs from the body text
+    // body_text = body_text.map(|x| x.replace("\t", " "));
+    // We remove consecutive underscores (2 or more) from the body text
+    match Regex::new("_{2,}") {
+        Ok(re) => {
+            body_text = re.replace(&body_text, "").to_string();
+        }
+        Err(_) => {}
+    };
+    // We remove consecutive dashes (2 or more) from the body text
+    match Regex::new(r"\-{2,}") {
+        Ok(re) => {
+            body_text = re.replace(&body_text, "").to_string();
+        }
+        Err(_) => {}
+    };
+    body_text
+}
+
 pub async fn search_emails_in_tantity_and_dwata_db(
     filters: EmailFilters,
     limit: usize,
@@ -316,16 +352,7 @@ pub async fn search_emails_in_tantity_and_dwata_db(
             // We select first 200 characters of the body text for each email
             result.iter_mut().for_each(|x: &mut Email| {
                 if let Some(body) = &x.body_text {
-                    let mut body_text = Some(body.clone().chars().take(400).collect::<String>());
-                    // We remove consecutive new lines from the body text
-                    body_text = body_text.map(|x| x.replace("\n\n", "\n"));
-                    // We remove consecutive spaces from the body text
-                    body_text = body_text.map(|x| x.replace("  ", " "));
-                    // We remove consecutive tabs from the body text
-                    body_text = body_text.map(|x| x.replace("\t", " "));
-                    // We remove consecutive dashes (2 or more) from the body text using a regex
-                    body_text = body_text.map(|x| x.replace(r"-{2,}", "-"));
-                    x.body_text = body_text;
+                    x.body_text = Some(clean_email_body_text(body));
                 }
             });
             let count = match count_builder

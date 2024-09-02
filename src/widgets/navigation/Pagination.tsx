@@ -14,9 +14,10 @@ const Pagination: Component = () => {
   const [_, { getColors }] = useUserInterface();
   return (
     <div
-      class="flex justify-center pt-2"
+      class="absolute bottom-0 left-0 right-0 h-20 justify-center pt-2"
       style={{
         color: getColors().colors["editor.foreground"],
+        "background-color": getColors().colors["panel.background"],
       }}
     >
       <PaginationItem label="Previous" />
