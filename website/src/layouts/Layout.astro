@@ -2,15 +2,14 @@
 import { SEO } from "astro-seo";
 import Footer from "@components/footer.astro";
 import Navbar from "@components/navbar/navbar.astro";
-// Supports weights 300-700
-import "@fontsource-variable/space-grotesk";
+// Supports weights 200-900
+import "@fontsource-variable/source-serif-4";
 // Supports weights 200-800
 import "@fontsource-variable/manrope";
 
 export interface Props {
   title: string;
 }
-
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
 
 const resolvedImageWithDomain = new URL(
@@ -36,7 +35,7 @@ const makeTitle = title
     <!-- <link rel="preload" as="image" href={src} alt="Hero" /> -->
     <SEO
       title={makeTitle}
-      description="general purpose AI studio. Mix AI models, connect to databases, APIs (like Stripe), CSV/Excel files, even email"
+      description=""
       canonical={canonicalURL}
       twitter={{
         creator: "@sumitdatta",
@@ -58,7 +57,7 @@ const makeTitle = title
       h2,
       h3,
       h4 {
-        font-family: "Space Grotesk Variable", sans-serif;
+        font-family: "Source Serif 4 Variable", serif;
       }
     </style>
   </body>

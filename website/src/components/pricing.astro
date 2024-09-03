@@ -56,7 +56,9 @@ const { plan } = Astro.props;
           <div class="mt-8 text-center text-sm">Coming soon</div>
         ) : (
           <div class="mt-4 flex flex-col gap-y-8">
-            <div class="text-center text-sm">Some features are not ready</div>
+            <div class="text-center text-sm text-red-400 py-2">
+              Some features are not ready
+            </div>
             <Link
               href={"https://github.com/pixlie/dwata/packages"}
               block

@@ -1,41 +1,42 @@
 ---
 import { Picture } from "astro:assets";
-import heroImage from "assets/hero.png";
+import dwataScreenshot from "assets/0.2.0_email_screen.png";
 import Link from "@components/ui/link.astro";
 import { Icon } from "astro-icon/components";
 ---
 
-<main
-  class="grid md:grid-cols-2 place-items-center pt-16 pb-8 md:pt-12 md:pb-24">
-  <div class="py-6 md:order-1 hidden md:block">
-    <Picture
-      src={heroImage}
-      alt="Astronaut in the air"
-      widths={[200, 400, 600]}
-      sizes="(max-width: 800px) 100vw, 620px"
-      loading="eager"
-      format="avif"
-    />
-  </div>
+<main class="pt-2 md:pt-16 pb-8 md:pb-24">
   <div>
-    <h1
-      class="text-5xl lg:text-6xl xl:text-7xl font-bold lg:tracking-tight xl:tracking-tighter">
-      Communications: managed
+    <h1 class="text-5xl lg:text-7xl font-bold lg:tracking-tight">
+      Your emails are a treasure trove.
     </h1>
-    <div class="mt-4 text-slate-600 max-w-xl">
-      <div class="text-xl">
-        One app for your emails, calendars, contacts, files, Slack, blogs and
-        much more.
+    <div class="mt-4">
+      <Picture
+        src={dwataScreenshot}
+        alt="Email screen in dwata"
+        class="w-full max-w-screen-md mx-auto rounded-md drop-shadow-md my-12"
+      />
+
+      <div
+        class="text-xl md:text-3xl text-center font-semibold my-6 text-slate-700">
+        dwata is a private app that uses AI to unlock your emails' real value.
+        Emails, files, calendars, contacts: all searchable and beautifully
+        organized.
       </div>
 
-      <div class="flex flex-col text-lg gap-y-1 mt-3">
+      <div class="flex flex-col text-lg gap-y-1 mt-3 text-slate-600">
         <div><strong>Blazing fast</strong> search</div>
+        <div><strong>Unlimited</strong> accounts</div>
         <div>
-          <strong>Offline</strong> access for unlimited accounts
+          Runs on <strong>your computer</strong>
         </div>
         <div>
-          <strong>Open source</strong> desktop app for complete privacy
+          Open source and <strong>100% private</strong>
         </div>
+      </div>
+
+      <div class="text-red-400 mt-6">
+        dwata is in a very early stage of development
       </div>
 
       <div class="mt-3 flex flex-col sm:flex-row gap-3">

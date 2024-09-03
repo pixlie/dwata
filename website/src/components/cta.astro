@@ -1,17 +1,24 @@
 ---
+import { Picture } from "astro:assets";
 import Link from "./ui/link.astro";
+import sumitThumbnail from "assets/Sumit_thumbnail.jpg";
 ---
 
 <div
-  class="bg-black p-8 md:px-20 md:py-20 mt-20 mx-auto max-w-5xl rounded-lg flex flex-col items-center text-center">
-  <h2 class="text-white text-4xl md:text-6xl tracking-tight">
+  class="bg-black p-8 md:px-20 md:py-20 mt-20 mx-auto max-w-5xl rounded-lg flex flex-col items-center">
+  <h2 class="text-white text-4xl md:text-6xl tracking-tight text-center">
     Software for impact
   </h2>
   <p class="text-slate-400 mt-4 text-lg md:text-xl">
-    Hi, I am Sumit. I am building dwata because I feel software should empower
-    all of us, irrespective of how much we can pay. Software for daily impact is
-    at the heart of dwata. Let's join to build a better digital future for
-    everyone. Please feel free to connect and share your thoughts.
+    <Picture
+      src={sumitThumbnail}
+      alt="Sumit Datta"
+      class="w-24 rounded-md float-left mr-4"
+    />
+    Hi, I am Sumit. I am building dwata because I believe AI can be helpful only
+    when we can easily share our data with it. dwata is private from the ground up,
+    enabling you to safely create your personal assistant. I would love to talk to
+    you about your digital workflow.
   </p>
   <div class="flex mt-5">
     <Link href="https://www.linkedin.com/in/brainless/" style="inverted"
