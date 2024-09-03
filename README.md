@@ -1,17 +1,25 @@
 # dwata
 
-## Communications: managed
+## Your emails are a treasure trove.
 
-One app for your emails, calendars, contacts, files, Slack, blogs and much more.
-Blazing fast search, offline access for unlimited accounts.
+![Email screen](./docs/assets/0.2.0_email_screen.png?raw=true)
 
-Open source and runs on your laptop for complete privacy. dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission.
+dwata is a private app that uses AI to unlock your emails' real value. Emails, files, calendars, contacts: all searchable and beautifully organized.
+
+- Blazing fast search
+- Unlimited accounts
+- Runs on your computer
+- Open source and 100% private
+
+dwata **does not** send any data (not even product analytics) outside your computer without your explicit permission. dwata can use Ollama for full privacy.
 
 > [!WARNING]
 >
 > dwata is in a very early stage of development.
 
-## Emails, files, Slack... a thousand paper cuts
+[Download for free](https://github.com/pixlie/dwata/releases)
+
+## Our inboxes are like thousand paper cuts.
 
 Getting everything in one place, searching across mutliple accounts, keeping track of todos, delegating information with others can all take up a lot of our daily time. Some days we are on top of our digital life, while on other days they drag us down.
 

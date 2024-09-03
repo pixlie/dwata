@@ -5,9 +5,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: [
-          "Space Grotesk Variable",
-          ...defaultTheme.fontFamily.sans,
+        serif: [
+          "Source Serif 4 Variable",
+          ...defaultTheme.fontFamily.serif,
         ],
         sans: [
           "Manrope Variable",
