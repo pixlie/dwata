@@ -12,7 +12,7 @@ const searchRoutes = [
   // },
   {
     label: "All Emails",
-    icon: "fa-solid fa-envelope",
+    icon: "inbox",
     href: "/search/emails",
   },
   // {
@@ -22,7 +22,7 @@ const searchRoutes = [
   // },
   {
     label: "Contacts",
-    icon: "fa-solid fa-address-book",
+    icon: "address-book",
     href: "/coming-soon/contacts",
   },
   // {
@@ -42,7 +42,7 @@ const searchRoutes = [
   // },
   {
     label: "Files",
-    icon: "fa-solid fa-file",
+    icon: "folder",
     href: "/search/files",
   },
   // {
