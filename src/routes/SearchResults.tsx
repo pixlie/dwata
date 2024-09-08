@@ -6,13 +6,10 @@ import {
   createSignal,
 } from "solid-js";
 import Heading from "../widgets/typography/Heading";
-import TextInput from "../widgets/interactable/TextInput";
-import { IFormFieldValue } from "../utils/types";
 import { useLocation, useParams, useSearchParams } from "@solidjs/router";
 import { EmailAccount } from "../api_types/EmailAccount";
 import { useSearchableData } from "../stores/searchableData";
 import { Mailbox } from "../api_types/Mailbox";
-import { searchRoutes } from "./routeList";
 import SearchResultEmailItem from "../widgets/search/SearchResultEmailItem";
 import SearchResultFileItem from "../widgets/search/SearchResultFileItem";
 import SelectedEmail from "../widgets/search/SelectedEmail";

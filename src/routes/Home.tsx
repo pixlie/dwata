@@ -8,8 +8,9 @@ const Home: Component = () => {
 
   return (
     <div class="max-w-screen-md mx-auto select-none cursor-default flex flex-col h-full">
-      <Heading size={2}>
-        Emails, calendars, contacts, files, Slack, blogs and much more.
+      <Heading size={2}>Insights that work.</Heading>
+      <Heading size={4}>
+        From your emails, files, calendars, Slack and more.
       </Heading>
 
       <div

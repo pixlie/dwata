@@ -2,8 +2,8 @@ import { Component, createComputed, createMemo, createSignal } from "solid-js";
 import { IFormFieldValue } from "../../utils/types";
 import { useLocation, useParams, useSearchParams } from "@solidjs/router";
 import { useSearchableData } from "../../stores/searchableData";
-import { searchRoutes } from "../../routes/routeList";
 import TextInput from "../interactable/TextInput";
+import { routes } from "../../routes/routeList";
 
 interface ISearchFormData {
   query: string;
@@ -12,8 +12,8 @@ interface ISearchFormData {
 const Search: Component = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const params = useParams();
-  const [{ emailAccounts, emails }, { fetchEmailsForAccounts }] =
+  // const params = useParams();
+  const [{ emailAccounts, _emails }, { fetchEmailsForAccounts }] =
     useSearchableData();
   const [formData, setFormData] = createSignal<ISearchFormData>({
     query: "",
@@ -71,9 +71,7 @@ const Search: Component = () => {
 
   const getSearchTypeDisplay = createMemo(() => {
     if (!!location.pathname) {
-      const matchedRoute = searchRoutes.find(
-        (x) => x.href === location.pathname,
-      );
+      const matchedRoute = routes.find((x) => x.href === location.pathname);
       if (matchedRoute) {
         return " " + matchedRoute.label.toLowerCase();
       }

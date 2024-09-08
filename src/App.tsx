@@ -25,12 +25,10 @@ const MainContent: Component<RouteSectionProps> = (props) => {
       <Sidebar />
 
       <main class={"pl-20 h-full w-full " + getClasses()["app"]}>
-        {/* <div class="xl:pl-96"> */}
         <div class="px-8 pt-2 pb-24">
           {/* Main area */}
           {props.children}
         </div>
-        {/* </div> */}
       </main>
     </>
   );

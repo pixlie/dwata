@@ -1,6 +1,6 @@
 import { Component, For } from "solid-js";
 import SidebarLink from "./SidebarLink";
-import { searchRoutes } from "../../routes/routeList";
+import { routes } from "../../routes/routeList";
 import { useTailwindClasses } from "../../stores/TailwindClasses";
 
 const Sidebar: Component = () => {
@@ -14,7 +14,7 @@ const Sidebar: Component = () => {
       }
     >
       <ul role="list" class="flex flex-col items-center space-y-1">
-        <For each={searchRoutes}>{(item) => <SidebarLink {...item} />}</For>
+        <For each={routes}>{(item) => <SidebarLink {...item} />}</For>
       </ul>
 
       {/* <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" /> */}

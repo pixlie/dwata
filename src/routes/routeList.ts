@@ -4,14 +4,19 @@ interface Route {
   href: string;
 }
 
-const searchRoutes = [
+const routes = [
   // {
   //   label: "Focus",
   //   icon: "fa-solid fa-circle-dot",
   //   href: "/coming-soon/focus",
   // },
   {
-    label: "All Emails",
+    label: "Insights",
+    icon: "insight",
+    href: "/insights",
+  },
+  {
+    label: "Emails",
     icon: "inbox",
     href: "/search/emails",
   },
@@ -53,4 +58,4 @@ const searchRoutes = [
 ];
 
 export type { Route };
-export { searchRoutes };
+export { routes };
