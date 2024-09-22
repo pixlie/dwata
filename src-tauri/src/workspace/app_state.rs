@@ -1,14 +1,12 @@
 use crate::error::DwataError;
 use log::{error, info};
-use sqlx::migrate::{MigrateDatabase, Migrator};
-use sqlx::{Pool, Sqlite};
 use std::fs::create_dir_all;
 use std::path::PathBuf;
 
 pub async fn get_database_connection(
     app_data_dir: &PathBuf,
     migrations_dir: PathBuf,
-) -> Result<Pool<Sqlite>, DwataError> {
+) -> Result<(), DwataError> {
     let mut path = app_data_dir.clone();
     path.push("databases");
     path.push("sqlite3");

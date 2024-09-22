@@ -9,17 +9,17 @@ use tauri::{path::BaseDirectory, App, Manager};
 use tokio::sync::Mutex;
 use workspace::app_state::get_database_connection;
 
-mod chat;
-mod database_source;
-mod directory_source;
+// mod chat;
+// mod database_source;
+// mod directory_source;
 mod error;
-mod labels;
-mod relational_database;
+// mod labels;
+// mod relational_database;
 // mod saved_query;
 mod ai_integration;
 mod content;
-mod embedding;
-mod text_generation;
+// mod embedding;
+// mod text_generation;
 // mod schema;
 mod user_account;
 // mod workflow;
@@ -77,11 +77,11 @@ fn main() {
             workspace::commands::update_module_item,
             workspace::commands::upsert_module_item,
             workspace::process_log::get_process_log,
-            directory_source::commands::fetch_file_list_in_directory,
-            directory_source::commands::fetch_file_content_list,
+            // directory_source::commands::fetch_file_list_in_directory,
+            // directory_source::commands::fetch_file_content_list,
             ai_integration::commands::get_ai_model_list,
             ai_integration::commands::get_ai_model_choice_list,
-            text_generation::commands::chat_with_ai,
+            // text_generation::commands::chat_with_ai,
             email_account::commands::fetch_emails,
             email::commands::search_emails,
             oauth2::commands::get_oauth2_app_choice_list,

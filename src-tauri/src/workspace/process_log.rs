@@ -1,13 +1,13 @@
 use super::{
-    crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
-    ProcessLog, ProcessLogCreateUpdate,
+    // crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
+    ProcessLog,
+    ProcessLogCreateUpdate,
 };
 use crate::error::DwataError;
 use chrono::Utc;
 use log::error;
-use sqlx::{query, query_as, Pool, Sqlite};
-use std::{ops::Deref, time::Duration};
-use tauri::{AppHandle, Emitter, State};
+use std::time::Duration;
+use tauri::{AppHandle, Emitter};
 use tokio::time::interval;
 
 impl CRUDRead for ProcessLog {
@@ -41,12 +41,8 @@ impl CRUDCreateUpdate for ProcessLogCreateUpdate {
 }
 
 #[tauri::command]
-pub async fn get_process_log(
-    db: State<'_, Pool<Sqlite>>,
-    app: AppHandle,
-) -> Result<(), DwataError> {
+pub async fn get_process_log(app: AppHandle) -> Result<(), DwataError> {
     let mut interval = interval(Duration::from_secs(2));
-    let db = db.deref();
     loop {
         interval.tick().await;
         // Let's read the process_log table and send any pending updates to the frontend

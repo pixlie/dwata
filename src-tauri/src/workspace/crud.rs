@@ -5,8 +5,6 @@ use chrono::{DateTime, Utc};
 use log::{error, info};
 use serde::Serialize;
 use serde_json::Value;
-use sqlx::sqlite::SqliteRow;
-use sqlx::{query_as, query_scalar, Execute, FromRow, Pool, QueryBuilder, Sqlite};
 use ts_rs::TS;
 
 pub trait CRUDRead {
@@ -16,14 +14,9 @@ pub trait CRUDRead {
         None
     }
 
-    async fn read_all_helper(
-        limit: usize,
-        offset: usize,
-        db: &Pool<Sqlite>,
-    ) -> Result<(Vec<Self>, usize), DwataError>
+    async fn read_all_helper(limit: usize, offset: usize) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send + Unpin,
-        for<'r> Self: FromRow<'r, SqliteRow>,
+        Self: Sized + Send,
     {
         match query_as(&format!(
             "SELECT * FROM {} LIMIT {} OFFSET {}",
@@ -69,36 +62,30 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_all(
-        limit: usize,
-        offset: usize,
-        db: &Pool<Sqlite>,
-    ) -> Result<(Vec<Self>, usize), DwataError>
+    async fn read_all(limit: usize, offset: usize) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send + Unpin,
-        for<'r> Self: FromRow<'r, SqliteRow>,
+        Self: Sized + Send,
     {
         // We check if there are default filters to apply
         let default_filters = Self::set_default_filters();
         match default_filters {
             Some(filters) => match filters {
                 ModuleFilters::AIIntegration(x) => {
-                    Self::read_with_filter_helper(x, limit, offset, db).await
+                    Self::read_with_filter_helper(x, limit, offset).await
                 }
-                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, limit, offset, db).await,
+                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, limit, offset).await,
                 _ => {
                     error!("Invalid module {}", filters.to_string());
                     Err(DwataError::ModuleNotFound)
                 }
             },
-            None => Self::read_all_helper(limit, offset, db).await,
+            None => Self::read_all_helper(limit, offset).await,
         }
     }
 
-    async fn read_one_by_pk(pk: i64, db: &Pool<Sqlite>) -> Result<Self, DwataError>
+    async fn read_one_by_pk(pk: i64) -> Result<Self, DwataError>
     where
-        Self: Sized + Send + Unpin,
-        for<'r> Self: FromRow<'r, SqliteRow>,
+        Self: Sized + Send,
     {
         let result: Result<Self, sqlx::Error> = query_as(&format!(
             "SELECT * FROM {} WHERE id = ?",
@@ -131,15 +118,13 @@ pub trait CRUDRead {
         filters: T,
         limit: usize,
         offset: usize,
-        db: &Pool<Sqlite>,
     ) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send + Unpin,
-        for<'r> Self: FromRow<'r, SqliteRow>,
+        Self: Sized + Send,
         T: CRUDReadFilter,
     {
-        let mut builder: QueryBuilder<Sqlite> =
-            QueryBuilder::new(format!("SELECT * FROM {} WHERE ", Self::table_name()));
+        // let mut builder: QueryBuilder<Sqlite> =
+        //     QueryBuilder::new(format!("SELECT * FROM {} WHERE ", Self::table_name()));
         // This QueryBuilder is used to count the number of rows, without using LIMIT and OFFSET in the same query
         let mut count_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
             "SELECT COUNT(*) FROM {} WHERE ",
@@ -249,14 +234,12 @@ pub trait CRUDRead {
         filters: T,
         limit: usize,
         offset: usize,
-        db: &Pool<Sqlite>,
     ) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send + Unpin,
-        for<'r> Self: FromRow<'r, SqliteRow>,
+        Self: Sized + Send,
         T: CRUDReadFilter,
     {
-        Self::read_with_filter_helper(filters, limit, offset, db).await
+        Self::read_with_filter_helper(filters, limit, offset).await
     }
 }
 
@@ -308,16 +291,13 @@ pub trait CRUDCreateUpdate {
 
     fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError>;
 
-    async fn pre_insert(&self, _db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
+    async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
         Ok(VecColumnNameValue::default())
     }
 
-    async fn insert_module_data(
-        &self,
-        db: &Pool<Sqlite>,
-    ) -> Result<InsertUpdateResponse, DwataError> {
+    async fn insert_module_data(&self) -> Result<InsertUpdateResponse, DwataError> {
         let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
-        let other_column_names_values: VecColumnNameValue = self.pre_insert(db).await?;
+        let other_column_names_values: VecColumnNameValue = self.pre_insert().await?;
         let column_names_values = VecColumnNameValue {
             0: [column_names_values.0, other_column_names_values.0].concat(),
         };
@@ -394,18 +374,13 @@ pub trait CRUDCreateUpdate {
     async fn post_insert(
         &self,
         response: InsertUpdateResponse,
-        _db: &Pool<Sqlite>,
     ) -> Result<InsertUpdateResponse, DwataError> {
         Ok(response)
     }
 
-    async fn update_module_data(
-        &self,
-        pk: i64,
-        db: &Pool<Sqlite>,
-    ) -> Result<InsertUpdateResponse, DwataError> {
-        let mut builder: QueryBuilder<Sqlite> =
-            QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
+    async fn update_module_data(&self, pk: i64) -> Result<InsertUpdateResponse, DwataError> {
+        // let mut builder: QueryBuilder<Sqlite> =
+        //     QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
         let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
         let mut count = 0;
         let limit = column_names_values.0.len();

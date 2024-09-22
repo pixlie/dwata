@@ -7,10 +7,9 @@ use crate::content::{
 };
 use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
-use sqlx::{Pool, Sqlite};
 
 impl Writable for OAuth2App {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         Ok(NextStep::Configure(Configuration {
             title: "OAuth2 credentials".to_string(),
             description: "OAuth2 credentials for third party services".to_string(),

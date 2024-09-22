@@ -5,10 +5,9 @@ use crate::content::{
 };
 use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
-use sqlx::{Pool, Sqlite};
 
 impl Writable for AIIntegration {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         let ai_provider_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
                 (AIProvider::OpenAI.to_string(), "OpenAI".to_string()),

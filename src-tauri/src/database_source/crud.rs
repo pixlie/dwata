@@ -3,7 +3,6 @@ use crate::database_source::helpers::check_database_connection;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue};
 use chrono::Utc;
-use sqlx::{Pool, Sqlite, SqliteConnection};
 use std::str::FromStr;
 
 impl CRUDRead for DatabaseSource {
@@ -44,7 +43,7 @@ impl CRUDCreateUpdate for DatabaseSourceCreateUpdate {
         Ok(names_values)
     }
 
-    async fn pre_insert(&self, _db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
+    async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
         // We connect to this database and check if it works
         check_database_connection(
             &DatabaseType::from_str(self.database_type.as_ref().unwrap())?,

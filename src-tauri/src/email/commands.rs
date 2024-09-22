@@ -4,9 +4,8 @@ use crate::{
     workspace::{ModuleDataList, ModuleDataReadList, ModuleFilters},
 };
 use log::error;
-use sqlx::{Pool, Sqlite};
 use std::ops::Deref;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 pub async fn search_emails(
@@ -14,7 +13,6 @@ pub async fn search_emails(
     limit: Option<usize>,
     offset: Option<usize>,
     app: AppHandle,
-    db: State<'_, Pool<Sqlite>>,
 ) -> Result<ModuleDataReadList, DwataError> {
     let limit = limit.unwrap_or(25);
     let offset = offset.unwrap_or(0);

@@ -9,7 +9,6 @@ use crate::workspace::{
     ModuleFilters,
 };
 use chrono::Utc;
-use sqlx::{Pool, Sqlite};
 use std::str::FromStr;
 
 impl CRUDRead for Chat {
@@ -70,7 +69,6 @@ impl CRUDCreateUpdate for ChatCreateUpdate {
     async fn post_insert(
         &self,
         response: InsertUpdateResponse,
-        _db: &Pool<Sqlite>,
     ) -> Result<InsertUpdateResponse, DwataError> {
         Ok(InsertUpdateResponse {
             next_task: Some("chat_with_ai".to_string()),

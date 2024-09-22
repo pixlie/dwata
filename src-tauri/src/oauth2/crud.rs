@@ -7,7 +7,6 @@ use crate::{
     workspace::crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
 };
 use chrono::Utc;
-use sqlx::{query_as, Pool, Sqlite};
 
 impl CRUDRead for OAuth2App {
     fn table_name() -> String {
@@ -72,7 +71,7 @@ impl CRUDCreateUpdate for OAuth2TokenCreateUpdate {
         Ok(names_values)
     }
 
-    // async fn pre_insert(&self, db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
+    // async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
     //     // We call the OAuth2 server and get the authorization code,
     //     // refresh token, access token, identifier etc.
     //     if self.oauth2_app_id.is_none() {

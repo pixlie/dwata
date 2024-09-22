@@ -3,10 +3,9 @@ use crate::content::content::{ContentSpec, ContentType};
 use crate::content::form::FormField;
 use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
-use sqlx::{Pool, Sqlite};
 
 impl Writable for DirectorySource {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         Ok(NextStep::Configure(Configuration::new(
             "Directory",
             "Directory containing files which match specified types",

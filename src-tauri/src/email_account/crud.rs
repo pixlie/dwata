@@ -7,7 +7,6 @@ use crate::workspace::crud::{
     CRUDCreateUpdate, CRUDRead, InputValue, InsertUpdateResponse, VecColumnNameValue,
 };
 use chrono::Utc;
-use sqlx::{query_as, Pool, Sqlite};
 use std::str::FromStr;
 
 impl CRUDRead for EmailAccount {
@@ -48,7 +47,7 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
         Ok(names_values)
     }
 
-    async fn pre_insert(&self, db: &Pool<Sqlite>) -> Result<VecColumnNameValue, DwataError> {
+    async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
         // We check if gmail is the provider and if so, we create the OAuth2 token for the OAuth2 app
         // In the OAuth2CreateUpdate, there is a pre_insert function that will call the OAuth2 server
         // and get the authorization code, refresh token, access token, identifier etc.
@@ -119,7 +118,6 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
     async fn post_insert(
         &self,
         response: InsertUpdateResponse,
-        _db: &Pool<Sqlite>,
     ) -> Result<InsertUpdateResponse, DwataError> {
         // When we add a new Email Account, we want to fetch emails from that account
         // We do this by calling the fetch_emails function as the next step

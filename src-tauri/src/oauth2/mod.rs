@@ -8,7 +8,6 @@ use oauth2::{
     RefreshToken, StandardTokenResponse, TokenResponse,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, FromRow, Pool, Sqlite, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
@@ -94,7 +93,7 @@ pub struct Oauth2APIResponse {
 }
 
 impl OAuth2Token {
-    pub async fn get_oauth2_app(&mut self, db: &Pool<Sqlite>) -> Result<OAuth2App, DwataError> {
+    pub async fn get_oauth2_app(&mut self) -> Result<OAuth2App, DwataError> {
         if let Some(oauth2_app) = &self.oauth2_app {
             Ok(oauth2_app.clone())
         } else {
@@ -106,11 +105,8 @@ impl OAuth2Token {
         }
     }
 
-    pub async fn refetch_google_access_token(
-        &mut self,
-        db: &Pool<Sqlite>,
-    ) -> Result<(), DwataError> {
-        let oauth2_app = self.get_oauth2_app(db).await?;
+    pub async fn refetch_google_access_token(&mut self) -> Result<(), DwataError> {
+        let oauth2_app = self.get_oauth2_app().await?;
         let client = get_google_oauth2_client(
             oauth2_app.client_id.clone(),
             oauth2_app.client_secret.as_ref().unwrap().clone(),
@@ -152,7 +148,7 @@ impl OAuth2Token {
                     access_token: Some(x.access_token().secret().to_string()),
                     ..Default::default()
                 };
-                updated.update_module_data(oauth2_token.id, db).await?;
+                updated.update_module_data(oauth2_token.id).await?;
             }
             None => {
                 let code = AuthorizationCode::new(self.authorization_code.clone());
@@ -178,7 +174,7 @@ impl OAuth2Token {
                             access_token: Some(x.access_token().secret().to_string()),
                             ..Default::default()
                         };
-                        updated.update_module_data(self.id, db).await?;
+                        updated.update_module_data(self.id).await?;
                     }
                     None => {
                         error!("Could not get token response");

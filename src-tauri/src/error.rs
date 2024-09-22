@@ -13,7 +13,7 @@ pub enum DwataError {
     InvalidDatabaseType,
     FilterNotSupported,
 
-    // Internal SQLite DB for Dwata
+    // Internal RocksDB for Dwata
     CouldNotCreateDwataDB,
     CouldNotConnectToDwataDB,
     CouldNotInsertToDwataDB,

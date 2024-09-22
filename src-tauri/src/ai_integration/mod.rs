@@ -1,30 +1,27 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::{FromRow, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
 pub mod commands;
 pub mod crud;
-pub mod models;
 pub mod providers;
 
-#[derive(Debug, Default, Deserialize, Serialize, Clone, TS, Type, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Debug, Default, Deserialize, Serialize, Clone, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
 pub enum AIProvider {
-    OpenAI,
-    Groq,
+    // OpenAI,
+    // Groq,
+    // Ollama,
     #[default]
-    Ollama,
-    // Anthropic,
+    Anthropic,
     // Mistral,
 }
 
-#[derive(Debug, Serialize, FromRow, TS)]
+#[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct AIIntegration {

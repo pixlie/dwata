@@ -3,10 +3,9 @@ use crate::content::form::FormField;
 use crate::database_source::DatabaseSource;
 use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
-use sqlx::{Pool, Sqlite};
 
 impl Writable for DatabaseSource {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         let database_type_content_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
                 ("PostgreSQL".to_string(), "PostgreSQL".to_string()),

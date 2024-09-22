@@ -6,7 +6,6 @@ use chrono::{DateTime, Utc};
 use log::{error, info};
 use mail_parser::MessageParser;
 use regex::Regex;
-use sqlx::{Execute, Pool, QueryBuilder, Sqlite};
 use std::{fs::create_dir_all, path::PathBuf};
 use tantivy::{
     collector::TopDocs,
@@ -64,15 +63,14 @@ pub async fn parse_email_from_file(
 pub async fn save_emails_to_dwata_db(
     mailbox: &Mailbox,
     emails: &Vec<ParsedEmail>,
-    db: &Pool<Sqlite>,
 ) -> Result<(), DwataError> {
     // We store each parsed email in Dwata DB
     let batch_size = 100;
     let mut inserted_count = 0;
     for email in emails.iter().skip(inserted_count).take(batch_size) {
-        let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(
-            "INSERT INTO email (uid, mailbox_id, from_email_address, date, subject, body_text, message_id, in_reply_to, created_at) VALUES "
-        );
+        // let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(
+        //     "INSERT INTO email (uid, mailbox_id, from_email_address, date, subject, body_text, message_id, in_reply_to, created_at) VALUES "
+        // );
         query_builder.push("(");
         query_builder.push_bind(email.uid);
         query_builder.push(", ");
@@ -295,11 +293,10 @@ pub async fn search_emails_in_tantity_and_dwata_db(
     limit: usize,
     offset: usize,
     storage_dir: &PathBuf,
-    db: &Pool<Sqlite>,
 ) -> Result<(Vec<Email>, usize), DwataError> {
     let column_names_values: VecColumnNameValue = filters.get_column_names_values_to_filter();
-    let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT * FROM email");
-    let mut count_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT COUNT(*) FROM email");
+    // let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT * FROM email");
+    // let mut count_builder: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT COUNT(*) FROM email");
     let mut where_clause = false;
     let email_account_id = match column_names_values.find_by_name("email_account_id") {
         Some(InputValue::ID(x)) => {
@@ -375,7 +372,7 @@ pub async fn search_emails_in_tantity_and_dwata_db(
     }
 }
 
-// async fn find_and_save_contacts(email_account_id: i64, db: &Pool<Sqlite>) {
+// async fn find_and_save_contacts(email_account_id: i64) {
 //     let sql = "SELECT DISTINCT from_email_address FROM email WHERE
 //        mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?) AND
 //        from_contact_id IS NULL";

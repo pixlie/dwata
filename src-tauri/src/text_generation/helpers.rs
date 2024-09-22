@@ -5,7 +5,6 @@ use crate::chat::{Chat, ChatCreateUpdate, ChatFilters, ProcessStatus, Role};
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead, InsertUpdateResponse};
 use chrono::{Duration, Utc};
-use sqlx::{Pool, Sqlite};
 
 /// Generates response for a chat thread.
 /// This function sends all previous messages for this thread to the AI model.
@@ -19,10 +18,7 @@ use sqlx::{Pool, Sqlite};
 /// # Returns
 ///
 /// * `Result<InsertUpdateResponse, DwataError>` - The response from the AI model.
-pub async fn generate_text_for_chat(
-    chat_id: i64,
-    db: &Pool<Sqlite>,
-) -> Result<InsertUpdateResponse, DwataError> {
+pub async fn generate_text_for_chat(chat_id: i64) -> Result<InsertUpdateResponse, DwataError> {
     let chat: Chat;
     let root_chat: Chat;
     let model: AIModel;

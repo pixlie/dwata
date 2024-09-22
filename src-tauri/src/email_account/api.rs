@@ -7,7 +7,6 @@ use crate::oauth2::{OAuth2App, OAuth2Provider};
 use crate::workspace::api::{Configuration, NextStep, Writable};
 use crate::workspace::crud::CRUDRead;
 use crate::workspace::ModuleDataCreateUpdate;
-use sqlx::{Pool, Sqlite};
 use std::str::FromStr;
 
 impl EmailAccount {
@@ -55,10 +54,7 @@ impl EmailAccount {
         ]
     }
 
-    async fn get_fields_for_oauth2_auth(
-        email_provider: &EmailProvider,
-        db: &Pool<Sqlite>,
-    ) -> Vec<FormField> {
+    async fn get_fields_for_oauth2_auth(email_provider: &EmailProvider) -> Vec<FormField> {
         // If provider is Gmail, then we show OAuth2 app list if there are more than one for Google,
         // else we add a hidden field with the OAuth2 app ID
         match email_provider {
@@ -128,14 +124,11 @@ impl EmailAccount {
 }
 
 impl Writable for EmailAccount {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         Ok(NextStep::Configure(Self::get_initial_configuration()))
     }
 
-    async fn next_step(
-        data: ModuleDataCreateUpdate,
-        db: &Pool<Sqlite>,
-    ) -> Result<NextStep, DwataError> {
+    async fn next_step(data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Add the Google authorization URL as a field
@@ -146,7 +139,7 @@ impl Writable for EmailAccount {
                     return Ok(NextStep::Continue);
                 }
 
-                let oauth2_app = OAuth2App::read_one_by_pk(x.oauth2_app_id.unwrap(), db).await?;
+                let oauth2_app = OAuth2App::read_one_by_pk(x.oauth2_app_id.unwrap()).await?;
                 let authorize_url = get_google_oauth2_authorize_url(
                     oauth2_app.client_id,
                     oauth2_app.client_secret.unwrap(),
@@ -179,10 +172,7 @@ impl Writable for EmailAccount {
         }
     }
 
-    async fn on_change(
-        data: ModuleDataCreateUpdate,
-        db: &Pool<Sqlite>,
-    ) -> Result<NextStep, DwataError> {
+    async fn on_change(data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Check if the provider is set
@@ -198,7 +188,7 @@ impl Writable for EmailAccount {
                 match provider {
                     EmailProvider::Gmail => {
                         fields.extend(
-                            Self::get_fields_for_oauth2_auth(&provider, db)
+                            Self::get_fields_for_oauth2_auth(&provider)
                                 .await
                                 .into_iter(),
                         );
