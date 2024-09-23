@@ -19,7 +19,7 @@ impl CRUDCreateUpdate for OAuth2AppCreateUpdate {
         "oauth2_app".to_string()
     }
 
-    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
+    fn get_parsed_item(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.provider {
             names_values.push_name_value("provider", InputValue::Text(x.clone()));
@@ -46,7 +46,7 @@ impl CRUDCreateUpdate for OAuth2TokenCreateUpdate {
         "oauth2_token".to_string()
     }
 
-    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
+    fn get_parsed_item(&self) -> Result<VecColumnNameValue, DwataError> {
         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
         if let Some(x) = &self.authorization_code {
             names_values.push_name_value("authorization_code", InputValue::Text(x.clone()));

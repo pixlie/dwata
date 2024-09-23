@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use email_account::app_state::EmailAccountsState;
+// use email_account::app_state::EmailAccountsState;
 use env_logger;
 use log::info;
 use tauri::{App, Manager};
@@ -15,7 +15,7 @@ mod error;
 // mod labels;
 // mod relational_database;
 // mod saved_query;
-mod ai_integration;
+// mod ai_integration;
 mod content;
 // mod embedding;
 // mod text_generation;
@@ -24,8 +24,8 @@ mod content;
 // mod workflow;
 // mod contacts;
 mod email;
-mod email_account;
-mod oauth2;
+// mod email_account;
+// mod oauth2;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
@@ -43,7 +43,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         app_data_dir.to_str().unwrap()
     );
     app.manage(DwataDB::new(&app_data_dir));
-    app.manage(EmailAccountsState::new(Mutex::new(vec![])));
+    // app.manage(EmailAccountsState::new(Mutex::new(vec![])));
     Ok(())
 }
 
@@ -56,20 +56,20 @@ fn main() {
             workspace::commands::module_insert_or_update_on_change,
             workspace::commands::module_insert_or_update_next_step,
             workspace::commands::read_row_list_for_module,
-            workspace::commands::read_row_list_for_module_with_filter,
+            // workspace::commands::read_row_list_for_module_with_filter,
             workspace::commands::read_module_item_by_pk,
             workspace::commands::insert_module_item,
-            workspace::commands::update_module_item,
-            workspace::commands::upsert_module_item,
+            // workspace::commands::update_module_item,
+            // workspace::commands::upsert_module_item,
             workspace::process_log::get_process_log,
             // directory_source::commands::fetch_file_list_in_directory,
             // directory_source::commands::fetch_file_content_list,
             // ai_integration::commands::get_ai_model_list,
             // ai_integration::commands::get_ai_model_choice_list,
             // text_generation::commands::chat_with_ai,
-            email_account::commands::fetch_emails,
-            email::commands::search_emails,
-            oauth2::commands::get_oauth2_app_choice_list,
+            // email_account::commands::fetch_emails,
+            // email::commands::search_emails,
+            // oauth2::commands::get_oauth2_app_choice_list,
             // schema::commands::read_schema,
             // relational_database::commands::load_data,
             // chat::commands::start_chat_thread,

@@ -46,7 +46,7 @@ pub enum ProcessStatus {
 #[ts(export, rename_all = "camelCase")]
 pub struct Chat {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     // This is null for the first chat
     #[ts(type = "number")]

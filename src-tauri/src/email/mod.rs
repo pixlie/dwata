@@ -4,8 +4,8 @@ use ts_rs::TS;
 
 pub mod commands;
 pub mod crud;
-pub mod helpers;
-pub mod tests;
+// pub mod helpers;
+// pub mod tests;
 
 #[derive(Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
@@ -52,7 +52,7 @@ pub struct Email {
 
 pub struct ParsedEmail {
     pub uid: u32,
-    pub mailbox_id: i64,
+    pub mailbox_id: u32,
     pub message_id: Option<String>,
     pub in_reply_to: Vec<String>,
     pub from_name: String,
@@ -64,7 +64,7 @@ pub struct ParsedEmail {
 }
 
 pub struct SearchedEmail {
-    pub email_id: i64,
+    pub email_id: u32,
 }
 
 #[derive(Deserialize, TS)]

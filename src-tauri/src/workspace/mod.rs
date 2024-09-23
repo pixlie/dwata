@@ -1,11 +1,11 @@
-use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate, AIIntegrationFilters};
+// use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate, AIIntegrationFilters};
 // use crate::chat::{Chat, ChatCreateUpdate, ChatFilters};
 // use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 // use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
 use crate::email::{Email, EmailFilters};
-use crate::email_account::{EmailAccount, EmailAccountCreateUpdate, Mailbox};
-use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
-use crate::user_account::{UserAccount, UserAccountCreateUpdate};
+// use crate::email_account::{EmailAccount, EmailAccountCreateUpdate, Mailbox};
+// use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
+// use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
@@ -35,14 +35,14 @@ pub enum Module {
 #[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataRead {
-    UserAccount(UserAccount),
+    // UserAccount(UserAccount),
     // DirectorySource(DirectorySource),
     // DatabaseSource(DatabaseSource),
-    AIIntegration(AIIntegration),
+    // AIIntegration(AIIntegration),
     // Chat(Chat),
-    OAuth2App(OAuth2App),
-    EmailAccount(EmailAccount),
-    Mailbox(Mailbox),
+    // OAuth2App(OAuth2App),
+    // EmailAccount(EmailAccount),
+    // Mailbox(Mailbox),
     Email(Email),
 }
 
@@ -60,33 +60,33 @@ pub struct ModuleDataReadList {
 #[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataList {
-    UserAccount(Vec<UserAccount>),
+    // UserAccount(Vec<UserAccount>),
     // DirectorySource(Vec<DirectorySource>),
     // DatabaseSource(Vec<DatabaseSource>),
-    AIIntegration(Vec<AIIntegration>),
+    // AIIntegration(Vec<AIIntegration>),
     // Chat(Vec<Chat>),
-    OAuth2App(Vec<OAuth2App>),
-    EmailAccount(Vec<EmailAccount>),
-    Mailbox(Vec<Mailbox>),
+    // OAuth2App(Vec<OAuth2App>),
+    // EmailAccount(Vec<EmailAccount>),
+    // Mailbox(Vec<Mailbox>),
     Email(Vec<Email>),
 }
 
 #[derive(Deserialize, TS)]
 #[ts(export)]
 pub enum ModuleDataCreateUpdate {
-    UserAccount(UserAccountCreateUpdate),
+    // UserAccount(UserAccountCreateUpdate),
     // DirectorySource(DirectorySourceCreateUpdate),
     // DatabaseSource(DatabaseSourceCreateUpdate),
-    AIIntegration(AIIntegrationCreateUpdate),
+    // AIIntegration(AIIntegrationCreateUpdate),
     // Chat(ChatCreateUpdate),
-    OAuth2App(OAuth2AppCreateUpdate),
-    EmailAccount(EmailAccountCreateUpdate),
+    // OAuth2App(OAuth2AppCreateUpdate),
+    // EmailAccount(EmailAccountCreateUpdate),
 }
 
 #[derive(Deserialize, Display, TS)]
 #[ts(export)]
 pub enum ModuleFilters {
-    AIIntegration(AIIntegrationFilters),
+    // AIIntegration(AIIntegrationFilters),
     // Chat(ChatFilters),
     Email(EmailFilters),
 }
@@ -116,7 +116,7 @@ pub enum ProcessingStatusInLog {
 #[ts(export, rename_all = "camelCase")]
 pub struct ProcessLog {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
     pub task: ProcessInLog,
 
     #[ts(type = "Array<[string, string]>")]

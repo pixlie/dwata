@@ -76,7 +76,7 @@ impl EmailAccount {
 
 impl Mailbox {
     pub async fn fetch_emails(
-        email_account_id: i64,
+        email_account_id: u32,
         mailbox_name: &str,
         storage_dir: &PathBuf,
         email_account_state: &EmailAccountsState,
@@ -341,7 +341,7 @@ impl Mailbox {
 }
 
 pub async fn get_imap_session(
-    email_account_id: i64,
+    email_account_id: u32,
     email_account_state: &EmailAccountsState,
 ) -> Result<Arc<Mutex<Session<TlsStream<TcpStream>>>>, DwataError> {
     let session = {
@@ -360,7 +360,7 @@ pub async fn get_imap_session(
 }
 
 pub async fn fetch_and_index_emails_for_email_account(
-    pk: i64,
+    pk: u32,
     storage_dir: &PathBuf,
     email_account_state: &EmailAccountsState,
     db: &DwataDB,

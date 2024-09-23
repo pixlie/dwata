@@ -372,7 +372,7 @@ pub async fn search_emails_in_tantity_and_dwata_db(
     }
 }
 
-// async fn find_and_save_contacts(email_account_id: i64) {
+// async fn find_and_save_contacts(email_account_id: u32) {
 //     let sql = "SELECT DISTINCT from_email_address FROM email WHERE
 //        mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?) AND
 //        from_contact_id IS NULL";

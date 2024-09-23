@@ -11,7 +11,7 @@ pub mod crud;
 pub struct UserAccount {
     // First user, with ID one is used as default user
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
     pub first_name: String,
     pub last_name: Option<String>,
     pub email: Option<String>,

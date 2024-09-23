@@ -17,7 +17,7 @@ use tauri::State;
 ///
 /// * `Result<InsertUpdateResponse, DwataError>` - The response from the AI model.
 #[tauri::command]
-pub async fn chat_with_ai(chat_id: i64) -> Result<InsertUpdateResponse, DwataError> {
+pub async fn chat_with_ai(chat_id: u32) -> Result<InsertUpdateResponse, DwataError> {
     generate_text_for_chat(chat_id, db.deref()).await
 }
 

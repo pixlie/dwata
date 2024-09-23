@@ -15,7 +15,7 @@ pub mod crud;
 pub mod helpers;
 pub mod providers;
 
-#[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
+#[derive(Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -27,7 +27,7 @@ pub enum EmailProvider {
 }
 
 pub struct EmailAccountStatus {
-    pub id: i64,
+    pub id: u32,
     pub mailbox_names: Vec<String>,
     pub imap_session: Option<Arc<Mutex<Session<TlsStream<TcpStream>>>>>,
 }
@@ -37,7 +37,7 @@ pub struct EmailAccountStatus {
 #[ts(export, rename_all = "camelCase")]
 pub struct EmailAccount {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     pub provider: EmailProvider,
 
@@ -65,9 +65,9 @@ pub struct EmailAccountCreateUpdate {
 #[ts(export, rename_all = "camelCase")]
 pub struct Mailbox {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
     #[ts(type = "number")]
-    pub email_account_id: i64,
+    pub email_account_id: u32,
     pub name: String,
 
     #[ts(skip)]
@@ -100,14 +100,13 @@ pub struct Mailbox {
     // last_contact_processed_email_uid: Option<u32>,
 }
 
-// #[derive(Default)]
-// pub struct MailboxCreateUpdate {
-//     pub email_account_id: Option<i64>,
-//     pub name: Option<String>,
-//     pub storage_path: Option<String>,
-//     pub messages: Option<u32>,
-//     pub uid_next: Option<u32>,
-//     pub uid_validity: Option<u32>,
-//     pub last_saved_email_uid: Option<u32>,
-//     pub last_indexed_email_uid: Option<u32>,
-// }
+pub struct MailboxCreateUpdate {
+    pub email_account_id: Option<i64>,
+    pub name: Option<String>,
+    pub storage_path: Option<String>,
+    pub messages: Option<u32>,
+    pub uid_next: Option<u32>,
+    pub uid_validity: Option<u32>,
+    pub last_saved_email_uid: Option<u32>,
+    pub last_indexed_email_uid: Option<u32>,
+}

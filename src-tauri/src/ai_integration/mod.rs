@@ -25,7 +25,7 @@ pub enum AIProvider {
 #[ts(export, rename_all = "camelCase")]
 pub struct AIIntegration {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     pub label: Option<String>,
     pub ai_provider: AIProvider,
@@ -38,14 +38,14 @@ pub struct AIIntegration {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-// #[derive(Debug, Deserialize, TS)]
-// #[serde(rename_all = "camelCase")]
-// #[ts(export, rename_all = "camelCase")]
-// pub struct AIIntegrationCreateUpdate {
-//     pub label: Option<String>,
-//     pub ai_provider: Option<String>,
-//     pub api_key: Option<String>,
-// }
+#[derive(Debug, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, rename_all = "camelCase")]
+pub struct AIIntegrationCreateUpdate {
+    pub label: Option<String>,
+    pub ai_provider: Option<String>,
+    pub api_key: Option<String>,
+}
 
 #[derive(Clone, Default, Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]

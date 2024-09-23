@@ -29,7 +29,7 @@ pub enum OAuth2Provider {
 #[ts(export, rename_all = "camelCase")]
 pub struct OAuth2App {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     pub provider: OAuth2Provider,
     pub client_id: String,
@@ -44,8 +44,8 @@ pub struct OAuth2App {
 #[ts(export, rename_all = "camelCase")]
 pub struct OAuth2Token {
     #[ts(type = "number")]
-    pub id: i64,
-    pub oauth2_app_id: i64,
+    pub id: u32,
+    pub oauth2_app_id: u32,
 
     pub authorization_code: String,
     pub access_token: String,

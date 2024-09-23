@@ -24,7 +24,7 @@ pub enum DatabaseType {
 #[derive(Debug, Deserialize, Serialize, FromRow, TS)]
 #[ts(export, rename_all = "camelCase")]
 pub struct DatabaseSource {
-    id: i64,
+    id: u32,
     pub label: Option<String>,
     pub database_type: DatabaseType,
 

@@ -18,7 +18,7 @@ use chrono::{Duration, Utc};
 /// # Returns
 ///
 /// * `Result<InsertUpdateResponse, DwataError>` - The response from the AI model.
-pub async fn generate_text_for_chat(chat_id: i64) -> Result<InsertUpdateResponse, DwataError> {
+pub async fn generate_text_for_chat(chat_id: u32) -> Result<InsertUpdateResponse, DwataError> {
     let chat: Chat;
     let root_chat: Chat;
     let model: AIModel;

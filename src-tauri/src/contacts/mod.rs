@@ -7,7 +7,7 @@ use ts_rs::TS;
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Contact {
-    pub id: i64,
+    pub id: u32,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
 

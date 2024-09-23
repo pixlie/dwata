@@ -49,14 +49,14 @@ pub trait Writable {
 
     async fn on_change(
         _data: ModuleDataCreateUpdate,
-        _db: State<'_, DwataDB>,
+        _db: &DwataDB,
     ) -> Result<NextStep, DwataError> {
         return Ok(NextStep::Continue);
     }
 
     async fn next_step(
         _data: ModuleDataCreateUpdate,
-        _db: State<'_, DwataDB>,
+        _db: &DwataDB,
     ) -> Result<NextStep, DwataError> {
         return Ok(NextStep::Continue);
     }

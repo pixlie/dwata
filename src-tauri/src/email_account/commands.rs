@@ -6,7 +6,7 @@ use tauri::{AppHandle, Manager, State};
 
 #[tauri::command]
 pub async fn fetch_emails(
-    pk: i64,
+    pk: u32,
     app: AppHandle,
     email_account_state: State<'_, EmailAccountsState>,
 ) -> Result<(), DwataError> {
