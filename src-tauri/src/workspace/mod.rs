@@ -12,9 +12,9 @@ use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
-pub mod app_state;
 pub mod commands;
 pub mod crud;
+pub mod db;
 pub mod process_log;
 
 #[derive(Deserialize, Display, TS)]
@@ -91,7 +91,7 @@ pub enum ModuleFilters {
     Email(EmailFilters),
 }
 
-#[derive(Clone, Serialize, TS, EnumString, Display)]
+#[derive(Clone, Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -101,7 +101,7 @@ pub enum ProcessInLog {
     IndexEmails,
 }
 
-#[derive(Clone, Serialize, TS, EnumString, Display)]
+#[derive(Clone, Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -111,7 +111,7 @@ pub enum ProcessingStatusInLog {
     Completed,
 }
 
-#[derive(Clone, Serialize, TS)]
+#[derive(Clone, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct ProcessLog {

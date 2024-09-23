@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 use imap::Session;
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
 use std::net::TcpStream;
 use std::sync::Arc;
 use strum::{Display, EnumString};
@@ -17,7 +16,6 @@ pub mod helpers;
 pub mod providers;
 
 #[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -34,7 +32,7 @@ pub struct EmailAccountStatus {
     pub imap_session: Option<Arc<Mutex<Session<TlsStream<TcpStream>>>>>,
 }
 
-#[derive(Serialize, FromRow, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct EmailAccount {
@@ -62,7 +60,7 @@ pub struct EmailAccountCreateUpdate {
     // pub oauth2_token_id: Option<i64>,
 }
 
-#[derive(Serialize, FromRow, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Mailbox {
@@ -102,14 +100,14 @@ pub struct Mailbox {
     // last_contact_processed_email_uid: Option<u32>,
 }
 
-#[derive(Default)]
-pub struct MailboxCreateUpdate {
-    pub email_account_id: Option<i64>,
-    pub name: Option<String>,
-    pub storage_path: Option<String>,
-    pub messages: Option<u32>,
-    pub uid_next: Option<u32>,
-    pub uid_validity: Option<u32>,
-    pub last_saved_email_uid: Option<u32>,
-    pub last_indexed_email_uid: Option<u32>,
-}
+// #[derive(Default)]
+// pub struct MailboxCreateUpdate {
+//     pub email_account_id: Option<i64>,
+//     pub name: Option<String>,
+//     pub storage_path: Option<String>,
+//     pub messages: Option<u32>,
+//     pub uid_next: Option<u32>,
+//     pub uid_validity: Option<u32>,
+//     pub last_saved_email_uid: Option<u32>,
+//     pub last_indexed_email_uid: Option<u32>,
+// }

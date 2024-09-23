@@ -6,8 +6,10 @@ use crate::oauth2::helpers::get_google_oauth2_authorize_url;
 use crate::oauth2::{OAuth2App, OAuth2Provider};
 use crate::workspace::api::{Configuration, NextStep, Writable};
 use crate::workspace::crud::CRUDRead;
+use crate::workspace::db::DwataDB;
 use crate::workspace::ModuleDataCreateUpdate;
 use std::str::FromStr;
+use tauri::State;
 
 impl EmailAccount {
     fn get_initial_form_fields() -> Vec<FormField> {
@@ -59,7 +61,7 @@ impl EmailAccount {
         // else we add a hidden field with the OAuth2 app ID
         match email_provider {
             EmailProvider::Gmail => {
-                match OAuth2App::read_all(25, 0, db).await {
+                match OAuth2App::read_all(25, 0).await {
                     Ok((oauth2_apps, _)) => {
                         // Check if we have only one OAuth2 app for this provider
                         let mut apps_iter = oauth2_apps
@@ -128,7 +130,10 @@ impl Writable for EmailAccount {
         Ok(NextStep::Configure(Self::get_initial_configuration()))
     }
 
-    async fn next_step(data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
+    async fn next_step(
+        data: ModuleDataCreateUpdate,
+        db: State<'_, DwataDB>,
+    ) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Add the Google authorization URL as a field
@@ -139,7 +144,7 @@ impl Writable for EmailAccount {
                     return Ok(NextStep::Continue);
                 }
 
-                let oauth2_app = OAuth2App::read_one_by_pk(x.oauth2_app_id.unwrap()).await?;
+                let oauth2_app = OAuth2App::read_one_by_key(x.oauth2_app_id.unwrap(), db).await?;
                 let authorize_url = get_google_oauth2_authorize_url(
                     oauth2_app.client_id,
                     oauth2_app.client_secret.unwrap(),

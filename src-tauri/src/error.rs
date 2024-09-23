@@ -1,6 +1,5 @@
 use log::error;
 use serde::{Deserialize, Serialize};
-use sqlx::migrate::MigrateError;
 use std::error::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -19,7 +18,7 @@ pub enum DwataError {
     CouldNotInsertToDwataDB,
     CouldNotUpdateDwataDB,
     CouldNotFetchRowsFromDwataDB,
-    CouldNotMigrateDwataDB,
+    CouldNotFetchSingleRowFromDwataDB,
 
     // Blanket error for sqlx
     SqlxError,
@@ -102,20 +101,6 @@ impl Error for DwataError {
 impl std::fmt::Display for DwataError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
-    }
-}
-
-impl From<sqlx::Error> for DwataError {
-    fn from(err: sqlx::Error) -> Self {
-        error!("Got an sqlx error\n Error: {}", err);
-        DwataError::SqlxError
-    }
-}
-
-impl From<MigrateError> for DwataError {
-    fn from(err: MigrateError) -> Self {
-        error!("Could not migrate Dwata DB\n Error: {}", err);
-        DwataError::CouldNotMigrateDwataDB
     }
 }
 

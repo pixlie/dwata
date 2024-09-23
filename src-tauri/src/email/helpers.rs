@@ -300,13 +300,13 @@ pub async fn search_emails_in_tantity_and_dwata_db(
     let mut where_clause = false;
     let email_account_id = match column_names_values.find_by_name("email_account_id") {
         Some(InputValue::ID(x)) => {
-            where_clause = true;
-            query_builder
-                .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
-            count_builder
-                .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
-            query_builder.push_bind(x);
-            count_builder.push_bind(x);
+            // where_clause = true;
+            // query_builder
+            //     .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
+            // count_builder
+            //     .push(" WHERE mailbox_id IN (SELECT id FROM mailbox WHERE email_account_id = ?)");
+            // query_builder.push_bind(x);
+            // count_builder.push_bind(x);
             Some(x)
         }
         _ => None,

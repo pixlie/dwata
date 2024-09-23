@@ -1,4 +1,4 @@
-use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox, MailboxCreateUpdate};
+use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox};
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use crate::oauth2::helpers::get_google_oauth2_tokens;
@@ -47,73 +47,73 @@ impl CRUDCreateUpdate for EmailAccountCreateUpdate {
         Ok(names_values)
     }
 
-    async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
-        // We check if gmail is the provider and if so, we create the OAuth2 token for the OAuth2 app
-        // In the OAuth2CreateUpdate, there is a pre_insert function that will call the OAuth2 server
-        // and get the authorization code, refresh token, access token, identifier etc.
-        let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
-        if self.provider == Some("gmail".to_string()) {
-            if self.oauth2_app_id.is_none() {
-                return Err(DwataError::CouldNotFindOAuth2Config);
-            }
-            let oauth2_app_id = self.oauth2_app_id.unwrap();
-            let sql = "SELECT * FROM oauth2_app WHERE id = ?";
-            let oauth2_app: OAuth2App = query_as(sql).bind(oauth2_app_id).fetch_one(db).await?;
-            let oauth2_response = get_google_oauth2_tokens(
-                oauth2_app.client_id.clone(),
-                oauth2_app.client_secret.as_ref().unwrap().clone(),
-            )
-            .await?;
-            // We check if there is an existing OAuth2 token for this OAuth2 app and identifier combination
-            let oauth2_token_id =
-                match OAuth2Token::read_all(25, 0, db)
-                    .await?
-                    .0
-                    .iter()
-                    .find(|token| {
-                        token.oauth2_app_id == oauth2_app_id
-                            && token.identifier == oauth2_response.identifier
-                            && token.handle == oauth2_response.handle
-                    }) {
-                    Some(oauth2_token) => {
-                        // We already have an OAuth2 token for this combination, let's update it
-                        let updated = OAuth2TokenCreateUpdate {
-                            refresh_token: oauth2_response.refresh_token.clone(),
-                            access_token: Some(oauth2_response.access_token.clone()),
-                            ..Default::default()
-                        };
-                        updated.update_module_data(oauth2_token.id, db).await?;
-                        oauth2_token.id
-                    }
-                    None => {
-                        // We did not find an existing OAuth2 token for this combination, let's create a new one
-                        let oauth2_token_id = OAuth2TokenCreateUpdate {
-                            authorization_code: Some(oauth2_response.authorization_code.clone()),
-                            oauth2_app_id: Some(oauth2_app_id),
-                            refresh_token: oauth2_response.refresh_token.clone(),
-                            access_token: Some(oauth2_response.access_token.clone()),
-                            identifier: Some(oauth2_response.identifier.clone()),
-                            handle: oauth2_response.handle.clone(),
-                        }
-                        .insert_module_data(db)
-                        .await?
-                        .pk;
-                        oauth2_token_id
-                    }
-                };
-            match OAuth2Token::read_one_by_pk(oauth2_token_id, db).await {
-                Ok(oauth2_token) => {
-                    name_values.push_name_value("oauth2_token_id", InputValue::ID(oauth2_token.id));
-                    name_values.push_name_value(
-                        "email_address",
-                        InputValue::Text(oauth2_token.handle.unwrap()),
-                    );
-                }
-                Err(_) => return Err(DwataError::CouldNotFindOAuth2Config),
-            };
-        }
-        Ok(name_values)
-    }
+    // async fn pre_insert(&self) -> Result<VecColumnNameValue, DwataError> {
+    //     // We check if gmail is the provider and if so, we create the OAuth2 token for the OAuth2 app
+    //     // In the OAuth2CreateUpdate, there is a pre_insert function that will call the OAuth2 server
+    //     // and get the authorization code, refresh token, access token, identifier etc.
+    //     let mut name_values: VecColumnNameValue = VecColumnNameValue::default();
+    //     if self.provider == Some("gmail".to_string()) {
+    //         if self.oauth2_app_id.is_none() {
+    //             return Err(DwataError::CouldNotFindOAuth2Config);
+    //         }
+    //         let oauth2_app_id = self.oauth2_app_id.unwrap();
+    //         let sql = "SELECT * FROM oauth2_app WHERE id = ?";
+    //         let oauth2_app: OAuth2App = query_as(sql).bind(oauth2_app_id).fetch_one(db).await?;
+    //         let oauth2_response = get_google_oauth2_tokens(
+    //             oauth2_app.client_id.clone(),
+    //             oauth2_app.client_secret.as_ref().unwrap().clone(),
+    //         )
+    //         .await?;
+    //         // We check if there is an existing OAuth2 token for this OAuth2 app and identifier combination
+    //         let oauth2_token_id =
+    //             match OAuth2Token::read_all(25, 0, db)
+    //                 .await?
+    //                 .0
+    //                 .iter()
+    //                 .find(|token| {
+    //                     token.oauth2_app_id == oauth2_app_id
+    //                         && token.identifier == oauth2_response.identifier
+    //                         && token.handle == oauth2_response.handle
+    //                 }) {
+    //                 Some(oauth2_token) => {
+    //                     // We already have an OAuth2 token for this combination, let's update it
+    //                     let updated = OAuth2TokenCreateUpdate {
+    //                         refresh_token: oauth2_response.refresh_token.clone(),
+    //                         access_token: Some(oauth2_response.access_token.clone()),
+    //                         ..Default::default()
+    //                     };
+    //                     updated.update_module_data(oauth2_token.id, db).await?;
+    //                     oauth2_token.id
+    //                 }
+    //                 None => {
+    //                     // We did not find an existing OAuth2 token for this combination, let's create a new one
+    //                     let oauth2_token_id = OAuth2TokenCreateUpdate {
+    //                         authorization_code: Some(oauth2_response.authorization_code.clone()),
+    //                         oauth2_app_id: Some(oauth2_app_id),
+    //                         refresh_token: oauth2_response.refresh_token.clone(),
+    //                         access_token: Some(oauth2_response.access_token.clone()),
+    //                         identifier: Some(oauth2_response.identifier.clone()),
+    //                         handle: oauth2_response.handle.clone(),
+    //                     }
+    //                     .insert_module_data(db)
+    //                     .await?
+    //                     .pk;
+    //                     oauth2_token_id
+    //                 }
+    //             };
+    //         match OAuth2Token::read_one_by_key(oauth2_token_id, db).await {
+    //             Ok(oauth2_token) => {
+    //                 name_values.push_name_value("oauth2_token_id", InputValue::ID(oauth2_token.id));
+    //                 name_values.push_name_value(
+    //                     "email_address",
+    //                     InputValue::Text(oauth2_token.handle.unwrap()),
+    //                 );
+    //             }
+    //             Err(_) => return Err(DwataError::CouldNotFindOAuth2Config),
+    //         };
+    //     }
+    //     Ok(name_values)
+    // }
 
     async fn post_insert(
         &self,

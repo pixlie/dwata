@@ -1,8 +1,10 @@
-use super::{ModuleDataReadList, ModuleFilters};
+use super::db::DwataDB;
+use super::ModuleFilters;
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use chrono::{DateTime, Utc};
 use log::{error, info};
+use serde::de::DeserializeOwned;
 use serde::Serialize;
 use serde_json::Value;
 use ts_rs::TS;
@@ -16,7 +18,7 @@ pub trait CRUDRead {
 
     async fn read_all_helper(limit: usize, offset: usize) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send,
+        Self: DeserializeOwned,
     {
         match query_as(&format!(
             "SELECT * FROM {} LIMIT {} OFFSET {}",
@@ -64,7 +66,7 @@ pub trait CRUDRead {
 
     async fn read_all(limit: usize, offset: usize) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send,
+        Self: DeserializeOwned,
     {
         // We check if there are default filters to apply
         let default_filters = Self::set_default_filters();
@@ -73,7 +75,7 @@ pub trait CRUDRead {
                 ModuleFilters::AIIntegration(x) => {
                     Self::read_with_filter_helper(x, limit, offset).await
                 }
-                ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, limit, offset).await,
+                // ModuleFilters::Chat(x) => Self::read_with_filter_helper(x, limit, offset).await,
                 _ => {
                     error!("Invalid module {}", filters.to_string());
                     Err(DwataError::ModuleNotFound)
@@ -83,33 +85,42 @@ pub trait CRUDRead {
         }
     }
 
-    async fn read_one_by_pk(pk: i64) -> Result<Self, DwataError>
+    async fn read_one_by_key(pk: i64, db: &DwataDB) -> Result<Self, DwataError>
     where
-        Self: Sized + Send,
+        Self: DeserializeOwned,
     {
-        let result: Result<Self, sqlx::Error> = query_as(&format!(
-            "SELECT * FROM {} WHERE id = ?",
-            Self::table_name()
-        ))
-        .bind(pk)
-        .fetch_one(db)
-        .await;
-        match result {
-            Ok(row) => {
-                info!(
-                    "Fetched one row from Dwata DB, table {}, ID {}",
-                    Self::table_name(),
-                    pk
-                );
-                Ok(row)
-            }
+        let table = db.get_db(&Self::table_name(), None)?;
+        match table.get(pk.to_string()) {
+            Ok(item_opt) => match item_opt {
+                Some(item) => match serde_json::from_slice::<Self>(&item) {
+                    Ok(deserialized) => Ok(deserialized),
+                    Err(err) => {
+                        error!(
+                            "Could not deserialize item from Dwata DB, table {}, key {}\nError: {}",
+                            Self::table_name(),
+                            pk,
+                            err
+                        );
+                        Err(DwataError::CouldNotFetchSingleRowFromDwataDB)
+                    }
+                },
+                None => {
+                    error!(
+                        "Could not read one item by key from Dwata DB, table {}, key {}",
+                        Self::table_name(),
+                        pk
+                    );
+                    Err(DwataError::CouldNotFetchSingleRowFromDwataDB)
+                }
+            },
             Err(err) => {
                 error!(
-                    "Could not fetch rows from Dwata DB, table {}.\nError: {}",
+                    "Could not read one item by key from Dwata DB, table {}, key {}\nError: {}",
                     Self::table_name(),
+                    pk,
                     err
                 );
-                Err(DwataError::CouldNotFetchRowsFromDwataDB)
+                Err(DwataError::CouldNotFetchSingleRowFromDwataDB)
             }
         }
     }
@@ -120,7 +131,7 @@ pub trait CRUDRead {
         offset: usize,
     ) -> Result<(Vec<Self>, usize), DwataError>
     where
-        Self: Sized + Send,
+        Self: DeserializeOwned,
         T: CRUDReadFilter,
     {
         // let mut builder: QueryBuilder<Sqlite> =
@@ -295,7 +306,7 @@ pub trait CRUDCreateUpdate {
         Ok(VecColumnNameValue::default())
     }
 
-    async fn insert_module_data(&self) -> Result<InsertUpdateResponse, DwataError> {
+    async fn insert_module_data(&self, db: &DwataDB) -> Result<InsertUpdateResponse, DwataError> {
         let column_names_values: VecColumnNameValue = self.get_column_names_values()?;
         let other_column_names_values: VecColumnNameValue = self.pre_insert().await?;
         let column_names_values = VecColumnNameValue {
@@ -374,11 +385,16 @@ pub trait CRUDCreateUpdate {
     async fn post_insert(
         &self,
         response: InsertUpdateResponse,
+        _db: &DwataDB,
     ) -> Result<InsertUpdateResponse, DwataError> {
         Ok(response)
     }
 
-    async fn update_module_data(&self, pk: i64) -> Result<InsertUpdateResponse, DwataError> {
+    async fn update_module_data(
+        &self,
+        pk: i64,
+        db: &DwataDB,
+    ) -> Result<InsertUpdateResponse, DwataError> {
         // let mut builder: QueryBuilder<Sqlite> =
         //     QueryBuilder::new(format!("UPDATE {} SET ", Self::table_name()));
         let column_names_values: VecColumnNameValue = self.get_column_names_values()?;

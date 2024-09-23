@@ -45,6 +45,7 @@ tantivy = "0.22.0"
 tauri-plugin-shell = "2.0.0-rc.2"
 regex = "1.10.6"
 pixlieai = { path = "../../PixlieAI/pixlieai_rs" }
+rocksdb = "0.22.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

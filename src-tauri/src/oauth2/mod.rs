@@ -16,8 +16,7 @@ pub mod commands;
 pub mod crud;
 pub mod helpers;
 
-#[derive(Debug, Deserialize, Serialize, Clone, TS, Type, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Debug, Deserialize, Serialize, Clone, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -25,7 +24,7 @@ pub enum OAuth2Provider {
     Google,
 }
 
-#[derive(Clone, Serialize, FromRow, TS)]
+#[derive(Clone, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct OAuth2App {
@@ -40,7 +39,7 @@ pub struct OAuth2App {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize, FromRow, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct OAuth2Token {
@@ -60,7 +59,6 @@ pub struct OAuth2Token {
     pub modified_at: Option<DateTime<Utc>>,
 
     #[serde(skip)]
-    #[sqlx(skip)]
     #[ts(skip)]
     pub oauth2_app: Option<OAuth2App>,
 }

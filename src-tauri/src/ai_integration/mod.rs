@@ -4,7 +4,6 @@ use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
-pub mod commands;
 pub mod crud;
 pub mod providers;
 
@@ -21,7 +20,7 @@ pub enum AIProvider {
     // Mistral,
 }
 
-#[derive(Debug, Serialize, TS)]
+#[derive(Debug, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct AIIntegration {
@@ -39,14 +38,14 @@ pub struct AIIntegration {
     pub modified_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct AIIntegrationCreateUpdate {
-    pub label: Option<String>,
-    pub ai_provider: Option<String>,
-    pub api_key: Option<String>,
-}
+// #[derive(Debug, Deserialize, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export, rename_all = "camelCase")]
+// pub struct AIIntegrationCreateUpdate {
+//     pub label: Option<String>,
+//     pub ai_provider: Option<String>,
+//     pub api_key: Option<String>,
+// }
 
 #[derive(Clone, Default, Debug, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]

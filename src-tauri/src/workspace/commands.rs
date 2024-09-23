@@ -1,6 +1,7 @@
 use super::{
     api::{NextStep, Writable},
     crud::{CRUDCreateUpdate, InsertUpdateResponse},
+    db::DwataDB,
     Module, ModuleDataCreateUpdate, ModuleDataList, ModuleDataRead, ModuleDataReadList,
     ModuleFilters,
 };
@@ -14,6 +15,7 @@ use crate::oauth2::OAuth2App;
 use crate::user_account::UserAccount;
 use crate::workspace::crud::CRUDRead;
 use log::error;
+use tauri::State;
 
 #[tauri::command]
 pub fn module_insert_or_update_initiate(module: Module) -> Result<NextStep, DwataError> {
@@ -151,9 +153,14 @@ pub async fn read_row_list_for_module_with_filter(
 }
 
 #[tauri::command]
-pub async fn read_module_item_by_pk(module: Module, pk: i64) -> Result<ModuleDataRead, DwataError> {
+pub async fn read_module_item_by_pk(
+    module: Module,
+    pk: i64,
+    db: State<'_, DwataDB>,
+) -> Result<ModuleDataRead, DwataError> {
+    let db = db.inner();
     match module {
-        Module::UserAccount => UserAccount::read_one_by_pk(pk)
+        Module::UserAccount => UserAccount::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
         // Module::DirectorySource => DirectorySource::read_one_by_pk(pk)
@@ -162,22 +169,22 @@ pub async fn read_module_item_by_pk(module: Module, pk: i64) -> Result<ModuleDat
         // Module::DatabaseSource => DatabaseSource::read_one_by_pk(pk)
         //     .await
         //     .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
-        Module::AIIntegration => AIIntegration::read_one_by_pk(pk)
+        Module::AIIntegration => AIIntegration::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
         // Module::Chat => Chat::read_one_by_pk(pk)
         //     .await
         //     .and_then(|x| Ok(ModuleDataRead::Chat(x))),
-        Module::OAuth2App => OAuth2App::read_one_by_pk(pk)
+        Module::OAuth2App => OAuth2App::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::OAuth2App(x))),
-        Module::EmailAccount => EmailAccount::read_one_by_pk(pk)
+        Module::EmailAccount => EmailAccount::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::EmailAccount(x))),
-        Module::Mailbox => Mailbox::read_one_by_pk(pk)
+        Module::Mailbox => Mailbox::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::Mailbox(x))),
-        Module::Email => Email::read_one_by_pk(pk)
+        Module::Email => Email::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::Email(x))),
         _ => {
@@ -235,9 +242,11 @@ pub async fn update_module_item(
 pub async fn upsert_module_item(
     pk: i64,
     data: ModuleDataCreateUpdate,
+    db: State<'_, DwataDB>,
 ) -> Result<InsertUpdateResponse, DwataError> {
+    let db = db.inner();
     let existing = match data {
-        ModuleDataCreateUpdate::UserAccount(_) => UserAccount::read_one_by_pk(pk)
+        ModuleDataCreateUpdate::UserAccount(_) => UserAccount::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::UserAccount(x))),
         // ModuleDataCreateUpdate::DirectorySource(_) => DirectorySource::read_one_by_pk(pk)
@@ -246,16 +255,16 @@ pub async fn upsert_module_item(
         // ModuleDataCreateUpdate::DatabaseSource(_) => DatabaseSource::read_one_by_pk(pk)
         //     .await
         //     .and_then(|x| Ok(ModuleDataRead::DatabaseSource(x))),
-        ModuleDataCreateUpdate::AIIntegration(_) => AIIntegration::read_one_by_pk(pk)
+        ModuleDataCreateUpdate::AIIntegration(_) => AIIntegration::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::AIIntegration(x))),
         // ModuleDataCreateUpdate::Chat(_) => Chat::read_one_by_pk(pk)
         //     .await
         //     .and_then(|x| Ok(ModuleDataRead::Chat(x))),
-        ModuleDataCreateUpdate::OAuth2App(_) => OAuth2App::read_one_by_pk(pk)
+        ModuleDataCreateUpdate::OAuth2App(_) => OAuth2App::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::OAuth2App(x))),
-        ModuleDataCreateUpdate::EmailAccount(_) => EmailAccount::read_one_by_pk(pk)
+        ModuleDataCreateUpdate::EmailAccount(_) => EmailAccount::read_one_by_key(pk, db)
             .await
             .and_then(|x| Ok(ModuleDataRead::EmailAccount(x))),
     };

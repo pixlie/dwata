@@ -4,7 +4,6 @@ use crate::{
     workspace::{ModuleDataList, ModuleDataReadList, ModuleFilters},
 };
 use log::error;
-use std::ops::Deref;
 use tauri::{AppHandle, Manager};
 
 #[tauri::command]

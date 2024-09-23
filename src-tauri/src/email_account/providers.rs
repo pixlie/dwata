@@ -1,7 +1,7 @@
 use super::{EmailAccount, EmailProvider};
-use crate::error::DwataError;
 use crate::oauth2::OAuth2Token;
 use crate::workspace::crud::CRUDRead;
+use crate::{error::DwataError, workspace::db::DwataDB};
 use imap::Session;
 use log::{error, info};
 use native_tls::{TlsConnector, TlsStream};
@@ -25,6 +25,7 @@ impl imap::Authenticator for GmailAccount {
 impl EmailAccount {
     pub async fn create_imap_session(
         &mut self,
+        db: &DwataDB,
     ) -> Result<Session<TlsStream<TcpStream>>, DwataError> {
         let mut session: Option<Session<TlsStream<TcpStream>>> = None;
         match self.provider {
@@ -88,9 +89,12 @@ impl EmailAccount {
         }
     }
 
-    pub async fn get_oauth2_token_for_gmail(&self) -> Result<OAuth2Token, DwataError> {
+    pub async fn get_oauth2_token_for_gmail(
+        &self,
+        db: &DwataDB,
+    ) -> Result<OAuth2Token, DwataError> {
         if let Some(oauth2_token_id) = self.oauth2_token_id {
-            OAuth2Token::read_one_by_pk(oauth2_token_id, db).await
+            OAuth2Token::read_one_by_key(oauth2_token_id, db).await
         } else {
             Err(DwataError::CouldNotFindOAuth2Config)
         }

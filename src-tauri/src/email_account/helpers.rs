@@ -4,9 +4,9 @@ use crate::email::helpers::{
     index_emails_in_tantity, parse_email_from_file, save_emails_to_dwata_db,
 };
 use crate::email::{Email, ParsedEmail};
-use crate::email_account::MailboxCreateUpdate;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
+use crate::workspace::db::DwataDB;
 use crate::workspace::{ProcessInLog, ProcessLogCreateUpdate, ProcessingStatusInLog};
 use imap::Session;
 use log::{error, info};
@@ -25,6 +25,7 @@ impl EmailAccount {
     pub async fn prep_for_access(
         &mut self,
         email_account_state: &EmailAccountsState,
+        db: &DwataDB,
     ) -> Result<Vec<String>, DwataError> {
         let imap_session = self.create_imap_session(db).await?;
         {
@@ -362,8 +363,9 @@ pub async fn fetch_and_index_emails_for_email_account(
     pk: i64,
     storage_dir: &PathBuf,
     email_account_state: &EmailAccountsState,
+    db: &DwataDB,
 ) -> Result<(), DwataError> {
-    let mut email_account = EmailAccount::read_one_by_pk(pk, db).await?;
+    let mut email_account = EmailAccount::read_one_by_key(pk, db).await?;
     let mut emails_storage_dir = storage_dir.clone();
     emails_storage_dir.push("emails");
     emails_storage_dir.push(email_account.email_address.clone());
@@ -404,7 +406,7 @@ pub async fn fetch_and_index_emails_for_email_account(
 
         let mut read_emails_count = 0;
         loop {
-            let mailbox = Mailbox::read_one_by_pk(mailbox_id, db).await?;
+            let mailbox = Mailbox::read_one_by_key(mailbox_id, db).await?;
             let emails = mailbox
                 .read_emails_from_local_storage(read_emails_count as usize, 1000)
                 .await?;

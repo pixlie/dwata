@@ -1,13 +1,14 @@
 use super::{
-    // crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
-    ProcessLog,
-    ProcessLogCreateUpdate,
+    crud::{CRUDCreateUpdate, CRUDRead, InputValue, VecColumnNameValue},
+    db::DwataDB,
+    ProcessLog, ProcessLogCreateUpdate,
 };
 use crate::error::DwataError;
 use chrono::Utc;
 use log::error;
+use rocksdb::IteratorMode;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, State};
 use tokio::time::interval;
 
 impl CRUDRead for ProcessLog {
@@ -41,7 +42,7 @@ impl CRUDCreateUpdate for ProcessLogCreateUpdate {
 }
 
 #[tauri::command]
-pub async fn get_process_log(app: AppHandle) -> Result<(), DwataError> {
+pub async fn get_process_log(app: AppHandle, db: State<'_, DwataDB>) -> Result<(), DwataError> {
     let mut interval = interval(Duration::from_secs(2));
     loop {
         interval.tick().await;
@@ -63,6 +64,20 @@ pub async fn get_process_log(app: AppHandle) -> Result<(), DwataError> {
             }
             Err(err) => {
                 error!("Could not read process log\n Error: {}", err);
+            }
+        }
+        let updates = db.get_db("process_log", None)?;
+        for row in updates.iterator(IteratorMode::Start) {
+            match row {
+                Ok((key, value)) => {
+                    // We send the update to the frontend
+                    app.emit("process_log", &value).unwrap();
+                    // Update the is_sent_to_frontend column
+                    let mut update = serde_json::from_slice::<ProcessLog>(&value).unwrap();
+                    update.is_sent_to_frontend = true;
+                    updates.put(key, serde_json::to_string(&update).unwrap().as_bytes());
+                }
+                Err(_) => {}
             }
         }
     }

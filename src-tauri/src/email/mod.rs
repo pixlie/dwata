@@ -20,7 +20,7 @@ pub enum EmailFlag {
     MayCreate,
 }
 
-#[derive(Default, Serialize, TS)]
+#[derive(Default, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Email {
