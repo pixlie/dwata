@@ -1,30 +1,36 @@
 import { Component } from "solid-js";
 import { RouteSectionProps } from "@solidjs/router";
-import NavigationBar from "./widgets/navigation/NavigationBar";
+import TopNavigationBar from "./widgets/navigation/TopNavigationBar";
 import { UserProvider } from "./stores/user";
 import Sidebar from "./widgets/navigation/Sidebar";
 import { WorkspaceProvider } from "./stores/workspace";
 import { SchemaProvider } from "./stores/schema";
-import {
-  UserInterfaceProvider,
-  useUserInterface,
-} from "./stores/userInterface";
+import { UserInterfaceProvider } from "./stores/userInterface";
 import { NextTaskProvider } from "./stores/nextTask";
 import { ProcessLogLoader, ProcessLogProvider } from "./stores/processLog";
 import { SearchableDataProvider } from "./stores/searchableData";
+import {
+  TailwindClassesProvider,
+  useTailwindClasses,
+} from "./stores/TailwindClasses";
 
 const MainContent: Component<RouteSectionProps> = (props) => {
-  const [_, { getColors }] = useUserInterface();
+  const [_, { getClasses }] = useTailwindClasses();
 
   return (
-    <div
-      class="grow p-4"
-      style={{
-        "background-color": getColors().colors["editor.background"],
-      }}
-    >
-      {props.children}
-    </div>
+    <>
+      <ProcessLogLoader />
+      <TopNavigationBar />
+
+      <Sidebar />
+
+      <main class={"pl-20 h-full w-full " + getClasses()["app"]}>
+        <div class="px-8 pt-2 pb-24">
+          {/* Main area */}
+          {props.children}
+        </div>
+      </main>
+    </>
   );
 };
 
@@ -33,24 +39,17 @@ const App: Component<RouteSectionProps> = (props) => {
     <ProcessLogProvider>
       <UserProvider>
         <UserInterfaceProvider>
-          <WorkspaceProvider>
-            <SearchableDataProvider>
-              <SchemaProvider>
-                <NextTaskProvider>
-                  <div class="flex flex-col w-full h-full">
-                    <ProcessLogLoader />
-                    <NavigationBar />
-
-                    <div class="flex grow h-full overflow-hidden">
-                      <Sidebar />
-
-                      <MainContent {...props} />
-                    </div>
-                  </div>
-                </NextTaskProvider>
-              </SchemaProvider>
-            </SearchableDataProvider>
-          </WorkspaceProvider>
+          <TailwindClassesProvider>
+            <WorkspaceProvider>
+              <SearchableDataProvider>
+                <SchemaProvider>
+                  <NextTaskProvider>
+                    <MainContent {...props} />
+                  </NextTaskProvider>
+                </SchemaProvider>
+              </SearchableDataProvider>
+            </WorkspaceProvider>
+          </TailwindClassesProvider>
         </UserInterfaceProvider>
       </UserProvider>
     </ProcessLogProvider>

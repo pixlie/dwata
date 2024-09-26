@@ -3,21 +3,15 @@ import {
   For,
   createComputed,
   createMemo,
-  createResource,
   createSignal,
 } from "solid-js";
 import Heading from "../widgets/typography/Heading";
-import TextInput from "../widgets/interactable/TextInput";
-import { IFormFieldValue } from "../utils/types";
 import { useLocation, useParams, useSearchParams } from "@solidjs/router";
 import { EmailAccount } from "../api_types/EmailAccount";
 import { useSearchableData } from "../stores/searchableData";
 import { Mailbox } from "../api_types/Mailbox";
-import { invoke } from "@tauri-apps/api/core";
-import { searchRoutes } from "./routeList";
 import SearchResultEmailItem from "../widgets/search/SearchResultEmailItem";
 import SearchResultFileItem from "../widgets/search/SearchResultFileItem";
-import Pagination from "../widgets/navigation/Pagination";
 import SelectedEmail from "../widgets/search/SelectedEmail";
 
 const MailboxLabel: Component<Mailbox> = (props) => {
@@ -66,7 +60,7 @@ interface ISearchFormData {
   query: string;
 }
 
-const Search: Component = () => {
+const SearchResults: Component = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const params = useParams();
@@ -119,46 +113,10 @@ const Search: Component = () => {
     }
   });
 
-  const handleChange = (name: string, value: IFormFieldValue) => {
-    setFormData((state) => ({
-      ...state,
-      [name]: value,
-    }));
-  };
-
-  const getSearchTypeDisplay = createMemo(() => {
-    if (!!location.pathname) {
-      const matchedRoute = searchRoutes.find(
-        (x) => x.href === location.pathname,
-      );
-      if (matchedRoute) {
-        return " " + matchedRoute.label.toLowerCase();
-      }
-    }
-    return " all emails";
-  });
-
   return (
     <div class="flex flex-col h-full">
-      {/* <div
-        class="max-w-96"
-        style={{ color: getColors().colors["editor.foreground"] }}
-      >
-        <EmailAccountBox />
-      </div> */}
-
-      <TextInput
-        name="query"
-        contentType="Text"
-        contentSpec={{}}
-        isEditable
-        onChange={handleChange}
-        value={"query" in formData() ? formData().query : undefined}
-        placeholder={`Search${getSearchTypeDisplay()}`}
-      />
-
-      <div class="grid grid-cols-12 mt-2 h-full gap-4">
-        <div class="col-span-5 h-full overflow-y-hidden relative">
+      <div class="grid grid-cols-12 mt-2 h-full gap-x-2">
+        <div class="col-span-5 h-full overflow-y-hidden rounded-l-xl bg-white shadow-md">
           {!!params.searchType && params.searchType === "files" ? (
             <div class="grid grid-cols-5 gap-4 h-full overflow-y-auto pb-32">
               <For each={emails()?.data}>
@@ -174,10 +132,10 @@ const Search: Component = () => {
             </div>
           ) : null}
 
-          <Pagination />
+          {/* <Pagination /> */}
         </div>
 
-        <div class="overflow-y-auto col-span-7">
+        <div class="overflow-y-auto col-span-7 rounded-r-xl bg-white shadow-md">
           <SelectedEmail />
         </div>
       </div>
@@ -185,8 +143,8 @@ const Search: Component = () => {
   );
 };
 
-const SearchWrapper: Component = () => {
-  return <Search />;
+const SearchResultsWrapper: Component = () => {
+  return <SearchResults />;
 };
 
-export default SearchWrapper;
+export default SearchResultsWrapper;
