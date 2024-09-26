@@ -13,7 +13,7 @@ const SelectedEmail: Component = () => {
 
   // We render a full email like in any email client
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col p-4">
       <Heading size={4}>{selectedEmail()?.subject}</Heading>
 
       <div
@@ -31,7 +31,7 @@ const SelectedEmail: Component = () => {
       <div class="flex flex-col gap-y-0.5 pb-16">
         {selectedEmail()
           ?.bodyText?.split("\n")
-          .map((x) => <div class="font-thin text-lg">{x}</div>)}
+          .map((x) => <div class="font-light text-md tracking-tight">{x}</div>)}
       </div>
     </div>
   );

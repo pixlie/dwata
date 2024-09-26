@@ -4,15 +4,20 @@ interface Route {
   href: string;
 }
 
-const searchRoutes = [
+const routes = [
   // {
   //   label: "Focus",
   //   icon: "fa-solid fa-circle-dot",
   //   href: "/coming-soon/focus",
   // },
   {
-    label: "All Emails",
-    icon: "fa-solid fa-envelope",
+    label: "Insights",
+    icon: "insight",
+    href: "/insights",
+  },
+  {
+    label: "Emails",
+    icon: "inbox",
     href: "/search/emails",
   },
   // {
@@ -22,7 +27,7 @@ const searchRoutes = [
   // },
   {
     label: "Contacts",
-    icon: "fa-solid fa-address-book",
+    icon: "address-book",
     href: "/coming-soon/contacts",
   },
   // {
@@ -42,7 +47,7 @@ const searchRoutes = [
   // },
   {
     label: "Files",
-    icon: "fa-solid fa-file",
+    icon: "folder",
     href: "/search/files",
   },
   // {
@@ -53,4 +58,4 @@ const searchRoutes = [
 ];
 
 export type { Route };
-export { searchRoutes };
+export { routes };

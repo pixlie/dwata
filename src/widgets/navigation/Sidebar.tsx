@@ -1,20 +1,21 @@
 import { Component, For } from "solid-js";
-import NavigationLink from "./NavigationLink";
-import { useUserInterface } from "../../stores/userInterface";
-import { searchRoutes } from "../../routes/routeList";
+import SidebarLink from "./SidebarLink";
+import { routes } from "../../routes/routeList";
+import { useTailwindClasses } from "../../stores/TailwindClasses";
 
 const Sidebar: Component = () => {
-  const [_, { getColors }] = useUserInterface();
+  const [_, { getClasses }] = useTailwindClasses();
 
   return (
     <div
-      class="w-64 shrink-0 border-r-2 flex flex-col"
-      style={{
-        "background-color": getColors().colors["sideBar.background"],
-        "border-color": getColors().colors["sideBar.border"],
-      }}
+      class={
+        "fixed inset-y-0 left-0 z-50 block w-20 overflow-y-auto pb-4 pt-20 " +
+        getClasses()["sideBar"]
+      }
     >
-      <For each={searchRoutes}>{(item) => <NavigationLink {...item} />}</For>
+      <ul role="list" class="flex flex-col items-center space-y-1">
+        <For each={routes}>{(item) => <SidebarLink {...item} />}</For>
+      </ul>
 
       {/* <SidebarHeading label="Chats" icon="fa-solid fa-comments" href="/chat" /> */}
       {/* <div class="my-4 px-4">
@@ -26,16 +27,8 @@ const Sidebar: Component = () => {
         href="/search"
       /> */}
 
-      <div class="flex-grow" />
-      {/* <div
-        class="mt-4 border-b"
-        style={{ "border-color": getColors().colors["sideBar.border"] }}
-      /> */}
-      <NavigationLink
-        label="Settings"
-        icon="fa-solid fa-cog"
-        href="/settings"
-      />
+      <div class="grow" />
+      <SidebarLink label="Settings" icon="fa-solid fa-cog" href="/settings" />
     </div>
   );
 };
