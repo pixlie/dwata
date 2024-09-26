@@ -1,11 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
+#![allow(unused)]
 // use email_account::app_state::EmailAccountsState;
 use env_logger;
 use log::info;
 use tauri::{App, Manager};
-use workspace::db::DwataDB;
+use workspace::{config::DwataConfig, db::DwataDB};
 
 // mod chat;
 // mod database_source;
@@ -42,6 +42,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
         app_data_dir.to_str().unwrap()
     );
     app.manage(DwataDB::new(&app_data_dir));
+    app.manage(DwataConfig::new(&app_data_dir));
     // app.manage(EmailAccountsState::new(Mutex::new(vec![])));
     Ok(())
 }

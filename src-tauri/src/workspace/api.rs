@@ -1,3 +1,4 @@
+use super::config::DwataConfig;
 use super::db::DwataDB;
 use super::ModuleDataCreateUpdate;
 use crate::content::form::{FormButton, FormButtonType, FormField};
@@ -57,6 +58,7 @@ pub trait Writable {
     async fn next_step(
         _data: ModuleDataCreateUpdate,
         _db: &DwataDB,
+        _config: &DwataConfig,
     ) -> Result<NextStep, DwataError> {
         return Ok(NextStep::Continue);
     }

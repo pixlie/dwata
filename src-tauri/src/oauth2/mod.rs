@@ -12,8 +12,8 @@ use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
-pub mod api;
-pub mod commands;
+// pub mod api;
+// pub mod commands;
 pub mod crud;
 pub mod helpers;
 
@@ -25,20 +25,29 @@ pub enum OAuth2Provider {
     Google,
 }
 
-#[derive(Clone, Deserialize, Serialize, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct OAuth2App {
-    #[ts(type = "number")]
-    pub id: u32,
+// #[derive(Clone, Deserialize, Serialize, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export, rename_all = "camelCase")]
+// pub struct OAuth2App {
+//     #[ts(type = "number")]
+//     pub id: u32,
 
-    pub provider: OAuth2Provider,
-    pub client_id: String,
-    pub client_secret: Option<String>,
+//     pub provider: OAuth2Provider,
+//     pub client_id: String,
+//     pub client_secret: Option<String>,
 
-    pub created_at: DateTime<Utc>,
-    pub modified_at: Option<DateTime<Utc>>,
-}
+//     pub created_at: DateTime<Utc>,
+//     pub modified_at: Option<DateTime<Utc>>,
+// }
+
+// #[derive(Default, Deserialize, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export, rename_all = "camelCase")]
+// pub struct OAuth2AppCreateUpdate {
+//     pub provider: Option<String>,
+//     pub client_id: Option<String>,
+//     pub client_secret: Option<String>,
+// }
 
 #[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -46,8 +55,7 @@ pub struct OAuth2App {
 pub struct OAuth2Token {
     #[ts(type = "number")]
     pub id: u32,
-    pub oauth2_app_id: u32,
-
+    // pub oauth2_app_id: u32,
     pub authorization_code: String,
     pub access_token: String,
     pub refresh_token: Option<String>,
@@ -58,19 +66,9 @@ pub struct OAuth2Token {
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
-
-    #[serde(skip)]
-    #[ts(skip)]
-    pub oauth2_app: Option<OAuth2App>,
-}
-
-#[derive(Default, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct OAuth2AppCreateUpdate {
-    pub provider: Option<String>,
-    pub client_id: Option<String>,
-    pub client_secret: Option<String>,
+    // #[serde(skip)]
+    // #[ts(skip)]
+    // pub oauth2_app: Option<OAuth2App>,
 }
 
 #[derive(Default)]
@@ -92,21 +90,21 @@ pub struct Oauth2APIResponse {
 }
 
 impl OAuth2Token {
-    pub async fn get_oauth2_app(&mut self, db: &DwataDB) -> Result<OAuth2App, DwataError> {
-        if let Some(oauth2_app) = &self.oauth2_app {
-            Ok(oauth2_app.clone())
-        } else {
-            let oauth2_app: OAuth2App = OAuth2App::read_one_by_key(self.oauth2_app_id, db).await?;
-            self.oauth2_app = Some(oauth2_app);
-            Ok(self.oauth2_app.as_ref().unwrap().clone())
-        }
-    }
+    // pub async fn get_oauth2_app(&mut self, db: &DwataDB) -> Result<OAuth2App, DwataError> {
+    //     if let Some(oauth2_app) = &self.oauth2_app {
+    //         Ok(oauth2_app.clone())
+    //     } else {
+    //         let oauth2_app: OAuth2App = OAuth2App::read_one_by_key(self.oauth2_app_id, db).await?;
+    //         self.oauth2_app = Some(oauth2_app);
+    //         Ok(self.oauth2_app.as_ref().unwrap().clone())
+    //     }
+    // }
 
     pub async fn refetch_google_access_token(&mut self, db: &DwataDB) -> Result<(), DwataError> {
-        let oauth2_app = self.get_oauth2_app(db).await?;
+        // let oauth2_app = self.get_oauth2_app(db).await?;
         let client = get_google_oauth2_client(
-            oauth2_app.client_id.clone(),
-            oauth2_app.client_secret.as_ref().unwrap().clone(),
+            google_oauth2_client_id.to_string(),
+            google_oauth2_client_secret.to_string(),
         )?;
 
         let mut token_response: Option<

@@ -3,8 +3,9 @@ use crate::content::content::{Content, ContentSpec, ContentType, TextType};
 use crate::content::form::{FormButton, FormButtonType, FormField};
 use crate::error::DwataError;
 use crate::oauth2::helpers::get_google_oauth2_authorize_url;
-use crate::oauth2::{OAuth2App, OAuth2Provider};
+use crate::oauth2::OAuth2Provider;
 use crate::workspace::api::{Configuration, NextStep, Writable};
+use crate::workspace::config::{DwataConfig, GoogleOAuthAppConfig};
 use crate::workspace::crud::CRUDRead;
 use crate::workspace::db::DwataDB;
 use crate::workspace::ModuleDataCreateUpdate;
@@ -55,63 +56,63 @@ impl EmailAccount {
         ]
     }
 
-    async fn get_fields_for_oauth2_auth(
-        email_provider: &EmailProvider,
-        db: &DwataDB,
-    ) -> Vec<FormField> {
-        // If provider is Gmail, then we show OAuth2 app list if there are more than one for Google,
-        // else we add a hidden field with the OAuth2 app ID
-        match email_provider {
-            EmailProvider::Gmail => {
-                match OAuth2App::read_all(25, 0, db).await {
-                    Ok((oauth2_apps, _)) => {
-                        // Check if we have only one OAuth2 app for this provider
-                        let mut apps_iter = oauth2_apps
-                            .iter()
-                            .filter(|app| matches!(app.provider, OAuth2Provider::Google));
-                        if apps_iter.clone().count() == 1 {
-                            vec![FormField {
-                                name: "oauth2AppId".to_string(),
-                                content_type: ContentType::Text,
-                                content_spec: ContentSpec::default(),
-                                is_hidden: Some(true),
-                                default_value: Some(Content::ID(apps_iter.next().unwrap().id)),
-                                ..Default::default()
-                            }]
-                        } else {
-                            vec![FormField {
-                                name: "oauth2AppId".to_string(),
-                                label: Some("Select OAuth2 app".to_string()),
-                                content_type: ContentType::SingleChoice,
-                                content_spec: ContentSpec {
-                                    choices_from_function: Some(
-                                        "get_oauth2_app_choice_list".to_string(),
-                                    ),
-                                    ..ContentSpec::default()
-                                },
-                                ..Default::default()
-                            }]
-                        }
-                    }
-                    Err(_) => {
-                        vec![FormField {
-                            name: "oauth2AppId".to_string(),
-                            label: Some("Select OAuth2 app".to_string()),
-                            content_type: ContentType::SingleChoice,
-                            content_spec: ContentSpec {
-                                choices_from_function: Some(
-                                    "get_oauth2_app_choice_list".to_string(),
-                                ),
-                                ..ContentSpec::default()
-                            },
-                            ..Default::default()
-                        }]
-                    }
-                }
-            }
-            _ => vec![],
-        }
-    }
+    // async fn get_fields_for_oauth2_auth(
+    //     email_provider: &EmailProvider,
+    //     db: &DwataDB,
+    // ) -> Vec<FormField> {
+    //     // If provider is Gmail, then we show OAuth2 app list if there are more than one for Google,
+    //     // else we add a hidden field with the OAuth2 app ID
+    //     match email_provider {
+    //         EmailProvider::Gmail => {
+    //             match OAuth2App::read_all(25, 0, db).await {
+    //                 Ok((oauth2_apps, _)) => {
+    //                     // Check if we have only one OAuth2 app for this provider
+    //                     let mut apps_iter = oauth2_apps
+    //                         .iter()
+    //                         .filter(|app| matches!(app.provider, OAuth2Provider::Google));
+    //                     if apps_iter.clone().count() == 1 {
+    //                         vec![FormField {
+    //                             name: "oauth2AppId".to_string(),
+    //                             content_type: ContentType::Text,
+    //                             content_spec: ContentSpec::default(),
+    //                             is_hidden: Some(true),
+    //                             default_value: Some(Content::ID(apps_iter.next().unwrap().id)),
+    //                             ..Default::default()
+    //                         }]
+    //                     } else {
+    //                         vec![FormField {
+    //                             name: "oauth2AppId".to_string(),
+    //                             label: Some("Select OAuth2 app".to_string()),
+    //                             content_type: ContentType::SingleChoice,
+    //                             content_spec: ContentSpec {
+    //                                 choices_from_function: Some(
+    //                                     "get_oauth2_app_choice_list".to_string(),
+    //                                 ),
+    //                                 ..ContentSpec::default()
+    //                             },
+    //                             ..Default::default()
+    //                         }]
+    //                     }
+    //                 }
+    //                 Err(_) => {
+    //                     vec![FormField {
+    //                         name: "oauth2AppId".to_string(),
+    //                         label: Some("Select OAuth2 app".to_string()),
+    //                         content_type: ContentType::SingleChoice,
+    //                         content_spec: ContentSpec {
+    //                             choices_from_function: Some(
+    //                                 "get_oauth2_app_choice_list".to_string(),
+    //                             ),
+    //                             ..ContentSpec::default()
+    //                         },
+    //                         ..Default::default()
+    //                     }]
+    //                 }
+    //             }
+    //         }
+    //         _ => vec![],
+    //     }
+    // }
 
     fn get_initial_configuration() -> Configuration {
         Configuration {
@@ -132,7 +133,11 @@ impl Writable for EmailAccount {
         Ok(NextStep::Configure(Self::get_initial_configuration()))
     }
 
-    async fn next_step(data: ModuleDataCreateUpdate, db: &DwataDB) -> Result<NextStep, DwataError> {
+    async fn next_step(
+        data: ModuleDataCreateUpdate,
+        db: &DwataDB,
+        config: &DwataConfig,
+    ) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Add the Google authorization URL as a field
@@ -143,14 +148,18 @@ impl Writable for EmailAccount {
                     return Ok(NextStep::Continue);
                 }
 
-                let oauth2_app = OAuth2App::read_one_by_key(x.oauth2_app_id.unwrap(), db).await?;
-                let authorize_url = get_google_oauth2_authorize_url(
-                    oauth2_app.client_id,
-                    oauth2_app.client_secret.unwrap(),
-                )
-                .await?;
+                match &config.google_oauth2_app {
+                    GoogleOAuthAppConfig::Configured {
+                        client_id,
+                        client_secret,
+                    } => {
+                        let authorize_url = get_google_oauth2_authorize_url(
+                            client_id.clone(),
+                            client_secret.clone(),
+                        )
+                        .await?;
 
-                Ok(NextStep::Configure(
+                        Ok(NextStep::Configure(
                         Configuration {
                             title: "OAuth2 credentials".to_string(),
                             description: "Waiting for your authorization at the URL".to_string(),
@@ -171,6 +180,11 @@ impl Writable for EmailAccount {
                             submit_implicitly: true
                         })
                     )
+                    }
+                    GoogleOAuthAppConfig::NotConfigured => {
+                        return Err(DwataError::NextStepNotAvailable);
+                    }
+                }
             }
             _ => Err(DwataError::NextStepNotAvailable),
         }
@@ -191,11 +205,11 @@ impl Writable for EmailAccount {
                 let mut fields = Self::get_initial_form_fields();
                 match provider {
                     EmailProvider::Gmail => {
-                        fields.extend(
-                            Self::get_fields_for_oauth2_auth(&provider, db)
-                                .await
-                                .into_iter(),
-                        );
+                        // fields.extend(
+                        //     Self::get_fields_for_oauth2_auth(&provider, db)
+                        //         .await
+                        //         .into_iter(),
+                        // );
                         Ok(NextStep::Configure(Configuration::new(
                             "Email Account",
                             "Email account details",

@@ -16,6 +16,7 @@ use ts_rs::TS;
 
 pub mod api;
 pub mod commands;
+pub mod config;
 pub mod crud;
 pub mod db;
 pub mod process_log;

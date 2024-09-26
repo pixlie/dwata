@@ -1,6 +1,5 @@
 use super::{
-    helpers::get_google_oauth2_tokens, OAuth2App, OAuth2AppCreateUpdate, OAuth2Provider,
-    OAuth2Token, OAuth2TokenCreateUpdate,
+    helpers::get_google_oauth2_tokens, OAuth2Provider, OAuth2Token, OAuth2TokenCreateUpdate,
 };
 use crate::{
     error::DwataError,
@@ -10,44 +9,44 @@ use crate::{
     },
 };
 use chrono::Utc;
-use std::str::FromStr;
+// use std::str::FromStr;
 
-impl CRUDRead for OAuth2App {
-    fn table_name() -> String {
-        "oauth2_app".to_string()
-    }
-}
+// impl CRUDRead for OAuth2App {
+//     fn table_name() -> String {
+//         "oauth2_app".to_string()
+//     }
+// }
 
-impl CRUDCreateUpdate for OAuth2App {
-    type Payload = OAuth2AppCreateUpdate;
+// impl CRUDCreateUpdate for OAuth2App {
+//     type Payload = OAuth2AppCreateUpdate;
 
-    fn table_name() -> String {
-        "oauth2_app".to_string()
-    }
+//     fn table_name() -> String {
+//         "oauth2_app".to_string()
+//     }
 
-    fn get_parsed_item(
-        payload: OAuth2AppCreateUpdate,
-        pk: u32,
-        _db: &DwataDB,
-    ) -> Result<OAuth2App, DwataError> {
-        Ok(OAuth2App {
-            id: pk,
-            provider: payload.provider.map_or(
-                Err(DwataError::invalid_field_value("provider")),
-                |x| {
-                    OAuth2Provider::from_str(&x)
-                        .map_err(|_| DwataError::invalid_field_value("provider"))
-                },
-            )?,
-            client_id: payload
-                .client_id
-                .ok_or(DwataError::invalid_field_value("client_id"))?,
-            client_secret: payload.client_secret,
-            created_at: Utc::now(),
-            modified_at: None,
-        })
-    }
-}
+//     fn get_parsed_item(
+//         payload: OAuth2AppCreateUpdate,
+//         pk: u32,
+//         _db: &DwataDB,
+//     ) -> Result<OAuth2App, DwataError> {
+//         Ok(OAuth2App {
+//             id: pk,
+//             provider: payload.provider.map_or(
+//                 Err(DwataError::invalid_field_value("provider")),
+//                 |x| {
+//                     OAuth2Provider::from_str(&x)
+//                         .map_err(|_| DwataError::invalid_field_value("provider"))
+//                 },
+//             )?,
+//             client_id: payload
+//                 .client_id
+//                 .ok_or(DwataError::invalid_field_value("client_id"))?,
+//             client_secret: payload.client_secret,
+//             created_at: Utc::now(),
+//             modified_at: None,
+//         })
+//     }
+// }
 
 impl CRUDRead for OAuth2Token {
     fn table_name() -> String {
@@ -69,9 +68,9 @@ impl CRUDCreateUpdate for OAuth2Token {
     ) -> Result<OAuth2Token, DwataError> {
         Ok(OAuth2Token {
             id: pk,
-            oauth2_app_id: payload
-                .oauth2_app_id
-                .ok_or(DwataError::invalid_field_value("oauth2_app_id"))?,
+            // oauth2_app_id: payload
+            //     .oauth2_app_id
+            //     .ok_or(DwataError::invalid_field_value("oauth2_app_id"))?,
             authorization_code: payload
                 .authorization_code
                 .ok_or(DwataError::invalid_field_value("authorization_code"))?,
@@ -85,7 +84,7 @@ impl CRUDCreateUpdate for OAuth2Token {
             handle: payload.handle,
             created_at: Utc::now(),
             modified_at: None,
-            oauth2_app: None,
+            // oauth2_app: None,
         })
     }
 

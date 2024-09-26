@@ -2,7 +2,7 @@ use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox};
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use crate::oauth2::helpers::get_google_oauth2_tokens;
-use crate::oauth2::{OAuth2App, OAuth2Token, OAuth2TokenCreateUpdate};
+use crate::oauth2::{OAuth2Token, OAuth2TokenCreateUpdate};
 use crate::workspace::crud::{
     CRUDCreateUpdate, CRUDRead, InputValue, InsertUpdateResponse, VecColumnNameValue,
 };
