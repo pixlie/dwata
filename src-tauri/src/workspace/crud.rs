@@ -3,7 +3,7 @@ use super::ModuleFilters;
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use chrono::{DateTime, Utc};
-use log::{error, info};
+use log::error;
 use rocksdb::IteratorMode;
 use serde::de::DeserializeOwned;
 use serde::Serialize;

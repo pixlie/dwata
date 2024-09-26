@@ -5,7 +5,7 @@ use std::fs::create_dir_all;
 use std::path::PathBuf;
 
 pub struct DwataDB {
-    root_path: PathBuf,
+    db_root_path: PathBuf,
 }
 
 impl DwataDB {
@@ -17,8 +17,22 @@ impl DwataDB {
             info!("Created Dwata DB directory: {}", db_path.to_str().unwrap());
         }
         Self {
-            root_path: root_path.clone(),
+            db_root_path: db_path,
         }
+    }
+
+    pub fn get_db_path(&self, table_name: &str) -> PathBuf {
+        let mut db_path = self.db_root_path.clone();
+        db_path.push(table_name);
+        if !db_path.as_path().exists() {
+            create_dir_all(db_path.as_path()).unwrap_or_else(|_| {});
+            info!(
+                "Created Dwata DB directory for {}: {}",
+                table_name,
+                db_path.to_str().unwrap()
+            );
+        }
+        db_path
     }
 
     pub fn get_db(
@@ -26,18 +40,12 @@ impl DwataDB {
         table_name: &str,
         prefix_opt: Option<String>,
     ) -> Result<DBWithThreadMode<SingleThreaded>, DwataError> {
-        let mut db_path = self.root_path.clone();
-        db_path.push(table_name);
-        let db_options = match prefix_opt {
-            Some(prefix) => {
-                let mut db_options = Options::default();
-                db_options
-                    .set_prefix_extractor(SliceTransform::create_fixed_prefix(prefix.len() + 1));
-                db_options
-            }
-            None => Options::default(),
+        let mut db_options = Options::default();
+        db_options.create_if_missing(true);
+        if let Some(prefix) = prefix_opt {
+            db_options.set_prefix_extractor(SliceTransform::create_fixed_prefix(prefix.len() + 1));
         };
-        match DB::open(&db_options, db_path) {
+        match DB::open(&db_options, self.get_db_path(table_name)) {
             Ok(db) => Ok(db),
             Err(err) => {
                 error!("Could not open Dwata DB\n Error: {}", err);
@@ -49,11 +57,9 @@ impl DwataDB {
     pub fn increment_key(&self, table_name: &str) -> Result<u32, DwataError> {
         // We store all incrementing keys in a separate table
         // We check if the queried table has a key in our incrementing table
-        let mut db_path = self.root_path.clone();
-        db_path.push(table_name);
-        db_path.push("_incrementing_keys");
+        let pk_table_name = "_incrementing_keys";
         let key = format!("key/{}", table_name);
-        let db: TransactionDB = match TransactionDB::open_default(db_path) {
+        let db: TransactionDB = match TransactionDB::open_default(self.get_db_path(pk_table_name)) {
             Ok(db) => db,
             Err(err) => {
                 error!("Could not open Dwata DB\n Error: {}", err);

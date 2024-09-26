@@ -10,9 +10,9 @@ use ts_rs::TS;
 
 pub mod api;
 pub mod app_state;
-pub mod commands;
+// pub mod commands;
 pub mod crud;
-pub mod helpers;
+// pub mod helpers;
 pub mod providers;
 
 #[derive(Deserialize, Serialize, TS, EnumString, Display)]
@@ -43,7 +43,7 @@ pub struct EmailAccount {
 
     pub email_address: String,
     pub password: Option<String>,
-    pub oauth2_token_id: Option<i64>,
+    pub oauth2_token_id: Option<u32>,
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
@@ -56,7 +56,7 @@ pub struct EmailAccountCreateUpdate {
     pub provider: Option<String>,
     pub email_address: Option<String>,
     pub password: Option<String>,
-    pub oauth2_app_id: Option<i64>,
+    pub oauth2_app_id: Option<u32>,
     // pub oauth2_token_id: Option<i64>,
 }
 

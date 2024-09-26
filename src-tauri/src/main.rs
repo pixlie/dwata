@@ -5,7 +5,6 @@
 use env_logger;
 use log::info;
 use tauri::{App, Manager};
-use tokio::sync::Mutex;
 use workspace::db::DwataDB;
 
 // mod chat;
@@ -24,8 +23,8 @@ mod content;
 // mod workflow;
 // mod contacts;
 mod email;
-// mod email_account;
-// mod oauth2;
+mod email_account;
+mod oauth2;
 mod workspace;
 
 fn setup(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {

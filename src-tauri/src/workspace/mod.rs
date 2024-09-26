@@ -2,7 +2,10 @@
 // use crate::chat::{Chat, ChatCreateUpdate, ChatFilters};
 // use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
 // use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::email::{Email, EmailFilters};
+use crate::{
+    email::{Email, EmailFilters},
+    email_account::EmailAccountCreateUpdate,
+};
 // use crate::email_account::{EmailAccount, EmailAccountCreateUpdate, Mailbox};
 // use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
 // use crate::user_account::{UserAccount, UserAccountCreateUpdate};
@@ -80,7 +83,7 @@ pub enum ModuleDataCreateUpdate {
     // AIIntegration(AIIntegrationCreateUpdate),
     // Chat(ChatCreateUpdate),
     // OAuth2App(OAuth2AppCreateUpdate),
-    // EmailAccount(EmailAccountCreateUpdate),
+    EmailAccount(EmailAccountCreateUpdate),
 }
 
 #[derive(Deserialize, Display, TS)]

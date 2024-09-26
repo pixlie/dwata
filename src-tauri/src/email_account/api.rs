@@ -9,7 +9,6 @@ use crate::workspace::crud::CRUDRead;
 use crate::workspace::db::DwataDB;
 use crate::workspace::ModuleDataCreateUpdate;
 use std::str::FromStr;
-use tauri::State;
 
 impl EmailAccount {
     fn get_initial_form_fields() -> Vec<FormField> {
@@ -56,12 +55,15 @@ impl EmailAccount {
         ]
     }
 
-    async fn get_fields_for_oauth2_auth(email_provider: &EmailProvider) -> Vec<FormField> {
+    async fn get_fields_for_oauth2_auth(
+        email_provider: &EmailProvider,
+        db: &DwataDB,
+    ) -> Vec<FormField> {
         // If provider is Gmail, then we show OAuth2 app list if there are more than one for Google,
         // else we add a hidden field with the OAuth2 app ID
         match email_provider {
             EmailProvider::Gmail => {
-                match OAuth2App::read_all(25, 0).await {
+                match OAuth2App::read_all(25, 0, db).await {
                     Ok((oauth2_apps, _)) => {
                         // Check if we have only one OAuth2 app for this provider
                         let mut apps_iter = oauth2_apps
@@ -130,10 +132,7 @@ impl Writable for EmailAccount {
         Ok(NextStep::Configure(Self::get_initial_configuration()))
     }
 
-    async fn next_step(
-        data: ModuleDataCreateUpdate,
-        db: State<'_, DwataDB>,
-    ) -> Result<NextStep, DwataError> {
+    async fn next_step(data: ModuleDataCreateUpdate, db: &DwataDB) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Add the Google authorization URL as a field
@@ -177,7 +176,7 @@ impl Writable for EmailAccount {
         }
     }
 
-    async fn on_change(data: ModuleDataCreateUpdate) -> Result<NextStep, DwataError> {
+    async fn on_change(data: ModuleDataCreateUpdate, db: &DwataDB) -> Result<NextStep, DwataError> {
         match data {
             ModuleDataCreateUpdate::EmailAccount(x) => {
                 // Check if the provider is set
@@ -193,7 +192,7 @@ impl Writable for EmailAccount {
                 match provider {
                     EmailProvider::Gmail => {
                         fields.extend(
-                            Self::get_fields_for_oauth2_auth(&provider)
+                            Self::get_fields_for_oauth2_auth(&provider, db)
                                 .await
                                 .into_iter(),
                         );

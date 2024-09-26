@@ -1,4 +1,4 @@
-use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox, MailboxCreateUpdate};
+use super::{EmailAccount, EmailAccountCreateUpdate, EmailProvider, Mailbox};
 use crate::content::content::{Content, ContentType};
 use crate::error::DwataError;
 use crate::oauth2::helpers::get_google_oauth2_tokens;

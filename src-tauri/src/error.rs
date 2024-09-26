@@ -20,9 +20,6 @@ pub enum DwataError {
     CouldNotFetchRowsFromDwataDB,
     CouldNotFetchSingleRowFromDwataDB,
 
-    // Blanket error for sqlx
-    SqlxError,
-
     // Workspace and configuration
     ModuleNotFound,
     NextStepNotAvailable,
@@ -44,9 +41,6 @@ pub enum DwataError {
     ChatHasNoRootId,
     ToolUseNotSupported,
 
-    // Integrated vector DB
-    CouldNotConnectToVectorDB,
-
     // Chat context related
     CouldNotFindNode,
 
@@ -60,6 +54,7 @@ pub enum DwataError {
 
     // API requests related
     CouldNotConnectToAPI,
+    InvalidFieldValue(String),
 
     // Enum related
     CouldNotParseEnum,
@@ -71,6 +66,7 @@ pub enum DwataError {
     CouldNotStartAuthResponseServer,
     CouldNotGetTokenResponse,
     CouldNotAuthenticateToService,
+    InvalidOAuth2Provider,
 
     // Email related
     InvalidEmailProvider,
@@ -90,6 +86,12 @@ pub enum DwataError {
     CouldNotOpenSearchIndex,
     CouldNotParseSearchQuery,
     CouldNotSearchTheIndex,
+}
+
+impl DwataError {
+    pub fn invalid_field_value(field_name: &str) -> Self {
+        DwataError::InvalidFieldValue(field_name.to_string())
+    }
 }
 
 impl Error for DwataError {
