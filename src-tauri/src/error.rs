@@ -67,6 +67,7 @@ pub enum DwataError {
     CouldNotGetTokenResponse,
     CouldNotAuthenticateToService,
     InvalidOAuth2Provider,
+    CouldNotFindOAuth2App,
 
     // Email related
     InvalidEmailProvider,

@@ -3,16 +3,13 @@ use std::path::PathBuf;
 use config::Config;
 use serde::Deserialize;
 
-pub enum GoogleOAuthAppConfig {
-    Configured {
-        client_id: String,
-        client_secret: String,
-    },
-    NotConfigured,
+pub struct GoogleOAuthAppConfig {
+    pub client_id: String,
+    pub client_secret: String,
 }
 
 pub struct DwataConfig {
-    pub google_oauth2_app: GoogleOAuthAppConfig,
+    pub google_oauth2_app: Option<GoogleOAuthAppConfig>,
 }
 
 #[derive(Deserialize)]
@@ -36,18 +33,16 @@ impl DwataConfig {
                         raw_config.google_oauth2_client_id,
                         raw_config.google_oauth2_client_secret,
                     ) {
-                        (Some(client_id), Some(client_secret)) => {
-                            GoogleOAuthAppConfig::Configured {
-                                client_id,
-                                client_secret,
-                            }
-                        }
-                        _ => GoogleOAuthAppConfig::NotConfigured,
+                        (Some(client_id), Some(client_secret)) => Some(GoogleOAuthAppConfig {
+                            client_id,
+                            client_secret,
+                        }),
+                        _ => None,
                     },
                 }
             }
             Err(_) => DwataConfig {
-                google_oauth2_app: GoogleOAuthAppConfig::NotConfigured,
+                google_oauth2_app: None,
             },
         }
     }

@@ -1,5 +1,6 @@
 use super::{EmailAccount, EmailProvider};
 use crate::oauth2::OAuth2Token;
+use crate::workspace::config::DwataConfig;
 use crate::workspace::crud::CRUDRead;
 use crate::{error::DwataError, workspace::db::DwataDB};
 use imap::Session;
@@ -26,6 +27,7 @@ impl EmailAccount {
     pub async fn create_imap_session(
         &mut self,
         db: &DwataDB,
+        config: &DwataConfig,
     ) -> Result<Session<TlsStream<TcpStream>>, DwataError> {
         let mut session: Option<Session<TlsStream<TcpStream>>> = None;
         match self.provider {
@@ -50,7 +52,7 @@ impl EmailAccount {
                         }
                         Err((error, _)) => {
                             error!("Error authenticating with Gmail: {}", error);
-                            oauth2_token.refetch_google_access_token(db).await?;
+                            oauth2_token.refetch_google_access_token(db, config).await?;
                         }
                     }
                 }

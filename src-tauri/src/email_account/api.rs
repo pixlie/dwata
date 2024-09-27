@@ -149,13 +149,10 @@ impl Writable for EmailAccount {
                 }
 
                 match &config.google_oauth2_app {
-                    GoogleOAuthAppConfig::Configured {
-                        client_id,
-                        client_secret,
-                    } => {
+                    Some(app) => {
                         let authorize_url = get_google_oauth2_authorize_url(
-                            client_id.clone(),
-                            client_secret.clone(),
+                            app.client_id.clone(),
+                            app.client_secret.clone(),
                         )
                         .await?;
 
@@ -178,10 +175,9 @@ impl Writable for EmailAccount {
                             }],
                             buttons: vec![],
                             submit_implicitly: true
-                        })
-                    )
+                        }))
                     }
-                    GoogleOAuthAppConfig::NotConfigured => {
+                    None => {
                         return Err(DwataError::NextStepNotAvailable);
                     }
                 }

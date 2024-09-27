@@ -1,3 +1,4 @@
+use crate::workspace::config::DwataConfig;
 use crate::workspace::crud::CRUDCreateUpdate;
 use crate::workspace::db::DwataDB;
 use crate::{error::DwataError, workspace::crud::CRUDRead};
@@ -100,12 +101,20 @@ impl OAuth2Token {
     //     }
     // }
 
-    pub async fn refetch_google_access_token(&mut self, db: &DwataDB) -> Result<(), DwataError> {
+    pub async fn refetch_google_access_token(
+        &mut self,
+        db: &DwataDB,
+        config: &DwataConfig,
+    ) -> Result<(), DwataError> {
         // let oauth2_app = self.get_oauth2_app(db).await?;
-        let client = get_google_oauth2_client(
-            google_oauth2_client_id.to_string(),
-            google_oauth2_client_secret.to_string(),
-        )?;
+        let client = match &config.google_oauth2_app {
+            Some(app) => {
+                get_google_oauth2_client(app.client_id.clone(), app.client_secret.clone())?
+            }
+            None => {
+                return Err(DwataError::CouldNotFindOAuth2App);
+            }
+        };
 
         let mut token_response: Option<
             StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType>,
