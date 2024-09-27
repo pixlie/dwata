@@ -11,6 +11,7 @@ import UserAccountForm from "./routes/UserAccountForm";
 import { ChatRoutes, ChatWrapper } from "./routes/Chat";
 import DirectoryBrowser from "./routes/DirectoryBrowser";
 import SearchResultsWrapper from "./routes/SearchResults";
+import Graph from "./routes/Graph";
 
 render(
   () => (
@@ -25,6 +26,7 @@ render(
         <ChatRoutes />
       </Route>
       <Route path={"/search/:searchType"} component={SearchResultsWrapper} />
+      <Route path={"/graph"} component={Graph} />
       <Route path={"/"} component={Home} />
     </Router>
   ),

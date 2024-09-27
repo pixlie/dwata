@@ -11,6 +11,11 @@ const routes = [
   //   href: "/coming-soon/focus",
   // },
   {
+    label: "Graph",
+    icon: "graph",
+    href: "/graph",
+  },
+  {
     label: "Insights",
     icon: "insight",
     href: "/insights",

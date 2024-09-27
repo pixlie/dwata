@@ -4,6 +4,7 @@ import Inbox from "../assets/icons/Inbox";
 import AddressBook from "../assets/icons/AddressBook";
 import Folder from "../assets/icons/Folder";
 import Insight from "../assets/icons/Insight";
+import Graph from "../assets/icons/Graph";
 
 interface IPropTypes {
   iconName: string;
@@ -22,6 +23,8 @@ const GetIcon: Component<IPropTypes> = (props) => {
       return <Folder class={classes} />;
     case "insight":
       return <Insight class={classes} />;
+    case "graph":
+      return <Graph class={classes} />;
     case "home":
     default:
       return <Home class={classes} />;

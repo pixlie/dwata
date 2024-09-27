@@ -4,7 +4,7 @@ interface IPropTypes {
   class: string;
 }
 
-const Inbox: Component<IPropTypes> = (props) => (
+const Folder: Component<IPropTypes> = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
@@ -21,4 +21,4 @@ const Inbox: Component<IPropTypes> = (props) => (
   </svg>
 );
 
-export default Inbox;
+export default Folder;
