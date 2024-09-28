@@ -2,14 +2,12 @@ use super::{DirectorySource, File};
 use crate::content::containers::HeterogeneousContentArray;
 use crate::error::DwataError;
 use crate::workspace::crud::CRUDRead;
-use sqlx::{Pool, Sqlite};
 use std::{ops::Deref, path::PathBuf};
 use tauri::State;
 
 #[tauri::command]
 pub(crate) async fn fetch_file_list_in_directory(
-    directory_id: i64,
-    db: State<'_, Pool<Sqlite>>,
+    directory_id: u32,
 ) -> Result<Vec<File>, DwataError> {
     // Find the Directory matching the given folder_id
     match DirectorySource::read_one_by_pk(directory_id, db.deref()).await {
@@ -20,9 +18,8 @@ pub(crate) async fn fetch_file_list_in_directory(
 
 #[tauri::command]
 pub(crate) async fn fetch_file_content_list(
-    directory_id: i64,
+    directory_id: u32,
     relative_file_path: &str,
-    db: State<'_, Pool<Sqlite>>,
 ) -> Result<HeterogeneousContentArray, DwataError> {
     // Find the Directory matching the given folder_id
     match DirectorySource::read_one_by_pk(directory_id, db.deref()).await {

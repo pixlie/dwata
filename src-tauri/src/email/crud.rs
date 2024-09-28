@@ -1,4 +1,4 @@
-use super::{Email, EmailCreateUpdate, EmailFilters};
+use super::{Email, EmailFilters};
 use crate::error::DwataError;
 use crate::workspace::crud::{
     CRUDCreateUpdate, CRUDRead, CRUDReadFilter, InputValue, VecColumnNameValue,
@@ -17,20 +17,20 @@ impl CRUDReadFilter for EmailFilters {
     }
 }
 
-impl CRUDCreateUpdate for EmailCreateUpdate {
-    fn table_name() -> String {
-        "email".to_string()
-    }
+// impl CRUDCreateUpdate for Email {
+//     fn table_name() -> String {
+//         "email".to_string()
+//     }
 
-    fn get_column_names_values(&self) -> Result<VecColumnNameValue, DwataError> {
-        let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
-        if let Some(x) = &self.parent_email_id {
-            names_values.push_name_value("parent_email_id", InputValue::ID(*x));
-        }
+//     fn get_parsed_item(&self) -> Result<VecColumnNameValue, DwataError> {
+//         let mut names_values: VecColumnNameValue = VecColumnNameValue::default();
+//         if let Some(x) = &self.parent_email_id {
+//             names_values.push_name_value("parent_email_id", InputValue::ID(*x));
+//         }
 
-        Ok(names_values)
-    }
-}
+//         Ok(names_values)
+//     }
+// }
 
 impl CRUDRead for Email {
     fn table_name() -> String {

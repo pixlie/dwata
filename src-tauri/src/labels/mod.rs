@@ -7,7 +7,7 @@ use ts_rs::TS;
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Label {
-    pub id: i64,
+    pub id: u32,
     pub display_name: String,
 
     // Labels can be nested, so we need to store the parent ID

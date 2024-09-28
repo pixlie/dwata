@@ -1,5 +1,7 @@
-use crate::error::DwataError;
+use crate::workspace::config::DwataConfig;
 use crate::workspace::crud::CRUDCreateUpdate;
+use crate::workspace::db::DwataDB;
+use crate::{error::DwataError, workspace::crud::CRUDRead};
 use chrono::{DateTime, Utc};
 use helpers::get_google_oauth2_client;
 use log::{error, info};
@@ -8,17 +10,15 @@ use oauth2::{
     RefreshToken, StandardTokenResponse, TokenResponse,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, FromRow, Pool, Sqlite, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
-pub mod api;
-pub mod commands;
+// pub mod api;
+// pub mod commands;
 pub mod crud;
 pub mod helpers;
 
-#[derive(Debug, Deserialize, Serialize, Clone, TS, Type, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Debug, Deserialize, Serialize, Clone, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -26,29 +26,37 @@ pub enum OAuth2Provider {
     Google,
 }
 
-#[derive(Clone, Serialize, FromRow, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct OAuth2App {
-    #[ts(type = "number")]
-    pub id: i64,
+// #[derive(Clone, Deserialize, Serialize, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export, rename_all = "camelCase")]
+// pub struct OAuth2App {
+//     #[ts(type = "number")]
+//     pub id: u32,
 
-    pub provider: OAuth2Provider,
-    pub client_id: String,
-    pub client_secret: Option<String>,
+//     pub provider: OAuth2Provider,
+//     pub client_id: String,
+//     pub client_secret: Option<String>,
 
-    pub created_at: DateTime<Utc>,
-    pub modified_at: Option<DateTime<Utc>>,
-}
+//     pub created_at: DateTime<Utc>,
+//     pub modified_at: Option<DateTime<Utc>>,
+// }
 
-#[derive(Serialize, FromRow, TS)]
+// #[derive(Default, Deserialize, TS)]
+// #[serde(rename_all = "camelCase")]
+// #[ts(export, rename_all = "camelCase")]
+// pub struct OAuth2AppCreateUpdate {
+//     pub provider: Option<String>,
+//     pub client_id: Option<String>,
+//     pub client_secret: Option<String>,
+// }
+
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct OAuth2Token {
     #[ts(type = "number")]
-    pub id: i64,
-    pub oauth2_app_id: i64,
-
+    pub id: u32,
+    // pub oauth2_app_id: u32,
     pub authorization_code: String,
     pub access_token: String,
     pub refresh_token: Option<String>,
@@ -59,26 +67,15 @@ pub struct OAuth2Token {
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
-
-    #[serde(skip)]
-    #[sqlx(skip)]
-    #[ts(skip)]
-    pub oauth2_app: Option<OAuth2App>,
-}
-
-#[derive(Default, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
-#[ts(export, rename_all = "camelCase")]
-pub struct OAuth2AppCreateUpdate {
-    pub provider: Option<String>,
-    pub client_id: Option<String>,
-    pub client_secret: Option<String>,
+    // #[serde(skip)]
+    // #[ts(skip)]
+    // pub oauth2_app: Option<OAuth2App>,
 }
 
 #[derive(Default)]
 pub struct OAuth2TokenCreateUpdate {
     pub authorization_code: Option<String>,
-    pub oauth2_app_id: Option<i64>,
+    pub oauth2_app_id: Option<u32>,
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,
     pub identifier: Option<String>,
@@ -94,27 +91,30 @@ pub struct Oauth2APIResponse {
 }
 
 impl OAuth2Token {
-    pub async fn get_oauth2_app(&mut self, db: &Pool<Sqlite>) -> Result<OAuth2App, DwataError> {
-        if let Some(oauth2_app) = &self.oauth2_app {
-            Ok(oauth2_app.clone())
-        } else {
-            let sql = "SELECT * FROM oauth2_app WHERE id = ?";
-            let oauth2_app: OAuth2App =
-                query_as(sql).bind(self.oauth2_app_id).fetch_one(db).await?;
-            self.oauth2_app = Some(oauth2_app);
-            Ok(self.oauth2_app.as_ref().unwrap().clone())
-        }
-    }
+    // pub async fn get_oauth2_app(&mut self, db: &DwataDB) -> Result<OAuth2App, DwataError> {
+    //     if let Some(oauth2_app) = &self.oauth2_app {
+    //         Ok(oauth2_app.clone())
+    //     } else {
+    //         let oauth2_app: OAuth2App = OAuth2App::read_one_by_key(self.oauth2_app_id, db).await?;
+    //         self.oauth2_app = Some(oauth2_app);
+    //         Ok(self.oauth2_app.as_ref().unwrap().clone())
+    //     }
+    // }
 
     pub async fn refetch_google_access_token(
         &mut self,
-        db: &Pool<Sqlite>,
+        db: &DwataDB,
+        config: &DwataConfig,
     ) -> Result<(), DwataError> {
-        let oauth2_app = self.get_oauth2_app(db).await?;
-        let client = get_google_oauth2_client(
-            oauth2_app.client_id.clone(),
-            oauth2_app.client_secret.as_ref().unwrap().clone(),
-        )?;
+        // let oauth2_app = self.get_oauth2_app(db).await?;
+        let client = match &config.google_oauth2_app {
+            Some(app) => {
+                get_google_oauth2_client(app.client_id.clone(), app.client_secret.clone())?
+            }
+            None => {
+                return Err(DwataError::CouldNotFindOAuth2App);
+            }
+        };
 
         let mut token_response: Option<
             StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType>,
@@ -140,53 +140,58 @@ impl OAuth2Token {
             }
         }
 
-        let oauth2_token: OAuth2Token = {
-            let sql = "SELECT * FROM oauth2_token WHERE oauth2_app_id = ?";
-            query_as(sql).bind(self.id).fetch_one(db).await?
-        };
-        match token_response {
-            Some(x) => {
-                let updated = OAuth2TokenCreateUpdate {
-                    oauth2_app_id: Some(self.id),
-                    refresh_token: x.refresh_token().map(|x| x.secret().clone()),
-                    access_token: Some(x.access_token().secret().to_string()),
-                    ..Default::default()
-                };
-                updated.update_module_data(oauth2_token.id, db).await?;
-            }
-            None => {
-                let code = AuthorizationCode::new(self.authorization_code.clone());
-                // Exchange the authorization code with a token
-                token_response = match client
-                    .exchange_code(code)
-                    // .set_pkce_verifier(pkce_code_verifier)
-                    .request_async(&async_http_client)
-                    .await
-                {
-                    Ok(x) => Some(x),
-                    Err(err) => {
-                        error!("Could not exchange code\n Error: {}", err);
-                        return Err(DwataError::CouldNotGetTokenResponse);
-                    }
-                };
+        // let oauth2_token: OAuth2Token = OAuth2Token::read_all(100, 0, db)
+        //     .await?
+        //     .0
+        //     .iter()
+        //     .find(|&&x| x.oauth2_app_id == self.id).ok_or(DwataError::);
+        // let oauth2_token: OAuth2Token = {
+        //     let sql = "SELECT * FROM oauth2_token WHERE oauth2_app_id = ?";
+        //     query_as(sql).bind(self.id).fetch_one(db).await?
+        // };
+        // match token_response {
+        //     Some(x) => {
+        //         let updated = OAuth2TokenCreateUpdate {
+        //             oauth2_app_id: Some(self.id),
+        //             refresh_token: x.refresh_token().map(|x| x.secret().clone()),
+        //             access_token: Some(x.access_token().secret().to_string()),
+        //             ..Default::default()
+        //         };
+        //         updated.update_module_data(oauth2_token.id).await?;
+        //     }
+        //     None => {
+        //         let code = AuthorizationCode::new(self.authorization_code.clone());
+        //         // Exchange the authorization code with a token
+        //         token_response = match client
+        //             .exchange_code(code)
+        //             // .set_pkce_verifier(pkce_code_verifier)
+        //             .request_async(&async_http_client)
+        //             .await
+        //         {
+        //             Ok(x) => Some(x),
+        //             Err(err) => {
+        //                 error!("Could not exchange code\n Error: {}", err);
+        //                 return Err(DwataError::CouldNotGetTokenResponse);
+        //             }
+        //         };
 
-                match token_response {
-                    Some(x) => {
-                        let updated = OAuth2TokenCreateUpdate {
-                            oauth2_app_id: Some(self.id),
-                            refresh_token: x.refresh_token().map(|x| x.secret().clone()),
-                            access_token: Some(x.access_token().secret().to_string()),
-                            ..Default::default()
-                        };
-                        updated.update_module_data(self.id, db).await?;
-                    }
-                    None => {
-                        error!("Could not get token response");
-                        return Err(DwataError::CouldNotGetTokenResponse);
-                    }
-                }
-            }
-        }
+        //         match token_response {
+        //             Some(x) => {
+        //                 let updated = OAuth2TokenCreateUpdate {
+        //                     oauth2_app_id: Some(self.id),
+        //                     refresh_token: x.refresh_token().map(|x| x.secret().clone()),
+        //                     access_token: Some(x.access_token().secret().to_string()),
+        //                     ..Default::default()
+        //                 };
+        //                 updated.update_module_data(self.id).await?;
+        //             }
+        //             None => {
+        //                 error!("Could not get token response");
+        //                 return Err(DwataError::CouldNotGetTokenResponse);
+        //             }
+        //         }
+        //     }
+        // }
 
         Ok(())
     }

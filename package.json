@@ -17,6 +17,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "3d-force-graph": "^1.73.4",
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@solidjs/router": "^0.12.5",
     "@tauri-apps/api": "2.0.0-beta.3",

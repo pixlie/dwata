@@ -72,7 +72,7 @@ pub struct ContentSpec {
 #[ts(export)]
 pub enum Content {
     Text(String),
-    ID(#[ts(type = "number")] i64),
+    ID(#[ts(type = "number")] u32),
     // Image(Image),
     // DateTime(DateTime<Utc>),
 }

@@ -1,15 +1,13 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{prelude::FromRow, types::Json, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod commands;
 pub mod crud;
-pub mod helpers;
-pub mod tests;
+// pub mod helpers;
+// pub mod tests;
 
-#[derive(Deserialize, Serialize, TS, Type, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum EmailFlag {
@@ -22,21 +20,19 @@ pub enum EmailFlag {
     MayCreate,
 }
 
-#[derive(Default, Serialize, FromRow, TS)]
+#[derive(Default, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Email {
-    #[ts(type = "number")]
-    pub id: i64,
-
     // The UID of the email in the mailbox
     #[ts(type = "number")]
     pub uid: u32,
 
     #[ts(type = "number")]
-    pub mailbox_id: i64,
+    pub mailbox_id: u32,
 
-    pub from_email_address: String,
+    pub from_name: String,
+    pub from_email: String,
 
     // Contacts are processed after saving emails and it depends on certain logic
     #[ts(type = "number")]
@@ -46,22 +42,17 @@ pub struct Email {
     pub date: i64,
     pub subject: String,
     pub body_text: Option<String>,
-    // pub flag: Option<EmailFlag>,
 
     // This is from email headers
     pub message_id: Option<String>,
     // This is from email headers
     #[ts(type = "Array<string>")]
-    pub in_reply_to: Json<Vec<String>>,
-
-    // When this email is a reply to another email
-    #[ts(type = "number")]
-    pub parent_email_id: Option<i64>,
+    pub in_reply_to: Vec<String>,
 }
 
 pub struct ParsedEmail {
     pub uid: u32,
-    pub mailbox_id: i64,
+    pub mailbox_id: u32,
     pub message_id: Option<String>,
     pub in_reply_to: Vec<String>,
     pub from_name: String,
@@ -73,7 +64,7 @@ pub struct ParsedEmail {
 }
 
 pub struct SearchedEmail {
-    pub email_id: i64,
+    pub email_id: u32,
 }
 
 #[derive(Deserialize, TS)]

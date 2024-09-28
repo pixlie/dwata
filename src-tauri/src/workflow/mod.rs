@@ -10,7 +10,7 @@ pub mod actionable;
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Workflow {
-    pub id: i64,
+    pub id: u32,
     pub title: Option<String>,
     pub summary: Option<String>,
     pub system_prompt: Option<String>,
@@ -31,7 +31,7 @@ pub struct Workflow {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Objective {
-    pub id: i64,
+    pub id: u32,
     pub item: String,
     pub is_complete: bool,
     pub order: i64,
@@ -57,9 +57,9 @@ impl Objective {
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Step {
-    pub id: i64,
+    pub id: u32,
 
-    pub workflow_id: i64,
+    pub workflow_id: u32,
     pub item: String,
     pub order: i64,
 }
@@ -80,7 +80,7 @@ pub enum ActionType {
 }
 
 pub struct PromptTemplate {
-    id: i64,
+    id: u32,
 
     prompt: String,
 }

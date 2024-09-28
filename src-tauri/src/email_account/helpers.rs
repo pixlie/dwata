@@ -4,15 +4,14 @@ use crate::email::helpers::{
     index_emails_in_tantity, parse_email_from_file, save_emails_to_dwata_db,
 };
 use crate::email::{Email, ParsedEmail};
-use crate::email_account::MailboxCreateUpdate;
 use crate::error::DwataError;
 use crate::workspace::crud::{CRUDCreateUpdate, CRUDRead};
+use crate::workspace::db::DwataDB;
 use crate::workspace::{ProcessInLog, ProcessLogCreateUpdate, ProcessingStatusInLog};
 use imap::Session;
 use log::{error, info};
 use native_tls::TlsStream;
 use slug::slugify;
-use sqlx::{query_as, Pool, Sqlite};
 use std::collections::HashSet;
 use std::fs::{create_dir_all, read_dir, remove_dir_all, File};
 use std::io::{self, Read};
@@ -25,8 +24,8 @@ use tokio::{sync::Mutex, task::JoinSet};
 impl EmailAccount {
     pub async fn prep_for_access(
         &mut self,
-        db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
+        db: &DwataDB,
     ) -> Result<Vec<String>, DwataError> {
         let imap_session = self.create_imap_session(db).await?;
         {
@@ -61,7 +60,6 @@ impl EmailAccount {
 
     pub async fn get_all_mailboxes(
         &mut self,
-        _db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
     ) -> Result<Vec<String>, DwataError> {
         let imap_session = get_imap_session(self.id, email_account_state).await?;
@@ -78,10 +76,9 @@ impl EmailAccount {
 
 impl Mailbox {
     pub async fn fetch_emails(
-        email_account_id: i64,
+        email_account_id: u32,
         mailbox_name: &str,
         storage_dir: &PathBuf,
-        db: &Pool<Sqlite>,
         email_account_state: &EmailAccountsState,
     ) -> Result<i64, DwataError> {
         // We read emails using IMAP and store the raw messages in a local folder
@@ -344,7 +341,7 @@ impl Mailbox {
 }
 
 pub async fn get_imap_session(
-    email_account_id: i64,
+    email_account_id: u32,
     email_account_state: &EmailAccountsState,
 ) -> Result<Arc<Mutex<Session<TlsStream<TcpStream>>>>, DwataError> {
     let session = {
@@ -363,12 +360,12 @@ pub async fn get_imap_session(
 }
 
 pub async fn fetch_and_index_emails_for_email_account(
-    pk: i64,
+    pk: u32,
     storage_dir: &PathBuf,
-    db: &Pool<Sqlite>,
     email_account_state: &EmailAccountsState,
+    db: &DwataDB,
 ) -> Result<(), DwataError> {
-    let mut email_account = EmailAccount::read_one_by_pk(pk, db).await?;
+    let mut email_account = EmailAccount::read_one_by_key(pk, db).await?;
     let mut emails_storage_dir = storage_dir.clone();
     emails_storage_dir.push("emails");
     emails_storage_dir.push(email_account.email_address.clone());
@@ -409,7 +406,7 @@ pub async fn fetch_and_index_emails_for_email_account(
 
         let mut read_emails_count = 0;
         loop {
-            let mailbox = Mailbox::read_one_by_pk(mailbox_id, db).await?;
+            let mailbox = Mailbox::read_one_by_key(mailbox_id, db).await?;
             let emails = mailbox
                 .read_emails_from_local_storage(read_emails_count as usize, 1000)
                 .await?;

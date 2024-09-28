@@ -2,7 +2,6 @@ use chrono::{DateTime, Utc};
 use imap::Session;
 use native_tls::TlsStream;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Type};
 use std::net::TcpStream;
 use std::sync::Arc;
 use strum::{Display, EnumString};
@@ -11,13 +10,12 @@ use ts_rs::TS;
 
 pub mod api;
 pub mod app_state;
-pub mod commands;
+// pub mod commands;
 pub mod crud;
-pub mod helpers;
+// pub mod helpers;
 pub mod providers;
 
-#[derive(Deserialize, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -29,23 +27,23 @@ pub enum EmailProvider {
 }
 
 pub struct EmailAccountStatus {
-    pub id: i64,
+    pub id: u32,
     pub mailbox_names: Vec<String>,
     pub imap_session: Option<Arc<Mutex<Session<TlsStream<TcpStream>>>>>,
 }
 
-#[derive(Serialize, FromRow, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct EmailAccount {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     pub provider: EmailProvider,
 
     pub email_address: String,
     pub password: Option<String>,
-    pub oauth2_token_id: Option<i64>,
+    pub oauth2_token_id: Option<u32>,
 
     pub created_at: DateTime<Utc>,
     pub modified_at: Option<DateTime<Utc>>,
@@ -58,18 +56,18 @@ pub struct EmailAccountCreateUpdate {
     pub provider: Option<String>,
     pub email_address: Option<String>,
     pub password: Option<String>,
-    pub oauth2_app_id: Option<i64>,
+    pub oauth2_app_id: Option<u32>,
     // pub oauth2_token_id: Option<i64>,
 }
 
-#[derive(Serialize, FromRow, TS)]
+#[derive(Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct Mailbox {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
     #[ts(type = "number")]
-    pub email_account_id: i64,
+    pub email_account_id: u32,
     pub name: String,
 
     #[ts(skip)]
@@ -102,7 +100,6 @@ pub struct Mailbox {
     // last_contact_processed_email_uid: Option<u32>,
 }
 
-#[derive(Default)]
 pub struct MailboxCreateUpdate {
     pub email_account_id: Option<i64>,
     pub name: Option<String>,

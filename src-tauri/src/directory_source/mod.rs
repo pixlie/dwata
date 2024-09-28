@@ -26,7 +26,7 @@ pub struct File {
 #[ts(export, rename_all = "camelCase")]
 pub struct DirectorySource {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
 
     #[sqlx(try_from = "String")]
     pub path: PathBuf,

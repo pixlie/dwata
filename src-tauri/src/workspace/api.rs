@@ -1,8 +1,10 @@
+use super::config::DwataConfig;
+use super::db::DwataDB;
 use super::ModuleDataCreateUpdate;
 use crate::content::form::{FormButton, FormButtonType, FormField};
 use crate::error::DwataError;
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Sqlite};
+use tauri::State;
 use ts_rs::TS;
 
 #[derive(Deserialize, Serialize, TS)]
@@ -44,18 +46,19 @@ pub enum NextStep {
 }
 
 pub trait Writable {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError>;
+    fn initiate() -> Result<NextStep, DwataError>;
 
     async fn on_change(
         _data: ModuleDataCreateUpdate,
-        _db: &Pool<Sqlite>,
+        _db: &DwataDB,
     ) -> Result<NextStep, DwataError> {
         return Ok(NextStep::Continue);
     }
 
     async fn next_step(
         _data: ModuleDataCreateUpdate,
-        _db: &Pool<Sqlite>,
+        _db: &DwataDB,
+        _config: &DwataConfig,
     ) -> Result<NextStep, DwataError> {
         return Ok(NextStep::Continue);
     }

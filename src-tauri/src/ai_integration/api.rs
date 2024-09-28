@@ -5,15 +5,15 @@ use crate::content::{
 };
 use crate::error::DwataError;
 use crate::workspace::api::{Configuration, NextStep, Writable};
-use sqlx::{Pool, Sqlite};
 
 impl Writable for AIIntegration {
-    fn initiate(_db: &Pool<Sqlite>) -> Result<NextStep, DwataError> {
+    fn initiate() -> Result<NextStep, DwataError> {
         let ai_provider_spec: ContentSpec = ContentSpec {
             choices: Some(vec![
-                (AIProvider::OpenAI.to_string(), "OpenAI".to_string()),
-                (AIProvider::Groq.to_string(), "Groq".to_string()),
-                (AIProvider::Ollama.to_string(), "Ollama".to_string()),
+                // (AIProvider::OpenAI.to_string(), "OpenAI".to_string()),
+                // (AIProvider::Groq.to_string(), "Groq".to_string()),
+                // (AIProvider::Ollama.to_string(), "Ollama".to_string)),
+                (AIProvider::Anthropic.to_string(), "Anthropic".to_string()),
             ]),
             ..ContentSpec::default()
         };

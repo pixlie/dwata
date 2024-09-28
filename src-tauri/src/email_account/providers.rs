@@ -1,11 +1,11 @@
 use super::{EmailAccount, EmailProvider};
-use crate::error::DwataError;
 use crate::oauth2::OAuth2Token;
+use crate::workspace::config::DwataConfig;
 use crate::workspace::crud::CRUDRead;
+use crate::{error::DwataError, workspace::db::DwataDB};
 use imap::Session;
 use log::{error, info};
 use native_tls::{TlsConnector, TlsStream};
-use sqlx::{Pool, Sqlite};
 use std::net::TcpStream;
 
 pub struct GmailAccount {
@@ -26,7 +26,8 @@ impl imap::Authenticator for GmailAccount {
 impl EmailAccount {
     pub async fn create_imap_session(
         &mut self,
-        db: &Pool<Sqlite>,
+        db: &DwataDB,
+        config: &DwataConfig,
     ) -> Result<Session<TlsStream<TcpStream>>, DwataError> {
         let mut session: Option<Session<TlsStream<TcpStream>>> = None;
         match self.provider {
@@ -51,7 +52,7 @@ impl EmailAccount {
                         }
                         Err((error, _)) => {
                             error!("Error authenticating with Gmail: {}", error);
-                            oauth2_token.refetch_google_access_token(db).await?;
+                            oauth2_token.refetch_google_access_token(db, config).await?;
                         }
                     }
                 }
@@ -92,10 +93,10 @@ impl EmailAccount {
 
     pub async fn get_oauth2_token_for_gmail(
         &self,
-        db: &Pool<Sqlite>,
+        db: &DwataDB,
     ) -> Result<OAuth2Token, DwataError> {
         if let Some(oauth2_token_id) = self.oauth2_token_id {
-            OAuth2Token::read_one_by_pk(oauth2_token_id, db).await
+            OAuth2Token::read_one_by_key(oauth2_token_id, db).await
         } else {
             Err(DwataError::CouldNotFindOAuth2Config)
         }
@@ -103,7 +104,6 @@ impl EmailAccount {
 
     // pub async fn get_selected_mailbox(
     //     &self,
-    //     _db: &Pool<Sqlite>,
     //     email_account_state: &EmailAccountsState,
     // ) -> Result<Mailbox, DwataError> {
     //     let email_account_state = email_account_state.lock().await;

@@ -1,31 +1,34 @@
-use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate, AIIntegrationFilters};
-use crate::chat::{Chat, ChatCreateUpdate, ChatFilters};
-use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
-use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
-use crate::email::{Email, EmailFilters};
-use crate::email_account::{EmailAccount, EmailAccountCreateUpdate, Mailbox};
-use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
-use crate::user_account::{UserAccount, UserAccountCreateUpdate};
+// use crate::ai_integration::{AIIntegration, AIIntegrationCreateUpdate, AIIntegrationFilters};
+// use crate::chat::{Chat, ChatCreateUpdate, ChatFilters};
+// use crate::database_source::{DatabaseSource, DatabaseSourceCreateUpdate};
+// use crate::directory_source::{DirectorySource, DirectorySourceCreateUpdate};
+use crate::{
+    email::{Email, EmailFilters},
+    email_account::EmailAccountCreateUpdate,
+};
+// use crate::email_account::{EmailAccount, EmailAccountCreateUpdate, Mailbox};
+// use crate::oauth2::{OAuth2App, OAuth2AppCreateUpdate};
+// use crate::user_account::{UserAccount, UserAccountCreateUpdate};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{types::Json, FromRow, Type};
 use strum::{Display, EnumString};
 use ts_rs::TS;
 
 pub mod api;
-pub mod app_state;
 pub mod commands;
+pub mod config;
 pub mod crud;
+pub mod db;
 pub mod process_log;
 
 #[derive(Deserialize, Display, TS)]
 #[ts(export)]
 pub enum Module {
     UserAccount,
-    DirectorySource,
-    DatabaseSource,
+    // DirectorySource,
+    // DatabaseSource,
     AIIntegration,
-    Chat,
+    // Chat,
     OAuth2App,
     EmailAccount,
     Mailbox,
@@ -36,14 +39,14 @@ pub enum Module {
 #[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataRead {
-    UserAccount(UserAccount),
-    DirectorySource(DirectorySource),
-    DatabaseSource(DatabaseSource),
-    AIIntegration(AIIntegration),
-    Chat(Chat),
-    OAuth2App(OAuth2App),
-    EmailAccount(EmailAccount),
-    Mailbox(Mailbox),
+    // UserAccount(UserAccount),
+    // DirectorySource(DirectorySource),
+    // DatabaseSource(DatabaseSource),
+    // AIIntegration(AIIntegration),
+    // Chat(Chat),
+    // OAuth2App(OAuth2App),
+    // EmailAccount(EmailAccount),
+    // Mailbox(Mailbox),
     Email(Email),
 }
 
@@ -61,39 +64,38 @@ pub struct ModuleDataReadList {
 #[serde(tag = "type", content = "data")]
 #[ts(export)]
 pub enum ModuleDataList {
-    UserAccount(Vec<UserAccount>),
-    DirectorySource(Vec<DirectorySource>),
-    DatabaseSource(Vec<DatabaseSource>),
-    AIIntegration(Vec<AIIntegration>),
-    Chat(Vec<Chat>),
-    OAuth2App(Vec<OAuth2App>),
-    EmailAccount(Vec<EmailAccount>),
-    Mailbox(Vec<Mailbox>),
+    // UserAccount(Vec<UserAccount>),
+    // DirectorySource(Vec<DirectorySource>),
+    // DatabaseSource(Vec<DatabaseSource>),
+    // AIIntegration(Vec<AIIntegration>),
+    // Chat(Vec<Chat>),
+    // OAuth2App(Vec<OAuth2App>),
+    // EmailAccount(Vec<EmailAccount>),
+    // Mailbox(Vec<Mailbox>),
     Email(Vec<Email>),
 }
 
 #[derive(Deserialize, TS)]
 #[ts(export)]
 pub enum ModuleDataCreateUpdate {
-    UserAccount(UserAccountCreateUpdate),
-    DirectorySource(DirectorySourceCreateUpdate),
-    DatabaseSource(DatabaseSourceCreateUpdate),
-    AIIntegration(AIIntegrationCreateUpdate),
-    Chat(ChatCreateUpdate),
-    OAuth2App(OAuth2AppCreateUpdate),
+    // UserAccount(UserAccountCreateUpdate),
+    // DirectorySource(DirectorySourceCreateUpdate),
+    // DatabaseSource(DatabaseSourceCreateUpdate),
+    // AIIntegration(AIIntegrationCreateUpdate),
+    // Chat(ChatCreateUpdate),
+    // OAuth2App(OAuth2AppCreateUpdate),
     EmailAccount(EmailAccountCreateUpdate),
 }
 
 #[derive(Deserialize, Display, TS)]
 #[ts(export)]
 pub enum ModuleFilters {
-    AIIntegration(AIIntegrationFilters),
-    Chat(ChatFilters),
+    // AIIntegration(AIIntegrationFilters),
+    // Chat(ChatFilters),
     Email(EmailFilters),
 }
 
-#[derive(Clone, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Clone, Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -103,8 +105,7 @@ pub enum ProcessInLog {
     IndexEmails,
 }
 
-#[derive(Clone, Serialize, Type, TS, EnumString, Display)]
-#[sqlx(rename_all = "lowercase")]
+#[derive(Clone, Deserialize, Serialize, TS, EnumString, Display)]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 #[ts(export)]
@@ -114,15 +115,16 @@ pub enum ProcessingStatusInLog {
     Completed,
 }
 
-#[derive(Clone, Serialize, FromRow, TS)]
+#[derive(Clone, Deserialize, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, rename_all = "camelCase")]
 pub struct ProcessLog {
     #[ts(type = "number")]
-    pub id: i64,
+    pub id: u32,
     pub task: ProcessInLog,
+
     #[ts(type = "Array<[string, string]>")]
-    pub arguments: Json<Vec<(String, String)>>,
+    pub arguments: Vec<(String, String)>,
     pub status: ProcessingStatusInLog,
     pub is_sent_to_frontend: bool,
 
